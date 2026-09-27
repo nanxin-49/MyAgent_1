@@ -1,10 +1,10 @@
-# EchoMind As-Is Baseline
+# CartCare As-Is Baseline
 
 本目录保存固定测试集和可重复的真实 HTTP Baseline Runner。Runner 默认调用生产入口 POST /chat，并在每个响应后读取 /trace/tool/{request_id}。
 
 ## 运行
 
-在 EchoMind 服务和 Redis/Chroma 已启动后，从仓库根目录执行：
+在 CartCare 服务和 Redis/Chroma 已启动后，从仓库根目录执行：
 
     python evaluation/run_baseline.py --base-url http://localhost:8000
 

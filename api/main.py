@@ -1,7 +1,7 @@
 """
-EchoMind 智能客服系统 — FastAPI 入口
+CartCare 智能客服系统 — FastAPI 入口
 
-启动时打印小熊饼干图案。
+启动时打印 CartCare 启动标识。
 所有核心组件在 lifespan 中初始化，通过环境变量配置。
 """
 import asyncio
@@ -33,13 +33,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-BANNER = r"""
-    ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ
-   ╔══════════════════════╗
-   ║   EchoMind  v2.0     ║
-   ║   智能客服 AI 系统    ║
-   ╚══════════════════════╝
-    ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ
+BANNER = """========================================
+ CartCare
+ E-commerce Support Agent
+========================================
 """
 
 # ── 全局组件（lifespan 中初始化）─────────────────────────────────────────────
@@ -179,18 +176,18 @@ async def lifespan(app: FastAPI):
         baseline_path=os.getenv("EVAL_BASELINE_PATH", "/app/data/eval/baseline.json"),
     )
 
-    logger.info("EchoMind 已就绪")
+    logger.info("CartCare 已就绪")
     yield
 
     await _monitor.stop()
     if _memory is not None:
         await _memory.close()
-    logger.info("EchoMind 已关闭")
+    logger.info("CartCare 已关闭")
 
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 app = FastAPI(
-    title="EchoMind 智能客服",
+    title="CartCare E-commerce Support Agent",
     version="2.0.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -616,7 +613,7 @@ async def run_eval(body: Optional[EvalRunInput] = None):
 # ── 交互式 CLI ────────────────────────────────────────────────────────────────
 async def _cli():
     print(BANNER)
-    print("EchoMind CLI — 输入 quit 退出\n")
+    print("CartCare CLI — 输入 quit 退出\n")
 
     from agents.agent_orchestrator import AgentOrchestrator, Request
     from memory.conversation_memory import MemoryManager, MsgRole
@@ -650,10 +647,10 @@ async def _cli():
         try:
             msg = input("你: ").strip()
         except (EOFError, KeyboardInterrupt):
-            print("\n再见 ʕ•ᴥ•ʔ")
+            print("\n再见")
             break
         if not msg or msg.lower() in ("quit", "exit", "退出"):
-            print("再见 ʕ•ᴥ•ʔ")
+            print("再见")
             break
 
         ctx = await mem.get_context(user_id, conv_id, query=msg)
@@ -667,7 +664,7 @@ async def _cli():
         await mem.add_message(user_id, conv_id, MsgRole.USER, msg)
         await mem.add_message(user_id, conv_id, MsgRole.ASSISTANT, result.response)
 
-        print(f"\nEchoMind [{result.agent_type.value}]: {result.response}\n")
+        print(f"\nCartCare [{result.agent_type.value}]: {result.response}\n")
 
     await mem.close()
 

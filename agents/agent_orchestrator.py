@@ -423,7 +423,7 @@ class GeneralAgent(BaseAgent):
         max_tokens=900,
     )
     system_prompt = (
-        "你是 EchoMind 智能客服。友好、简洁地回答用户问题。"
+        "你是 CartCare 电商客服助手。友好、简洁地回答用户问题。"
         "如果问题超出你的能力范围，明确说明并建议转接专业客服。"
     )
 

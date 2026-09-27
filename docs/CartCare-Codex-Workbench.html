@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CartCare 重构协同工作台</title>
+  <style>
+    :root{
+      --bg:#f4f7fb; --panel:#fff; --panel2:#f8fafc; --text:#132238; --muted:#667085;
+      --line:#dfe5ec; --primary:#3157d5; --primary-soft:#eaf0ff;
+      --green:#18794e; --green-soft:#e9f8f0; --amber:#a15c00; --amber-soft:#fff4df;
+      --red:#b42318; --red-soft:#fff0ef; --purple:#6f42c1; --purple-soft:#f3ecff;
+      --dark:#142033; --shadow:0 12px 32px rgba(16,24,40,.08); --radius:16px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    button,input,textarea,select{font:inherit}
+    .app{display:grid;grid-template-columns:275px minmax(0,1fr);min-height:100vh}
+    aside{position:sticky;top:0;height:100vh;overflow:auto;background:var(--dark);color:#fff;padding:24px 18px}
+    .brand{font-size:22px;font-weight:800;margin-bottom:4px}.sub{font-size:13px;color:#b9c4d6;margin-bottom:20px}
+    nav a{display:block;color:#dbe7ff;text-decoration:none;padding:8px 10px;border-radius:9px;font-size:14px;margin:3px 0}
+    nav a:hover{background:rgba(255,255,255,.09)}
+    .side-actions{display:grid;gap:8px;margin-top:20px}
+    .btn{border:0;border-radius:10px;padding:10px 13px;cursor:pointer;transition:.18s}
+    .btn:hover{transform:translateY(-1px)} .btn-primary{background:var(--primary);color:#fff}
+    .btn-light{background:#fff;color:#111827}.btn-dark{background:#24324b;color:#fff}.btn-danger{background:#7f1d1d;color:#fff}
+    main{padding:30px;max-width:1500px;width:100%;margin:auto}
+    .hero{background:linear-gradient(135deg,#142a63,#3157d5);color:#fff;border-radius:24px;padding:32px;box-shadow:var(--shadow)}
+    .hero h1{margin:0 0 8px;font-size:clamp(28px,4vw,44px)} .hero p{margin:7px 0;color:#dfe7ff;max-width:1050px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.chip{font-size:12px;font-weight:700;border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.14)}
+    .dashboard{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:20px 0}
+    .metric,.card,section{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .metric{padding:17px}.metric .label{font-size:12px;color:var(--muted)}.metric .value{font-size:27px;font-weight:800;margin-top:4px}
+    .progress{height:10px;background:#e7ebf0;border-radius:99px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:linear-gradient(90deg,#3157d5,#36a269);width:0;transition:.2s}
+    section{padding:22px;margin:0 0 18px} section h2{margin:0 0 12px;font-size:23px} section h3{margin:20px 0 10px}
+    .callout{border-left:4px solid var(--primary);background:var(--primary-soft);padding:13px 15px;border-radius:10px;margin:12px 0}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .card{padding:16px}.card h3{margin:0 0 7px;font-size:17px}.muted{color:var(--muted);font-size:13px}
+    .status-pill,.prio,.owner,.truth{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800;white-space:nowrap}
+    .p0{background:var(--red-soft);color:var(--red)}.p1{background:var(--amber-soft);color:var(--amber)}.p2{background:var(--primary-soft);color:var(--primary)}.p3{background:var(--purple-soft);color:var(--purple)}
+    .verified{background:var(--green-soft);color:var(--green)}.todo{background:#eef2f6;color:#526071}.risk{background:var(--red-soft);color:var(--red)}
+    .me{background:#edf6ff;color:#175cd3}.codex{background:#f4ecff;color:#6941c6}.both{background:#eafaf2;color:#067647}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}th,td{border:1px solid var(--line);padding:9px;vertical-align:top;text-align:left}th{background:#f7f9fc}
+    .baseline-item{display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+    .baseline-item:last-child{border-bottom:0}
+    .work-item{border:1px solid var(--line);border-radius:14px;background:#fff;padding:15px;margin:10px 0}
+    .work-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .work-title{font-weight:800}.meta{display:flex;gap:6px;flex-wrap:wrap}
+    .work-grid{display:grid;grid-template-columns:180px 200px 1fr;gap:10px;margin-top:12px;align-items:start}
+    label.small{font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px}
+    select,input[type="text"],textarea{width:100%;border:1px solid #cfd7e3;border-radius:9px;padding:9px;background:#fff;color:var(--text)}
+    textarea{min-height:84px;resize:vertical}
+    .work-item.done{opacity:.72}.work-item.done .work-title{text-decoration:line-through;color:#667085}
+    .decision{display:grid;grid-template-columns:160px 170px 1fr;gap:10px;margin:10px 0}
+    pre{background:#101828;color:#f8fafc;padding:15px;border-radius:12px;overflow:auto;white-space:pre-wrap}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .footer{color:var(--muted);font-size:12px;text-align:center;padding:8px 0 30px}
+    .file-input{display:none}
+    @media(max-width:1100px){.dashboard{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}.work-grid{grid-template-columns:1fr}.decision{grid-template-columns:1fr}}
+    @media(max-width:900px){.app{grid-template-columns:1fr}aside{position:relative;height:auto}.grid2{grid-template-columns:1fr}}
+    @media(max-width:560px){main{padding:16px}.dashboard{grid-template-columns:1fr}.hero{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">CartCare Workbench</div>
+    <div class="sub">用户 × Codex 协同重构工作台</div>
+    <nav>
+      <a href="#overview">总览</a>
+      <a href="#baseline">当前事实基线</a>
+      <a href="#scope">项目目标与边界</a>
+      <a href="#architecture">目标架构</a>
+      <a href="#roadmap">P0–P3 改造路线</a>
+      <a href="#workboard">协同任务板</a>
+      <a href="#decisions">决策日志</a>
+      <a href="#verification">Codex 核验队列</a>
+      <a href="#evidence">验收与指标</a>
+      <a href="#handoff">Codex 交接 Prompt</a>
+    </nav>
+    <div class="side-actions">
+      <button class="btn btn-primary" onclick="exportState()">导出工作台 JSON</button>
+      <button class="btn btn-light" onclick="document.getElementById('importFile').click()">导入 JSON</button>
+      <input id="importFile" class="file-input" type="file" accept=".json,application/json" onchange="importState(event)">
+      <button class="btn btn-dark" onclick="downloadSnapshot()">下载当前 HTML 快照</button>
+      <button class="btn btn-danger" onclick="resetState()">清空本地进度</button>
+    </div>
+    <div id="saveStatus" class="muted" style="color:#b9c4d6;margin-top:12px">自动保存到浏览器 localStorage。</div>
+  </aside>
+
+  <main>
+    <header class="hero" id="overview">
+      <h1>CartCare 2.0 重构协同工作台</h1>
+      <p><strong>定位：</strong>面向电商售前/订单/物流/售后场景的可靠客服 Agent。LLM 负责理解、选择工具和必要的多步决策；业务约束、权限、退款资格和高风险动作由确定性程序控制。</p>
+      <p><strong>使用方式：</strong>这里不是学习打卡页，而是项目事实基线、改造 Backlog、Codex 核验、验收证据和设计决策的唯一协同入口。</p>
+      <div class="chips">
+        <span class="chip">事实优先于 README</span>
+        <span class="chip">RAG ≠ 动态业务数据</span>
+        <span class="chip">Agentic Decision + Deterministic Gate</span>
+        <span class="chip">Trace / Eval / HITL</span>
+        <span class="chip">不为技术名词堆模块</span>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <div class="metric"><div class="label">任务完成率</div><div id="progressPct" class="value">0%</div><div class="progress"><div id="progressBar"></div></div></div>
+      <div class="metric"><div class="label">已完成任务</div><div id="doneCount" class="value">0</div></div>
+      <div class="metric"><div class="label">进行中</div><div id="doingCount" class="value">0</div></div>
+      <div class="metric"><div class="label">待 Codex 核验</div><div id="verifyCount" class="value">0</div></div>
+      <div class="metric"><div class="label">最近保存</div><div id="lastSaved" class="value" style="font-size:17px">—</div></div>
+    </div>
+
+    <section id="baseline">
+      <h2>1. 当前事实基线（Codex 已核验）</h2>
+      <div class="callout">原则：只有能从真实调用关系或可执行路径证明的能力，才标为“已验证”。README 描述只能作为文档，不作为事实基线。</div>
+
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>/chat 主链路：</strong>Memory → Intent → Orchestrator → Agent LLM / Tool Calling。RAG 不是 API 前置固定阶段，而是 Agent 选择 <code>search_knowledge_base</code> 后触发。</div><div class="muted">api/main.py / agents/tools.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>当前 Agent：</strong>General / Technical / Billing / Escalation。Technical 仍包含 401/500/login/crash；Billing 包含 billing/refund/invoice/payment/subscription，业务范围尚未完全收敛到电商。</div><div class="muted">agent_orchestrator.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Tool Runtime：</strong>存在工具白名单、基础 schema 校验、tool_use → tool_result → LLM 循环，Agent 最大 3 轮；ToolManager 还有 timeout/cache/circuit-breaker/fallback/query rewrite/parallel recall/rerank。</div><div class="muted">agent_orchestrator.py / tool_manager.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>RAG：</strong>ChromaDB + 约 500 字切片 + vector query；metadata 目前较薄，缺 policy version / effective_at / citation source contract。</div><div class="muted">knowledge_base.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Memory：</strong>Redis working memory + Chroma episodic + user_profile；有 LLM 压缩摘要。但客服长期记忆边界还需要重新定义。</div><div class="muted">conversation_memory.py</div></div>
+      <div class="baseline-item"><div><span class="truth risk">关键缺口</span></div><div><strong>没有真实/模拟电商业务动作闭环：</strong>当前没有 get_order / get_shipment / execute_refund / cancel_order 等业务 Provider 与执行工具。</div><div class="muted">agents/tools.py</div></div>
+      <div class="baseline-item"><div><span class="truth risk">关键缺口</span></div><div><strong>没有 Policy Engine / HITL 执行闭环：</strong>退款资格、pending action、批准/拒绝、幂等执行等尚未形成确定性链路。</div><div class="muted">agents/tools.py / orchestrator</div></div>
+      <div class="baseline-item"><div><span class="truth risk">关键缺口</span></div><div><strong>认证与 ownership：</strong>user_id 来自请求体，当前没有可信认证主体，也没有订单所有权校验。</div><div class="muted">api/main.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Eval：</strong>有 intent accuracy / macro-F1 / LLM-as-Judge / regression；缺 tool、RAG、policy、HITL、幂等性等专项指标。</div><div class="muted">evaluation/evaluator.py</div></div>
+      <div class="baseline-item"><div><span class="truth risk">工程风险</span></div><div><strong>测试：</strong>当前 tests/ 主要只有 orchestrator 测试；Codex 执行 pytest 时出现模块导入收集错误，容器内没有 pytest。</div><div class="muted">tests/ / runtime</div></div>
+      <div class="baseline-item"><div><span class="truth risk">设计债</span></div><div><strong>Monitor routing penalty：</strong>每类 Agent 当前只有一个实例，因此同类性能降权没有实际候选竞争价值。</div><div class="muted">performance_monitor.py</div></div>
+      <div class="baseline-item"><div><span class="truth risk">命名风险</span></div><div><strong>mcp/ 不是标准 MCP 实现：</strong>目前是自研本地工具框架，requirements 中没有标准 MCP SDK/client/server/transport。</div><div class="muted">mcp/tool_manager.py</div></div>
+    </section>
+
+    <section id="scope">
+      <h2>2. 项目目标与业务边界</h2>
+      <div class="grid3">
+        <div class="card"><h3>核心用户</h3><p>中小型电商平台的一线客服场景。用户通过对话查询政策、订单、物流、库存，发起售后，并在复杂或高风险情况下转人工。</p></div>
+        <div class="card"><h3>CartCare 应做</h3><p>FAQ/政策问答、商品咨询、订单/物流/库存查询、售后资格判断、退款/取消前置校验、人工升级、Trace 与 Eval。</p></div>
+        <div class="card"><h3>CartCare 暂不做</h3><p>完整商城、支付网关、真实客服工单平台、推荐系统、营销自动化、复杂 CRM。只实现足够支撑 Agent 工程能力的业务后端。</p></div>
+      </div>
+
+      <h3>四类 Source of Truth</h3>
+      <table>
+        <thead><tr><th>类型</th><th>示例</th><th>推荐来源</th><th>不能怎么做</th></tr></thead>
+        <tbody>
+          <tr><td>静态/半静态知识</td><td>退货政策、配送规则、会员说明</td><td>RAG / versioned docs</td><td>不要从订单数据库“猜政策”</td></tr>
+          <tr><td>动态业务事实</td><td>订单状态、物流、库存、退款状态</td><td>Provider / Repository / API / DB</td><td>不要用 RAG 回答实时状态</td></tr>
+          <tr><td>可执行动作</td><td>申请退款、取消订单、创建人工工单</td><td>Tool + Policy Gate + 幂等执行</td><td>不要让 LLM 直接承诺执行成功</td></tr>
+          <tr><td>高风险决策</td><td>超额退款、异常账户、投诉升级</td><td>确定性规则 + HITL</td><td>不要只靠 prompt 约束</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="architecture">
+      <h2>3. CartCare 2.0 目标架构</h2>
+      <pre>User
+  │
+  ▼
+FastAPI /chat  ── trusted session / request_id
+  │
+  ▼
+Context Builder
+  ├─ recent conversation
+  ├─ session state
+  └─ safe customer context
+  │
+  ▼
+Intent + Risk Understanding
+  │
+  ▼
+Agent Runtime / Harness
+  ├─ Policy / FAQ  ─────────────► RAG
+  ├─ Order / Logistics / Stock ─► Business Providers
+  ├─ Refund / Cancel ───────────► Policy Engine
+  │                                  │
+  │                                  ├─ deny → explain / escalate
+  │                                  └─ allow → approval required?
+  │                                              │
+  │                                              ├─ yes → HITL checkpoint
+  │                                              └─ no  → Action Tool
+  └─ unresolved / complaint ─────► Human Escalation
+  │
+  ▼
+Result Validation / Grounding
+  │
+  ▼
+Response
+  │
+  ├─ Trace Events
+  └─ Eval / Regression</pre>
+
+      <div class="callout"><strong>推荐拓扑：</strong>第一阶段优先采用 <strong>单主 Agent + 专用 Tool/Workflow</strong>。只有当某个子域拥有明显不同的工具集合、状态机和评测指标时，再拆成 Specialist。不要先保留“四 Agent”再硬找理由。</div>
+    </section>
+
+    <section id="roadmap">
+      <h2>4. P0–P3 改造路线</h2>
+      <div class="grid2">
+        <div class="card"><h3><span class="prio p0">P0</span> 建立真实业务闭环</h3><p>收敛业务域；实现 mock business backend / Provider；新增 Order、Logistics、Inventory、Refund；实现 Refund/Cancel Policy Engine；HITL/approval/checkpoint；修复测试运行环境。</p></div>
+        <div class="card"><h3><span class="prio p1">P1</span> 可靠 Agent Runtime</h3><p>统一 Tool schema/executor；风险分级、timeout/retry/idempotency；RAG metadata/citation/low-confidence；专项 Eval；durable trace 基线。</p></div>
+        <div class="card"><h3><span class="prio p2">P2</span> 简化与可观测</h3><p>重新验证三路 Intent 和 Multi-Agent 是否必要；收缩长期 Memory；完善前端 Trace/引用/审批卡片；性能与成本指标。</p></div>
+        <div class="card"><h3><span class="prio p3">P3</span> 可选增强</h3><p>标准 MCP、Hybrid Search、Reranker、Corrective/Self-RAG、真实外部电商 API、认证/多租户。只有当 P0–P2 指标证明需要时再做。</p></div>
+      </div>
+    </section>
+
+    <section id="workboard">
+      <h2>5. 用户 × Codex 协同任务板</h2>
+      <p class="muted">状态与备注都会自动保存。Owner 用来明确谁负责“设计/判断”与谁负责“代码/验证”。</p>
+
+      <div class="work-item" data-task="T01">
+        <div class="work-head"><div><div class="work-title">T01 · 修正文档事实基线与主链路</div><div class="muted">README 必须与真实 /chat、RAG、Monitor、Eval 调用关系一致。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner both">共同</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence" placeholder="commit / 文件路径 / PR"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">README 主流程改为 Memory → Intent → Orchestrator → Agent/Tool；明确 Eval 不在每次 /chat 中运行；明确 mcp/ 为自研工具层。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T02">
+        <div class="work-head"><div><div class="work-title">T02 · 建立电商 Business Provider 层</div><div class="muted">订单、物流、库存、退款状态必须有可查询的 source of truth。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">定义 Product/Order/Inventory/Logistics/Refund Provider 接口；先用 SQLite/JSON mock backend；Tool 不直接依赖具体存储。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T03">
+        <div class="work-head"><div><div class="work-title">T03 · 增加真实客服 Tools</div><div class="muted">get_order / get_shipment / check_inventory / create_refund_request 等。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">读工具与写工具分离；统一 ToolResult；参数验证；错误类型；所有动态状态都来自 Provider。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T04">
+        <div class="work-head"><div><div class="work-title">T04 · Refund / Cancel Policy Engine</div><div class="muted">把不可违反的业务规则从 prompt 中剥离。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner both">共同</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">输入订单事实 + policy version，输出 allow/deny/require_approval + reason_code；至少覆盖退款时限、订单状态、金额阈值。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T05">
+        <div class="work-head"><div><div class="work-title">T05 · HITL / Pending Action / Resume</div><div class="muted">高风险动作必须可以暂停、审批并恢复。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">定义 pending_action；approve/reject endpoint；checkpoint；重复 approval 不得导致重复执行。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T06">
+        <div class="work-head"><div><div class="work-title">T06 · 修复测试可执行基线</div><div class="muted">任何重构前先保证 pytest 在本地/容器可跑。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">解决 ModuleNotFoundError；开发/CI 依赖含 pytest；至少 API、Provider、Policy、Tool、核心 Agent Loop 有 smoke tests。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T07">
+        <div class="work-head"><div><div class="work-title">T07 · RAG 合同升级</div><div class="muted">从“能搜”升级到“可引用、可评测、知道无答案”。</div></div><div class="meta"><span class="prio p1">P1</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">metadata 增 source/policy_version/effective_at/doc_type；结果返回 citations；建立低相关度阈值和无答案策略；先测 vector baseline 再决定 hybrid/rerank。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T08">
+        <div class="work-head"><div><div class="work-title">T08 · 统一 Tool Executor 与风险模型</div><div class="muted">消除 AgentToolSpec 与 ToolManager 校验行为不一致。</div></div><div class="meta"><span class="prio p1">P1</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">统一 strict schema；read/write/dangerous 分级；timeout/retry/idempotency key；明确可重试与不可重试错误。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T09">
+        <div class="work-head"><div><div class="work-title">T09 · 扩展专项 Eval</div><div class="muted">从 LLM-as-Judge 扩展到系统行为指标。</div></div><div class="meta"><span class="prio p1">P1</span><span class="owner both">共同</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">增加 routing accuracy、tool selection/args、Recall@K、citation accuracy、task success、policy violation、missed escalation、HITL correctness、loop rate、latency/cost。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T10">
+        <div class="work-head"><div><div class="work-title">T10 · Multi-Agent 简化实验</div><div class="muted">用实验决定是否保留 General / Technical / Billing / Escalation。</div></div><div class="meta"><span class="prio p2">P2</span><span class="owner both">共同</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">对比 single agent + tools 与当前 multi-agent：任务成功率、误路由、token、延迟、复杂度。若没有明显收益，合并 Agent。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T11">
+        <div class="work-head"><div><div class="work-title">T11 · Memory 边界重构</div><div class="muted">客服 Agent 不应无限保存用户信息。</div></div><div class="meta"><span class="prio p2">P2</span><span class="owner both">共同</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">保留 session context 与必要摘要；长期 profile 只保存低风险稳定偏好；订单、支付、退款状态不作为长期记忆事实。</textarea></div></div>
+      </div>
+
+      <div class="work-item" data-task="T12">
+        <div class="work-head"><div><div class="work-title">T12 · Trace / Demo UI / README 收尾</div><div class="muted">把“系统怎么做决策”展示出来，而不展示隐藏思维链。</div></div><div class="meta"><span class="prio p2">P2</span><span class="owner both">共同</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">展示 routing、tool、retrieval citation、policy decision、approval、latency；README 给出 3 个端到端 demo 和量化结果。</textarea></div></div>
+      </div>
+    </section>
+
+    <section id="decisions">
+      <h2>6. 设计决策日志</h2>
+      <p class="muted">用来记录“为什么这样改”，避免 Codex 只看到任务，不知道取舍。可以自由修改。</p>
+      <div class="decision"><input data-decision="d1-date" type="text" placeholder="日期"><input data-decision="d1-title" type="text" value="RAG 与动态数据分离"><textarea data-decision="d1-body">政策/FAQ 走 RAG；订单/物流/库存/退款状态必须走 Provider/API/DB。原因：动态事实需要实时、可验证的 source of truth。</textarea></div>
+      <div class="decision"><input data-decision="d2-date" type="text" placeholder="日期"><input data-decision="d2-title" type="text" value="退款规则不交给 LLM"><textarea data-decision="d2-body">LLM 可以识别退款意图并收集信息，但退款资格、金额阈值、订单状态约束由 Policy Engine 决定。</textarea></div>
+      <div class="decision"><input data-decision="d3-date" type="text" placeholder="日期"><input data-decision="d3-title" type="text" value="Multi-Agent 先验证后保留"><textarea data-decision="d3-body">当前四 Agent 结构不是默认正确答案。先实现业务 Tool/Policy，再用实验比较 single-agent + tools 和 multi-agent。</textarea></div>
+      <div class="decision"><input data-decision="d4-date" type="text" placeholder="日期"><input data-decision="d4-title" type="text" placeholder="新增决策"><textarea data-decision="d4-body" placeholder="记录决策背景、选择、放弃的方案、依据……"></textarea></div>
+    </section>
+
+    <section id="verification">
+      <h2>7. Codex 核验队列</h2>
+      <div class="callout">每个任务完成后，不只问“代码写了吗”，而要让 Codex 回答：调用链真的接上了吗？测试能跑吗？失败路径是什么？README 是否同步？</div>
+      <div class="grid2">
+        <div class="card"><h3>每次提交前</h3><p>检查 diff 是否只修改计划范围；运行相关 unit/integration tests；确认没有 Mock 冒充真实动作；检查 Tool/Policy/HITL 是否存在绕过路径。</p></div>
+        <div class="card"><h3>每个阶段完成后</h3><p>重新扫描主链路；更新 Current State Baseline；输出新增能力、未完成缺口、文档漂移、测试结果和回滚点。</p></div>
+      </div>
+      <textarea id="verifyNotes" data-global="verifyNotes" placeholder="记录 Codex 核验结论、阻塞项、发现的新技术债……"></textarea>
+    </section>
+
+    <section id="evidence">
+      <h2>8. 验收与量化指标</h2>
+      <table>
+        <thead><tr><th>能力</th><th>核心指标</th><th>第一版目标</th><th>证据形式</th></tr></thead>
+        <tbody>
+          <tr><td>Routing</td><td>routing accuracy / missed escalation</td><td>建立固定测试集并可重复执行</td><td>eval JSON + confusion matrix</td></tr>
+          <tr><td>Tool</td><td>selection / argument / execution success</td><td>读工具与写工具分别统计</td><td>trace + deterministic assertions</td></tr>
+          <tr><td>RAG</td><td>Recall@K / citation accuracy / no-answer</td><td>先建立 vector baseline</td><td>retrieval eval cases</td></tr>
+          <tr><td>Policy</td><td>policy violation / bypass rate</td><td>应为 0</td><td>规则单测 + adversarial cases</td></tr>
+          <tr><td>HITL</td><td>approval correctness / duplicate action</td><td>敏感写操作 100% 经过 gate</td><td>checkpoint + idempotency tests</td></tr>
+          <tr><td>Agent Loop</td><td>task success / repeat loop / max-step hit</td><td>可追踪失败分类</td><td>trace events</td></tr>
+          <tr><td>性能</td><td>latency / tokens / cost</td><td>形成 baseline 后再优化</td><td>per-request metrics</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="handoff">
+      <h2>9. Codex 交接 Prompt</h2>
+      <p class="muted">当你准备让 Codex 实施下一项任务时，复制下面模板，并补充任务 ID 与当前工作台 JSON/相关报告。</p>
+      <pre id="handoffPrompt">你正在维护 CartCare 项目。请先阅读仓库真实代码、README、tests 和相关配置，不要根据文件名猜测能力，也不要先修改代码。
+
+当前协同原则：
+1. 真实调用链 > README 描述。
+2. 静态/半静态政策知识走 RAG；订单、物流、库存、退款状态走 Provider/API/DB。
+3. LLM 负责开放式理解与工具选择；退款资格、权限、金额限制、状态转换等硬规则进入 deterministic Policy Engine。
+4. 所有危险写操作必须经过 Permission/Policy Gate，必要时 HITL；需要支持 checkpoint、resume 和幂等。
+5. 每次改动必须有可执行测试与可追踪证据；不要只让代码“看起来存在”。
+6. 不默认保留 Multi-Agent。若单 Agent + Tools 更简单且指标不差，应优先简化。
+7. 不要把 mcp/ 目录名当成标准 Model Context Protocol；除非实际接入标准 MCP SDK/transport。
+
+本次任务：
+[填写任务 ID，例如 T02]
+
+开始前请输出：
+- 你理解的当前实现
+- 本任务涉及的真实调用链
+- 计划修改的文件
+- 风险和兼容点
+- 验收测试
+
+实施后请输出：
+- 修改文件与关键变更
+- 新增/修改测试及运行结果
+- 端到端调用链证据
+- 是否产生 README/架构文档漂移
+- 尚未解决的问题
+- 建议把该任务状态设为 doing / verify / done 中的哪一个
+
+除非明确要求，不要顺手重构本任务之外的模块。</pre>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="copyPrompt()">复制 Codex Prompt</button>
+        <button class="btn btn-dark" onclick="copyProgressSummary()">复制当前进度摘要</button>
+      </div>
+    </section>
+
+    <div class="footer">CartCare Workbench v2 · localStorage 自动保存 · 建议每次 Codex 完成任务后更新证据与状态，并定期导出 JSON。</div>
+  </main>
+</div>
+
+<script>
+const KEY="cartcare_workbench_v2";
+
+function collectState(){
+  const tasks={};
+  document.querySelectorAll("[data-task]").forEach(card=>{
+    const id=card.dataset.task; tasks[id]={};
+    card.querySelectorAll("[data-field]").forEach(el=>tasks[id][el.dataset.field]=el.value);
+  });
+  const decisions={};
+  document.querySelectorAll("[data-decision]").forEach(el=>decisions[el.dataset.decision]=el.value);
+  const globals={};
+  document.querySelectorAll("[data-global]").forEach(el=>globals[el.dataset.global]=el.value);
+  return {version:2,updatedAt:new Date().toISOString(),tasks,decisions,globals};
+}
+function applyState(s){
+  if(!s)return;
+  document.querySelectorAll("[data-task]").forEach(card=>{
+    const t=s.tasks?.[card.dataset.task]; if(!t)return;
+    card.querySelectorAll("[data-field]").forEach(el=>{if(t[el.dataset.field]!==undefined)el.value=t[el.dataset.field]});
+  });
+  document.querySelectorAll("[data-decision]").forEach(el=>{if(s.decisions?.[el.dataset.decision]!==undefined)el.value=s.decisions[el.dataset.decision]});
+  document.querySelectorAll("[data-global]").forEach(el=>{if(s.globals?.[el.dataset.global]!==undefined)el.value=s.globals[el.dataset.global]});
+  updateUI(); setLastSaved(s.updatedAt);
+}
+function save(){
+  const s=collectState(); localStorage.setItem(KEY,JSON.stringify(s)); setLastSaved(s.updatedAt);
+  const el=document.getElementById("saveStatus"); el.textContent="已自动保存。";
+  clearTimeout(window.__sv); window.__sv=setTimeout(()=>el.textContent="自动保存到浏览器 localStorage。",1200);
+}
+function updateUI(){
+  const cards=[...document.querySelectorAll("[data-task]")];
+  let done=0,doing=0,verify=0;
+  cards.forEach(c=>{
+    const st=c.querySelector('[data-field="status"]').value;
+    c.classList.toggle("done",st==="done");
+    if(st==="done")done++; if(st==="doing")doing++; if(st==="verify")verify++;
+  });
+  const pct=cards.length?Math.round(done/cards.length*100):0;
+  document.getElementById("progressPct").textContent=pct+"%";
+  document.getElementById("progressBar").style.width=pct+"%";
+  document.getElementById("doneCount").textContent=done;
+  document.getElementById("doingCount").textContent=doing;
+  document.getElementById("verifyCount").textContent=verify;
+}
+function setLastSaved(iso){
+  if(!iso)return; const d=new Date(iso);
+  document.getElementById("lastSaved").textContent=d.toLocaleString("zh-CN",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+}
+function exportState(){
+  const s=collectState(); const blob=new Blob([JSON.stringify(s,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cartcare-workbench-progress.json";a.click();URL.revokeObjectURL(a.href);
+}
+function importState(e){
+  const f=e.target.files?.[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{try{const s=JSON.parse(r.result);localStorage.setItem(KEY,JSON.stringify(s));applyState(s);save()}catch(err){alert("JSON 无法解析："+err.message)}};
+  r.readAsText(f,"utf-8"); e.target.value="";
+}
+function resetState(){
+  if(!confirm("确定清空本浏览器中的工作台进度吗？"))return;
+  localStorage.removeItem(KEY); location.reload();
+}
+function downloadSnapshot(){
+  save();
+  const clone=document.documentElement.cloneNode(true);
+  const state=JSON.stringify(collectState()).replace(/</g,"\\u003c");
+  const script=document.createElement("script");
+  script.textContent=`localStorage.setItem("${KEY}", JSON.stringify(${state}));`;
+  clone.querySelector("body").appendChild(script);
+  const blob=new Blob(["<!DOCTYPE html>\n"+clone.outerHTML],{type:"text/html;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CartCare-Workbench.html";a.click();URL.revokeObjectURL(a.href);
+}
+async function copyPrompt(){
+  await navigator.clipboard.writeText(document.getElementById("handoffPrompt").innerText);
+  alert("Codex Prompt 已复制");
+}
+async function copyProgressSummary(){
+  const s=collectState();
+  const rows=Object.entries(s.tasks).map(([id,t])=>`${id}: ${t.status}${t.evidence?` | ${t.evidence}`:""}${t.note?` | ${t.note}`:""}`).join("\n");
+  await navigator.clipboard.writeText(`CartCare 当前工作台进度\n更新时间: ${s.updatedAt}\n\n${rows}`);
+  alert("进度摘要已复制");
+}
+document.addEventListener("input",e=>{if(e.target.matches("[data-field],[data-decision],[data-global]")){updateUI();save()}});
+document.addEventListener("change",e=>{if(e.target.matches("[data-field]")){updateUI();save()}});
+const saved=localStorage.getItem(KEY); if(saved){try{applyState(JSON.parse(saved))}catch(e){}}
+updateUI();
+</script>
+</body>
+</html>

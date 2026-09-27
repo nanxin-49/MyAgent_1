@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# EchoMind 镜像运行脚本
+# CartCare 镜像运行脚本
 # 提供多种运行配置选项
 
 set -e
@@ -40,7 +40,7 @@ print_error() {
 
 show_help() {
     cat << EOF
-EchoMind Docker 镜像运行工具
+CartCare Docker 镜像运行工具
 
 用法: ./run-image.sh [命令] [选项]
 

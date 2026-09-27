@@ -1,6 +1,8 @@
-# EchoMind
+# CartCare
 
-EchoMind 是一个面向客服/运营场景的多 Agent 智能系统。它不是单纯的聊天机器人，而是把以下能力串成闭环：
+E-commerce Support Agent
+
+CartCare 是一个面向客服/运营场景的多 Agent 智能系统。它不是单纯的聊天机器人，而是把以下能力串成闭环：
 
 - 细粒度意图识别
 - 路由驱动的多 Agent 编排
@@ -140,7 +142,7 @@ data/                       持久化数据
 
 | 服务 | 端口 |
 |---|---:|
-| EchoMind API | 8000 |
+| CartCare API | 8000 |
 | ChromaDB | 8001 |
 | Redis | 6379 |
 | Prometheus | 9090 |
@@ -160,10 +162,10 @@ data/                       持久化数据
 
 如果你只想看项目怎么工作，直接读：
 
-- [EchoMind定位与技术亮点](wiki/EchoMind定位与技术亮点.md)
+- [CartCare定位与技术亮点](wiki/CartCare定位与技术亮点.md)
 - [技术亮点](wiki/技术亮点.md)
 - [重点代码](wiki/重点代码.md)
 
 ## 一句话概括
 
-EchoMind 是一个可观测、可评测、可降级的多 Agent 客服运行时。
+CartCare 是一个可观测、可评测、可降级的多 Agent 客服运行时。

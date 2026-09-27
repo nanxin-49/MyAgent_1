@@ -1,4 +1,4 @@
-# EchoMind As-Is Baseline Report
+# CartCare As-Is Baseline Report
 
 > 本报告由 evaluation/run_baseline.py 生成。固定 Case 通过真实 HTTP POST /chat 运行；服务不可用时保留 BLOCKED，不用 Mock 结果替代。
 
