@@ -4,9 +4,9 @@
 
 ## 一句话定位
 
-CartCare 是一个面向复杂客服任务的多 Agent 客服编排运行时。
+CartCare 是一个面向复杂客服任务的多 Agent 客服编排运行时，并正在补齐面向电商动态事实的 Provider 层。
 
-它不是单个“客服机器人”，也不是简单把几个 prompt 拼在一起，而是一个把意图识别、知识检索、记忆、路由、工具、监控和评测串起来的协同系统。系统先理解用户问题，再决定由哪个 Agent 主处理、是否需要其他 Agent 辅助、是否应该查知识库、是否应该升级到人工，最后再把结果写回记忆和观测系统。
+它不是单个“客服机器人”，也不是简单把几个 prompt 拼在一起，而是一个把意图识别、知识检索、动态业务事实、记忆、路由、工具、监控和评测串起来的协同系统。系统先理解用户问题，再决定由哪个 Agent 主处理、是否需要其他 Agent 辅助、是否由 Agent 按需调用知识库或后续业务 Tool，最后再把结果写回记忆和观测系统。
 
 ## 它解决什么问题
 
@@ -123,14 +123,14 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
   -> /chat
   -> 读取 Redis 工作记忆、ChromaDB 历史摘要和用户画像
   -> 识别细粒度意图、意图组、置信度和结构化实体
-  -> 按意图判断是否触发 RAG 知识库检索
   -> 生成结构化路由决策
      - primary_agent
      - supporting_agents
      - routing_reason
      - routing_confidence
   -> 单 Agent 执行或并行多 Agent 执行
-  -> 注入记忆、知识库、结构化实体和动态 Skills
+  -> Agent 按需 tool_use：search_knowledge_base；业务事实后续由 Provider Tool 接入
+  -> 注入记忆、tool_result、结构化实体和动态 Skills
   -> LLM 生成回复
   -> 写入工作记忆
   -> 异步更新用户画像
@@ -142,7 +142,7 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
 - 记忆解决上下文
 - 意图解决分流
 - 路由解决主辅协作
-- RAG 解决事实正确性
+- RAG 解决静态政策知识的 grounding；动态订单/物流/库存/退款事实由 Provider 提供
 - Skills 解决业务规范
 - 监控解决在线健康度
 - 评测解决迭代质量
@@ -237,7 +237,19 @@ CartCare 使用 ChromaDB 构建知识库，用于存放退款政策、配送说�
 
 但不是所有请求都会触发 RAG。
 
-系统会先识别意图，只有业务类问题才检索知识库。问候、反馈、转人工、未知意图不会触发 RAG，避免无效检索和上下文干扰。
+系统不会在 API 层固定预检索；Agent 只有在模型发出 `search_knowledge_base` tool_use 时才进入 RAG 工具循环。动态订单、物流、库存和退款状态不由 RAG 伪造。
+
+### 动态业务 Provider 层
+
+T02 新增 `providers/`，为动态业务事实提供与存储解耦的只读接口：
+
+- `ProductProvider`：商品基础信息
+- `OrderProvider`：订单状态和订单明细
+- `InventoryProvider`：库存快照
+- `LogisticsProvider`：订单物流状态
+- `RefundProvider`：退款记录状态
+
+Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。当前实现是测试/演示用 JSON fixture 内存 Backend，未接入 `/chat`、Agent Tool 或真实外部电商系统。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误都有明确类型；退款资格、金额阈值、写操作和审批属于后续 Policy/HITL 任务。
 
 ### 4. Redis + ChromaDB 记忆体系
 
@@ -335,7 +347,8 @@ CartCare 则是：
   -> 意图识别
   -> 实体提取
   -> 记忆读取
-  -> 按意图 RAG
+  -> Agent 按需 tool_use 调用 RAG
+  -> Provider Tool（接入后）读取动态业务事实
   -> 结构化多 Agent 路由
   -> Skills 注入
   -> Agent 回复

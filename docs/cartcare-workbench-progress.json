@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-27T11:24:24.0267429Z",
+  "updatedAt": "2026-09-27T12:30:00Z",
   "tasks": {
     "T01": {
       "status": "done",
-      "evidence": "README.md; wiki/重点代码.md; wiki/业务流程说明.md; wiki/技术亮点.md; wiki/assets/architecture/02-chat-flow.svg",
+      "evidence": "README.md; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
       "note": "README 与核心 Wiki 已按真实 /chat 调用链修正：Memory → Intent → Orchestrator → Agent/Tool → Memory；RAG 仅由 Agent 按需调用 search_knowledge_base；Monitor 为后台观测；Eval 通过 /eval/run 独立触发；mcp/ 明确为自研工具层。"
     },
     "T02": {
-      "status": "todo",
-      "evidence": "",
-      "note": "定义 Product/Order/Inventory/Logistics/Refund Provider 接口；先用 SQLite/JSON mock backend；Tool 不直接依赖具体存储。"
+      "status": "verify",
+      "evidence": "providers/; tests/test_business_providers.py; tests/fixtures/business_provider_data.json; README.md; docs/CartCare-Codex-Workbench.html; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
+      "note": "已建立五类只读 Provider、BusinessBackend Protocol、结构化 Pydantic 模型和 typed errors；当前仅使用明确标注的 JSON fixture 内存 Mock，未接入 Agent/API Tool。"
     },
     "T03": {
       "status": "todo",
