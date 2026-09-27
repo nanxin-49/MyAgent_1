@@ -1,0 +1,6 @@
+# Development and test dependencies.
+# Runtime packages remain declared in requirements.txt and are inherited here.
+-r requirements.txt
+
+# Test runner
+pytest==8.3.4

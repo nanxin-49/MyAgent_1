@@ -1,0 +1,84 @@
+{
+  "version": 2,
+  "updatedAt": "2026-09-27T00:00:00.000Z",
+  "tasks": {
+    "T01": {
+      "status": "todo",
+      "evidence": "",
+      "note": "README 主流程改为 Memory → Intent → Orchestrator → Agent/Tool；明确 Eval 不在每次 /chat 中运行；明确 mcp/ 为自研工具层。"
+    },
+    "T02": {
+      "status": "todo",
+      "evidence": "",
+      "note": "定义 Product/Order/Inventory/Logistics/Refund Provider 接口；先用 SQLite/JSON mock backend；Tool 不直接依赖具体存储。"
+    },
+    "T03": {
+      "status": "todo",
+      "evidence": "",
+      "note": "读工具与写工具分离；统一 ToolResult；参数验证；错误类型；所有动态状态都来自 Provider。"
+    },
+    "T04": {
+      "status": "todo",
+      "evidence": "",
+      "note": "输入订单事实 + policy version，输出 allow/deny/require_approval + reason_code；至少覆盖退款时限、订单状态、金额阈值。"
+    },
+    "T05": {
+      "status": "todo",
+      "evidence": "",
+      "note": "定义 pending_action；approve/reject endpoint；checkpoint；重复 approval 不得导致重复执行。"
+    },
+    "T06": {
+      "status": "verify",
+      "evidence": "requirements-dev.txt; pytest.ini; Dockerfile development target; evaluation/README.md; tests/test_environment.py",
+      "note": "已分离 production 与 development/test 依赖，固定 pytest 入口和仓库导入路径，增加模块导入 smoke test，并补充本地/Docker 命令。当前 Windows Python 3.14 无法安装锁定的 pydantic-core 2.27.1，Docker daemon 也不可用，待 Python 3.12 或容器环境复验。"
+    },
+    "T07": {
+      "status": "todo",
+      "evidence": "",
+      "note": "metadata 增 source/policy_version/effective_at/doc_type；结果返回 citations；建立低相关度阈值和无答案策略；先测 vector baseline 再决定 hybrid/rerank。"
+    },
+    "T08": {
+      "status": "todo",
+      "evidence": "",
+      "note": "统一 strict schema；read/write/dangerous 分级；timeout/retry/idempotency key；明确可重试与不可重试错误。"
+    },
+    "T09": {
+      "status": "todo",
+      "evidence": "",
+      "note": "增加 routing accuracy、tool selection/args、Recall@K、citation accuracy、task success、policy violation、missed escalation、HITL correctness、loop rate、latency/cost。"
+    },
+    "T10": {
+      "status": "todo",
+      "evidence": "",
+      "note": "对比 single agent + tools 与当前 multi-agent：任务成功率、误路由、token、延迟、复杂度。若没有明显收益，合并 Agent。"
+    },
+    "T11": {
+      "status": "todo",
+      "evidence": "",
+      "note": "保留 session context 与必要摘要；长期 profile 只保存低风险稳定偏好；订单、支付、退款状态不作为长期记忆事实。"
+    },
+    "T12": {
+      "status": "todo",
+      "evidence": "",
+      "note": "展示 routing、tool、retrieval citation、policy decision、approval、latency；README 给出 3 个端到端 demo 和量化结果。"
+    }
+  },
+  "decisions": {
+    "d1-date": "",
+    "d1-title": "RAG 与动态数据分离",
+    "d1-body": "政策/FAQ 走 RAG；订单/物流/库存/退款状态必须走 Provider/API/DB。原因：动态事实需要实时、可验证的 source of truth。",
+    "d2-date": "",
+    "d2-title": "退款规则不交给 LLM",
+    "d2-body": "LLM 可以识别退款意图并收集信息，但退款资格、金额阈值、订单状态约束由 Policy Engine 决定。",
+    "d3-date": "",
+    "d3-title": "Multi-Agent 先验证后保留",
+    "d3-body": "当前四 Agent 结构不是默认正确答案。先实现业务 Tool/Policy，再用实验比较 single-agent + tools 和 multi-agent。",
+    "d4-date": "",
+    "d4-title": "",
+    "d4-body": ""
+  },
+  "globals": {
+    "verifyNotes": ""
+  }
+}
+

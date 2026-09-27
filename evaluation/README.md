@@ -21,9 +21,26 @@
 
 服务不可用时，Runner 会为每条 Case 保存 status=blocked 和原始连接错误，不会用 Mock 结果冒充 E2E 结果。
 
+## 本地测试环境
+
+生产依赖和开发/测试依赖分开声明：
+
+- `requirements.txt`：运行 CartCare API 所需的生产依赖；
+- `requirements-dev.txt`：继承生产依赖并增加 pytest。
+
+在仓库根目录创建或激活虚拟环境后执行：
+
+    python -m pip install -r requirements-dev.txt
+    python -m pytest -q
+
+Docker 开发镜像包含测试依赖，生产镜像不包含 pytest：
+
+    docker build --target development -t cartcare-dev .
+    docker run --rm cartcare-dev python -m pytest -q
+
 ## Tool Trace 测试
 
-项目现有测试使用 pytest 风格函数。若环境已安装 pytest：
+项目现有测试使用 pytest 风格函数：
 
     python -m pytest -q
 
