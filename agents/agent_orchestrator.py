@@ -276,6 +276,7 @@ class BaseAgent:
             tool_uses = [block for block in (resp.content or []) if self._block_type(block) == "tool_use"]
             if not tool_uses:
                 self._last_tools_used = tools_used
+                self._last_tool_traces = tool_traces
                 return extract_text_content(resp.content)
 
             messages.append({"role": "assistant", "content": resp.content})
@@ -324,6 +325,10 @@ class BaseAgent:
                         "error": error_text,
                     }
                 )
+                # Persist incrementally so a later provider failure still
+                # exposes the tool attempt in the error response and trace API.
+                self._last_tools_used = list(tools_used)
+                self._last_tool_traces = list(tool_traces)
                 tool_results.append({
                     "type": "tool_result",
                     "tool_use_id": tool_use_id,

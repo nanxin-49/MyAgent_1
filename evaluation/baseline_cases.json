@@ -1,0 +1,257 @@
+[
+  {
+    "id": "technical_login_01",
+    "scenario": "single_technical",
+    "messages": ["登录一直报 401，怎么办？"],
+    "expected": {
+      "intent": "technical_login",
+      "primary_agent": "technical",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": ["lookup_error_code"],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "technical_crash_01",
+    "scenario": "single_technical",
+    "messages": ["App 一打开就崩溃。"],
+    "expected": {
+      "intent": "technical_crash",
+      "primary_agent": "technical",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "billing_duplicate_01",
+    "scenario": "single_billing",
+    "messages": ["这个月为什么重复扣款 99 元？"],
+    "expected": {
+      "intent": "payment_issue",
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": ["compare_amounts"],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "billing_refund_01",
+    "scenario": "single_billing",
+    "messages": ["我想申请退款。"],
+    "expected": {
+      "intent": "refund",
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "required",
+      "expected_tools": ["search_knowledge_base"],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "billing_invoice_01",
+    "scenario": "single_billing",
+    "messages": ["我的发票怎么还没有开出来？"],
+    "expected": {
+      "intent": "invoice",
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "general_logistics_01",
+    "scenario": "general",
+    "messages": ["订单发货以后一般多久能收到？"],
+    "expected": {
+      "intent": "logistics",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "general_greeting_01",
+    "scenario": "general",
+    "messages": ["你好"],
+    "expected": {
+      "intent": "greeting",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "skip",
+      "expected_tools": [],
+      "escalation": "forbidden"
+    }
+  },
+  {
+    "id": "compound_technical_billing_01",
+    "scenario": "compound",
+    "messages": ["登录一直报 401，而且这个月还重复扣了我 99 元。"],
+    "expected": {
+      "intent": "technical_login",
+      "primary_agent": "technical",
+      "supporting_agents": ["billing"],
+      "multi_agent": true,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "compound_technical_billing_02",
+    "scenario": "compound",
+    "messages": ["登录报错 401，而且出现了重复扣款。"],
+    "expected": {
+      "intent": "technical_login",
+      "primary_agent": "technical",
+      "supporting_agents": ["billing"],
+      "multi_agent": true,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "rag_refund_eta_01",
+    "scenario": "rag_required",
+    "messages": ["退款审核通过以后多久能到账？"],
+    "expected": {
+      "intent": "refund",
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "required",
+      "expected_tools": ["search_knowledge_base"],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "rag_membership_01",
+    "scenario": "rag_required",
+    "messages": ["金卡会员有什么优惠？"],
+    "expected": {
+      "intent": "query",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "required",
+      "expected_tools": ["search_knowledge_base"],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "rag_skip_greeting_01",
+    "scenario": "rag_skip",
+    "messages": ["你好"],
+    "expected": {
+      "intent": "greeting",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "skip",
+      "expected_tools": [],
+      "escalation": "forbidden"
+    }
+  },
+  {
+    "id": "knowledge_gap_01",
+    "scenario": "knowledge_gap",
+    "messages": ["企业版 SAML 证书应该怎么轮换？"],
+    "expected": {
+      "intent": "query",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "required",
+      "expected_tools": ["search_knowledge_base"],
+      "escalation": "optional"
+    },
+    "notes": "运行前应检查默认知识库是否确实没有该主题；低相关返回不视为知识命中。"
+  },
+  {
+    "id": "clarification_01",
+    "scenario": "clarification",
+    "messages": ["帮我处理一下这个问题。"],
+    "expected": {
+      "intent": "other",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "skip",
+      "expected_tools": [],
+      "escalation": "forbidden"
+    }
+  },
+  {
+    "id": "escalation_human_01",
+    "scenario": "escalation",
+    "messages": ["我要人工客服。"],
+    "expected": {
+      "intent": "human_handoff",
+      "primary_agent": "escalation",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "skip",
+      "expected_tools": [],
+      "escalation": "required"
+    }
+  },
+  {
+    "id": "escalation_refund_01",
+    "scenario": "escalation",
+    "messages": ["帮我直接把这笔重复扣款退回来。"],
+    "expected": {
+      "intent": ["payment_issue", "refund"],
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional"
+    }
+  },
+  {
+    "id": "escalation_false_positive_01",
+    "scenario": "escalation_false_positive",
+    "messages": ["暂时不用人工客服，我想先自己排查一下 401。"],
+    "expected": {
+      "intent": "technical_login",
+      "primary_agent": "technical",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": ["lookup_error_code"],
+      "escalation": "forbidden"
+    }
+  },
+  {
+    "id": "memory_continuity_01",
+    "scenario": "memory_multiturn",
+    "messages": ["我的订单号是 A12345。", "它现在到哪里了？"],
+    "expected": {
+      "intent": "order_status",
+      "primary_agent": "general",
+      "supporting_agents": [],
+      "multi_agent": false,
+      "rag": "optional",
+      "expected_tools": [],
+      "escalation": "optional",
+      "memory_continuity": "required"
+    },
+    "notes": "订单号格式刻意保留为当前代码可识别的 A+数字形式。"
+  }
+]

@@ -211,9 +211,59 @@ def test_tool_use_round_trip_executes_only_whitelisted_tool():
 
     assert response.success is True
     assert response.tools_used == ["lookup_error_code"]
+    assert len(response.tool_traces) == 1
+    trace = response.tool_traces[0]
+    assert trace["agent_type"] == "technical"
+    assert trace["tool_name"] == "lookup_error_code"
+    assert trace["tool_use_id"] == "toolu_1"
+    assert trace["input"] == {"error_code": "401"}
+    assert trace["success"] is True
+    # lookup_error_code returns a domain payload without a success key; the
+    # trace must still expose result_success as an explicit nullable field.
+    assert trace["result_success"] is None
+    assert trace["latency_ms"] >= 0
+    assert trace["cached"] is False
+    assert trace["reranked"] is False
+    assert trace["error"] == ""
     assert len(client.calls) == 2
     assert {tool["name"] for tool in client.calls[0]["tools"]} == {
         "lookup_error_code",
         "build_diagnostic_plan",
     }
     assert "tool_result" in str(client.calls[1]["messages"])
+
+
+def test_tool_trace_survives_provider_failure_after_tool_execution():
+    class ToolUseBlock:
+        type = "tool_use"
+        id = "toolu_provider_failure"
+        name = "lookup_error_code"
+        input = {"error_code": "401"}
+
+    class FailingAfterToolClient:
+        def __init__(self):
+            self.calls = []
+
+        class Messages:
+            def __init__(self, owner):
+                self.owner = owner
+
+            async def create(self, **kwargs):
+                self.owner.calls.append(kwargs)
+                if len(self.owner.calls) == 1:
+                    return type("Response", (), {"content": [ToolUseBlock()]})()
+                raise RuntimeError("provider down after tool execution")
+
+        @property
+        def messages(self):
+            return self.Messages(self)
+
+    client = FailingAfterToolClient()
+    agent = TechnicalAgent(client, "test-model")
+    response = asyncio.run(agent.handle(make_request()))
+
+    assert response.success is False
+    assert len(response.tool_traces) == 1
+    assert response.tool_traces[0]["tool_name"] == "lookup_error_code"
+    assert response.tool_traces[0]["success"] is True
+    assert len(client.calls) == 2

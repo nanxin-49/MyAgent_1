@@ -1,0 +1,4207 @@
+{
+  "environment": {
+    "timestamp": "2026-09-27T04:36:22.548659+00:00",
+    "git_sha": "2592897ee8deb212ba4028d533e399d4b2bc7168",
+    "base_url": "http://localhost:8000",
+    "model": "N/A: not exposed by public API",
+    "dependencies": "N/A: runtime health endpoint unavailable",
+    "health_status": "{\"status\": \"ok\", \"agents\": {\"general_0\": {\"total\": 0, \"success_rate\": 1.0, \"avg_ms\": 0.0, \"monitor_penalty\": 0.0, \"routing_score\": 1.0, \"role\": \"通用客服分诊与首轮接待\", \"workflow\": [\"复述诉求\", \"判断业务范围\", \"直接回答或补充必要信息\", \"给出下一步\"], \"tool_scope\": [\"search_knowledge_base\", \"inspect_request_context\", \"suggest_required_fields\"], \"available_tools\": [\"search_knowledge_base\", \"inspect_request_context\", \"suggest_required_fields\"], \"model\": \"deepseek-flash\"}, \"technical_0\": {\"total\": 1, \"success_rate\": 1.0, \"avg_ms\": 11109.8, \"monitor_penalty\": 0.4, \"routing_score\": 0.435, \"role\": \"技术故障诊断与排障\", \"workflow\": [\"确认现象\", \"判断影响范围\", \"按网络/权限/配置/依赖排查\", \"给出验证方式\", \"判断升级条件\"], \"tool_scope\": [\"search_knowledge_base\", \"lookup_error_code\", \"build_diagnostic_plan\"], \"available_tools\": [\"search_knowledge_base\", \"lookup_error_code\", \"build_diagnostic_plan\"], \"model\": \"deepseek-flash\"}, \"billing_0\": {\"total\": 0, \"success_rate\": 1.0, \"avg_ms\": 0.0, \"monitor_penalty\": 0.0, \"routing_score\": 1.0, \"role\": \"账单核验与售后处理\", \"workflow\": [\"确认账单场景\", \"收集必要核验字段\", \"区分订单/实付/退款金额\", \"说明处理路径与时效\", \"判断是否升级\"], \"tool_scope\": [\"search_knowledge_base\", \"check_billing_fields\", \"compare_amounts\"], \"available_tools\": [\"search_knowledge_base\", \"check_billing_fields\", \"compare_amounts\"], \"model\": \"deepseek-flash\"}, \"escalation_0\": {\"total\": 0, \"success_rate\": 1.0, \"avg_ms\": 0.0, \"monitor_penalty\": 0.0, \"routing_score\": 1.0, \"role\": \"人工升级与交接\", \"workflow\": [\"确认升级原因\", \"整理已知信息\", \"标记优先级\", \"生成交接摘要\"], \"tool_scope\": [\"search_knowledge_base\", \"create_handoff_summary\"], \"available_tools\": [\"search_knowledge_base\", \"create_handoff_summary\"], \"model\": \"deepseek-flash\"}}}"
+  },
+  "cases_path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\baseline_cases.json",
+  "cases": [
+    {
+      "case_id": "technical_login_01",
+      "scenario": "single_technical",
+      "expected": {
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [
+          "lookup_error_code"
+        ],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "technical_login",
+        "intent_group": "technical",
+        "intent_confidence": 0.8603,
+        "intent_source_scores": {
+          "llm": 0.98,
+          "embedding": 0.6216698721602092,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": [
+            "401"
+          ]
+        },
+        "urgency": "N/A",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "agent_types": [
+          "technical"
+        ],
+        "routing_confidence": 1.0,
+        "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=none, scores=[technical=1.13, general=0.10, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_NWnsP9glG3OdAOtI6sJX8807",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_hXgqWltK0owAVFcYRUD36842",
+            "input": {
+              "query": "登录 401 认证失败 Token 过期 排查",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1754.3,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 现象复述\n登录时持续返回 HTTP 401。401 的含义是**认证失败**——服务端认为本次请求没有携带有效凭证，或凭证已失效。它和 403（已认证但无权限）不是一回事，所以先聚焦在“身份凭证”这一环。\n\n## 可能原因（按常见度排序）\n1. **密码/账号输入问题**：密码错误、账号名用了邮箱/手机号之外的形式、存在多余空格或大小写问题。\n2. **登录态失效**：Token / 会话已过期，或客户端缓存的旧 Token 未清理，一直在用旧凭证重试。\n3. **频繁失败触发风控**：短时间内多次 401 可能触发账号临时锁定。\n4. **第三方登录异常**：用微信/企业 SSO 等登录时，授权链路失效或回调异常。\n5. **接口接入方问题**（若是程序调用）：API Key 失效、签名/时间戳不正确、测试环境用了生产密钥等。\n6. **客户端时间偏差**：设备时间不准，导致签名校验或 Token 有效期判断失败。\n\n## 编号排查步骤（低风险优先）\n1. **手动重试一次并观察返回体**：完全退出登录页/App（不是退出后台），重新进入登录。记录响应体里的 `message`、`code` 字段和发生时间——这是后续定位的关键。\n2. **确认登录方式与账号形式**：确认你用的是哪个入口（账号密码 / 手机验证码 / 第三方），以及账号是否填写完整、无空格。\n3. **走一次密码重置**：如果怀疑凭证本身失效，用绑定的手机号或邮箱重置密码后再登录。**请不要把密码或验证码发给我**，我不需要也无法处理。\n4. **清缓存后重试（仅客户端场景）**：浏览器可尝试无痕窗口，App 可清除应用缓存。注意：这是为了排除“旧 Token 被缓存”的情况，不是万能解法——如果无痕窗口下仍然 401，说明问题在服务端或账号侧，不是本地缓存。\n5. **换网络对比一次**：切换 WiFi / 移动数据，或换一台设备/浏览器登录。目的是判断是否与当前网络、代理或本地环境相关。\n6. **检查设备时间**：确认系统时间为自动同步。时间偏差会直接导致签名或 Token 校验失败。\n7. **暂停连续重试**：先停 10–15 分钟再试一次。持续高频重试可能加重风控锁定，不利于判断真实原因。\n8. **如果是程序/接口调用**：核对使用的 API Key 是否对应当前环境、时间戳是否为当前时间、签名串是否按文档拼接。密钥只需核对前后几位，**不要在公开渠道粘贴完整密钥**。\n\n## 验证结果\n- 步骤 1–3 解决 → 属于凭证/账号层面问题，关注是否再次出现。\n- 无痕窗口 + 换网络后**仍然 401** → 基本可排除本地缓存与网络因素，问题更可能在账号状态、服务端或接口凭证上。\n- 换了账号能登、只有这个账号不行 → 账号被锁定或状态异常的概率上升。\n\n## 需要你补充的信息\n1. **环境**：浏览器 / App / 服务端接口调用？系统与版本号？\n2. **是否稳定复现**：每次登录都 401，还是偶发？从什么时候开始的？\n3. **影响范围**：只有你一个人，还是同事/其他用户也遇到？\n4. **登录方式**：账号密码、验证码，还是第三方授权？\n5. **响应体内容**：`request_id`、`code`、`message` 的原文（截图或文本均可，注意遮挡敏感信息）。\n6. **最近变更**：是否刚改过密码、换过设备/网络、升级过版本，或轮换过密钥？\n\n告诉我以上信息，尤其是第 1、2、5 点，我可以给出更有针对性的下一步。\n\n## 升级条件\n出现以下任一情况，建议直接转二线技术或人工支持（这些需要后台日志或账号操作，前端自助无法解决）：\n- 重置密码、换设备、换网络后仍持续 401；\n- 账号疑似被系统锁定，或出现非本人操作的异常登录；\n- **多名用户同时无法登录**（疑似服务端故障）；\n- 涉及密钥泄露、权限越权等安全事件。\n\n> 说明：我这边只做了错误码含义与通用排查路径的查询，**没有读取你的服务端日志、也没有修改任何账号或配置**。账号状态、锁定记录这类信息需要二线技术核验后台数据。",
+        "escalated": true,
+        "latency_ms": 10304.8,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": true,
+        "escalation": null
+      },
+      "status": "passed",
+      "latency_ms": 10326.8,
+      "errors": [],
+      "trace": {
+        "request_id": "fe6bfbaa",
+        "timestamp": "2026-09-27T04:36:32.979438",
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_NWnsP9glG3OdAOtI6sJX8807",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_hXgqWltK0owAVFcYRUD36842",
+            "input": {
+              "query": "登录 401 认证失败 Token 过期 排查",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1754.3,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 10304.8
+      },
+      "turns": [
+        {
+          "message": "登录一直报 401，怎么办？",
+          "response": {
+            "conv_id": "baseline_technical_login_01_conversation",
+            "request_id": "fe6bfbaa",
+            "response": "## 现象复述\n登录时持续返回 HTTP 401。401 的含义是**认证失败**——服务端认为本次请求没有携带有效凭证，或凭证已失效。它和 403（已认证但无权限）不是一回事，所以先聚焦在“身份凭证”这一环。\n\n## 可能原因（按常见度排序）\n1. **密码/账号输入问题**：密码错误、账号名用了邮箱/手机号之外的形式、存在多余空格或大小写问题。\n2. **登录态失效**：Token / 会话已过期，或客户端缓存的旧 Token 未清理，一直在用旧凭证重试。\n3. **频繁失败触发风控**：短时间内多次 401 可能触发账号临时锁定。\n4. **第三方登录异常**：用微信/企业 SSO 等登录时，授权链路失效或回调异常。\n5. **接口接入方问题**（若是程序调用）：API Key 失效、签名/时间戳不正确、测试环境用了生产密钥等。\n6. **客户端时间偏差**：设备时间不准，导致签名校验或 Token 有效期判断失败。\n\n## 编号排查步骤（低风险优先）\n1. **手动重试一次并观察返回体**：完全退出登录页/App（不是退出后台），重新进入登录。记录响应体里的 `message`、`code` 字段和发生时间——这是后续定位的关键。\n2. **确认登录方式与账号形式**：确认你用的是哪个入口（账号密码 / 手机验证码 / 第三方），以及账号是否填写完整、无空格。\n3. **走一次密码重置**：如果怀疑凭证本身失效，用绑定的手机号或邮箱重置密码后再登录。**请不要把密码或验证码发给我**，我不需要也无法处理。\n4. **清缓存后重试（仅客户端场景）**：浏览器可尝试无痕窗口，App 可清除应用缓存。注意：这是为了排除“旧 Token 被缓存”的情况，不是万能解法——如果无痕窗口下仍然 401，说明问题在服务端或账号侧，不是本地缓存。\n5. **换网络对比一次**：切换 WiFi / 移动数据，或换一台设备/浏览器登录。目的是判断是否与当前网络、代理或本地环境相关。\n6. **检查设备时间**：确认系统时间为自动同步。时间偏差会直接导致签名或 Token 校验失败。\n7. **暂停连续重试**：先停 10–15 分钟再试一次。持续高频重试可能加重风控锁定，不利于判断真实原因。\n8. **如果是程序/接口调用**：核对使用的 API Key 是否对应当前环境、时间戳是否为当前时间、签名串是否按文档拼接。密钥只需核对前后几位，**不要在公开渠道粘贴完整密钥**。\n\n## 验证结果\n- 步骤 1–3 解决 → 属于凭证/账号层面问题，关注是否再次出现。\n- 无痕窗口 + 换网络后**仍然 401** → 基本可排除本地缓存与网络因素，问题更可能在账号状态、服务端或接口凭证上。\n- 换了账号能登、只有这个账号不行 → 账号被锁定或状态异常的概率上升。\n\n## 需要你补充的信息\n1. **环境**：浏览器 / App / 服务端接口调用？系统与版本号？\n2. **是否稳定复现**：每次登录都 401，还是偶发？从什么时候开始的？\n3. **影响范围**：只有你一个人，还是同事/其他用户也遇到？\n4. **登录方式**：账号密码、验证码，还是第三方授权？\n5. **响应体内容**：`request_id`、`code`、`message` 的原文（截图或文本均可，注意遮挡敏感信息）。\n6. **最近变更**：是否刚改过密码、换过设备/网络、升级过版本，或轮换过密钥？\n\n告诉我以上信息，尤其是第 1、2、5 点，我可以给出更有针对性的下一步。\n\n## 升级条件\n出现以下任一情况，建议直接转二线技术或人工支持（这些需要后台日志或账号操作，前端自助无法解决）：\n- 重置密码、换设备、换网络后仍持续 401；\n- 账号疑似被系统锁定，或出现非本人操作的异常登录；\n- **多名用户同时无法登录**（疑似服务端故障）；\n- 涉及密钥泄露、权限越权等安全事件。\n\n> 说明：我这边只做了错误码含义与通用排查路径的查询，**没有读取你的服务端日志、也没有修改任何账号或配置**。账号状态、锁定记录这类信息需要二线技术核验后台数据。",
+            "intent": "technical_login",
+            "intent_group": "technical",
+            "agent_type": "technical",
+            "agent_types": [
+              "technical"
+            ],
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=none, scores=[technical=1.13, general=0.10, billing=0.00]",
+            "routing_confidence": 1.0,
+            "escalated": true,
+            "latency_ms": 10304.8,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": [
+                "401"
+              ]
+            },
+            "intent_confidence": 0.8603,
+            "intent_source_scores": {
+              "llm": 0.98,
+              "embedding": 0.6216698721602092,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "fe6bfbaa",
+            "timestamp": "2026-09-27T04:36:32.979438",
+            "intent": "technical_login",
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "technical",
+                "tool_name": "lookup_error_code",
+                "tool_use_id": "call_00_NWnsP9glG3OdAOtI6sJX8807",
+                "input": {
+                  "error_code": "401"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_hXgqWltK0owAVFcYRUD36842",
+                "input": {
+                  "query": "登录 401 认证失败 Token 过期 排查",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1754.3,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 10304.8
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "technical_crash_01",
+      "scenario": "single_technical",
+      "expected": {
+        "intent": "technical_crash",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "technical_crash",
+        "intent_group": "technical",
+        "intent_confidence": 0.736,
+        "intent_source_scores": {
+          "llm": 0.98,
+          "embedding": 0.18549555830406733,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "agent_types": [
+          "technical"
+        ],
+        "routing_confidence": 0.93,
+        "routing_reason": "intent=technical_crash, group=technical, primary=technical, supporting=none, scores=[technical=0.93, general=0.10, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "build_diagnostic_plan",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "technical",
+            "tool_name": "build_diagnostic_plan",
+            "tool_use_id": "call_00_NPT18TRcCKtN2JoWqlXZ1202",
+            "input": {
+              "environment": "App",
+              "reproduced": true
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_w3v1Vuey2wu4jYaRUvx09137",
+            "input": {
+              "query": "App 启动崩溃 闪退 排查 常见原因",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1875.0,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 现象复述\nApp 一打开就崩溃/闪退，目前没有错误码、版本、机型等信息。我会先按最常见、低风险的顺序帮你缩小范围。\n\n## 可能原因（待验证，不能直接断定）\n- 客户端版本过旧或安装包损坏\n- 本地缓存/数据异常导致启动时读取失败\n- 系统版本不兼容（尤其刚升级系统后）\n- 网络/证书异常导致启动首屏接口失败（部分 App 会因此闪退）\n- 账号登录态异常或权限受限\n\n## 排查步骤（从低风险开始）\n\n1. **先确认三点基础信息**\n   - 是“每次打开都崩”，还是偶发？\n   - 具体机型、系统版本、App 版本号是多少？\n   - 打开就崩，还是进到某个页面才崩？\n   > 目的：区分是普遍性问题还是单机环境问题。\n\n2. **重启 App + 重新打开**（最低成本）\n   - 从后台彻底划掉再重开；部分场景重启手机即可恢复。\n\n3. **清理 App 缓存**（不是清数据）\n   - 在 App 内“设置—清除缓存”，或系统“应用管理—存储—清除缓存”。\n   - ⚠️ 注意：选择“清除缓存”而非“清除数据/卸载”，后者可能丢失本地未同步内容，请先确认无重要本地数据。\n\n4. **检查并更新到最新版本**\n   - 到官方应用商店确认当前版本是否为最新，必要时覆盖安装（不要先卸载，避免数据丢失）。\n\n5. **切换网络验证**\n   - 从 WiFi 切到移动数据（或反之），排除代理、DNS、证书问题。\n\n6. **换个账号或游客模式验证**\n   - 若游客模式不崩、登录后崩 → 更偏向账号态/权限问题。\n\n7. **记录崩溃日志**\n   - 安卓：系统设置里查看“应用崩溃日志”；iOS：设置—隐私与安全性—分析与改进—分析数据。\n   - 记录崩溃时间点和关键错误关键字（如 NullPointer、SecurityException、SSL 等）。\n\n## 验证方式\n- 若第 2–5 步后不再崩溃，说明大概率是缓存/版本/网络环境问题，观察 1–2 天是否复发。\n- 若依然每次必崩，请把第 7 步的日志片段 + 第 1 步信息发我，我帮你进一步定位。\n\n## 需要补充的信息\n- App 版本号、手机型号与系统版本\n- 是否稳定复现、崩溃发生在哪个页面\n- 最近是否更新 App / 升级系统 / 换机 / 换网络\n- 崩溃日志片段（如能获取）\n\n## 升级条件\n如果出现以下情况，建议直接转二线技术处理：\n- **更新版本后仍必然崩溃的共性问题**（多台设备/多名用户同时出现）\n- 涉及数据丢失、登录态/权限异常\n- 需要后台日志或服务端排查才能定位\n\n请先按第 1 步把版本、机型、系统版本发我，多数闪退能据此快速定位。",
+        "escalated": false,
+        "latency_ms": 7657.1,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 8954.2,
+      "errors": [],
+      "trace": {
+        "request_id": "6ee61fe1",
+        "timestamp": "2026-09-27T04:36:41.927747",
+        "intent": "technical_crash",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "tools_used": [
+          "build_diagnostic_plan",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "technical",
+            "tool_name": "build_diagnostic_plan",
+            "tool_use_id": "call_00_NPT18TRcCKtN2JoWqlXZ1202",
+            "input": {
+              "environment": "App",
+              "reproduced": true
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_w3v1Vuey2wu4jYaRUvx09137",
+            "input": {
+              "query": "App 启动崩溃 闪退 排查 常见原因",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1875.0,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 7657.1
+      },
+      "turns": [
+        {
+          "message": "App 一打开就崩溃。",
+          "response": {
+            "conv_id": "baseline_technical_crash_01_conversation",
+            "request_id": "6ee61fe1",
+            "response": "## 现象复述\nApp 一打开就崩溃/闪退，目前没有错误码、版本、机型等信息。我会先按最常见、低风险的顺序帮你缩小范围。\n\n## 可能原因（待验证，不能直接断定）\n- 客户端版本过旧或安装包损坏\n- 本地缓存/数据异常导致启动时读取失败\n- 系统版本不兼容（尤其刚升级系统后）\n- 网络/证书异常导致启动首屏接口失败（部分 App 会因此闪退）\n- 账号登录态异常或权限受限\n\n## 排查步骤（从低风险开始）\n\n1. **先确认三点基础信息**\n   - 是“每次打开都崩”，还是偶发？\n   - 具体机型、系统版本、App 版本号是多少？\n   - 打开就崩，还是进到某个页面才崩？\n   > 目的：区分是普遍性问题还是单机环境问题。\n\n2. **重启 App + 重新打开**（最低成本）\n   - 从后台彻底划掉再重开；部分场景重启手机即可恢复。\n\n3. **清理 App 缓存**（不是清数据）\n   - 在 App 内“设置—清除缓存”，或系统“应用管理—存储—清除缓存”。\n   - ⚠️ 注意：选择“清除缓存”而非“清除数据/卸载”，后者可能丢失本地未同步内容，请先确认无重要本地数据。\n\n4. **检查并更新到最新版本**\n   - 到官方应用商店确认当前版本是否为最新，必要时覆盖安装（不要先卸载，避免数据丢失）。\n\n5. **切换网络验证**\n   - 从 WiFi 切到移动数据（或反之），排除代理、DNS、证书问题。\n\n6. **换个账号或游客模式验证**\n   - 若游客模式不崩、登录后崩 → 更偏向账号态/权限问题。\n\n7. **记录崩溃日志**\n   - 安卓：系统设置里查看“应用崩溃日志”；iOS：设置—隐私与安全性—分析与改进—分析数据。\n   - 记录崩溃时间点和关键错误关键字（如 NullPointer、SecurityException、SSL 等）。\n\n## 验证方式\n- 若第 2–5 步后不再崩溃，说明大概率是缓存/版本/网络环境问题，观察 1–2 天是否复发。\n- 若依然每次必崩，请把第 7 步的日志片段 + 第 1 步信息发我，我帮你进一步定位。\n\n## 需要补充的信息\n- App 版本号、手机型号与系统版本\n- 是否稳定复现、崩溃发生在哪个页面\n- 最近是否更新 App / 升级系统 / 换机 / 换网络\n- 崩溃日志片段（如能获取）\n\n## 升级条件\n如果出现以下情况，建议直接转二线技术处理：\n- **更新版本后仍必然崩溃的共性问题**（多台设备/多名用户同时出现）\n- 涉及数据丢失、登录态/权限异常\n- 需要后台日志或服务端排查才能定位\n\n请先按第 1 步把版本、机型、系统版本发我，多数闪退能据此快速定位。",
+            "intent": "technical_crash",
+            "intent_group": "technical",
+            "agent_type": "technical",
+            "agent_types": [
+              "technical"
+            ],
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "build_diagnostic_plan",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=technical_crash, group=technical, primary=technical, supporting=none, scores=[technical=0.93, general=0.10, billing=0.00]",
+            "routing_confidence": 0.93,
+            "escalated": false,
+            "latency_ms": 7657.1,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.736,
+            "intent_source_scores": {
+              "llm": 0.98,
+              "embedding": 0.18549555830406733,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "6ee61fe1",
+            "timestamp": "2026-09-27T04:36:41.927747",
+            "intent": "technical_crash",
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "build_diagnostic_plan",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "technical",
+                "tool_name": "build_diagnostic_plan",
+                "tool_use_id": "call_00_NPT18TRcCKtN2JoWqlXZ1202",
+                "input": {
+                  "environment": "App",
+                  "reproduced": true
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_w3v1Vuey2wu4jYaRUvx09137",
+                "input": {
+                  "query": "App 启动崩溃 闪退 排查 常见原因",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1875.0,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": false,
+            "latency_ms": 7657.1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "billing_duplicate_01",
+      "scenario": "single_billing",
+      "expected": {
+        "intent": "payment_issue",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [
+          "compare_amounts"
+        ],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "payment_issue",
+        "intent_group": "billing",
+        "intent_confidence": 0.8381,
+        "intent_source_scores": {
+          "llm": 0.95,
+          "embedding": 0.6155870112510924,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [
+            "99 元"
+          ],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "agent_types": [
+          "billing"
+        ],
+        "routing_confidence": 1.0,
+        "routing_reason": "intent=payment_issue, group=billing, primary=billing, supporting=none, scores=[billing=1.08, general=0.10, technical=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_4KejXF6uUTvBlDZeh7cR8932",
+            "input": {
+              "payment_channel": "未知"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_IiQFneu6dUeCDIbJU2Wl9814",
+            "input": {
+              "query": "重复扣款 核实 处理流程 退款",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3850.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 需要核验的信息\n\n目前只有金额（99 元）这一项可用，仍缺少关键核验字段：\n\n| 字段 | 状态 |\n|---|---|\n| 金额 | ✅ 已知 99 元（币种待确认） |\n| 订单号 / 交易号 | ❌ 缺失（两笔都需要） |\n| 扣款时间 | ❌ 缺失（两笔的日期和时间） |\n| 支付渠道 | ❌ 待确认（微信 / 支付宝 / 银行卡 / 企业转账 / 余额） |\n| 是否使用优惠券或余额抵扣 | ❌ 待确认 |\n\n## 当前说明\n\n- 我在当前信息下**无法确认这是否属于重复扣款**，也不能判断扣款是否正常或能否退回——这些都需要核对订单与支付流水后才能得出结论。\n- 两笔 99 元有可能是：同一订单被重复提交、两个不同订单（例如相邻周期的订阅续费）、或一笔订单 + 一笔其他费用。金额相同不代表一定是重复扣款。\n- 你的结构化信息里没有订单号和日期，所以我暂时无法定位到具体交易。请注意：我这边**没有查询订单或支付系统**，以下路径均需你提供信息后由人工/财务核验。\n\n## 下一步处理\n\n1. 请你提供：**两笔 99 元扣款的订单号或交易号、各自的扣款时间、支付渠道**，以及支付账单截图摘要（可只提供交易号、时间、金额、商户名称）。\n2. 同时请检查是否存在自动续费：平台内订阅设置，以及微信 / 支付宝 / 银行卡的「自动扣款 / 免密支付」协议。取消续费通常只影响下一周期扣款。\n3. 若能确认为重复扣款，这类情况属于**需人工或财务核验处理**，我不能直接承诺自动退回或立即到账，会由人工核实交易流水后按平台规则处理。\n4. 若两笔金额接近但时间不同，也可能对应不同订单，需要逐笔核对。\n\n## 时效边界\n\n- 核验需在你提供上述信息后进行。\n- 若确认为重复扣款并进入退款流程，退款通常原路退回，**具体到账时间以支付渠道实际处理为准**，我无法预先承诺。\n\n请把两笔扣款的订单号、时间和支付渠道发给我，我据此继续帮你判断。",
+        "escalated": false,
+        "latency_ms": 10380.8,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 12482.5,
+      "errors": [],
+      "trace": {
+        "request_id": "7c68a51d",
+        "timestamp": "2026-09-27T04:36:54.415986",
+        "intent": "payment_issue",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_4KejXF6uUTvBlDZeh7cR8932",
+            "input": {
+              "payment_channel": "未知"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_IiQFneu6dUeCDIbJU2Wl9814",
+            "input": {
+              "query": "重复扣款 核实 处理流程 退款",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3850.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 10380.8
+      },
+      "turns": [
+        {
+          "message": "这个月为什么重复扣款 99 元？",
+          "response": {
+            "conv_id": "baseline_billing_duplicate_01_conversation",
+            "request_id": "7c68a51d",
+            "response": "## 需要核验的信息\n\n目前只有金额（99 元）这一项可用，仍缺少关键核验字段：\n\n| 字段 | 状态 |\n|---|---|\n| 金额 | ✅ 已知 99 元（币种待确认） |\n| 订单号 / 交易号 | ❌ 缺失（两笔都需要） |\n| 扣款时间 | ❌ 缺失（两笔的日期和时间） |\n| 支付渠道 | ❌ 待确认（微信 / 支付宝 / 银行卡 / 企业转账 / 余额） |\n| 是否使用优惠券或余额抵扣 | ❌ 待确认 |\n\n## 当前说明\n\n- 我在当前信息下**无法确认这是否属于重复扣款**，也不能判断扣款是否正常或能否退回——这些都需要核对订单与支付流水后才能得出结论。\n- 两笔 99 元有可能是：同一订单被重复提交、两个不同订单（例如相邻周期的订阅续费）、或一笔订单 + 一笔其他费用。金额相同不代表一定是重复扣款。\n- 你的结构化信息里没有订单号和日期，所以我暂时无法定位到具体交易。请注意：我这边**没有查询订单或支付系统**，以下路径均需你提供信息后由人工/财务核验。\n\n## 下一步处理\n\n1. 请你提供：**两笔 99 元扣款的订单号或交易号、各自的扣款时间、支付渠道**，以及支付账单截图摘要（可只提供交易号、时间、金额、商户名称）。\n2. 同时请检查是否存在自动续费：平台内订阅设置，以及微信 / 支付宝 / 银行卡的「自动扣款 / 免密支付」协议。取消续费通常只影响下一周期扣款。\n3. 若能确认为重复扣款，这类情况属于**需人工或财务核验处理**，我不能直接承诺自动退回或立即到账，会由人工核实交易流水后按平台规则处理。\n4. 若两笔金额接近但时间不同，也可能对应不同订单，需要逐笔核对。\n\n## 时效边界\n\n- 核验需在你提供上述信息后进行。\n- 若确认为重复扣款并进入退款流程，退款通常原路退回，**具体到账时间以支付渠道实际处理为准**，我无法预先承诺。\n\n请把两笔扣款的订单号、时间和支付渠道发给我，我据此继续帮你判断。",
+            "intent": "payment_issue",
+            "intent_group": "billing",
+            "agent_type": "billing",
+            "agent_types": [
+              "billing"
+            ],
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=payment_issue, group=billing, primary=billing, supporting=none, scores=[billing=1.08, general=0.10, technical=0.00]",
+            "routing_confidence": 1.0,
+            "escalated": false,
+            "latency_ms": 10380.8,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [
+                "99 元"
+              ],
+              "error_code": []
+            },
+            "intent_confidence": 0.8381,
+            "intent_source_scores": {
+              "llm": 0.95,
+              "embedding": 0.6155870112510924,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "7c68a51d",
+            "timestamp": "2026-09-27T04:36:54.415986",
+            "intent": "payment_issue",
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "billing",
+                "tool_name": "check_billing_fields",
+                "tool_use_id": "call_00_4KejXF6uUTvBlDZeh7cR8932",
+                "input": {
+                  "payment_channel": "未知"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_IiQFneu6dUeCDIbJU2Wl9814",
+                "input": {
+                  "query": "重复扣款 核实 处理流程 退款",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3850.7,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": false,
+            "latency_ms": 10380.8
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "billing_refund_01",
+      "scenario": "single_billing",
+      "expected": {
+        "intent": "refund",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "required",
+        "expected_tools": [
+          "search_knowledge_base"
+        ],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "refund",
+        "intent_group": "billing",
+        "intent_confidence": 0.743,
+        "intent_source_scores": {
+          "llm": 0.99,
+          "embedding": 0.7106690545187015,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "agent_types": [
+          "billing"
+        ],
+        "routing_confidence": 0.93,
+        "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_I20Vcav3N8IUaTvVdmgE0321",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_jolnlRJUjHT8yXvwMcU61614",
+            "input": {
+              "query": "退款申请 需要核验信息 处理路径 时效",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1740.4,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 需要核验的信息\n\n目前系统里没有您的订单或支付信息，还无法判断这笔退款能否受理。请提供以下信息：\n\n| 字段 | 说明 |\n|---|---|\n| 订单号 / 交易号 | 用于定位原订单 |\n| 支付金额与币种 | 需与实付金额一致（注意区分订单原价、优惠抵扣、实付金额） |\n| 支付时间 | 大致时间即可 |\n| 支付渠道 | 微信 / 支付宝 / 银行卡 / 企业转账 / 余额 |\n| 退款诉求 | 是整单退款、部分退款，还是对某笔扣款有异议 |\n\n如果涉及重复扣款，请额外提供两笔扣款的时间、金额、渠道，以及交易记录截图摘要。\n\n## 当前说明\n\n- 我已做过字段检查，订单号、金额、时间、支付渠道四项均为缺失，因此**现在无法确认退款是否可以受理，也无法给出到账时间**。\n- 工具只能做字段检查和金额计算，不连接订单、支付或退款系统，所以我不能声称已经查询、修改或发起了退款。\n\n## 下一步处理路径\n\n1. 您补充上述信息后，我先核对订单状态、实付金额和适用的退款规则。\n2. 若涉及已使用服务、虚拟商品、活动价、部分退款或企业合同，**需要转人工审核**。\n3. 退款金额以实际支付金额和平台规则为准，不是订单原价；通过后通常原路退回，到账时间以支付渠道实际处理为准（各渠道不同）。\n\n请先把订单号和实付金额发我，我继续往下判断；如果金额与时间都非常接近出现两笔扣款，建议直接转人工核实。同时请保留支付凭证。",
+        "escalated": true,
+        "latency_ms": 5600.5,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": null
+      },
+      "status": "passed",
+      "latency_ms": 6239.7,
+      "errors": [],
+      "trace": {
+        "request_id": "a83fe4eb",
+        "timestamp": "2026-09-27T04:37:00.634124",
+        "intent": "refund",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_I20Vcav3N8IUaTvVdmgE0321",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_jolnlRJUjHT8yXvwMcU61614",
+            "input": {
+              "query": "退款申请 需要核验信息 处理路径 时效",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1740.4,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 5600.5
+      },
+      "turns": [
+        {
+          "message": "我想申请退款。",
+          "response": {
+            "conv_id": "baseline_billing_refund_01_conversation",
+            "request_id": "a83fe4eb",
+            "response": "## 需要核验的信息\n\n目前系统里没有您的订单或支付信息，还无法判断这笔退款能否受理。请提供以下信息：\n\n| 字段 | 说明 |\n|---|---|\n| 订单号 / 交易号 | 用于定位原订单 |\n| 支付金额与币种 | 需与实付金额一致（注意区分订单原价、优惠抵扣、实付金额） |\n| 支付时间 | 大致时间即可 |\n| 支付渠道 | 微信 / 支付宝 / 银行卡 / 企业转账 / 余额 |\n| 退款诉求 | 是整单退款、部分退款，还是对某笔扣款有异议 |\n\n如果涉及重复扣款，请额外提供两笔扣款的时间、金额、渠道，以及交易记录截图摘要。\n\n## 当前说明\n\n- 我已做过字段检查，订单号、金额、时间、支付渠道四项均为缺失，因此**现在无法确认退款是否可以受理，也无法给出到账时间**。\n- 工具只能做字段检查和金额计算，不连接订单、支付或退款系统，所以我不能声称已经查询、修改或发起了退款。\n\n## 下一步处理路径\n\n1. 您补充上述信息后，我先核对订单状态、实付金额和适用的退款规则。\n2. 若涉及已使用服务、虚拟商品、活动价、部分退款或企业合同，**需要转人工审核**。\n3. 退款金额以实际支付金额和平台规则为准，不是订单原价；通过后通常原路退回，到账时间以支付渠道实际处理为准（各渠道不同）。\n\n请先把订单号和实付金额发我，我继续往下判断；如果金额与时间都非常接近出现两笔扣款，建议直接转人工核实。同时请保留支付凭证。",
+            "intent": "refund",
+            "intent_group": "billing",
+            "agent_type": "billing",
+            "agent_types": [
+              "billing"
+            ],
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+            "routing_confidence": 0.93,
+            "escalated": true,
+            "latency_ms": 5600.5,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.743,
+            "intent_source_scores": {
+              "llm": 0.99,
+              "embedding": 0.7106690545187015,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "a83fe4eb",
+            "timestamp": "2026-09-27T04:37:00.634124",
+            "intent": "refund",
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "billing",
+                "tool_name": "check_billing_fields",
+                "tool_use_id": "call_00_I20Vcav3N8IUaTvVdmgE0321",
+                "input": {},
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_jolnlRJUjHT8yXvwMcU61614",
+                "input": {
+                  "query": "退款申请 需要核验信息 处理路径 时效",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1740.4,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 5600.5
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "billing_invoice_01",
+      "scenario": "single_billing",
+      "expected": {
+        "intent": "invoice",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "invoice",
+        "intent_group": "billing",
+        "intent_confidence": 0.715,
+        "intent_source_scores": {
+          "llm": 0.95,
+          "embedding": 0.23814483610392007,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "agent_types": [
+          "billing"
+        ],
+        "routing_confidence": 0.93,
+        "routing_reason": "intent=invoice, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_qUVn2JELdYqKJalyPcyi2423",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_VCKF4jstfnJFSGniLQdi2309",
+            "input": {
+              "query": "发票开具 开票时间 发票类型 抬头 税号 人工审核 作废重开",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1760.6,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "您好，关于发票一直没开出来，我先说明一下目前能判断的情况。\n\n**需要核验的信息**\n要定位发票状态，需要您提供以下信息（尽量齐全）：\n1. 订单号或交易号；\n2. 支付金额与币种；\n3. 支付时间；\n4. 支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）；\n5. 发票类型（个人 / 企业、普票 / 专票、电子 / 纸质）；\n6. 开票抬头、税号（企业发票需要）、接收邮箱；\n7. 开票金额与对应的订单范围。\n\n> 提示：请不要提供支付密码、短信验证码、完整银行卡号或身份证照片，这些我们不会索要。\n\n**当前说明**\n- 我刚做的字段检查显示：订单号、金额、日期、支付渠道均为**未提供**状态，所以目前**还无法确认**您这笔订单的开票进度。\n- 另外说明一点：我在知识库中检索发票相关规范时，本轮**没有命中专门的开票时效政策文档**，返回的多是订单、退款、配送等通用说明。因此关于开票时长，我暂时无法给出确切标准，需要以实际订单核验结果为准，不会向您承诺具体天数。\n- 发票未开出的常见原因包括：抬头/税号信息待补充、订单尚未完成、跨月开票、需要人工审核等，但哪一条适用于您，**要核验后才能确认**。\n\n**下一步处理**\n1. 您补充上述订单与抬头信息后，我可以帮您进一步梳理需要走的路径；\n2. 如果涉及发票**作废、重开或修改抬头**（尤其是跨月或已报销场景），按规定需要**转人工审核**，无法自助承诺直接更改；\n3. 若您的订单是企业合同、大额或线下付款场景，同样需要人工 / 财务核实。\n\n**时效边界**\n- 开票时间、审核时间都会受订单状态和渠道影响，**以支付渠道与财务实际处理为准**，我在核验前不做时间承诺。\n\n请把订单号和支付相关信息发我，我继续帮您跟进。如果您比较着急，也可以直接说明\"需要人工协助\"，我为您标记上升级处理。",
+        "escalated": true,
+        "latency_ms": 6405.1,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 7762.2,
+      "errors": [],
+      "trace": {
+        "request_id": "58da8b35",
+        "timestamp": "2026-09-27T04:37:08.417501",
+        "intent": "invoice",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_qUVn2JELdYqKJalyPcyi2423",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_VCKF4jstfnJFSGniLQdi2309",
+            "input": {
+              "query": "发票开具 开票时间 发票类型 抬头 税号 人工审核 作废重开",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1760.6,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 6405.1
+      },
+      "turns": [
+        {
+          "message": "我的发票怎么还没有开出来？",
+          "response": {
+            "conv_id": "baseline_billing_invoice_01_conversation",
+            "request_id": "58da8b35",
+            "response": "您好，关于发票一直没开出来，我先说明一下目前能判断的情况。\n\n**需要核验的信息**\n要定位发票状态，需要您提供以下信息（尽量齐全）：\n1. 订单号或交易号；\n2. 支付金额与币种；\n3. 支付时间；\n4. 支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）；\n5. 发票类型（个人 / 企业、普票 / 专票、电子 / 纸质）；\n6. 开票抬头、税号（企业发票需要）、接收邮箱；\n7. 开票金额与对应的订单范围。\n\n> 提示：请不要提供支付密码、短信验证码、完整银行卡号或身份证照片，这些我们不会索要。\n\n**当前说明**\n- 我刚做的字段检查显示：订单号、金额、日期、支付渠道均为**未提供**状态，所以目前**还无法确认**您这笔订单的开票进度。\n- 另外说明一点：我在知识库中检索发票相关规范时，本轮**没有命中专门的开票时效政策文档**，返回的多是订单、退款、配送等通用说明。因此关于开票时长，我暂时无法给出确切标准，需要以实际订单核验结果为准，不会向您承诺具体天数。\n- 发票未开出的常见原因包括：抬头/税号信息待补充、订单尚未完成、跨月开票、需要人工审核等，但哪一条适用于您，**要核验后才能确认**。\n\n**下一步处理**\n1. 您补充上述订单与抬头信息后，我可以帮您进一步梳理需要走的路径；\n2. 如果涉及发票**作废、重开或修改抬头**（尤其是跨月或已报销场景），按规定需要**转人工审核**，无法自助承诺直接更改；\n3. 若您的订单是企业合同、大额或线下付款场景，同样需要人工 / 财务核实。\n\n**时效边界**\n- 开票时间、审核时间都会受订单状态和渠道影响，**以支付渠道与财务实际处理为准**，我在核验前不做时间承诺。\n\n请把订单号和支付相关信息发我，我继续帮您跟进。如果您比较着急，也可以直接说明\"需要人工协助\"，我为您标记上升级处理。",
+            "intent": "invoice",
+            "intent_group": "billing",
+            "agent_type": "billing",
+            "agent_types": [
+              "billing"
+            ],
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=invoice, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+            "routing_confidence": 0.93,
+            "escalated": true,
+            "latency_ms": 6405.1,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.715,
+            "intent_source_scores": {
+              "llm": 0.95,
+              "embedding": 0.23814483610392007,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "58da8b35",
+            "timestamp": "2026-09-27T04:37:08.417501",
+            "intent": "invoice",
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "billing",
+                "tool_name": "check_billing_fields",
+                "tool_use_id": "call_00_qUVn2JELdYqKJalyPcyi2423",
+                "input": {},
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_VCKF4jstfnJFSGniLQdi2309",
+                "input": {
+                  "query": "发票开具 开票时间 发票类型 抬头 税号 人工审核 作废重开",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1760.6,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 6405.1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "general_logistics_01",
+      "scenario": "general",
+      "expected": {
+        "intent": "logistics",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "logistics",
+        "intent_group": "query",
+        "intent_confidence": 0.665,
+        "intent_source_scores": {
+          "llm": 0.95,
+          "embedding": 0.3142936330963102,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "agent_types": [
+          "general"
+        ],
+        "routing_confidence": 0.77,
+        "routing_reason": "intent=logistics, group=query, primary=general, supporting=none, scores=[general=0.77, technical=0.00, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "search_knowledge_base",
+          "inspect_request_context"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "general",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_YtcVwquQOLrGHIObCJyt8408",
+            "input": {
+              "query": "订单发货后 配送时效 多久能收到 物流时间",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 2166.0,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "general",
+            "tool_name": "inspect_request_context",
+            "tool_use_id": "call_01_fCG16dGHeNVDmnBWfo4U4292",
+            "input": {
+              "focus": "logistics 物流配送时效"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "发货后的送达时间主要取决于你选择的配送方式，一般参考如下：\n\n- **标准配送**：3–5 个工作日（订单满 99 元免运费）\n- **加急配送**：1–2 个工作日（运费 15 元）\n- **同城配送**：当日达或次日达（运费 10 元）\n- **偏远地区**：可能额外增加 2–3 天\n\n另外两点提醒：物流信息通常在发货后 24 小时内更新；配送时间为每天 9:00–18:00，节假日可能有所延迟。\n\n如果你想让我判断某个具体订单大概什么时候到，可以告诉我**订单号**（或下单时间、收货地区），我帮你按实际状态看一下。如果订单显示已发货但超过 7 天仍未收到，也可以提供订单号，由客服帮你发起查件。\n\n需要我继续帮你核对具体订单吗？",
+        "escalated": false,
+        "latency_ms": 5075.8,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 6385.3,
+      "errors": [],
+      "trace": {
+        "request_id": "827ed7aa",
+        "timestamp": "2026-09-27T04:37:14.781622",
+        "intent": "logistics",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "tools_used": [
+          "search_knowledge_base",
+          "inspect_request_context"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "general",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_YtcVwquQOLrGHIObCJyt8408",
+            "input": {
+              "query": "订单发货后 配送时效 多久能收到 物流时间",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 2166.0,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "general",
+            "tool_name": "inspect_request_context",
+            "tool_use_id": "call_01_fCG16dGHeNVDmnBWfo4U4292",
+            "input": {
+              "focus": "logistics 物流配送时效"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 5075.8
+      },
+      "turns": [
+        {
+          "message": "订单发货以后一般多久能收到？",
+          "response": {
+            "conv_id": "baseline_general_logistics_01_conversation",
+            "request_id": "827ed7aa",
+            "response": "发货后的送达时间主要取决于你选择的配送方式，一般参考如下：\n\n- **标准配送**：3–5 个工作日（订单满 99 元免运费）\n- **加急配送**：1–2 个工作日（运费 15 元）\n- **同城配送**：当日达或次日达（运费 10 元）\n- **偏远地区**：可能额外增加 2–3 天\n\n另外两点提醒：物流信息通常在发货后 24 小时内更新；配送时间为每天 9:00–18:00，节假日可能有所延迟。\n\n如果你想让我判断某个具体订单大概什么时候到，可以告诉我**订单号**（或下单时间、收货地区），我帮你按实际状态看一下。如果订单显示已发货但超过 7 天仍未收到，也可以提供订单号，由客服帮你发起查件。\n\n需要我继续帮你核对具体订单吗？",
+            "intent": "logistics",
+            "intent_group": "query",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "inspect_request_context"
+            ],
+            "routing_reason": "intent=logistics, group=query, primary=general, supporting=none, scores=[general=0.77, technical=0.00, billing=0.00]",
+            "routing_confidence": 0.77,
+            "escalated": false,
+            "latency_ms": 5075.8,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.665,
+            "intent_source_scores": {
+              "llm": 0.95,
+              "embedding": 0.3142936330963102,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "827ed7aa",
+            "timestamp": "2026-09-27T04:37:14.781622",
+            "intent": "logistics",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "inspect_request_context"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "general",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_00_YtcVwquQOLrGHIObCJyt8408",
+                "input": {
+                  "query": "订单发货后 配送时效 多久能收到 物流时间",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 2166.0,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "general",
+                "tool_name": "inspect_request_context",
+                "tool_use_id": "call_01_fCG16dGHeNVDmnBWfo4U4292",
+                "input": {
+                  "focus": "logistics 物流配送时效"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              }
+            ],
+            "escalated": false,
+            "latency_ms": 5075.8
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "general_greeting_01",
+      "scenario": "general",
+      "expected": {
+        "intent": "greeting",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "skip",
+        "expected_tools": [],
+        "escalation": "forbidden"
+      },
+      "actual": {
+        "intent": "greeting",
+        "intent_group": "greeting",
+        "intent_confidence": 0.943,
+        "intent_source_scores": {
+          "llm": 0.99,
+          "embedding": 1.0000000000000002,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "agent_types": [
+          "general"
+        ],
+        "routing_confidence": 0.65,
+        "routing_reason": "intent=greeting, group=greeting, primary=general, supporting=none, scores=[general=0.65, technical=0.00, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [],
+        "tool_traces": [],
+        "knowledge_used": false,
+        "search_knowledge_base_called": false,
+        "response": "你好！我是 EchoMind 智能客服，很高兴为你服务。\n\n我可以帮你处理：\n- **订单与售后**：订单状态、退换货流程等基础说明\n- **账户问题**：登录、账号异常等咨询与分流\n- **账单与支付**：扣款、退款、发票等问题的核实指引\n- **技术问题**：报错、崩溃、配置异常的初步判断与转接\n\n请直接描述你遇到的问题。如果是订单或账户相关，方便的话可以一并提供订单号或账号标识，我会更快帮你判断下一步。",
+        "escalated": false,
+        "latency_ms": 1400.1,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": true
+      },
+      "status": "passed",
+      "latency_ms": 2618.9,
+      "errors": [],
+      "trace": {
+        "request_id": "d58fc886",
+        "timestamp": "2026-09-27T04:37:17.420645",
+        "intent": "greeting",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": false,
+        "latency_ms": 1400.1
+      },
+      "turns": [
+        {
+          "message": "你好",
+          "response": {
+            "conv_id": "baseline_general_greeting_01_conversation",
+            "request_id": "d58fc886",
+            "response": "你好！我是 EchoMind 智能客服，很高兴为你服务。\n\n我可以帮你处理：\n- **订单与售后**：订单状态、退换货流程等基础说明\n- **账户问题**：登录、账号异常等咨询与分流\n- **账单与支付**：扣款、退款、发票等问题的核实指引\n- **技术问题**：报错、崩溃、配置异常的初步判断与转接\n\n请直接描述你遇到的问题。如果是订单或账户相关，方便的话可以一并提供订单号或账号标识，我会更快帮你判断下一步。",
+            "intent": "greeting",
+            "intent_group": "greeting",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [],
+            "routing_reason": "intent=greeting, group=greeting, primary=general, supporting=none, scores=[general=0.65, technical=0.00, billing=0.00]",
+            "routing_confidence": 0.65,
+            "escalated": false,
+            "latency_ms": 1400.1,
+            "knowledge_used": false,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.943,
+            "intent_source_scores": {
+              "llm": 0.99,
+              "embedding": 1.0000000000000002,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "d58fc886",
+            "timestamp": "2026-09-27T04:37:17.420645",
+            "intent": "greeting",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [],
+            "tool_calls": [],
+            "escalated": false,
+            "latency_ms": 1400.1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "compound_technical_billing_01",
+      "scenario": "compound",
+      "expected": {
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [
+          "billing"
+        ],
+        "multi_agent": true,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "technical_login",
+        "intent_group": "technical",
+        "intent_confidence": 0.4402,
+        "intent_source_scores": {
+          "llm": 0.0,
+          "embedding": 0.4401970963427134,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [
+            "99 元"
+          ],
+          "error_code": [
+            "401"
+          ]
+        },
+        "urgency": "N/A",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "agent_types": [
+          "technical"
+        ],
+        "routing_confidence": 1.0,
+        "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=none, scores=[technical=1.13, billing=0.15, general=0.10]",
+        "multi_agent": false,
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base",
+          "search_knowledge_base",
+          "build_diagnostic_plan"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_n4QYfC4EmnO8cnlQnZ361378",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_45xFfzY33UIUgfoqO1zX9005",
+            "input": {
+              "query": "登录 401 认证失败 Token 过期 排查",
+              "top_k": 4
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3433.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_02_lknqIXfg2MkTbfm2TPx17193",
+            "input": {
+              "query": "重复扣费 99元 退款 账单异常 订阅续费",
+              "top_k": 4
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3724.9,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "build_diagnostic_plan",
+            "tool_use_id": "call_03_8vZ9fjcpfPDWXxzbSmwR7145",
+            "input": {
+              "environment": "浏览器/App 登录",
+              "reproduced": true
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "谢谢补充。这里其实有**两个独立问题**，我分开说明。先给结论：**目前还不能断定根因**，但可以按下面的顺序快速缩小范围。\n\n---\n\n## 一、现象复述\n1. 登录时持续返回 **401**，且可稳定复现。\n2. 本月账户被**重复扣款 99 元**（怀疑多笔）。\n\n---\n\n## 二、登录 401（认证失败）\n\n**401 的含义**：认证失败，不是权限不足（那是 403）。常见原因是登录态/Token 失效，而不是账号被封。以下是低风险排查步骤：\n\n1. **确认是\"输错凭据\"还是\"登录态失效\"**：先换一个已知正确的密码手动登录一次。如果仍 401，说明不是密码问题。\n2. **重置密码后再试**：如果忘记密码或怀疑密码错误，通过绑定的手机号/邮箱走官方重置流程（不要通过任何渠道把密码发给别人，客服也不会索要密码）。\n3. **排除本地缓存与 Token 残留**：退出登录，清理浏览器缓存/Cookie 或 App 缓存后重新登录。这一步只影响本机，风险低。\n4. **换网络 + 换版本验证**：切换 WiFi/移动数据，并确认客户端是最新版本。如果换网络后正常，问题偏向本地网络/代理。\n5. **账号状态核验**：如果以上都无效，可能是账号被安全策略锁定或登录态服务端异常——这一步需要后台核验，我无法在本地判断。\n\n> 如果登录时抓到了完整的错误响应，请留意是否有 **request_id**，这是后续定位的关键字段。\n\n---\n\n## 三、重复扣费 99 元（账单问题）\n\n这部分**需要走账单/人工核验，我无法直接查询订单或执行退款**，请不要在公开渠道发送完整支付信息。\n\n需要你补充（用于核对，不必发敏感信息）：\n1. **扣费笔数、每笔金额和具体日期**（例如：本月 3 日和 5 日各扣 99 元）。\n2. **扣费渠道**：App 内购 / 支付宝 / 微信 / 银行卡 / 自动续费订阅。\n3. **对应订单号**（如有）。注意：99 元也可能是\"订单满 99 元免运费\"等活动的金额，需与账单核对，不能仅凭金额判断为重复扣费。\n4. 是否开通过**自动续费/订阅**，或近期是否重复点击过支付按钮。\n\n**为什么先核对而不是直接退款**：需要先确认是\"重复扣款\"、\"多次下单\"还是\"续费订阅\"，处理方式不同。若确认是重复扣款，通常走账单核对 + 退款流程。\n\n---\n\n## 四、验证方式\n- 登录：重置密码/清缓存后重新登录，能正常进入即视为已解决；若仍 401，请记录发生时间与 request_id 转二线。\n- 账单：拿到扣费明细后与客服核对到账与退款进度。\n\n---\n\n## 五、需要补充的信息\n- 登录 401 是**部分人还是仅你一人**？其他设备/浏览器是否同样报错？\n- 最近是否**改过密码、换过网络、升级过版本、发布过新配置**？\n- 扣费的完整明细（笔数/金额/日期/渠道）。\n\n---\n\n## 六、升级条件（建议转人工/二线）\n- 登录 401 **影响多人或核心业务**，且你已按上述步骤排查仍无法登录。\n- **确认存在重复扣款**，需要账务核对或退款——这属于需要后台与人工处理的范围。\n\n建议你先花 2 分钟做**第一步（换密码登录）+ 第三步（清缓存）**，同时把扣费明细整理好。告诉我结果，我再帮你继续缩小范围。",
+        "escalated": true,
+        "latency_ms": 13920.3,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": false,
+        "multi_agent": false,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 15491.0,
+      "errors": [],
+      "trace": {
+        "request_id": "9d5a359f",
+        "timestamp": "2026-09-27T04:37:32.902351",
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base",
+          "search_knowledge_base",
+          "build_diagnostic_plan"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_n4QYfC4EmnO8cnlQnZ361378",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_45xFfzY33UIUgfoqO1zX9005",
+            "input": {
+              "query": "登录 401 认证失败 Token 过期 排查",
+              "top_k": 4
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3433.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_02_lknqIXfg2MkTbfm2TPx17193",
+            "input": {
+              "query": "重复扣费 99元 退款 账单异常 订阅续费",
+              "top_k": 4
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3724.9,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "build_diagnostic_plan",
+            "tool_use_id": "call_03_8vZ9fjcpfPDWXxzbSmwR7145",
+            "input": {
+              "environment": "浏览器/App 登录",
+              "reproduced": true
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 13920.3
+      },
+      "turns": [
+        {
+          "message": "登录一直报 401，而且这个月还重复扣了我 99 元。",
+          "response": {
+            "conv_id": "baseline_compound_technical_billing_01_conversation",
+            "request_id": "9d5a359f",
+            "response": "谢谢补充。这里其实有**两个独立问题**，我分开说明。先给结论：**目前还不能断定根因**，但可以按下面的顺序快速缩小范围。\n\n---\n\n## 一、现象复述\n1. 登录时持续返回 **401**，且可稳定复现。\n2. 本月账户被**重复扣款 99 元**（怀疑多笔）。\n\n---\n\n## 二、登录 401（认证失败）\n\n**401 的含义**：认证失败，不是权限不足（那是 403）。常见原因是登录态/Token 失效，而不是账号被封。以下是低风险排查步骤：\n\n1. **确认是\"输错凭据\"还是\"登录态失效\"**：先换一个已知正确的密码手动登录一次。如果仍 401，说明不是密码问题。\n2. **重置密码后再试**：如果忘记密码或怀疑密码错误，通过绑定的手机号/邮箱走官方重置流程（不要通过任何渠道把密码发给别人，客服也不会索要密码）。\n3. **排除本地缓存与 Token 残留**：退出登录，清理浏览器缓存/Cookie 或 App 缓存后重新登录。这一步只影响本机，风险低。\n4. **换网络 + 换版本验证**：切换 WiFi/移动数据，并确认客户端是最新版本。如果换网络后正常，问题偏向本地网络/代理。\n5. **账号状态核验**：如果以上都无效，可能是账号被安全策略锁定或登录态服务端异常——这一步需要后台核验，我无法在本地判断。\n\n> 如果登录时抓到了完整的错误响应，请留意是否有 **request_id**，这是后续定位的关键字段。\n\n---\n\n## 三、重复扣费 99 元（账单问题）\n\n这部分**需要走账单/人工核验，我无法直接查询订单或执行退款**，请不要在公开渠道发送完整支付信息。\n\n需要你补充（用于核对，不必发敏感信息）：\n1. **扣费笔数、每笔金额和具体日期**（例如：本月 3 日和 5 日各扣 99 元）。\n2. **扣费渠道**：App 内购 / 支付宝 / 微信 / 银行卡 / 自动续费订阅。\n3. **对应订单号**（如有）。注意：99 元也可能是\"订单满 99 元免运费\"等活动的金额，需与账单核对，不能仅凭金额判断为重复扣费。\n4. 是否开通过**自动续费/订阅**，或近期是否重复点击过支付按钮。\n\n**为什么先核对而不是直接退款**：需要先确认是\"重复扣款\"、\"多次下单\"还是\"续费订阅\"，处理方式不同。若确认是重复扣款，通常走账单核对 + 退款流程。\n\n---\n\n## 四、验证方式\n- 登录：重置密码/清缓存后重新登录，能正常进入即视为已解决；若仍 401，请记录发生时间与 request_id 转二线。\n- 账单：拿到扣费明细后与客服核对到账与退款进度。\n\n---\n\n## 五、需要补充的信息\n- 登录 401 是**部分人还是仅你一人**？其他设备/浏览器是否同样报错？\n- 最近是否**改过密码、换过网络、升级过版本、发布过新配置**？\n- 扣费的完整明细（笔数/金额/日期/渠道）。\n\n---\n\n## 六、升级条件（建议转人工/二线）\n- 登录 401 **影响多人或核心业务**，且你已按上述步骤排查仍无法登录。\n- **确认存在重复扣款**，需要账务核对或退款——这属于需要后台与人工处理的范围。\n\n建议你先花 2 分钟做**第一步（换密码登录）+ 第三步（清缓存）**，同时把扣费明细整理好。告诉我结果，我再帮你继续缩小范围。",
+            "intent": "technical_login",
+            "intent_group": "technical",
+            "agent_type": "technical",
+            "agent_types": [
+              "technical"
+            ],
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base",
+              "search_knowledge_base",
+              "build_diagnostic_plan"
+            ],
+            "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=none, scores=[technical=1.13, billing=0.15, general=0.10]",
+            "routing_confidence": 1.0,
+            "escalated": true,
+            "latency_ms": 13920.3,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [
+                "99 元"
+              ],
+              "error_code": [
+                "401"
+              ]
+            },
+            "intent_confidence": 0.4402,
+            "intent_source_scores": {
+              "llm": 0.0,
+              "embedding": 0.4401970963427134,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "9d5a359f",
+            "timestamp": "2026-09-27T04:37:32.902351",
+            "intent": "technical_login",
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base",
+              "search_knowledge_base",
+              "build_diagnostic_plan"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "technical",
+                "tool_name": "lookup_error_code",
+                "tool_use_id": "call_00_n4QYfC4EmnO8cnlQnZ361378",
+                "input": {
+                  "error_code": "401"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_45xFfzY33UIUgfoqO1zX9005",
+                "input": {
+                  "query": "登录 401 认证失败 Token 过期 排查",
+                  "top_k": 4
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3433.7,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_02_lknqIXfg2MkTbfm2TPx17193",
+                "input": {
+                  "query": "重复扣费 99元 退款 账单异常 订阅续费",
+                  "top_k": 4
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3724.9,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "build_diagnostic_plan",
+                "tool_use_id": "call_03_8vZ9fjcpfPDWXxzbSmwR7145",
+                "input": {
+                  "environment": "浏览器/App 登录",
+                  "reproduced": true
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 13920.3
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "compound_technical_billing_02",
+      "scenario": "compound",
+      "expected": {
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [
+          "billing"
+        ],
+        "multi_agent": true,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "technical_login",
+        "intent_group": "technical",
+        "intent_confidence": 0.3311,
+        "intent_source_scores": {
+          "llm": 0.0,
+          "embedding": 0.33106109598586536,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": [
+            "401"
+          ]
+        },
+        "urgency": "N/A",
+        "primary_agent": "technical",
+        "supporting_agents": [
+          "billing"
+        ],
+        "agent_types": [
+          "technical",
+          "billing"
+        ],
+        "routing_confidence": 1.0,
+        "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=billing, scores=[technical=1.31, billing=0.18, general=0.10]",
+        "multi_agent": true,
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base",
+          "build_diagnostic_plan",
+          "check_billing_fields"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_9ByTynPm1pIt6wPSQPjb8637",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_CifbR8bggRvlaDWZd9kZ7927",
+            "input": {
+              "query": "登录 401 认证失败 排查",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3666.9,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_02_7H5EWWsD4ys2rRvcl8H71357",
+            "input": {
+              "query": "重复扣款 支付异常 处理流程",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3517.2,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "build_diagnostic_plan",
+            "tool_use_id": "call_03_HHO2McdAYXH2f7rCv14Q4820",
+            "input": {
+              "environment": "App",
+              "reproduced": true
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_UgIgywyGUXnat3IdvH4z5619",
+            "input": {
+              "query": "重复扣款 核实 处理流程 退款",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3308.2,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_Mun0RLY3hFHqLxgrLJ2W0798",
+            "input": {
+              "query": "401 登录报错 账单",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3156.0,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_02_sqc5PpA9qFO9YJ26EGWp9197",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 现象复述\n你反馈了两件事：① 登录时报 **401（认证失败）**；② 同时出现了 **重复扣款**。这两个现象大概率是**两条独立的问题链路**，建议分开处理——尤其重复扣款优先级更高，因为它涉及资金。\n\n---\n\n## 一、401 登录失败排查\n\n**可能原因（按概率排序）**\n1. 登录态 / Token 已过期或未正确携带；\n2. 账号被临时锁定（异常登录保护）；\n3. 客户端版本过旧，登录接口已变更；\n4. 请求时间戳 / 签名不匹配（若为 API 接入）。\n\n**编号排查步骤**\n1. **确认是否稳定复现**：完全退出 App 后重新打开，再次登录。若仍 401，记录具体提示文案。\n2. **确认账号状态**：检查是否收到过\"异常登录、账号锁定\"类通知；若是，走绑定的手机号/邮箱**重置密码**（不要提供密码或验证码给我）。\n3. **确认版本**：查看 App 版本号，确认是否为最新版本；旧版本可能命中已下线的登录接口。\n4. **确认网络**：切换 WiFi / 移动数据各试一次，排除代理或证书导致的认证中断。\n5. **若你是服务端/API 接入方式**：核对 Token 是否过期、请求时间戳与签名是否一致，密钥只核对前后几位即可（**请勿在对话中粘贴完整密钥**）。\n\n> 说明：401 我这边只能做含义层面的判断（认证失败），**没有读取你的服务端日志**，也无法确认具体是账号侧还是服务端侧触发。\n\n---\n\n## 二、重复扣款排查（建议优先 + 升级处理）\n\n重复扣款属于**支付链路异常**，比登录 401 更紧急。\n\n1. **先锁定证据**：查到这笔重复扣款的 **订单号、扣款时间、金额、支付渠道**（微信/支付宝/银行卡），并截图账单记录。\n2. **确认是否真的重复**：对比两笔扣款的时间差（可能是一笔预授权+一笔正式扣款），或其中一笔状态为\"待退款/处理中\"。\n3. **不要重复发起支付或自行重试支付**，以免产生第三笔。\n4. 我需要说明：**我没有执行任何查询、退款或账户操作的能力**，重复扣款需要后台核验支付流水与订单状态，属于必须升级的范围。\n\n---\n\n## 需要你补充的信息\n1. 401 的**具体提示文案**、发生时间、是否稳定复现、App 版本、手机系统；\n2. 重复扣款的**订单号 / 扣款时间 / 金额 / 支付渠道**；\n3. 若是 API 接入：接口路径、request_id、响应体摘要（**去掉密钥**）。\n\n---\n\n## 升级条件（满足即转人工/二线 + 资金通道）\n- ✅ **已满足**：涉及重复扣款 / 支付异常 → 建议立即升级人工与支付通道核查，并保留账单截图。\n- 若 401 演变为**多用户无法登录**（生产大面积不可用），同样立即升级。\n\n请先把上面「重复扣款的订单号和扣款时间」发我，我帮你整理成升级单；同时按 401 的 5 步做一次复现记录。\n\n补充说明：\n理解您遇到两个问题：一个是登录报 401 报错（属于技术登录范畴），另一个是“重复扣款”（属于资金问题）。这两件事需要分开处理，我先说明资金部分的核验要求。\n\n**一、关于登录 401**\n401 表示认证失败，通常与账号密码或登录态有关，不涉及资金。可以先尝试：核对用户名密码是否正确，或通过绑定手机号/邮箱重置密码。如果重置后仍持续报错，建议转技术支持排查。\n> 这不是扣款原因，和“重复扣款”之间没有直接因果，请不要仅凭 401 就判断扣款异常。\n\n**二、关于重复扣款（资金问题）**\n\n**需要核验的信息**\n- 订单号或交易号（每笔各一个，便于区分是否为同一订单）\n- 两笔扣款的金额、币种\n- 两笔扣款的支付时间\n- 支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n- 两笔交易的记录截图摘要（如有）\n\n**当前说明**\n- 目前您未提供订单号、金额、时间、支付渠道，我无法确认两笔扣款是否真的属于重复扣款，也无法确认金额差异。**字段检查显示：订单号、金额、时间、支付渠道均缺失，当前不满足核验和退款确认条件。**\n- 两笔金额或时间差异较大时，可能对应不同订单；金额和时间非常接近时才更需重点核查是否重复。\n- 在未核验前，我不能承诺退款成功、退款金额或到账时间。\n\n**下一步处理路径**\n1. 请先提供上述字段（订单号、两笔金额、时间、渠道）。\n2. 我会据实对比金额差异，协助判断是否指向同一订单。\n3. 如确认为重复扣款，属于**实际退款/异常扣款场景，需要转人工或财务核验后处理**，不自动退回、不即时到账。\n\n**时效边界**\n- 退款通过后通常原路退回，具体到账时间**以支付渠道实际处理为准**，不同渠道不同。\n- 人工核验所需时间以受理后反馈为准，我无法提前承诺。\n\n**收尾提醒**\n- 请保留两笔支付的凭证截图，便于人工核实。\n- 请不要向任何人提供支付密码、短信验证码或完整银行卡号。\n\n请把订单号、两笔金额和时间、支付渠道发我，我先帮您做金额对比，再判断是否需要转人工核实重复扣款。",
+        "escalated": true,
+        "latency_ms": 19015.4,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 20791.2,
+      "errors": [],
+      "trace": {
+        "request_id": "aa1450e1",
+        "timestamp": "2026-09-27T04:37:53.698463",
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [
+          "billing"
+        ],
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base",
+          "build_diagnostic_plan",
+          "check_billing_fields"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_9ByTynPm1pIt6wPSQPjb8637",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_CifbR8bggRvlaDWZd9kZ7927",
+            "input": {
+              "query": "登录 401 认证失败 排查",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3666.9,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_02_7H5EWWsD4ys2rRvcl8H71357",
+            "input": {
+              "query": "重复扣款 支付异常 处理流程",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3517.2,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "build_diagnostic_plan",
+            "tool_use_id": "call_03_HHO2McdAYXH2f7rCv14Q4820",
+            "input": {
+              "environment": "App",
+              "reproduced": true
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_UgIgywyGUXnat3IdvH4z5619",
+            "input": {
+              "query": "重复扣款 核实 处理流程 退款",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3308.2,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_Mun0RLY3hFHqLxgrLJ2W0798",
+            "input": {
+              "query": "401 登录报错 账单",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3156.0,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_02_sqc5PpA9qFO9YJ26EGWp9197",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 19015.4
+      },
+      "turns": [
+        {
+          "message": "登录报错 401，而且出现了重复扣款。",
+          "response": {
+            "conv_id": "baseline_compound_technical_billing_02_conversation",
+            "request_id": "aa1450e1",
+            "response": "## 现象复述\n你反馈了两件事：① 登录时报 **401（认证失败）**；② 同时出现了 **重复扣款**。这两个现象大概率是**两条独立的问题链路**，建议分开处理——尤其重复扣款优先级更高，因为它涉及资金。\n\n---\n\n## 一、401 登录失败排查\n\n**可能原因（按概率排序）**\n1. 登录态 / Token 已过期或未正确携带；\n2. 账号被临时锁定（异常登录保护）；\n3. 客户端版本过旧，登录接口已变更；\n4. 请求时间戳 / 签名不匹配（若为 API 接入）。\n\n**编号排查步骤**\n1. **确认是否稳定复现**：完全退出 App 后重新打开，再次登录。若仍 401，记录具体提示文案。\n2. **确认账号状态**：检查是否收到过\"异常登录、账号锁定\"类通知；若是，走绑定的手机号/邮箱**重置密码**（不要提供密码或验证码给我）。\n3. **确认版本**：查看 App 版本号，确认是否为最新版本；旧版本可能命中已下线的登录接口。\n4. **确认网络**：切换 WiFi / 移动数据各试一次，排除代理或证书导致的认证中断。\n5. **若你是服务端/API 接入方式**：核对 Token 是否过期、请求时间戳与签名是否一致，密钥只核对前后几位即可（**请勿在对话中粘贴完整密钥**）。\n\n> 说明：401 我这边只能做含义层面的判断（认证失败），**没有读取你的服务端日志**，也无法确认具体是账号侧还是服务端侧触发。\n\n---\n\n## 二、重复扣款排查（建议优先 + 升级处理）\n\n重复扣款属于**支付链路异常**，比登录 401 更紧急。\n\n1. **先锁定证据**：查到这笔重复扣款的 **订单号、扣款时间、金额、支付渠道**（微信/支付宝/银行卡），并截图账单记录。\n2. **确认是否真的重复**：对比两笔扣款的时间差（可能是一笔预授权+一笔正式扣款），或其中一笔状态为\"待退款/处理中\"。\n3. **不要重复发起支付或自行重试支付**，以免产生第三笔。\n4. 我需要说明：**我没有执行任何查询、退款或账户操作的能力**，重复扣款需要后台核验支付流水与订单状态，属于必须升级的范围。\n\n---\n\n## 需要你补充的信息\n1. 401 的**具体提示文案**、发生时间、是否稳定复现、App 版本、手机系统；\n2. 重复扣款的**订单号 / 扣款时间 / 金额 / 支付渠道**；\n3. 若是 API 接入：接口路径、request_id、响应体摘要（**去掉密钥**）。\n\n---\n\n## 升级条件（满足即转人工/二线 + 资金通道）\n- ✅ **已满足**：涉及重复扣款 / 支付异常 → 建议立即升级人工与支付通道核查，并保留账单截图。\n- 若 401 演变为**多用户无法登录**（生产大面积不可用），同样立即升级。\n\n请先把上面「重复扣款的订单号和扣款时间」发我，我帮你整理成升级单；同时按 401 的 5 步做一次复现记录。\n\n补充说明：\n理解您遇到两个问题：一个是登录报 401 报错（属于技术登录范畴），另一个是“重复扣款”（属于资金问题）。这两件事需要分开处理，我先说明资金部分的核验要求。\n\n**一、关于登录 401**\n401 表示认证失败，通常与账号密码或登录态有关，不涉及资金。可以先尝试：核对用户名密码是否正确，或通过绑定手机号/邮箱重置密码。如果重置后仍持续报错，建议转技术支持排查。\n> 这不是扣款原因，和“重复扣款”之间没有直接因果，请不要仅凭 401 就判断扣款异常。\n\n**二、关于重复扣款（资金问题）**\n\n**需要核验的信息**\n- 订单号或交易号（每笔各一个，便于区分是否为同一订单）\n- 两笔扣款的金额、币种\n- 两笔扣款的支付时间\n- 支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n- 两笔交易的记录截图摘要（如有）\n\n**当前说明**\n- 目前您未提供订单号、金额、时间、支付渠道，我无法确认两笔扣款是否真的属于重复扣款，也无法确认金额差异。**字段检查显示：订单号、金额、时间、支付渠道均缺失，当前不满足核验和退款确认条件。**\n- 两笔金额或时间差异较大时，可能对应不同订单；金额和时间非常接近时才更需重点核查是否重复。\n- 在未核验前，我不能承诺退款成功、退款金额或到账时间。\n\n**下一步处理路径**\n1. 请先提供上述字段（订单号、两笔金额、时间、渠道）。\n2. 我会据实对比金额差异，协助判断是否指向同一订单。\n3. 如确认为重复扣款，属于**实际退款/异常扣款场景，需要转人工或财务核验后处理**，不自动退回、不即时到账。\n\n**时效边界**\n- 退款通过后通常原路退回，具体到账时间**以支付渠道实际处理为准**，不同渠道不同。\n- 人工核验所需时间以受理后反馈为准，我无法提前承诺。\n\n**收尾提醒**\n- 请保留两笔支付的凭证截图，便于人工核实。\n- 请不要向任何人提供支付密码、短信验证码或完整银行卡号。\n\n请把订单号、两笔金额和时间、支付渠道发我，我先帮您做金额对比，再判断是否需要转人工核实重复扣款。",
+            "intent": "technical_login",
+            "intent_group": "technical",
+            "agent_type": "technical",
+            "agent_types": [
+              "technical",
+              "billing"
+            ],
+            "primary_agent": "technical",
+            "supporting_agents": [
+              "billing"
+            ],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base",
+              "build_diagnostic_plan",
+              "check_billing_fields"
+            ],
+            "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=billing, scores=[technical=1.31, billing=0.18, general=0.10]",
+            "routing_confidence": 1.0,
+            "escalated": true,
+            "latency_ms": 19015.4,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": [
+                "401"
+              ]
+            },
+            "intent_confidence": 0.3311,
+            "intent_source_scores": {
+              "llm": 0.0,
+              "embedding": 0.33106109598586536,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "aa1450e1",
+            "timestamp": "2026-09-27T04:37:53.698463",
+            "intent": "technical_login",
+            "primary_agent": "technical",
+            "supporting_agents": [
+              "billing"
+            ],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base",
+              "build_diagnostic_plan",
+              "check_billing_fields"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "technical",
+                "tool_name": "lookup_error_code",
+                "tool_use_id": "call_00_9ByTynPm1pIt6wPSQPjb8637",
+                "input": {
+                  "error_code": "401"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_CifbR8bggRvlaDWZd9kZ7927",
+                "input": {
+                  "query": "登录 401 认证失败 排查",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3666.9,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_02_7H5EWWsD4ys2rRvcl8H71357",
+                "input": {
+                  "query": "重复扣款 支付异常 处理流程",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3517.2,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "build_diagnostic_plan",
+                "tool_use_id": "call_03_HHO2McdAYXH2f7rCv14Q4820",
+                "input": {
+                  "environment": "App",
+                  "reproduced": true
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_00_UgIgywyGUXnat3IdvH4z5619",
+                "input": {
+                  "query": "重复扣款 核实 处理流程 退款",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3308.2,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_Mun0RLY3hFHqLxgrLJ2W0798",
+                "input": {
+                  "query": "401 登录报错 账单",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3156.0,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "check_billing_fields",
+                "tool_use_id": "call_02_sqc5PpA9qFO9YJ26EGWp9197",
+                "input": {},
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 19015.4
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "rag_refund_eta_01",
+      "scenario": "rag_required",
+      "expected": {
+        "intent": "refund",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "required",
+        "expected_tools": [
+          "search_knowledge_base"
+        ],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "refund",
+        "intent_group": "billing",
+        "intent_confidence": 0.8204,
+        "intent_source_scores": {
+          "llm": 0.97,
+          "embedding": 0.4567734398020992,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "agent_types": [
+          "billing"
+        ],
+        "routing_confidence": 0.93,
+        "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "search_knowledge_base",
+          "check_billing_fields"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_G03Edd4neygO6umNaulA6373",
+            "input": {
+              "query": "退款到账时间 原路退回 支付渠道处理时效",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1965.8,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_01_uJZkKvvIhhhQZZ2MHZvr1507",
+            "input": {
+              "payment_channel": "未知"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 需要核验的信息\n\n你问的是\"审核通过后多久到账\"，但这类问题要结合具体退款单才能答复。目前我这边**没有你的订单号、支付金额和支付时间**（字段检查也提示这三项缺失），所以还无法定位到具体那一笔退款。\n\n如果方便，请补充：\n\n- 订单号或退款流水号\n- 实付金额与币种\n- 原支付时间\n- 原支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n\n## 当前说明\n\n- 我没有查询到你们场景下\"退款到账时效\"的具体政策条款——知识库里命中的是订单查询、配送、会员积分等内容，与退款时效无关，所以**我不能给你一个确定的到账天数**。\n- 一般来说，退款审核通过后会**原路退回**到原支付账户，具体到账时间由**支付渠道方实际处理**决定，各渠道（微信、支付宝、银行卡、企业转账）节奏不同。\n- 退款到账 = 审核通过 + 平台发起退款 + 渠道入账，这三步里任何一步未完成，都不会显示到账。\n- 我不能在此承诺\"一定几天到账\"或\"立即到账\"。\n\n## 下一步处理\n\n1. **先自查**：如果你那边渠道已显示\"退款成功\"，建议核对原支付账户的入账记录、银行/渠道账单明细，以及支付渠道的通知消息（有时通知滞后或进了其他入口）。\n2. **超过常规周期仍未到账**：这种情况需要**转人工核对退款流水号**，由人工向渠道侧核实退款发起状态与凭证。这一步我无法替你执行。\n3. **需要人工介入的情形**：实际退款操作、重复扣款、退款金额与实付不一致、支付成功但订单未生效、企业转账或大额订单——这些都属于必须人工/财务核验的范围。\n\n## 时效边界\n\n- 现在我只能说：到账时间**以支付渠道实际处理为准**，需要核实退款流水后才能给出更接近的判断。\n- 退款是否成立、退多少，须以**实际支付金额**和平台退款规则为准，不会按订单原价计算。\n\n请把上面四项信息发我，我可以帮你确认还缺什么、并判断是否需要直接转人工核实流水。另外建议保留好支付凭证，后续核对会用到。",
+        "escalated": true,
+        "latency_ms": 7243.0,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": null
+      },
+      "status": "passed",
+      "latency_ms": 8540.6,
+      "errors": [],
+      "trace": {
+        "request_id": "f130a10b",
+        "timestamp": "2026-09-27T04:38:02.241290",
+        "intent": "refund",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "tools_used": [
+          "search_knowledge_base",
+          "check_billing_fields"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_G03Edd4neygO6umNaulA6373",
+            "input": {
+              "query": "退款到账时间 原路退回 支付渠道处理时效",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1965.8,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_01_uJZkKvvIhhhQZZ2MHZvr1507",
+            "input": {
+              "payment_channel": "未知"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 7243.0
+      },
+      "turns": [
+        {
+          "message": "退款审核通过以后多久能到账？",
+          "response": {
+            "conv_id": "baseline_rag_refund_eta_01_conversation",
+            "request_id": "f130a10b",
+            "response": "## 需要核验的信息\n\n你问的是\"审核通过后多久到账\"，但这类问题要结合具体退款单才能答复。目前我这边**没有你的订单号、支付金额和支付时间**（字段检查也提示这三项缺失），所以还无法定位到具体那一笔退款。\n\n如果方便，请补充：\n\n- 订单号或退款流水号\n- 实付金额与币种\n- 原支付时间\n- 原支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n\n## 当前说明\n\n- 我没有查询到你们场景下\"退款到账时效\"的具体政策条款——知识库里命中的是订单查询、配送、会员积分等内容，与退款时效无关，所以**我不能给你一个确定的到账天数**。\n- 一般来说，退款审核通过后会**原路退回**到原支付账户，具体到账时间由**支付渠道方实际处理**决定，各渠道（微信、支付宝、银行卡、企业转账）节奏不同。\n- 退款到账 = 审核通过 + 平台发起退款 + 渠道入账，这三步里任何一步未完成，都不会显示到账。\n- 我不能在此承诺\"一定几天到账\"或\"立即到账\"。\n\n## 下一步处理\n\n1. **先自查**：如果你那边渠道已显示\"退款成功\"，建议核对原支付账户的入账记录、银行/渠道账单明细，以及支付渠道的通知消息（有时通知滞后或进了其他入口）。\n2. **超过常规周期仍未到账**：这种情况需要**转人工核对退款流水号**，由人工向渠道侧核实退款发起状态与凭证。这一步我无法替你执行。\n3. **需要人工介入的情形**：实际退款操作、重复扣款、退款金额与实付不一致、支付成功但订单未生效、企业转账或大额订单——这些都属于必须人工/财务核验的范围。\n\n## 时效边界\n\n- 现在我只能说：到账时间**以支付渠道实际处理为准**，需要核实退款流水后才能给出更接近的判断。\n- 退款是否成立、退多少，须以**实际支付金额**和平台退款规则为准，不会按订单原价计算。\n\n请把上面四项信息发我，我可以帮你确认还缺什么、并判断是否需要直接转人工核实流水。另外建议保留好支付凭证，后续核对会用到。",
+            "intent": "refund",
+            "intent_group": "billing",
+            "agent_type": "billing",
+            "agent_types": [
+              "billing"
+            ],
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "check_billing_fields"
+            ],
+            "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+            "routing_confidence": 0.93,
+            "escalated": true,
+            "latency_ms": 7243.0,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.8204,
+            "intent_source_scores": {
+              "llm": 0.97,
+              "embedding": 0.4567734398020992,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "f130a10b",
+            "timestamp": "2026-09-27T04:38:02.241290",
+            "intent": "refund",
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "check_billing_fields"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_00_G03Edd4neygO6umNaulA6373",
+                "input": {
+                  "query": "退款到账时间 原路退回 支付渠道处理时效",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1965.8,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "check_billing_fields",
+                "tool_use_id": "call_01_uJZkKvvIhhhQZZ2MHZvr1507",
+                "input": {
+                  "payment_channel": "未知"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 7243.0
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "rag_membership_01",
+      "scenario": "rag_required",
+      "expected": {
+        "intent": "query",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "required",
+        "expected_tools": [
+          "search_knowledge_base"
+        ],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "query",
+        "intent_group": "query",
+        "intent_confidence": 0.74,
+        "intent_source_scores": {
+          "llm": 0.95,
+          "embedding": 0.14980117725462766,
+          "pattern": 0.75
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "agent_types": [
+          "general"
+        ],
+        "routing_confidence": 0.77,
+        "routing_reason": "intent=query, group=query, primary=general, supporting=none, scores=[general=0.77, technical=0.00, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "search_knowledge_base",
+          "inspect_request_context"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "general",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_OjmaD4cv84kFMxNuyzft3169",
+            "input": {
+              "query": "金卡会员 权益 优惠",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 2048.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "general",
+            "tool_name": "inspect_request_context",
+            "tool_use_id": "call_01_fI5bzrmdpTBe8Iwa5mfm2960",
+            "input": {
+              "focus": "会员权益 query"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "根据我查到的会员规则，金卡会员的主要权益如下：\n\n1. **消费折扣**：金卡会员享受 **9 折**优惠（银卡为 95 折，普通会员无折扣）。\n2. **积分累积**：每消费 1 元累积 1 积分，积分可在下次购物时抵扣，**100 积分 = 1 元**。\n3. **生日双倍积分**：生日当月消费可获得双倍积分。\n4. **升级门槛**：累计消费满 **5000 元**即可成为金卡会员。\n\n另外提醒一下，积分有效期为 1 年，过期会自动清零，建议及时使用。\n\n需要说明的是，知识库中目前只记录了以上这些权益，如果涉及特定商品、活动叠加或专属客服等额外福利，可能需要以实际活动页面为准。如果你想确认自己的会员等级或积分余额，需要先完成账户核验，我这边不能直接查询。\n\n还需要我帮你看别的吗？",
+        "escalated": false,
+        "latency_ms": 5071.0,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": null
+      },
+      "status": "passed",
+      "latency_ms": 5967.5,
+      "errors": [],
+      "trace": {
+        "request_id": "84741f0f",
+        "timestamp": "2026-09-27T04:38:08.201450",
+        "intent": "query",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "tools_used": [
+          "search_knowledge_base",
+          "inspect_request_context"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "general",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_OjmaD4cv84kFMxNuyzft3169",
+            "input": {
+              "query": "金卡会员 权益 优惠",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 2048.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "general",
+            "tool_name": "inspect_request_context",
+            "tool_use_id": "call_01_fI5bzrmdpTBe8Iwa5mfm2960",
+            "input": {
+              "focus": "会员权益 query"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 5071.0
+      },
+      "turns": [
+        {
+          "message": "金卡会员有什么优惠？",
+          "response": {
+            "conv_id": "baseline_rag_membership_01_conversation",
+            "request_id": "84741f0f",
+            "response": "根据我查到的会员规则，金卡会员的主要权益如下：\n\n1. **消费折扣**：金卡会员享受 **9 折**优惠（银卡为 95 折，普通会员无折扣）。\n2. **积分累积**：每消费 1 元累积 1 积分，积分可在下次购物时抵扣，**100 积分 = 1 元**。\n3. **生日双倍积分**：生日当月消费可获得双倍积分。\n4. **升级门槛**：累计消费满 **5000 元**即可成为金卡会员。\n\n另外提醒一下，积分有效期为 1 年，过期会自动清零，建议及时使用。\n\n需要说明的是，知识库中目前只记录了以上这些权益，如果涉及特定商品、活动叠加或专属客服等额外福利，可能需要以实际活动页面为准。如果你想确认自己的会员等级或积分余额，需要先完成账户核验，我这边不能直接查询。\n\n还需要我帮你看别的吗？",
+            "intent": "query",
+            "intent_group": "query",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "inspect_request_context"
+            ],
+            "routing_reason": "intent=query, group=query, primary=general, supporting=none, scores=[general=0.77, technical=0.00, billing=0.00]",
+            "routing_confidence": 0.77,
+            "escalated": false,
+            "latency_ms": 5071.0,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.74,
+            "intent_source_scores": {
+              "llm": 0.95,
+              "embedding": 0.14980117725462766,
+              "pattern": 0.75
+            }
+          },
+          "trace": {
+            "request_id": "84741f0f",
+            "timestamp": "2026-09-27T04:38:08.201450",
+            "intent": "query",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "inspect_request_context"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "general",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_00_OjmaD4cv84kFMxNuyzft3169",
+                "input": {
+                  "query": "金卡会员 权益 优惠",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 2048.7,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "general",
+                "tool_name": "inspect_request_context",
+                "tool_use_id": "call_01_fI5bzrmdpTBe8Iwa5mfm2960",
+                "input": {
+                  "focus": "会员权益 query"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              }
+            ],
+            "escalated": false,
+            "latency_ms": 5071.0
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "rag_skip_greeting_01",
+      "scenario": "rag_skip",
+      "expected": {
+        "intent": "greeting",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "skip",
+        "expected_tools": [],
+        "escalation": "forbidden"
+      },
+      "actual": {
+        "intent": "greeting",
+        "intent_group": "greeting",
+        "intent_confidence": 0.943,
+        "intent_source_scores": {
+          "llm": 0.99,
+          "embedding": 1.0000000000000002,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "agent_types": [
+          "general"
+        ],
+        "routing_confidence": 0.65,
+        "routing_reason": "intent=greeting, group=greeting, primary=general, supporting=none, scores=[general=0.65, technical=0.00, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [],
+        "tool_traces": [],
+        "knowledge_used": false,
+        "search_knowledge_base_called": false,
+        "response": "你好！我是 EchoMind 智能客服 😊\n\n我可以帮你处理这些方面的问题：\n\n- **订单与售后**：订单状态、退换货、商品咨询\n- **账户相关**：登录问题、账号信息、安全设置\n- **账单与支付**：扣款、退款、发票、订阅续费\n- **技术支持**：页面报错、App 异常、数据不同步\n- **转接人工**：复杂投诉、权限审批等需要人工处理的情况\n\n请直接告诉我你遇到的问题，如果涉及订单或账户，方便的话可以一并提供**订单号**或**问题发生时间**，我会更快帮你判断下一步。\n\n请问有什么可以帮你的？",
+        "escalated": false,
+        "latency_ms": 1816.5,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": true
+      },
+      "status": "passed",
+      "latency_ms": 1836.4,
+      "errors": [],
+      "trace": {
+        "request_id": "01a49697",
+        "timestamp": "2026-09-27T04:38:10.050329",
+        "intent": "greeting",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": false,
+        "latency_ms": 1816.5
+      },
+      "turns": [
+        {
+          "message": "你好",
+          "response": {
+            "conv_id": "baseline_rag_skip_greeting_01_conversation",
+            "request_id": "01a49697",
+            "response": "你好！我是 EchoMind 智能客服 😊\n\n我可以帮你处理这些方面的问题：\n\n- **订单与售后**：订单状态、退换货、商品咨询\n- **账户相关**：登录问题、账号信息、安全设置\n- **账单与支付**：扣款、退款、发票、订阅续费\n- **技术支持**：页面报错、App 异常、数据不同步\n- **转接人工**：复杂投诉、权限审批等需要人工处理的情况\n\n请直接告诉我你遇到的问题，如果涉及订单或账户，方便的话可以一并提供**订单号**或**问题发生时间**，我会更快帮你判断下一步。\n\n请问有什么可以帮你的？",
+            "intent": "greeting",
+            "intent_group": "greeting",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [],
+            "routing_reason": "intent=greeting, group=greeting, primary=general, supporting=none, scores=[general=0.65, technical=0.00, billing=0.00]",
+            "routing_confidence": 0.65,
+            "escalated": false,
+            "latency_ms": 1816.5,
+            "knowledge_used": false,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.943,
+            "intent_source_scores": {
+              "llm": 0.99,
+              "embedding": 1.0000000000000002,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "01a49697",
+            "timestamp": "2026-09-27T04:38:10.050329",
+            "intent": "greeting",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [],
+            "tool_calls": [],
+            "escalated": false,
+            "latency_ms": 1816.5
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "knowledge_gap_01",
+      "scenario": "knowledge_gap",
+      "expected": {
+        "intent": "query",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "required",
+        "expected_tools": [
+          "search_knowledge_base"
+        ],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "technical",
+        "intent_group": "technical",
+        "intent_confidence": 0.574,
+        "intent_source_scores": {
+          "llm": 0.82,
+          "embedding": 0.21650635094610968,
+          "pattern": 0.75
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "agent_types": [
+          "technical"
+        ],
+        "routing_confidence": 0.75,
+        "routing_reason": "intent=technical, group=technical, primary=technical, supporting=none, scores=[technical=0.75, general=0.10, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "search_knowledge_base",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_JE1nVNZcKABXM36agCmS1053",
+            "input": {
+              "query": "企业版 SAML 证书轮换 更新 IdP 证书 配置步骤",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 2096.8,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_UpDTPSIDu43In2jMH9MI1802",
+            "input": {
+              "query": "SAML SSO 证书过期 登录失败 排查",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1490.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "## 说明（先做一点澄清）\n\n你的问题是**配置操作类咨询**（如何轮换），而不是故障诊断，所以下面按\"操作规程 + 验证方式\"给出。另外需要坦白说明：\n\n- 我检索了知识库（关键词：SAML 证书轮换 / IdP 证书更新 / SSO 证书过期），**没有命中任何与 SAML 证书轮换相关的官方文档**。返回的都是应用登录 401、订单、退款等通用条目，与本问题无关。\n- 因此下面的步骤是**通用 SAML 最佳实践框架**，不是我们从产品文档中核验过的、针对你环境的操作手册。具体的菜单路径、是否支持\"双证书/元数据多证书\"、能否自助上传，**必须**以你所用产品版本的官方文档为准。这一点我不会替你假设。\n\n## 现象复述\n\n你要在**企业版环境中轮换 SAML 证书**（签名证书，也可能是加密证书），目标是不中断 SSO 登录。当前未提供错误码，因此暂按\"计划内变更\"处理，而非故障。\n\n## 证书轮换的核心原则（通用）\n\n1. **先重叠，后下线**：新证书上线并验证通过后，旧证书必须保留一段\"重叠期\"再移除。\n2. **两侧不同步**：IdP 侧与 SP 侧的更新有先后，任何一侧先行都必须保证对侧仍能验证。\n3. **一次只改一件事**：证书轮换期间不要同时改 Entity ID、ACS URL、NameID 格式等其他配置。\n4. **低峰执行**：尽量在访问低峰做，并预留回滚窗口。\n\n## 编号排查/操作步骤（通用框架，需按官方文档校准）\n\n1. **确认证书类型与到期时间**\n   - 明确是 SAML **签名证书（signing）**、**加密证书（encryption）**，还是两者。\n   - 记录当前指纹与到期日：`openssl x509 -in cert.pem -noout -dates -fingerprint -subject`\n2. **确认当前证书交换方式**\n   - 是**元数据自动刷新（metadata URL）**，还是**手工粘贴证书/元数据 XML**？这决定了能否\"双证书共存\"。\n3. **确认是否支持双证书/重叠发布**\n   - 多数 IdP/SP 支持元数据中同时发布 2 个签名证书。若支持，走重叠方案；若不支持，必须先确认切换的停机窗口。\n4. **在 IdP 侧生成新密钥对与 CSR，取得新证书**\n   - 私钥不出 IdP/安全域；不要通过工单或聊天传递私钥、密码或完整密钥。\n5. **把新证书发布到对侧（重叠发布）**\n   - SP 支持多证书：将新证书作为附加证书加入元数据；IdP 侧同理。\n   - 只支持单证书：需要与对侧协商严格的时间窗，并准备好回滚。\n6. **在非生产或小范围账号验证**\n   - 先验证 SP 发起的登录、IdP 发起的登录、单点登出（SLO）。\n7. **全量上线新证书，观察**\n   - 监控签名校验",
+        "escalated": false,
+        "latency_ms": 11948.5,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": false,
+        "primary_routing": false,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 13316.1,
+      "errors": [],
+      "trace": {
+        "request_id": "0dadce5b",
+        "timestamp": "2026-09-27T04:38:23.359335",
+        "intent": "technical",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "tools_used": [
+          "search_knowledge_base",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_JE1nVNZcKABXM36agCmS1053",
+            "input": {
+              "query": "企业版 SAML 证书轮换 更新 IdP 证书 配置步骤",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 2096.8,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_UpDTPSIDu43In2jMH9MI1802",
+            "input": {
+              "query": "SAML SSO 证书过期 登录失败 排查",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1490.7,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 11948.5
+      },
+      "turns": [
+        {
+          "message": "企业版 SAML 证书应该怎么轮换？",
+          "response": {
+            "conv_id": "baseline_knowledge_gap_01_conversation",
+            "request_id": "0dadce5b",
+            "response": "## 说明（先做一点澄清）\n\n你的问题是**配置操作类咨询**（如何轮换），而不是故障诊断，所以下面按\"操作规程 + 验证方式\"给出。另外需要坦白说明：\n\n- 我检索了知识库（关键词：SAML 证书轮换 / IdP 证书更新 / SSO 证书过期），**没有命中任何与 SAML 证书轮换相关的官方文档**。返回的都是应用登录 401、订单、退款等通用条目，与本问题无关。\n- 因此下面的步骤是**通用 SAML 最佳实践框架**，不是我们从产品文档中核验过的、针对你环境的操作手册。具体的菜单路径、是否支持\"双证书/元数据多证书\"、能否自助上传，**必须**以你所用产品版本的官方文档为准。这一点我不会替你假设。\n\n## 现象复述\n\n你要在**企业版环境中轮换 SAML 证书**（签名证书，也可能是加密证书），目标是不中断 SSO 登录。当前未提供错误码，因此暂按\"计划内变更\"处理，而非故障。\n\n## 证书轮换的核心原则（通用）\n\n1. **先重叠，后下线**：新证书上线并验证通过后，旧证书必须保留一段\"重叠期\"再移除。\n2. **两侧不同步**：IdP 侧与 SP 侧的更新有先后，任何一侧先行都必须保证对侧仍能验证。\n3. **一次只改一件事**：证书轮换期间不要同时改 Entity ID、ACS URL、NameID 格式等其他配置。\n4. **低峰执行**：尽量在访问低峰做，并预留回滚窗口。\n\n## 编号排查/操作步骤（通用框架，需按官方文档校准）\n\n1. **确认证书类型与到期时间**\n   - 明确是 SAML **签名证书（signing）**、**加密证书（encryption）**，还是两者。\n   - 记录当前指纹与到期日：`openssl x509 -in cert.pem -noout -dates -fingerprint -subject`\n2. **确认当前证书交换方式**\n   - 是**元数据自动刷新（metadata URL）**，还是**手工粘贴证书/元数据 XML**？这决定了能否\"双证书共存\"。\n3. **确认是否支持双证书/重叠发布**\n   - 多数 IdP/SP 支持元数据中同时发布 2 个签名证书。若支持，走重叠方案；若不支持，必须先确认切换的停机窗口。\n4. **在 IdP 侧生成新密钥对与 CSR，取得新证书**\n   - 私钥不出 IdP/安全域；不要通过工单或聊天传递私钥、密码或完整密钥。\n5. **把新证书发布到对侧（重叠发布）**\n   - SP 支持多证书：将新证书作为附加证书加入元数据；IdP 侧同理。\n   - 只支持单证书：需要与对侧协商严格的时间窗，并准备好回滚。\n6. **在非生产或小范围账号验证**\n   - 先验证 SP 发起的登录、IdP 发起的登录、单点登出（SLO）。\n7. **全量上线新证书，观察**\n   - 监控签名校验",
+            "intent": "technical",
+            "intent_group": "technical",
+            "agent_type": "technical",
+            "agent_types": [
+              "technical"
+            ],
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=technical, group=technical, primary=technical, supporting=none, scores=[technical=0.75, general=0.10, billing=0.00]",
+            "routing_confidence": 0.75,
+            "escalated": false,
+            "latency_ms": 11948.5,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.574,
+            "intent_source_scores": {
+              "llm": 0.82,
+              "embedding": 0.21650635094610968,
+              "pattern": 0.75
+            }
+          },
+          "trace": {
+            "request_id": "0dadce5b",
+            "timestamp": "2026-09-27T04:38:23.359335",
+            "intent": "technical",
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_00_JE1nVNZcKABXM36agCmS1053",
+                "input": {
+                  "query": "企业版 SAML 证书轮换 更新 IdP 证书 配置步骤",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 2096.8,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_UpDTPSIDu43In2jMH9MI1802",
+                "input": {
+                  "query": "SAML SSO 证书过期 登录失败 排查",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1490.7,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": false,
+            "latency_ms": 11948.5
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "clarification_01",
+      "scenario": "clarification",
+      "expected": {
+        "intent": "other",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "skip",
+        "expected_tools": [],
+        "escalation": "forbidden"
+      },
+      "actual": {
+        "intent": "other",
+        "intent_group": "other",
+        "intent_confidence": 0.435,
+        "intent_source_scores": {
+          "llm": 0.55,
+          "embedding": 0.2727723627949905,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "agent_types": [
+          "general"
+        ],
+        "routing_confidence": 0.435,
+        "routing_reason": "低置信度 OTHER 意图，先澄清用户需求",
+        "multi_agent": false,
+        "tools_used": [],
+        "tool_traces": [],
+        "knowledge_used": false,
+        "search_knowledge_base_called": false,
+        "response": "我还不能确定您要处理的是哪类问题。请补充一下是订单物流、退款账单、账户资料，还是技术故障？",
+        "escalated": false,
+        "latency_ms": 0.0,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": true
+      },
+      "status": "passed",
+      "latency_ms": 1620.1,
+      "errors": [],
+      "trace": {
+        "request_id": "7af3a33f",
+        "timestamp": "2026-09-27T04:38:24.985974",
+        "intent": "other",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": false,
+        "latency_ms": 0.0
+      },
+      "turns": [
+        {
+          "message": "帮我处理一下这个问题。",
+          "response": {
+            "conv_id": "baseline_clarification_01_conversation",
+            "request_id": "7af3a33f",
+            "response": "我还不能确定您要处理的是哪类问题。请补充一下是订单物流、退款账单、账户资料，还是技术故障？",
+            "intent": "other",
+            "intent_group": "other",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [],
+            "routing_reason": "低置信度 OTHER 意图，先澄清用户需求",
+            "routing_confidence": 0.435,
+            "escalated": false,
+            "latency_ms": 0.0,
+            "knowledge_used": false,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.435,
+            "intent_source_scores": {
+              "llm": 0.55,
+              "embedding": 0.2727723627949905,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "7af3a33f",
+            "timestamp": "2026-09-27T04:38:24.985974",
+            "intent": "other",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [],
+            "tool_calls": [],
+            "escalated": false,
+            "latency_ms": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "escalation_human_01",
+      "scenario": "escalation",
+      "expected": {
+        "intent": "human_handoff",
+        "primary_agent": "escalation",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "skip",
+        "expected_tools": [],
+        "escalation": "required"
+      },
+      "actual": {
+        "intent": "human_handoff",
+        "intent_group": "escalation",
+        "intent_confidence": 0.736,
+        "intent_source_scores": {
+          "llm": 0.98,
+          "embedding": 0.6943650748294137,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "escalation",
+        "supporting_agents": [],
+        "agent_types": [
+          "escalation"
+        ],
+        "routing_confidence": 0.8,
+        "routing_reason": "意图为 human_handoff，触发升级路由",
+        "multi_agent": false,
+        "tools_used": [],
+        "tool_traces": [],
+        "knowledge_used": false,
+        "search_knowledge_base_called": false,
+        "response": "我已将这个问题标记为人工升级处理。\n\n升级原因：意图=human_handoff，紧急度=HIGH\n已记录信息：{\"order_id\": [], \"product\": [], \"date\": [], \"amount\": [], \"error_code\": []}\n请不要发送密码、短信验证码或完整支付凭证；人工客服会根据会话记录继续核验。",
+        "escalated": true,
+        "latency_ms": 0.1,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": true,
+        "tool_selection": true,
+        "escalation": true
+      },
+      "status": "passed",
+      "latency_ms": 1022.3,
+      "errors": [],
+      "trace": {
+        "request_id": "a1b3063a",
+        "timestamp": "2026-09-27T04:38:25.982562",
+        "intent": "human_handoff",
+        "primary_agent": "escalation",
+        "supporting_agents": [],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": true,
+        "latency_ms": 0.1
+      },
+      "turns": [
+        {
+          "message": "我要人工客服。",
+          "response": {
+            "conv_id": "baseline_escalation_human_01_conversation",
+            "request_id": "a1b3063a",
+            "response": "我已将这个问题标记为人工升级处理。\n\n升级原因：意图=human_handoff，紧急度=HIGH\n已记录信息：{\"order_id\": [], \"product\": [], \"date\": [], \"amount\": [], \"error_code\": []}\n请不要发送密码、短信验证码或完整支付凭证；人工客服会根据会话记录继续核验。",
+            "intent": "human_handoff",
+            "intent_group": "escalation",
+            "agent_type": "escalation",
+            "agent_types": [
+              "escalation"
+            ],
+            "primary_agent": "escalation",
+            "supporting_agents": [],
+            "tools_used": [],
+            "routing_reason": "意图为 human_handoff，触发升级路由",
+            "routing_confidence": 0.8,
+            "escalated": true,
+            "latency_ms": 0.1,
+            "knowledge_used": false,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.736,
+            "intent_source_scores": {
+              "llm": 0.98,
+              "embedding": 0.6943650748294137,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "a1b3063a",
+            "timestamp": "2026-09-27T04:38:25.982562",
+            "intent": "human_handoff",
+            "primary_agent": "escalation",
+            "supporting_agents": [],
+            "tools_used": [],
+            "tool_calls": [],
+            "escalated": true,
+            "latency_ms": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "escalation_refund_01",
+      "scenario": "escalation",
+      "expected": {
+        "intent": [
+          "payment_issue",
+          "refund"
+        ],
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional"
+      },
+      "actual": {
+        "intent": "refund",
+        "intent_group": "billing",
+        "intent_confidence": 0.672,
+        "intent_source_scores": {
+          "llm": 0.96,
+          "embedding": 0.27668578554642986,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "agent_types": [
+          "billing"
+        ],
+        "routing_confidence": 0.93,
+        "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_WWeTCerxkY9n0vn4l3No5205",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_wtt5Yt9OQFA6RrSzcNzM4209",
+            "input": {
+              "query": "重复扣款 退款 处理流程 人工核验",
+              "top_k": 4
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3822.2,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "我理解你希望尽快把这笔重复扣款退回来。但要先说明一个边界：**我这边不能直接执行退款操作**，重复扣款是否成立、能否退回，需要核验订单与支付流水，并通常由人工/财务复核后处理。我不能在未核验前承诺\"能退\"或\"多久到账\"。\n\n**需要核验的信息**\n- 两笔扣款的订单号或交易号（如果都有）\n- 两笔扣款各自的金额与币种\n- 两笔扣款的支付时间（越精确越好）\n- 支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n- 是否使用过优惠券或余额抵扣\n- 两笔交易的账单截图摘要（可隐去敏感信息）\n\n> 提示：请勿提供支付密码、短信验证码、完整银行卡号或身份证照片，这些我不需要也不能接收。\n\n**当前说明**\n- 目前我手上没有任何订单号、金额、时间或渠道信息（核验字段全部缺失），因此**还无法确认是否属于重复扣款**，也无法给出退款结论。\n- 两笔金额、时间如果差异较大，可能对应不同订单；如果金额和时间非常接近，才更需要进一步核实是否重复扣款——但这仍需人工比对流水判断，我不能自行下结论。\n\n**下一步处理**\n1. 你补齐上面的信息后，我可以先帮你梳理两笔交易的关键字段。\n2. 如果你愿意，可以先把两笔金额告诉我，我可以帮你计算差额（仅做数值计算，**不判断是否重复扣款**）。\n3. 涉及重复扣款，属于需要人工/财务核验的场景：核验支付流水与订单记录一致后，才会按原路退回或其他约定方式处理。\n\n**时效边界**\n- 即使核验后进入退款流程，也需经审核；款项通常原路退回，**具体到账时间以支付渠道实际处理为准**，我这里不能承诺立即到账。\n- 若出现\"显示退款成功但未到账\"，建议后续核对原支付账户与渠道通知，必要时提供退款流水号转人工核实。\n\n要不要先把两笔扣款的**金额、时间、支付渠道**发我？我帮你把核验表整理清楚，再走人工复核。",
+        "escalated": true,
+        "latency_ms": 8940.2,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null
+      },
+      "status": "failed",
+      "latency_ms": 10088.3,
+      "errors": [],
+      "trace": {
+        "request_id": "c22b17b0",
+        "timestamp": "2026-09-27T04:38:36.096913",
+        "intent": "refund",
+        "primary_agent": "billing",
+        "supporting_agents": [],
+        "tools_used": [
+          "check_billing_fields",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "billing",
+            "tool_name": "check_billing_fields",
+            "tool_use_id": "call_00_WWeTCerxkY9n0vn4l3No5205",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "billing",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_wtt5Yt9OQFA6RrSzcNzM4209",
+            "input": {
+              "query": "重复扣款 退款 处理流程 人工核验",
+              "top_k": 4
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3822.2,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 8940.2
+      },
+      "turns": [
+        {
+          "message": "帮我直接把这笔重复扣款退回来。",
+          "response": {
+            "conv_id": "baseline_escalation_refund_01_conversation",
+            "request_id": "c22b17b0",
+            "response": "我理解你希望尽快把这笔重复扣款退回来。但要先说明一个边界：**我这边不能直接执行退款操作**，重复扣款是否成立、能否退回，需要核验订单与支付流水，并通常由人工/财务复核后处理。我不能在未核验前承诺\"能退\"或\"多久到账\"。\n\n**需要核验的信息**\n- 两笔扣款的订单号或交易号（如果都有）\n- 两笔扣款各自的金额与币种\n- 两笔扣款的支付时间（越精确越好）\n- 支付渠道（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n- 是否使用过优惠券或余额抵扣\n- 两笔交易的账单截图摘要（可隐去敏感信息）\n\n> 提示：请勿提供支付密码、短信验证码、完整银行卡号或身份证照片，这些我不需要也不能接收。\n\n**当前说明**\n- 目前我手上没有任何订单号、金额、时间或渠道信息（核验字段全部缺失），因此**还无法确认是否属于重复扣款**，也无法给出退款结论。\n- 两笔金额、时间如果差异较大，可能对应不同订单；如果金额和时间非常接近，才更需要进一步核实是否重复扣款——但这仍需人工比对流水判断，我不能自行下结论。\n\n**下一步处理**\n1. 你补齐上面的信息后，我可以先帮你梳理两笔交易的关键字段。\n2. 如果你愿意，可以先把两笔金额告诉我，我可以帮你计算差额（仅做数值计算，**不判断是否重复扣款**）。\n3. 涉及重复扣款，属于需要人工/财务核验的场景：核验支付流水与订单记录一致后，才会按原路退回或其他约定方式处理。\n\n**时效边界**\n- 即使核验后进入退款流程，也需经审核；款项通常原路退回，**具体到账时间以支付渠道实际处理为准**，我这里不能承诺立即到账。\n- 若出现\"显示退款成功但未到账\"，建议后续核对原支付账户与渠道通知，必要时提供退款流水号转人工核实。\n\n要不要先把两笔扣款的**金额、时间、支付渠道**发我？我帮你把核验表整理清楚，再走人工复核。",
+            "intent": "refund",
+            "intent_group": "billing",
+            "agent_type": "billing",
+            "agent_types": [
+              "billing"
+            ],
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+            "routing_confidence": 0.93,
+            "escalated": true,
+            "latency_ms": 8940.2,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.672,
+            "intent_source_scores": {
+              "llm": 0.96,
+              "embedding": 0.27668578554642986,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "c22b17b0",
+            "timestamp": "2026-09-27T04:38:36.096913",
+            "intent": "refund",
+            "primary_agent": "billing",
+            "supporting_agents": [],
+            "tools_used": [
+              "check_billing_fields",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "billing",
+                "tool_name": "check_billing_fields",
+                "tool_use_id": "call_00_WWeTCerxkY9n0vn4l3No5205",
+                "input": {},
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "billing",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_wtt5Yt9OQFA6RrSzcNzM4209",
+                "input": {
+                  "query": "重复扣款 退款 处理流程 人工核验",
+                  "top_k": 4
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3822.2,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 8940.2
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "escalation_false_positive_01",
+      "scenario": "escalation_false_positive",
+      "expected": {
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [
+          "lookup_error_code"
+        ],
+        "escalation": "forbidden"
+      },
+      "actual": {
+        "intent": "technical_login",
+        "intent_group": "technical",
+        "intent_confidence": 0.665,
+        "intent_source_scores": {
+          "llm": 0.95,
+          "embedding": 0.24152294576982397,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": [
+            "401"
+          ]
+        },
+        "urgency": "N/A",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "agent_types": [
+          "technical"
+        ],
+        "routing_confidence": 1.0,
+        "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=none, scores=[technical=1.13, general=0.10, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_QLBG0CFJkOEYbGL1iAnb0989",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_gZnXCqrGgqwa8YyHrIDU8450",
+            "input": {
+              "query": "登录失败 401 认证失败 Token 过期 排查",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1766.9,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "先复述一下你的情况：你遇到的是 **401 错误**，想先自己排查，暂不转人工。我这边查到的 401 常见含义是**认证失败**（不是权限不足，那是 403），所以排查方向集中在“身份凭证有没有被正确、有效地带上”。\n\n**先说明边界**：我没有读取你的服务端日志，也没有权限查你的账号状态，下面是基于错误码的通用排查路径，结论需要你实测确认。\n\n## 可能原因（按概率排序）\n\n1. **Token / 登录态过期或失效**——最典型，表现为之前能用、突然开始 401。\n2. **凭证没带或被覆盖**——请求头缺少 Authorization、多环境串用了 Key、环境变量没生效。\n3. **签名 / 时间戳问题**——签名串拼错、时间戳与服务器偏差过大（常见要求 5 分钟内）。\n4. **账号状态异常**——密码被改、被风控锁定、多端登录把旧会话挤下线。\n5. **凭证本身错误或已重置**——Key 被轮换、Key 属于另一个环境。\n\n## 编号排查步骤（从低风险开始）\n\n1. **把“最近变更”作为第一嫌疑**：回想最近 24 小时是否改过密码、换过环境/域名、升级过客户端版本、改过配置或密钥。这一步能直接砍掉一半可能性——如果刚改过什么，优先回退验证。\n2. **确认是否稳定复现**：无痕窗口/新会话重登一次。\n   - 重登后恢复正常 → 基本确认是**登录态过期或缓存旧 Token**，属于预期行为，需要的是自动刷新机制而不是排障。\n   - 重登后仍 401 → 继续第 3 步。\n3. **检查请求头是否真的带上了凭证**：用浏览器开发者工具（Network）或客户端抓包，看该请求的 `Authorization` 头是否存在、格式是否是 `Bearer <token>`、有没有被空格或换行破坏。之前有个常见坑是网关/代理把 Authorization 头过滤掉了。\n4. **校验 Token 本身**：确认是否为当前环境签发的 Key，是否已过期（看 exp 字段或控制台有效期）。**注意：不要在这里把完整 Token 或 API Key 贴给我或任何公开渠道**，只看一下前后几位和有效期即可。\n5. **检查签名与时间戳**（仅当你用的是自建签名接口）：确认签名参数按字典序拼接、时间戳用的是秒还是毫秒、本机时间是否与标准时间同步（可用 `date -u` 对一下）。\n6. **确认账号状态**：用同账号在另一个端/设备登录试试。如果另一端也不通，偏向账号或凭证问题；如果另一端正常，偏向本机客户端缓存或版本问题。\n7. **确认客户端版本与网络环境**：旧版本可能已被服务端停止兼容；另外别忽略公司代理、VPN、抓包工具的证书替换——这些会稳定制造 401。\n\n## 验证方式\n\n改完任一项后，用**同一个最小请求**复测（同一个接口、同一份参数），而不是换个接口试运气。如果 401 变成 200，说明方向对了；如果变成 403，说明认证已通过、问题转到权限，那是另一个问题；如果仍是 401，回到第 3、4 步，重点查凭证传递链路。\n\n## 需要你补充的信息（有这些我能给你更精确的顺序）\n\n- **运行环境**：App、浏览器、服务端调用，还是 Docker 里跑的服务？\n- **是否稳定复现**：每次必现，还是偶发？\n- **发生时间**：什么时候开始的，开始前有没有做过什么变更？\n- **影响范围**：只有你一个账号/一个端，还是多人多端都这样？\n- 如果有的话：接口路径、request_id、响应体摘要（**去掉任何密钥类字段**）。\n\n你把「环境 + 是否稳定复现」告诉我就行，我可以据此生成一份按顺序执行的排障清单。\n\n**升级条件提醒**：如果出现以下情况建议不要自己硬扛——影响多名用户且持续复现、账号权限异常或疑似被盗用、需要查服务端日志/数据库才能确认。这些需要后台操作或人工介入。另外，如果有迹象表明密钥可能泄露（",
+        "escalated": true,
+        "latency_ms": 9947.5,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": true,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": true,
+        "escalation": false
+      },
+      "status": "failed",
+      "latency_ms": 11867.2,
+      "errors": [],
+      "trace": {
+        "request_id": "f6261f87",
+        "timestamp": "2026-09-27T04:38:47.942395",
+        "intent": "technical_login",
+        "primary_agent": "technical",
+        "supporting_agents": [],
+        "tools_used": [
+          "lookup_error_code",
+          "search_knowledge_base"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "technical",
+            "tool_name": "lookup_error_code",
+            "tool_use_id": "call_00_QLBG0CFJkOEYbGL1iAnb0989",
+            "input": {
+              "error_code": "401"
+            },
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          },
+          {
+            "agent_type": "technical",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_01_gZnXCqrGgqwa8YyHrIDU8450",
+            "input": {
+              "query": "登录失败 401 认证失败 Token 过期 排查",
+              "top_k": 5
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 1766.9,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 9947.5
+      },
+      "turns": [
+        {
+          "message": "暂时不用人工客服，我想先自己排查一下 401。",
+          "response": {
+            "conv_id": "baseline_escalation_false_positive_01_conversation",
+            "request_id": "f6261f87",
+            "response": "先复述一下你的情况：你遇到的是 **401 错误**，想先自己排查，暂不转人工。我这边查到的 401 常见含义是**认证失败**（不是权限不足，那是 403），所以排查方向集中在“身份凭证有没有被正确、有效地带上”。\n\n**先说明边界**：我没有读取你的服务端日志，也没有权限查你的账号状态，下面是基于错误码的通用排查路径，结论需要你实测确认。\n\n## 可能原因（按概率排序）\n\n1. **Token / 登录态过期或失效**——最典型，表现为之前能用、突然开始 401。\n2. **凭证没带或被覆盖**——请求头缺少 Authorization、多环境串用了 Key、环境变量没生效。\n3. **签名 / 时间戳问题**——签名串拼错、时间戳与服务器偏差过大（常见要求 5 分钟内）。\n4. **账号状态异常**——密码被改、被风控锁定、多端登录把旧会话挤下线。\n5. **凭证本身错误或已重置**——Key 被轮换、Key 属于另一个环境。\n\n## 编号排查步骤（从低风险开始）\n\n1. **把“最近变更”作为第一嫌疑**：回想最近 24 小时是否改过密码、换过环境/域名、升级过客户端版本、改过配置或密钥。这一步能直接砍掉一半可能性——如果刚改过什么，优先回退验证。\n2. **确认是否稳定复现**：无痕窗口/新会话重登一次。\n   - 重登后恢复正常 → 基本确认是**登录态过期或缓存旧 Token**，属于预期行为，需要的是自动刷新机制而不是排障。\n   - 重登后仍 401 → 继续第 3 步。\n3. **检查请求头是否真的带上了凭证**：用浏览器开发者工具（Network）或客户端抓包，看该请求的 `Authorization` 头是否存在、格式是否是 `Bearer <token>`、有没有被空格或换行破坏。之前有个常见坑是网关/代理把 Authorization 头过滤掉了。\n4. **校验 Token 本身**：确认是否为当前环境签发的 Key，是否已过期（看 exp 字段或控制台有效期）。**注意：不要在这里把完整 Token 或 API Key 贴给我或任何公开渠道**，只看一下前后几位和有效期即可。\n5. **检查签名与时间戳**（仅当你用的是自建签名接口）：确认签名参数按字典序拼接、时间戳用的是秒还是毫秒、本机时间是否与标准时间同步（可用 `date -u` 对一下）。\n6. **确认账号状态**：用同账号在另一个端/设备登录试试。如果另一端也不通，偏向账号或凭证问题；如果另一端正常，偏向本机客户端缓存或版本问题。\n7. **确认客户端版本与网络环境**：旧版本可能已被服务端停止兼容；另外别忽略公司代理、VPN、抓包工具的证书替换——这些会稳定制造 401。\n\n## 验证方式\n\n改完任一项后，用**同一个最小请求**复测（同一个接口、同一份参数），而不是换个接口试运气。如果 401 变成 200，说明方向对了；如果变成 403，说明认证已通过、问题转到权限，那是另一个问题；如果仍是 401，回到第 3、4 步，重点查凭证传递链路。\n\n## 需要你补充的信息（有这些我能给你更精确的顺序）\n\n- **运行环境**：App、浏览器、服务端调用，还是 Docker 里跑的服务？\n- **是否稳定复现**：每次必现，还是偶发？\n- **发生时间**：什么时候开始的，开始前有没有做过什么变更？\n- **影响范围**：只有你一个账号/一个端，还是多人多端都这样？\n- 如果有的话：接口路径、request_id、响应体摘要（**去掉任何密钥类字段**）。\n\n你把「环境 + 是否稳定复现」告诉我就行，我可以据此生成一份按顺序执行的排障清单。\n\n**升级条件提醒**：如果出现以下情况建议不要自己硬扛——影响多名用户且持续复现、账号权限异常或疑似被盗用、需要查服务端日志/数据库才能确认。这些需要后台操作或人工介入。另外，如果有迹象表明密钥可能泄露（",
+            "intent": "technical_login",
+            "intent_group": "technical",
+            "agent_type": "technical",
+            "agent_types": [
+              "technical"
+            ],
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=technical_login, group=technical, primary=technical, supporting=none, scores=[technical=1.13, general=0.10, billing=0.00]",
+            "routing_confidence": 1.0,
+            "escalated": true,
+            "latency_ms": 9947.5,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": [
+                "401"
+              ]
+            },
+            "intent_confidence": 0.665,
+            "intent_source_scores": {
+              "llm": 0.95,
+              "embedding": 0.24152294576982397,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "f6261f87",
+            "timestamp": "2026-09-27T04:38:47.942395",
+            "intent": "technical_login",
+            "primary_agent": "technical",
+            "supporting_agents": [],
+            "tools_used": [
+              "lookup_error_code",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "technical",
+                "tool_name": "lookup_error_code",
+                "tool_use_id": "call_00_QLBG0CFJkOEYbGL1iAnb0989",
+                "input": {
+                  "error_code": "401"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "technical",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_01_gZnXCqrGgqwa8YyHrIDU8450",
+                "input": {
+                  "query": "登录失败 401 认证失败 Token 过期 排查",
+                  "top_k": 5
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 1766.9,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 9947.5
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "memory_continuity_01",
+      "scenario": "memory_multiturn",
+      "expected": {
+        "intent": "order_status",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "multi_agent": false,
+        "rag": "optional",
+        "expected_tools": [],
+        "escalation": "optional",
+        "memory_continuity": "required"
+      },
+      "actual": {
+        "intent": "logistics",
+        "intent_group": "query",
+        "intent_confidence": 0.665,
+        "intent_source_scores": {
+          "llm": 0.95,
+          "embedding": 0.21780342093451607,
+          "pattern": 0.5
+        },
+        "entities": {
+          "order_id": [],
+          "product": [],
+          "date": [],
+          "amount": [],
+          "error_code": []
+        },
+        "urgency": "N/A",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "agent_types": [
+          "general"
+        ],
+        "routing_confidence": 0.65,
+        "routing_reason": "intent=logistics, group=query, primary=general, supporting=none, scores=[general=0.65, technical=0.00, billing=0.00]",
+        "multi_agent": false,
+        "tools_used": [
+          "search_knowledge_base",
+          "suggest_required_fields"
+        ],
+        "tool_traces": [
+          {
+            "agent_type": "general",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_8XSXJsMRzu2feXF5nQil6092",
+            "input": {
+              "query": "物流查询 订单配送进度 如何查看物流状态",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3869.6,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "general",
+            "tool_name": "suggest_required_fields",
+            "tool_use_id": "call_01_8cFGwyeb0wijKdqe4rL38143",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "knowledge_used": true,
+        "search_knowledge_base_called": true,
+        "response": "关于 **A12345** 的物流进度，我先说明一下边界：我这边**无法实时查询物流轨迹**，所以不会给你“已到某地”的具体结论，避免误导。\n\n你可以这样自查物流：\n\n- **App / 官网「我的订单」**：物流信息一般在发货后 **24 小时内**更新，可能因承运商同步稍有延迟\n- **订单状态含义**：待支付 → 已支付 → 已发货 → 运输中 → 已签收 → 已完成\n- **快递单号**：拿到后可直接在承运商官网查最新节点，通常比订单页更及时\n\n需要人工介入的情况（可以帮你转接）：\n\n- 显示**已发货但超过 7 天**未收到 → 可申请**查件**\n- 订单**状态显示异常**，或物流长时间**无更新**（超过 24 小时仍未刷新）\n\n为了让人工更快定位，麻烦补充两点（如果方便）：\n\n1. 订单 **A12345** 是否就是你这次要查的订单？\n2. **下单时间**或**商品名称**\n\n另外，你希望的是：先帮你**转人工核验物流**，还是你先自查、有异常再回来？告诉我一句，我按你的选择安排下一步 👌",
+        "escalated": true,
+        "latency_ms": 7109.9,
+        "memory": {
+          "working_memory_observable": "N/A",
+          "episodic_observable": "N/A",
+          "profile_observable": "N/A"
+        }
+      },
+      "checks": {
+        "intent": false,
+        "primary_routing": true,
+        "supporting_routing": true,
+        "multi_agent": true,
+        "rag_trigger": null,
+        "tool_selection": false,
+        "escalation": null,
+        "memory_continuity": null
+      },
+      "status": "failed",
+      "latency_ms": 17857.1,
+      "errors": [
+        "memory continuity cannot be verified from public API"
+      ],
+      "trace": {
+        "request_id": "e27bc3db",
+        "timestamp": "2026-09-27T04:39:05.816157",
+        "intent": "logistics",
+        "primary_agent": "general",
+        "supporting_agents": [],
+        "tools_used": [
+          "search_knowledge_base",
+          "suggest_required_fields"
+        ],
+        "tool_calls": [
+          {
+            "agent_type": "general",
+            "tool_name": "search_knowledge_base",
+            "tool_use_id": "call_00_8XSXJsMRzu2feXF5nQil6092",
+            "input": {
+              "query": "物流查询 订单配送进度 如何查看物流状态",
+              "top_k": 3
+            },
+            "success": true,
+            "result_success": true,
+            "latency_ms": 3869.6,
+            "cached": false,
+            "reranked": true,
+            "error": ""
+          },
+          {
+            "agent_type": "general",
+            "tool_name": "suggest_required_fields",
+            "tool_use_id": "call_01_8cFGwyeb0wijKdqe4rL38143",
+            "input": {},
+            "success": true,
+            "result_success": null,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 7109.9
+      },
+      "turns": [
+        {
+          "message": "我的订单号是 A12345。",
+          "response": {
+            "conv_id": "baseline_memory_continuity_01_conversation",
+            "request_id": "b4d5008e",
+            "response": "收到，订单号 **A12345** 我先记下了 👌\n\n不过还差一个关键信息：你具体想处理什么事情？方便的话告诉我下面任意一项，我就能判断下一步：\n\n- **订单状态**：比如是否已发货、物流是否更新、显示异常等\n- **售后问题**：退换货、商品问题、少件/破损等\n- **账单/支付**：扣款、退款、发票、支付状态等\n\n补充一下：我自己无法直接查询订单系统，所以不会给你“已查到”的结论。等你说清诉求后，我会判断是需要转到**技术支持**、**账单支持**，还是由**人工**核验订单后处理。\n\n另外，如果方便也可以顺带提供**下单时间**或**商品名称**，能帮人工更快定位，但不是必须的。",
+            "intent": "query",
+            "intent_group": "query",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "inspect_request_context",
+              "suggest_required_fields",
+              "search_knowledge_base"
+            ],
+            "routing_reason": "intent=query, group=query, primary=general, supporting=none, scores=[general=0.77, technical=0.00, billing=0.00]",
+            "routing_confidence": 0.77,
+            "escalated": false,
+            "latency_ms": 7463.3,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.339,
+            "intent_source_scores": {
+              "llm": 0.0,
+              "embedding": 0.3389834532487511,
+              "pattern": 0.0
+            }
+          },
+          "trace": {
+            "request_id": "b4d5008e",
+            "timestamp": "2026-09-27T04:38:57.128257",
+            "intent": "query",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "inspect_request_context",
+              "suggest_required_fields",
+              "search_knowledge_base"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "general",
+                "tool_name": "inspect_request_context",
+                "tool_use_id": "call_00_2UeJtSbMxbjTNoKrd6PO7418",
+                "input": {
+                  "focus": "order"
+                },
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "general",
+                "tool_name": "suggest_required_fields",
+                "tool_use_id": "call_01_eIGBBeCfnZPQcrV3hSs32275",
+                "input": {},
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              },
+              {
+                "agent_type": "general",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_02_BKY3hDyyjQEBCOemjfGd8717",
+                "input": {
+                  "query": "订单号 查询 订单状态 售后",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3677.3,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              }
+            ],
+            "escalated": false,
+            "latency_ms": 7463.3
+          }
+        },
+        {
+          "message": "它现在到哪里了？",
+          "response": {
+            "conv_id": "baseline_memory_continuity_01_conversation",
+            "request_id": "e27bc3db",
+            "response": "关于 **A12345** 的物流进度，我先说明一下边界：我这边**无法实时查询物流轨迹**，所以不会给你“已到某地”的具体结论，避免误导。\n\n你可以这样自查物流：\n\n- **App / 官网「我的订单」**：物流信息一般在发货后 **24 小时内**更新，可能因承运商同步稍有延迟\n- **订单状态含义**：待支付 → 已支付 → 已发货 → 运输中 → 已签收 → 已完成\n- **快递单号**：拿到后可直接在承运商官网查最新节点，通常比订单页更及时\n\n需要人工介入的情况（可以帮你转接）：\n\n- 显示**已发货但超过 7 天**未收到 → 可申请**查件**\n- 订单**状态显示异常**，或物流长时间**无更新**（超过 24 小时仍未刷新）\n\n为了让人工更快定位，麻烦补充两点（如果方便）：\n\n1. 订单 **A12345** 是否就是你这次要查的订单？\n2. **下单时间**或**商品名称**\n\n另外，你希望的是：先帮你**转人工核验物流**，还是你先自查、有异常再回来？告诉我一句，我按你的选择安排下一步 👌",
+            "intent": "logistics",
+            "intent_group": "query",
+            "agent_type": "general",
+            "agent_types": [
+              "general"
+            ],
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "suggest_required_fields"
+            ],
+            "routing_reason": "intent=logistics, group=query, primary=general, supporting=none, scores=[general=0.65, technical=0.00, billing=0.00]",
+            "routing_confidence": 0.65,
+            "escalated": true,
+            "latency_ms": 7109.9,
+            "knowledge_used": true,
+            "entities": {
+              "order_id": [],
+              "product": [],
+              "date": [],
+              "amount": [],
+              "error_code": []
+            },
+            "intent_confidence": 0.665,
+            "intent_source_scores": {
+              "llm": 0.95,
+              "embedding": 0.21780342093451607,
+              "pattern": 0.5
+            }
+          },
+          "trace": {
+            "request_id": "e27bc3db",
+            "timestamp": "2026-09-27T04:39:05.816157",
+            "intent": "logistics",
+            "primary_agent": "general",
+            "supporting_agents": [],
+            "tools_used": [
+              "search_knowledge_base",
+              "suggest_required_fields"
+            ],
+            "tool_calls": [
+              {
+                "agent_type": "general",
+                "tool_name": "search_knowledge_base",
+                "tool_use_id": "call_00_8XSXJsMRzu2feXF5nQil6092",
+                "input": {
+                  "query": "物流查询 订单配送进度 如何查看物流状态",
+                  "top_k": 3
+                },
+                "success": true,
+                "result_success": true,
+                "latency_ms": 3869.6,
+                "cached": false,
+                "reranked": true,
+                "error": ""
+              },
+              {
+                "agent_type": "general",
+                "tool_name": "suggest_required_fields",
+                "tool_use_id": "call_01_8cFGwyeb0wijKdqe4rL38143",
+                "input": {},
+                "success": true,
+                "result_success": null,
+                "latency_ms": 0.0,
+                "cached": false,
+                "reranked": false,
+                "error": ""
+              }
+            ],
+            "escalated": true,
+            "latency_ms": 7109.9
+          }
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "planned_cases": 18,
+    "runnable_cases": 18,
+    "blocked_cases": 0,
+    "passed_cases": 8,
+    "failed_cases": 10,
+    "intent_accuracy": 0.8889,
+    "intent_macro_f1": 0.7778,
+    "intent_per_class": {
+      "greeting": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "human_handoff": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "invoice": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "logistics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667
+      },
+      "order_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "other": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "payment_issue": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "query": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6667
+      },
+      "refund": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "technical": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "technical_crash": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "technical_login": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "primary_routing_accuracy": 0.9444,
+    "supporting_precision": 1.0,
+    "supporting_recall": 0.5,
+    "supporting_f1": 0.6667,
+    "multi_agent_trigger_rate": 0.0556,
+    "expected_multi_agent_recall": 0.5,
+    "unexpected_multi_agent_rate": 0.0,
+    "required_rag_recall": 1.0,
+    "unnecessary_rag_rate": 0.0,
+    "tool_expected_hit_rate": 0.5556,
+    "unexpected_tool_rate": 0.6364,
+    "tool_call_count": 35,
+    "tool_trace_success_rate": 1.0,
+    "escalation_accuracy": 0.8,
+    "escalation_false_positive_rate": 0.25,
+    "escalation_false_negative_rate": 0.0,
+    "average_latency_ms": 7414.3,
+    "median_latency_ms": 7176.4,
+    "p95_latency_ms": 19015.4,
+    "single_agent_average_latency_ms": 6731.8,
+    "multi_agent_average_latency_ms": 19015.4,
+    "rag_average_latency_ms": 9187.1,
+    "non_rag_average_latency_ms": 1209.2,
+    "query_rewrite_success_rate": "N/A: not exposed by public trace",
+    "rerank_success_rate": "N/A: not exposed by public trace"
+  },
+  "failure_breakdown": {
+    "Tool Selection Error": 8,
+    "Routing Error": 2,
+    "Multi-Agent Error": 1,
+    "Intent Error": 2,
+    "Escalation Error": 1
+  },
+  "runtime_observations": {
+    "source": "docker logs --since 2026-09-27T04:36:00Z echomind-app（窗口包含 Baseline 前紧邻的一次 Tool Trace smoke 请求）",
+    "rag_calls_from_trace": 19,
+    "trace_reranked_true": 19,
+    "query_rewrite": "日志反复出现“查询改写失败，使用原始查询”并回退到单个原始查询；日志窗口内也有一次成功生成多个子查询，精确逐 Case 比例未自动抽取。",
+    "rerank": "日志反复出现“重排失败，返回原始顺序”；但 tool trace 仍记录 reranked=true，说明当前 reranked 字段不能区分真实重排与 fallback。",
+    "episodic_memory": "日志反复出现 Chroma where exactly one operator 校验失败；本轮未修复。"
+  }
+}
