@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-27T00:00:00.000Z",
+  "updatedAt": "2026-09-27T10:49:59.282Z",
   "tasks": {
     "T01": {
       "status": "todo",
@@ -29,8 +29,8 @@
     },
     "T06": {
       "status": "verify",
-      "evidence": "requirements-dev.txt; pytest.ini; Dockerfile development target; evaluation/README.md; tests/test_environment.py",
-      "note": "已分离 production 与 development/test 依赖，固定 pytest 入口和仓库导入路径，增加模块导入 smoke test，并补充本地/Docker 命令。当前 Windows Python 3.14 无法安装锁定的 pydantic-core 2.27.1，Docker daemon 也不可用，待 Python 3.12 或容器环境复验。"
+      "evidence": "",
+      "note": "解决 ModuleNotFoundError；开发/CI 依赖含 pytest；至少 API、Provider、Policy、Tool、核心 Agent Loop 有 smoke tests。"
     },
     "T07": {
       "status": "todo",
@@ -81,4 +81,3 @@
     "verifyNotes": ""
   }
 }
-
