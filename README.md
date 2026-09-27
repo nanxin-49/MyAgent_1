@@ -2,15 +2,40 @@
 
 E-commerce Support Agent
 
-CartCare 是一个面向客服/运营场景的多 Agent 智能系统。它不是单纯的聊天机器人，而是把以下能力串成闭环：
+CartCare 是一个面向电商客服场景的可观测、多 Agent 编排运行时。当前代码已经接通记忆、意图识别、路由、Agent 工具调用、Skills 注入和知识库检索；订单查询、物流查询、退款执行、Policy Engine 和 HITL 仍是后续任务，不应从现有文件名推断为已接入。
 
-- 细粒度意图识别
-- 路由驱动的多 Agent 编排
-- 意图驱动 RAG 检索
-- Redis + ChromaDB 分层记忆
-- 动态 Skills 注入
-- 在线监控与路由降权
-- LLM-as-Judge 端到端评测
+## 当前真实主链路
+
+POST /chat 的实际调用关系如下：
+
+~~~text
+请求
+  -> MemoryManager.get_context()
+  -> AgentOrchestrator.recognize_intent()
+  -> 构造 Request（intent / entities / urgency / history / memory context）
+  -> AgentOrchestrator.run()
+       -> 生成 RoutingDecision
+       -> General / Technical / Billing / Escalation Agent
+       -> LLM 回复；必要时按 Agent 白名单执行工具调用（最多 3 轮）
+            -> search_knowledge_base（Agent 按需触发的 RAG 工具）
+  -> 写回用户消息和 Agent 回复
+  -> 异步更新用户画像
+  -> 返回 ChatResponse（路由、工具、升级和延迟信息）
+~~~
+
+RAG 不是 /chat 的 API 前置固定阶段。Agent 是否调用 search_knowledge_base 由模型在角色工具白名单内决定；knowledge_used 只有在该工具实际被调用时才为 true。需要直接调试查询改写、并行召回、去重和重排时使用 POST /search。
+
+Monitor 和 Eval 也不在每次 /chat 内同步运行：Monitor 在应用生命周期中后台采集统计并更新路由惩罚，POST /eval/run 才会显式启动意图和端到端评测。
+
+## 当前能力边界
+
+- **Agent / Intent**：IntentRecognizer 输出 intent、intent_group、confidence、urgency 和 entities；Orchestrator 路由到四类 Agent，复杂请求可主辅并行。
+- **Tool**：agents/tools.py 提供确定性的请求分析、字段检查、技术排障、金额比较、人工交接摘要和共享 RAG 工具；没有伪造订单或退款动作。
+- **RAG**：mcp/knowledge_base.py + ChromaDB 提供知识库；mcp/tool_manager.py 是项目自研的本地工具管理器，提供参数校验、缓存、超时、熔断、fallback、查询改写和重排，不是标准 MCP SDK/transport 接入。
+- **Memory**：Redis 保存工作记忆，ChromaDB 保存情景摘要和用户画像；每轮 /chat 回写消息，画像更新异步执行。
+- **Monitor / Trace**：/monitor、/metrics 和 /trace/* 暴露运行时统计与工具 trace；Monitor 的后台任务会把表现反馈给路由评分。
+- **Eval**：/eval/run 独立运行意图准确率、Macro-F1、LLM-as-Judge 和回归检查，不是 /chat 的隐式步骤。
+- **未接入的业务闭环**：当前没有真实或明确模拟的 Product/Order/Logistics/Refund Provider，也没有退款资格、权限、ownership、Policy Gate、审批和幂等执行链路。
 
 ## 你可以先看什么
 
@@ -18,6 +43,7 @@ CartCare 是一个面向客服/运营场景的多 Agent 智能系统。它不是
 - [重点代码](wiki/重点代码.md)
 - [业务流程说明](wiki/业务流程说明.md)
 - [完整使用指南](wiki/完整使用指南.md)
+- [Workbench 事实基线](docs/CartCare-Codex-Workbench.html)
 
 ## 快速开始
 
@@ -25,147 +51,90 @@ CartCare 是一个面向客服/运营场景的多 Agent 智能系统。它不是
 
 - Docker
 - Docker Compose
-- `ANTHROPIC_API_KEY`
+- ANTHROPIC_API_KEY
 
 如果使用兼容 Anthropic 协议的第三方模型服务，也可以配置：
 
-```env
+~~~env
 ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
 ANTHROPIC_MODEL=deepseek-v4-pro
 ANTHROPIC_API_KEY=your_key
-```
+~~~
 
 ### 2. 配置环境变量
 
-复制示例配置：
-
-```bash
+~~~bash
 cp .env.example .env
-```
+~~~
 
-最少确认这些变量可用：
+至少配置：
 
-```env
+~~~env
 ANTHROPIC_API_KEY=your_api_key
-REDIS_PASSWORD=echomind123
-```
+~~~
+
+不要把真实 API key 写入源码或 Git。
 
 ### 3. 启动服务
 
-推荐直接启动全栈：
-
-```bash
+~~~bash
 docker compose up -d --build
-```
-
-查看状态：
-
-```bash
 docker compose ps
-```
-
-看日志：
-
-```bash
 docker compose logs -f echomind
-```
+~~~
 
-### 4. 访问入口
+访问：
 
-- API: `http://localhost:8000`
-- Swagger: `http://localhost:8000/docs`
-- Nginx: `http://localhost`
-- Health: `http://localhost:8000/health`
+- API：http://localhost:8000
+- Swagger：http://localhost:8000/docs
+- Nginx：http://localhost
+- Health：http://localhost:8000/health
 
-## 核心功能
+## API 入口
 
-### 对话主链路
+| 入口 | 作用 |
+|---|---|
+| POST /chat | 真实客服主链路：记忆、意图、路由、Agent/Tool、回写 |
+| POST /search | 独立调试 RAG 查询改写、召回、去重和重排 |
+| POST /knowledge/add / POST /knowledge/upload | 写入知识库文档 |
+| GET /knowledge/stats | 查看知识库片段数 |
+| GET /skills / POST /skills/reload | 查看或热加载 Skills |
+| GET /monitor / GET /metrics | 查看运行时统计和 Prometheus 指标 |
+| GET /trace/tool/{request_id} / GET /trace/tools | 查看工具调用 trace |
+| POST /eval/run | 显式运行意图和端到端评测 |
 
-`POST /chat`
+## 代码结构
 
-流程是：
+~~~text
+api/main.py                    FastAPI 入口和生命周期装配
+agents/agent_orchestrator.py  意图后的路由、Agent 执行和 tool loop
+agents/tools.py               Agent 工具白名单及确定性 handler
+core/intent_recognizer.py     LLM / Embedding / Pattern 意图融合
+core/skill_loader.py          Skills 加载和 prompt 注入
+memory/conversation_memory.py Redis + ChromaDB 记忆
+mcp/tool_manager.py           自研工具管理器和 RAG 调用治理
+mcp/knowledge_base.py         ChromaDB 知识库
+monitor/performance_monitor.py 后台统计和路由惩罚
+evaluation/evaluator.py       独立评测器
+tests/                        pytest 测试与环境 smoke test
+~~~
 
-```text
-读取记忆 -> 意图识别 -> 知识检索 -> Agent 路由 -> 回复生成 -> 写回记忆
-```
+## 测试
 
-### 知识库
+开发和测试依赖单独声明在 requirements-dev.txt，其中继承生产依赖并额外安装 pytest：
 
-- `POST /search`
-- `POST /knowledge/add`
-- `POST /knowledge/upload`
-- `GET /knowledge/stats`
+~~~bash
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
+~~~
 
-### Skills
+容器测试：
 
-- `GET /skills`
-- `POST /skills/reload`
+~~~bash
+docker build --target development -t cartcare-dev .
+docker run --rm cartcare-dev python -m pytest -q
+~~~
 
-### 监控与评测
+## 项目方向
 
-- `GET /monitor`
-- `POST /eval/run`
-
-## 项目结构
-
-```text
-api/main.py                  FastAPI 入口
-agents/agent_orchestrator.py 多 Agent 编排
-core/intent_recognizer.py    三路融合意图识别
-core/skill_loader.py         动态 Skills 加载
-memory/conversation_memory.py  Redis + ChromaDB 记忆
-mcp/tool_manager.py          工具层、缓存、熔断、重排
-mcp/knowledge_base.py        ChromaDB 知识库
-monitor/performance_monitor.py 在线监控
-evaluation/evaluator.py      端到端评测
-wiki/                       详细文档
-skills/                     动态业务规则
-data/                       持久化数据
-```
-
-## 运行时架构
-
-```text
-用户请求
-  -> /chat
-  -> MemoryManager 读取工作记忆、情景记忆、用户画像
-  -> IntentRecognizer 输出 intent / intent_group / urgency / entities
-  -> 按意图决定是否检索知识库
-  -> AgentOrchestrator 路由到 General / Technical / Billing / Escalation
-  -> Skills 注入、工具调用、回复生成
-  -> 写回 Redis 和 ChromaDB
-  -> Monitor 采集在线指标
-  -> Evaluator 做意图识别和回复质量评测
-```
-
-## 主要端口
-
-| 服务 | 端口 |
-|---|---:|
-| CartCare API | 8000 |
-| ChromaDB | 8001 |
-| Redis | 6379 |
-| Prometheus | 9090 |
-| Nginx | 80 |
-
-## 开发和调试
-
-常用顺序：
-
-```text
-1. /health
-2. /chat
-3. /skills
-4. /monitor
-5. /eval/run
-```
-
-如果你只想看项目怎么工作，直接读：
-
-- [CartCare定位与技术亮点](wiki/CartCare定位与技术亮点.md)
-- [技术亮点](wiki/技术亮点.md)
-- [重点代码](wiki/重点代码.md)
-
-## 一句话概括
-
-CartCare 是一个可观测、可评测、可降级的多 Agent 客服运行时。
+下一阶段优先补齐 Provider、读写 Tool 分层、Policy Gate、HITL、幂等和专项 Eval。所有动态订单、物流、库存、支付和退款事实都应来自 Provider/API/DB；RAG 只承载静态或半静态政策知识。

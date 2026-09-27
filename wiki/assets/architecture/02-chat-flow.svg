@@ -52,7 +52,7 @@
   <!-- Header -->
   <rect class="header shadow" x="32" y="28" width="1536" height="112" rx="18"/>
   <text class="title" x="66" y="78">/chat 主链路架构</text>
-  <text class="subtitle" x="66" y="110">从用户请求到记忆读取、意图识别、按需知识库检索、Agent 回复和画像更新</text>
+  <text class="subtitle" x="66" y="110">从用户请求到记忆读取、意图识别、Agent 路由、按需工具检索、回复和画像更新</text>
   <g transform="translate(1272,58)">
     <rect class="soft-card" width="246" height="48" rx="12"/>
     <circle class="green" cx="28" cy="24" r="14"/>
@@ -90,21 +90,21 @@
     <rect class="card orange-card" width="300" height="132" rx="12"/>
     <circle class="orange" cx="44" cy="40" r="20"/>
     <text class="tiny" x="39" y="45">3</text>
-    <text class="label orange-text" x="82" y="48">RAG 知识库检索</text>
+    <text class="label orange-text" x="82" y="48">意图识别</text>
     <path d="M80 78 h70 v46 h-70z" fill="#ffffff" stroke="#f47d22" stroke-width="5"/>
     <path d="M160 86 h72 M160 104 h62 M160 122 h50" stroke="#f47d22" stroke-width="5" stroke-linecap="round"/>
-    <text class="muted" x="80" y="152">查询改写 / 召回 / 重排</text>
+    <text class="muted" x="80" y="152">LLM + Embedding + Pattern</text>
   </g>
 
   <g transform="translate(1212,320)">
     <rect class="card purple-card" width="280" height="132" rx="12"/>
     <circle class="purple" cx="44" cy="40" r="20"/>
     <text class="tiny" x="39" y="45">4</text>
-    <text class="label purple-text" x="82" y="48">意图识别</text>
+    <text class="label purple-text" x="82" y="48">Agent 路由</text>
     <circle cx="118" cy="100" r="31" fill="#ffffff" stroke="#6045a9" stroke-width="5"/>
     <path d="M92 100 h52 M118 74 v52 M98 80 c13 13 26 26 39 39 M138 80 c-13 13 -26 26 -39 39" stroke="#6045a9" stroke-width="3" fill="none"/>
-    <text class="muted" x="168" y="99">LLM</text>
-    <text class="muted" x="168" y="121">语义 + 规则</text>
+    <text class="muted" x="168" y="99">主 Agent</text>
+    <text class="muted" x="164" y="121">辅助 / 升级</text>
   </g>
 
   <path class="line" d="M372 386 L452 386"/>
@@ -118,35 +118,35 @@
     <rect class="card purple-card" width="280" height="132" rx="12"/>
     <circle class="purple" cx="44" cy="40" r="20"/>
     <text class="tiny" x="39" y="45">5</text>
-    <text class="label purple-text" x="82" y="48">Agent 路由</text>
+    <text class="label purple-text" x="82" y="48">Agent 执行</text>
     <circle class="purple" cx="112" cy="98" r="32"/>
     <circle cx="94" cy="90" r="6" fill="#fff"/>
     <circle cx="130" cy="90" r="6" fill="#fff"/>
     <circle cx="112" cy="112" r="6" fill="#fff"/>
     <path d="M94 90 L112 112 L130 90" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <text class="muted" x="164" y="96">通用 / 技术</text>
-    <text class="muted" x="164" y="118">账单 / 降级</text>
+    <text class="muted" x="164" y="96">LLM 回复</text>
+    <text class="muted" x="164" y="118">工具按需调用</text>
   </g>
 
   <g transform="translate(832,526)">
     <rect class="card green-card" width="300" height="132" rx="12"/>
     <circle class="green" cx="44" cy="40" r="20"/>
     <text class="tiny" x="39" y="45">6</text>
-    <text class="label green-text" x="82" y="48">动态 Skills 注入</text>
+    <text class="label green-text" x="82" y="48">Skills + 工具白名单</text>
     <rect x="82" y="76" width="62" height="54" rx="8" fill="#ffffff" stroke="#14945b" stroke-width="5"/>
     <path d="M144 76 L168 100 L144 100 Z" fill="#dff4e8" stroke="#14945b" stroke-width="4"/>
     <text class="muted" x="184" y="96">按 Agent</text>
-    <text class="muted" x="184" y="118">和关键词匹配</text>
+    <text class="muted" x="184" y="118">匹配并限制工具</text>
   </g>
 
   <g transform="translate(452,526)">
     <rect class="card blue-card" width="300" height="132" rx="12"/>
     <circle class="blue" cx="44" cy="40" r="20"/>
     <text class="tiny" x="39" y="45">7</text>
-    <text class="label blue-text" x="82" y="48">调用大模型</text>
+    <text class="label blue-text" x="82" y="48">LLM + Tool loop</text>
     <path d="M84 84 C100 60 142 60 158 84 C174 108 154 130 122 130 C90 130 68 108 84 84 Z" fill="#ffffff" stroke="#3165b7" stroke-width="5"/>
-    <text class="muted" x="176" y="96">Prompt</text>
-    <text class="muted" x="176" y="118">Memory + RAG + Skills</text>
+    <text class="muted" x="176" y="96">最多 3 轮</text>
+    <text class="muted" x="176" y="118">search_knowledge_base 按需</text>
   </g>
 
   <g transform="translate(92,526)">

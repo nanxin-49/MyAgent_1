@@ -31,6 +31,55 @@ If documentation conflicts with executable code, treat the code as authoritative
 Do not infer that a capability is active only because a file, class, function, or README section exists.
 Verify that it is connected to an executable path.
 
+
+## Wiki documentation policy
+
+Do **not** maintain every file under `wiki/`.
+
+Only the following Wiki documents are treated as core, actively maintained project documentation:
+
+1. `wiki/CartCare定位与技术亮点.md`
+   - explains what CartCare is
+   - defines the business scope and positioning
+   - summarizes the major architecture choices and technical highlights
+   - should stay understandable to someone reading the project for the first time
+
+2. `wiki/重点代码.md`
+   - explains the real executable request path
+   - maps important runtime behavior to concrete files, classes, and functions
+   - should stay aligned with the current implementation
+
+These two files are the primary Wiki documents for understanding the project.
+
+Other files under `wiki/` are secondary or historical material, including documents such as:
+
+- `CartCare学习文档.md`
+- `NexusOps企业智能运营协同中枢.md`
+- `带数据指标的加强版简历模板.md`
+- `技术亮点.md`
+- `架构图.md`
+- `简历包装.md`
+- `完整使用指南.md`
+- `文档中心.md`
+- `业务流程说明.md`
+
+Do not automatically update those files as part of ordinary implementation tasks.
+
+If one of them becomes materially misleading:
+
+1. report the drift
+2. mention which core document already contains the authoritative version
+3. update the secondary document only when the user explicitly requests documentation cleanup
+
+Do not duplicate the same architecture explanation across multiple Wiki files.
+
+For normal code changes, documentation review should normally be limited to:
+
+- `README.md`
+- `docs/CartCare-Codex-Workbench.html` / progress JSON when project state changes
+- `wiki/CartCare定位与技术亮点.md` when positioning or architecture changes
+- `wiki/重点代码.md` when executable call paths or core module responsibilities change
+
 ## Collaboration workspace
 
 Before starting a non-trivial task, read:
@@ -274,7 +323,14 @@ Map results to the workbench DoD.
 Report them without silently expanding scope.
 
 ### Documentation drift
-State whether README, Wiki, architecture docs, or the workbench baseline should be updated.
+State whether any of the following should be updated:
+
+- `README.md`
+- `docs/CartCare-Codex-Workbench.html` / progress JSON
+- `wiki/CartCare定位与技术亮点.md`
+- `wiki/重点代码.md`
+
+Do not update other Wiki files unless the user explicitly asks for documentation cleanup.
 
 ### Suggested task state
 Recommend `doing`, `blocked`, `verify`, or `done`, with a short reason.

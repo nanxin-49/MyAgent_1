@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-27T10:49:59.282Z",
+  "updatedAt": "2026-09-27T11:24:24.0267429Z",
   "tasks": {
     "T01": {
-      "status": "todo",
-      "evidence": "",
-      "note": "README 主流程改为 Memory → Intent → Orchestrator → Agent/Tool；明确 Eval 不在每次 /chat 中运行；明确 mcp/ 为自研工具层。"
+      "status": "done",
+      "evidence": "README.md; wiki/重点代码.md; wiki/业务流程说明.md; wiki/技术亮点.md; wiki/assets/architecture/02-chat-flow.svg",
+      "note": "README 与核心 Wiki 已按真实 /chat 调用链修正：Memory → Intent → Orchestrator → Agent/Tool → Memory；RAG 仅由 Agent 按需调用 search_knowledge_base；Monitor 为后台观测；Eval 通过 /eval/run 独立触发；mcp/ 明确为自研工具层。"
     },
     "T02": {
       "status": "todo",
@@ -81,3 +81,4 @@
     "verifyNotes": ""
   }
 }
+
