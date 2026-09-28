@@ -427,6 +427,7 @@ class GeneralAgent(BaseAgent):
         tool_scope=(
             "search_knowledge_base", "inspect_request_context", "suggest_required_fields",
             "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+            "request_refund", "request_cancel_order",
         ),
         temperature=0.3,
         max_tokens=900,
@@ -460,6 +461,7 @@ class TechnicalAgent(BaseAgent):
         tool_scope=(
             "search_knowledge_base", "lookup_error_code", "build_diagnostic_plan",
             "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+            "request_refund", "request_cancel_order",
         ),
         temperature=0.1,
         max_tokens=1200,
@@ -496,6 +498,7 @@ class BillingAgent(BaseAgent):
         tool_scope=(
             "search_knowledge_base", "check_billing_fields", "compare_amounts",
             "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+            "request_refund", "request_cancel_order",
         ),
         temperature=0.0,
         max_tokens=1100,
@@ -545,6 +548,7 @@ class EscalationAgent(BaseAgent):
         tool_scope=(
             "search_knowledge_base", "create_handoff_summary",
             "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+            "request_refund", "request_cancel_order",
         ),
         temperature=0.0,
         max_tokens=500,

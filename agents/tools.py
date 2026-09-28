@@ -344,6 +344,59 @@ def build_business_tools(backend: BusinessBackend) -> Dict[str, AgentToolSpec]:
     }
 
 
+def build_action_tools(action_service: Any) -> Dict[str, AgentToolSpec]:
+    """Build request-only sensitive action tools over the ActionService.
+
+    The handlers never accept user identity or eligibility from the model. They
+    derive identity from ``Request.user_id`` and delegate policy, idempotency,
+    approval, and execution control to the injected service.
+    """
+
+    def request_refund(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return action_service.request_refund(
+            order_id=args["order_id"],
+            user_id=req.user_id,
+            request_id=req.request_id,
+            amount=args.get("amount"),
+            idempotency_key=args.get("idempotency_key"),
+        ).to_tool_result()
+
+    def request_cancel_order(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return action_service.request_cancel(
+            order_id=args["order_id"],
+            user_id=req.user_id,
+            request_id=req.request_id,
+            idempotency_key=args.get("idempotency_key"),
+        ).to_tool_result()
+
+    identifier = lambda description: {
+        "type": "string",
+        "description": description,
+        "minLength": 1,
+    }
+    return {
+        "request_refund": make_tool(
+            "request_refund",
+            "请求退款；必须经过 Provider、Policy 和 ActionService，可能需要审批，不保证立即执行。",
+            {
+                "order_id": identifier("订单号"),
+                "amount": {"type": "number", "description": "可选退款金额"},
+                "idempotency_key": identifier("可选的重复请求幂等键"),
+            },
+            request_refund,
+            required=["order_id"],
+        ),
+        "request_cancel_order": make_tool(
+            "request_cancel_order",
+            "请求取消订单；必须经过 Provider、Policy 和 ActionService，不代表无条件取消成功。",
+            {
+                "order_id": identifier("订单号"),
+                "idempotency_key": identifier("可选的重复请求幂等键"),
+            },
+            request_cancel_order,
+            required=["order_id"],
+        ),
+    }
 def general_tools() -> Dict[str, AgentToolSpec]:
     return {
         "inspect_request_context": make_tool(

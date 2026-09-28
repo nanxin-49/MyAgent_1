@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-28T08:20:46Z",
+  "updatedAt": "2026-09-28T09:15:00Z",
   "tasks": {
     "T01": {
       "status": "done",
@@ -18,14 +18,14 @@
       "note": "已接入 get_product、get_order、get_shipment、check_inventory、get_refund_status 五个只读 Agent Tools；工具只依赖 Provider，ownership 和 typed error 转换由确定性代码完成；未实现写操作、Policy 或 HITL。Python 3.12 uv 环境完整 pytest 27 passed。"
     },
     "T04": {
-      "status": "verify",
+      "status": "done",
       "evidence": "policies/models.py; policies/engine.py; tests/test_policy_engine.py; README.md; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
-      "note": "独立确定性的 Refund/Cancel Policy Engine 已建立；仅消费 Provider 结构化事实，输出 allow/deny/require_approval、reason_code、policy_version 与 explanation；覆盖所有权、状态、7 天退款窗口、金额与审批条件，不执行动作或 HITL。Python 3.12 uv 环境完整 pytest 41 passed。"
+      "note": "独立确定性的 Refund/Cancel Policy Engine 已建立；仅消费 Provider 结构化事实，输出 allow/deny/require_approval、reason_code、policy_version 与 explanation；覆盖所有权、状态、7 天退款窗口、金额与审批条件，不执行动作或 HITL。Python 3.12 uv 环境完整 pytest 56 passed。"
     },
     "T05": {
-      "status": "todo",
-      "evidence": "",
-      "note": "定义 pending_action；approve/reject endpoint；checkpoint；重复 approval 不得导致重复执行。"
+      "status": "verify",
+      "evidence": "actions/models.py; actions/service.py; actions/backend.py; actions/executor.py; actions/store.py; agents/tools.py; api/main.py; tests/test_action_service.py; README.md; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
+      "note": "已建立 PendingAction、状态机、ActionService、approve/reject/resume、Provider+Policy 二次校验、幂等 Store 和明确标注的模拟 Action Backend；Agent write tools 只能请求敏感动作，不绕过 Policy；Python 3.12 uv 环境完整 pytest 56 passed。正式认证、持久化 Action Store 和真实外部业务系统留待后续。"
     },
     "T06": {
       "status": "done",

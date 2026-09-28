@@ -19,6 +19,7 @@ POST /chat 的实际调用关系如下：
        -> LLM 回复；必要时按 Agent 白名单执行工具调用（最多 3 轮）
             -> search_knowledge_base（Agent 按需触发的 RAG 工具）
             -> get_product / get_order / get_shipment / check_inventory / get_refund_status（只读 Provider Tools）
+            -> request_refund / request_cancel_order（ActionService；Policy、幂等和审批控制）
   -> 写回用户消息和 Agent 回复
   -> 异步更新用户画像
   -> 返回 ChatResponse（路由、工具、升级和延迟信息）
@@ -31,14 +32,14 @@ Monitor 和 Eval 也不在每次 /chat 内同步运行：Monitor 在应用生命
 ## 当前能力边界
 
 - **Agent / Intent**：IntentRecognizer 输出 intent、intent_group、confidence、urgency 和 entities；Orchestrator 路由到四类 Agent，复杂请求可主辅并行。
-- **Tool**：agents/tools.py 提供确定性的请求分析、字段检查、技术排障、金额比较、人工交接摘要、共享 RAG 工具和五个只读业务查询工具；没有退款执行、取消订单或其他写操作。
+- **Tool**：agents/tools.py 提供确定性的请求分析、字段检查、技术排障、金额比较、人工交接摘要、共享 RAG 工具、五个只读业务查询工具和两个受控敏感动作请求工具。
 - **Business Provider**：providers/ 定义 Product、Order、Inventory、Logistics、Refund 的结构化只读 Provider 和 Backend Protocol；Agent Tools 只依赖 Provider，当前通过 API lifespan 注入明确标注的 JSON fixture 内存 Mock。
 - **RAG**：mcp/knowledge_base.py + ChromaDB 提供知识库；mcp/tool_manager.py 是项目自研的本地工具管理器，提供参数校验、缓存、超时、熔断、fallback、查询改写和重排，不是标准 MCP SDK/transport 接入。
 - **Memory**：Redis 保存工作记忆，ChromaDB 保存情景摘要和用户画像；每轮 /chat 回写消息，画像更新异步执行。
 - **Monitor / Trace**：/monitor、/metrics 和 /trace/* 暴露运行时统计与工具 trace；Monitor 的后台任务会把表现反馈给路由评分。
 - **Eval**：/eval/run 独立运行意图准确率、Macro-F1、LLM-as-Judge 和回归检查，不是 /chat 的隐式步骤。
 - **Policy Engine**：`policies/` 对 Provider 结构化订单事实给出确定性的退款/取消资格决策（allow / deny / require_approval、reason_code、policy_version）；`refund-cancel-v1` 是示例规则，使用 7 天退款窗口和 500 CNY 自动处理阈值，当前尚未接入执行链。
-- **未接入的业务闭环**：真实外部系统、审批、写操作和幂等执行链路仍未接入。
+- **Action / HITL**：`actions/` 提供 PendingAction、ActionService、审批/拒绝/恢复、幂等和明确标注的模拟写后端；真实外部系统、正式认证和持久化 Action Store 仍未接入。
 
 ## 你可以先看什么
 
@@ -114,6 +115,7 @@ agents/agent_orchestrator.py  意图后的路由、Agent 执行和 tool loop
 agents/tools.py               Agent 工具白名单及确定性 handler
 providers/                    动态业务事实 Provider、Backend Protocol 和测试 Mock
 policies/                     确定性退款与取消资格判断，不执行写操作
+actions/                      PendingAction、审批、幂等和模拟动作执行边界
 core/intent_recognizer.py     LLM / Embedding / Pattern 意图融合
 core/skill_loader.py          Skills 加载和 prompt 注入
 memory/conversation_memory.py Redis + ChromaDB 记忆
@@ -148,4 +150,4 @@ docker run --rm --entrypoint python cartcare-dev -m pytest -q
 
 ## 项目方向
 
-下一阶段优先把 Policy Result 接入受控写操作，再补齐 HITL、幂等和专项 Eval。所有动态订单、物流、库存、支付和退款事实都应来自 Provider/API/DB；RAG 只承载静态或半静态政策知识。
+下一阶段优先把模拟 Action Store 替换为可持久化实现，再补齐专项 HITL/Eval 和真实业务适配器。所有动态订单、物流、库存、支付和退款事实都应来自 Provider/API/DB；RAG 只承载静态或半静态政策知识。

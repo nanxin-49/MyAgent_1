@@ -253,6 +253,8 @@ Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果�
 
 `policies/` 已提供确定性的退款和取消资格判断：输入是 Provider 校验过的订单事实、请求客户标识、评估时间与金额；输出包含 `allow` / `deny` / `require_approval`、`reason_code`、`policy_version` 和解释。Policy Engine 不读取数据源，也不执行退款、取消或审批；这些执行控制留给 T05。
 
+`actions/` 已建立 T05 控制闭环：`PendingAction` 记录敏感动作、Policy Result、审批状态、幂等键和执行结果；`ActionService` 在 request、approve、reject、resume 时重新校验 Provider facts 和 Policy，并通过明确标注的模拟 Action Backend 执行。该实现用于演示状态机和安全边界，不是支付渠道或真实商城集成。
+
 ### 4. Redis + ChromaDB 记忆体系
 
 CartCare 把记忆拆成三层：

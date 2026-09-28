@@ -5,6 +5,7 @@ CartCare 智能客服系统 — FastAPI 入口
 所有核心组件在 lifespan 中初始化，通过环境变量配置。
 """
 import asyncio
+import json
 import logging
 import os
 import pathlib
@@ -24,6 +25,7 @@ from fastapi import FastAPI, HTTPException, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field
+from actions import ActionResult
 
 load_dotenv()
 
@@ -46,6 +48,7 @@ _tool_manager = None
 _monitor      = None
 _evaluator    = None
 _skill_manager = None
+_action_service = None
 
 def _anthropic_cfg() -> Dict[str, Any]:
     key = os.getenv("ANTHROPIC_API_KEY", "")
@@ -63,12 +66,13 @@ def _anthropic_cfg() -> Dict[str, Any]:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _orchestrator, _memory, _tool_manager, _monitor, _evaluator, _skill_manager
+    global _orchestrator, _memory, _tool_manager, _monitor, _evaluator, _skill_manager, _action_service
 
     print(BANNER, flush=True)
 
     from agents.agent_orchestrator import AgentOrchestrator, Request, build_shared_rag_tools
-    from agents.tools import build_business_tools
+    from agents.tools import build_action_tools, build_business_tools
+    from actions import ActionService, InMemoryBusinessActionBackend
     from core.intent_recognizer import IntentRecognizer
     from evaluation.evaluator import EndToEndEvaluator
     from mcp.knowledge_base import KnowledgeBase
@@ -158,10 +162,18 @@ async def lifespan(app: FastAPI):
         "CARTCARE_BUSINESS_FIXTURE",
         str(pathlib.Path(_ROOT) / "providers" / "fixtures" / "business_provider_data.json"),
     )
-    business_backend = InMemoryBusinessBackend.from_fixture(business_fixture)
+    with open(business_fixture, "r", encoding="utf-8") as handle:
+        business_data = json.load(handle)
+    business_backend = InMemoryBusinessBackend(business_data)
+    action_backend = InMemoryBusinessActionBackend(business_data)
+    _action_service = ActionService(
+        business_backend=business_backend,
+        action_backend=action_backend,
+    )
     business_tools = build_business_tools(business_backend)
+    business_tools.update(build_action_tools(_action_service))
     logger.info(
-        "业务只读工具已加载（测试/演示 backend）: %s",
+        "业务工具已加载（测试/演示 backend）: %s",
         ", ".join(sorted(business_tools)),
     )
 
@@ -242,6 +254,11 @@ class ChatResponse(BaseModel):
     entities: Dict[str, List[str]] = Field(default_factory=dict)
     intent_confidence: float = 0.0
     intent_source_scores: Dict[str, float] = Field(default_factory=dict)
+
+
+class ActionCommandRequest(BaseModel):
+    user_id: str = "anonymous"
+    request_id: Optional[str] = None
 
 
 class ToolTraceResponse(BaseModel):
@@ -350,6 +367,49 @@ async def chat(req: ChatRequest):
         intent_confidence=round(intent_result.confidence, 4),
         intent_source_scores=intent_result.source_scores,
     )
+
+
+@app.post("/actions/{action_id}/approve", response_model=ActionResult, tags=["Actions"])
+async def approve_action(action_id: str, req: ActionCommandRequest):
+    """Approve an awaiting demo action; repeated approvals are idempotent."""
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.approve(
+        action_id=action_id,
+        user_id=req.user_id,
+        request_id=req.request_id or str(uuid.uuid4()),
+    )
+
+
+@app.post("/actions/{action_id}/reject", response_model=ActionResult, tags=["Actions"])
+async def reject_action(action_id: str, req: ActionCommandRequest):
+    """Reject an awaiting demo action; rejection is terminal."""
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.reject(
+        action_id=action_id,
+        user_id=req.user_id,
+        request_id=req.request_id or str(uuid.uuid4()),
+    )
+
+
+@app.post("/actions/{action_id}/resume", response_model=ActionResult, tags=["Actions"])
+async def resume_action(action_id: str, req: ActionCommandRequest):
+    """Resume an approved demo action; completed actions are returned unchanged."""
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.resume(
+        action_id=action_id,
+        user_id=req.user_id,
+        request_id=req.request_id or str(uuid.uuid4()),
+    )
+
+
+@app.get("/actions/{action_id}", response_model=ActionResult, tags=["Actions"])
+async def get_action(action_id: str, user_id: str = "anonymous"):
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.get(action_id, user_id=user_id)
 
 
 async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) -> tuple[str, bool]:
