@@ -366,9 +366,15 @@ class BaseAgent:
             raise ValueError(f"不允许的工具参数: {', '.join(sorted(unknown))}")
         type_map = {"string": str, "number": (int, float), "integer": int, "boolean": bool}
         for key, value in args.items():
-            expected = properties.get(key, {}).get("type")
-            if expected in type_map and not isinstance(value, type_map[expected]):
+            definition = properties.get(key, {})
+            expected = definition.get("type")
+            if expected in type_map and (
+                not isinstance(value, type_map[expected])
+                or (expected == "integer" and isinstance(value, bool))
+            ):
                 raise ValueError(f"参数 {key} 类型错误，期望 {expected}")
+            if expected == "string" and len(value) < int(definition.get("minLength", 0)):
+                raise ValueError(f"参数 {key} 不能为空")
 
     def _build_system_prompt(self, req: Request) -> str:
         """把角色契约和动态 Skills 拼入 system prompt。"""
@@ -418,7 +424,10 @@ class GeneralAgent(BaseAgent):
         input_contract=("对话历史", "用户画像", "意图与紧急度", "知识库上下文"),
         output_contract=("先回应核心问题", "信息不足时只询问必要字段", "明确下一步和边界"),
         handoff_conditions=("涉及权限、资金、隐私或复杂投诉", "用户明确要求人工"),
-        tool_scope=("search_knowledge_base", "inspect_request_context", "suggest_required_fields"),
+        tool_scope=(
+            "search_knowledge_base", "inspect_request_context", "suggest_required_fields",
+            "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+        ),
         temperature=0.3,
         max_tokens=900,
     )
@@ -448,7 +457,10 @@ class TechnicalAgent(BaseAgent):
         input_contract=("错误码", "问题发生时间", "运行环境", "影响范围", "最近变更", "知识库上下文"),
         output_contract=("现象复述", "可能原因", "编号排查步骤", "验证结果", "需要补充的信息"),
         handoff_conditions=("生产大面积不可用", "数据丢失或权限异常", "需要后台日志、数据库或人工操作"),
-        tool_scope=("search_knowledge_base", "lookup_error_code", "build_diagnostic_plan"),
+        tool_scope=(
+            "search_knowledge_base", "lookup_error_code", "build_diagnostic_plan",
+            "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+        ),
         temperature=0.1,
         max_tokens=1200,
     )
@@ -481,7 +493,10 @@ class BillingAgent(BaseAgent):
         input_contract=("订单号", "金额与币种", "支付时间", "支付渠道", "用户期望", "知识库上下文"),
         output_contract=("需要核验的信息", "当前可判断内容", "下一步处理路径", "时效边界"),
         handoff_conditions=("实际退款或补偿", "重复扣款或支付成功但订单未生效", "发票作废/重开", "企业合同或大额订单"),
-        tool_scope=("search_knowledge_base", "check_billing_fields", "compare_amounts"),
+        tool_scope=(
+            "search_knowledge_base", "check_billing_fields", "compare_amounts",
+            "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+        ),
         temperature=0.0,
         max_tokens=1100,
     )
@@ -527,7 +542,10 @@ class EscalationAgent(BaseAgent):
         input_contract=("用户消息", "意图", "紧急度", "结构化实体", "对话背景"),
         output_contract=("升级原因", "已知信息摘要", "还需补充的信息", "保守的后续说明"),
         handoff_conditions=("用户明确要求人工", "紧急或高风险场景"),
-        tool_scope=("search_knowledge_base", "create_handoff_summary"),
+        tool_scope=(
+            "search_knowledge_base", "create_handoff_summary",
+            "get_product", "get_order", "get_shipment", "check_inventory", "get_refund_status",
+        ),
         temperature=0.0,
         max_tokens=500,
     )

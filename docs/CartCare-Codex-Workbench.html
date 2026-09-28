@@ -117,13 +117,13 @@
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>/chat 主链路：</strong>Memory → Intent → Orchestrator → Agent LLM / Tool Calling。RAG 不是 API 前置固定阶段，而是 Agent 选择 <code>search_knowledge_base</code> 后触发。</div><div class="muted">api/main.py / agents/tools.py</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>当前 Agent：</strong>General / Technical / Billing / Escalation。Technical 仍包含 401/500/login/crash；Billing 包含 billing/refund/invoice/payment/subscription，业务范围尚未完全收敛到电商。</div><div class="muted">agent_orchestrator.py</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Tool Runtime：</strong>存在工具白名单、基础 schema 校验、tool_use → tool_result → LLM 循环，Agent 最大 3 轮；ToolManager 还有 timeout/cache/circuit-breaker/fallback/query rewrite/parallel recall/rerank。</div><div class="muted">agent_orchestrator.py / tool_manager.py</div></div>
-      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>RAG：</strong>ChromaDB + 约 500 字切片 + vector query；metadata 目前较薄，缺 policy version / effective_at / citation source contract。</div><div class="muted">knowledge_base.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>RAG：</strong>ChromaDB Server + <code>chromadb-client</code> / <code>HttpClient</code>；已移除 <code>PersistentClient</code> 本地 fallback。当前仍是约 500 字切片 + vector query，metadata 较薄，缺 policy version / effective_at / citation source contract。</div><div class="muted">knowledge_base.py / requirements.txt</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Memory：</strong>Redis working memory + Chroma episodic + user_profile；有 LLM 压缩摘要。但客服长期记忆边界还需要重新定义。</div><div class="muted">conversation_memory.py</div></div>
-      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Business Provider 读取层：</strong>已建立 Product / Order / Inventory / Logistics / Refund 的只读 Provider、Backend Protocol、结构化模型和 typed errors；当前仅有测试/演示 JSON fixture Mock，尚未接入 Agent Tool 或真实外部系统。</div><div class="muted">providers/</div></div>
-      <div class="baseline-item"><div><span class="truth risk">关键缺口</span></div><div><strong>没有 Policy Engine / HITL 执行闭环：</strong>退款资格、pending action、批准/拒绝、幂等执行等尚未形成确定性链路。</div><div class="muted">agents/tools.py / orchestrator</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Business Provider 与只读 Tool：</strong>Product / Order / Inventory / Logistics / Refund Provider 已通过 <code>build_business_tools()</code> 接入 Agent；当前 API lifespan 注入明确标注的 JSON fixture 测试/演示 backend，尚未接入真实外部系统或写操作。</div><div class="muted">providers/ / agents/tools.py / api/main.py</div></div>
+      <div class="baseline-item"><div><span class="truth risk">关键缺口</span></div><div><strong>Policy 尚未进入执行闭环：</strong>已建立独立、确定性的退款/取消资格判断及版本化结果；pending action、批准/拒绝、幂等执行及 Policy Gate 接线仍未完成。</div><div class="muted">policies/ / agents/tools.py / orchestrator</div></div>
       <div class="baseline-item"><div><span class="truth risk">关键缺口</span></div><div><strong>认证与 ownership：</strong>user_id 来自请求体，当前没有可信认证主体，也没有订单所有权校验。</div><div class="muted">api/main.py</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Eval：</strong>有 intent accuracy / macro-F1 / LLM-as-Judge / regression；缺 tool、RAG、policy、HITL、幂等性等专项指标。</div><div class="muted">evaluation/evaluator.py</div></div>
-      <div class="baseline-item"><div><span class="truth risk">工程风险</span></div><div><strong>测试入口：</strong>tests/ 已包含 orchestrator、environment import smoke 和 Provider 单元测试；requirements-dev.txt 声明 pytest；Dockerfile 的 development target 基于 Python 3.12 并包含开发依赖，docker-compose.yml 的应用服务仍构建 production target；GitHub Actions 使用 Python 3.12 执行 pytest。当前本机 Docker CLI/Desktop 已安装但服务为 stopped，启动服务和访问 docker_engine named pipe 均被当前权限拒绝，容器结果仍待可用 Docker/CI 执行。</div><div class="muted">Dockerfile / docker-compose.yml / .github/workflows/tests.yml</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>开发与测试环境：</strong>项目标准固定为 Python 3.12 + uv；<code>pyproject.toml</code> + <code>uv.lock</code> 为依赖事实源。本地执行 <code>uv sync --dev</code> 后完整 pytest 为 20 passed；GitHub Actions 的 Python 3.12 CI 已成功。当前 Windows Docker daemon 权限问题属于本机基础设施问题，不再阻塞测试基线。</div><div class="muted">pyproject.toml / uv.lock / .github/workflows/tests.yml · commit 7bc3a36</div></div>
       <div class="baseline-item"><div><span class="truth risk">设计债</span></div><div><strong>Monitor routing penalty：</strong>每类 Agent 当前只有一个实例，因此同类性能降权没有实际候选竞争价值。</div><div class="muted">performance_monitor.py</div></div>
       <div class="baseline-item"><div><span class="truth risk">命名风险</span></div><div><strong>mcp/ 不是标准 MCP 实现：</strong>目前是自研本地工具框架，requirements 中没有标准 MCP SDK/client/server/transport。</div><div class="muted">mcp/tool_manager.py</div></div>
     </section>
@@ -214,7 +214,7 @@ Response
       </div>
 
       <div class="work-item" data-task="T03">
-        <div class="work-head"><div><div class="work-title">T03 · 增加真实客服 Tools</div><div class="muted">get_order / get_shipment / check_inventory / create_refund_request 等。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-head"><div><div class="work-title">T03 · 增加真实客服 Tools</div><div class="muted">get_product / get_order / get_shipment / check_inventory / get_refund_status 等只读工具。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
         <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">读工具与写工具分离；统一 ToolResult；参数验证；错误类型；所有动态状态都来自 Provider。</textarea></div></div>
       </div>
 
@@ -229,8 +229,8 @@ Response
       </div>
 
       <div class="work-item" data-task="T06">
-        <div class="work-head"><div><div class="work-title">T06 · 修复测试可执行基线</div><div class="muted">任何重构前先保证 pytest 在本地/容器可跑。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
-        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">解决 ModuleNotFoundError；开发/CI 依赖含 pytest；至少 API、Provider、Policy、Tool、核心 Agent Loop 有 smoke tests。</textarea></div></div>
+        <div class="work-head"><div><div class="work-title">T06 · 标准开发环境与测试基线</div><div class="muted">固定 Python 3.12 + uv，并建立本地与 CI 可重复测试基线。</div></div><div class="meta"><span class="prio p0">P0</span><span class="owner codex">Codex</span></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option selected>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence" value="7bc3a36 · local 20 passed · GitHub Actions success"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">Python 3.12 + uv 已标准化；pyproject.toml + uv.lock 为依赖事实源；uv sync --dev 后完整 pytest 20 passed；GitHub Actions Python 3.12 CI 成功。Windows Docker daemon 权限为本机基础设施问题，不再阻塞 T06。</textarea></div></div>
       </div>
 
       <div class="work-item" data-task="T07">
@@ -270,7 +270,7 @@ Response
       <div class="decision"><input data-decision="d1-date" type="text" placeholder="日期"><input data-decision="d1-title" type="text" value="RAG 与动态数据分离"><textarea data-decision="d1-body">政策/FAQ 走 RAG；订单/物流/库存/退款状态必须走 Provider/API/DB。原因：动态事实需要实时、可验证的 source of truth。</textarea></div>
       <div class="decision"><input data-decision="d2-date" type="text" placeholder="日期"><input data-decision="d2-title" type="text" value="退款规则不交给 LLM"><textarea data-decision="d2-body">LLM 可以识别退款意图并收集信息，但退款资格、金额阈值、订单状态约束由 Policy Engine 决定。</textarea></div>
       <div class="decision"><input data-decision="d3-date" type="text" placeholder="日期"><input data-decision="d3-title" type="text" value="Multi-Agent 先验证后保留"><textarea data-decision="d3-body">当前四 Agent 结构不是默认正确答案。先实现业务 Tool/Policy，再用实验比较 single-agent + tools 和 multi-agent。</textarea></div>
-      <div class="decision"><input data-decision="d4-date" type="text" placeholder="日期"><input data-decision="d4-title" type="text" placeholder="新增决策"><textarea data-decision="d4-body" placeholder="记录决策背景、选择、放弃的方案、依据……"></textarea></div>
+      <div class="decision"><input data-decision="d4-date" type="text" value="2026-09-28"><input data-decision="d4-title" type="text" value="标准环境固定为 Python 3.12 + uv"><textarea data-decision="d4-body">pyproject.toml + uv.lock 作为依赖事实源；本地使用 uv sync --dev / uv run python -m pytest -q。Chroma 使用独立 Server + chromadb-client/HttpClient，不再使用 PersistentClient fallback。原因：提升 Windows 与 CI 的可复现性，避免 chroma-hnswlib 本地编译依赖。</textarea></div>
     </section>
 
     <section id="verification">
@@ -312,6 +312,7 @@ Response
 5. 每次改动必须有可执行测试与可追踪证据；不要只让代码“看起来存在”。
 6. 不默认保留 Multi-Agent。若单 Agent + Tools 更简单且指标不差，应优先简化。
 7. 不要把 mcp/ 目录名当成标准 Model Context Protocol；除非实际接入标准 MCP SDK/transport。
+8. 标准开发环境是 Python 3.12 + uv；pyproject.toml + uv.lock 为依赖事实源。Chroma 只通过 chromadb-client / HttpClient 连接独立服务，不得静默回退 PersistentClient。
 
 本次任务：
 [填写任务 ID，例如 T02]

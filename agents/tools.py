@@ -21,6 +21,16 @@ import json
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, List, Optional, TYPE_CHECKING, Union
 
+from providers import (
+    InventoryProvider,
+    LogisticsProvider,
+    OrderProvider,
+    ProductProvider,
+    ProviderError,
+    RefundProvider,
+)
+from providers.interfaces import BusinessBackend
+
 if TYPE_CHECKING:
     from agents.agent_orchestrator import Request
 
@@ -218,6 +228,119 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             search_knowledge_base,
             required=["query"],
         )
+    }
+
+
+def _business_tool_success(tool_name: str, value: Any) -> Dict[str, Any]:
+    """Serialize a validated Provider model into the stable Agent tool result."""
+    return {
+        "success": True,
+        "tool_name": tool_name,
+        "data": value.model_dump(mode="json"),
+        "source": "business_provider",
+    }
+
+
+def _business_tool_error(tool_name: str, error: ProviderError) -> Dict[str, Any]:
+    """Expose typed Provider failures without leaking backend implementation details."""
+    return {
+        "success": False,
+        "tool_name": tool_name,
+        "data": None,
+        "source": "business_provider",
+        "error": error.to_dict(),
+    }
+
+
+def build_business_tools(backend: BusinessBackend) -> Dict[str, AgentToolSpec]:
+    """Build read-only business tools over injected Provider implementations.
+
+    The backend is deliberately injected at the composition root. Tool handlers
+    never read fixtures or storage directly, and customer ownership always comes
+    from the authenticated request identity represented by ``Request.user_id``.
+    """
+    product_provider = ProductProvider(backend)
+    order_provider = OrderProvider(backend)
+    inventory_provider = InventoryProvider(backend)
+    logistics_provider = LogisticsProvider(backend)
+    refund_provider = RefundProvider(backend)
+
+    def run(tool_name: str, operation: Callable[[], Any]) -> Dict[str, Any]:
+        try:
+            return _business_tool_success(tool_name, operation())
+        except ProviderError as exc:
+            return _business_tool_error(tool_name, exc)
+
+    def get_product(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run("get_product", lambda: product_provider.get_product(args["product_id"]))
+
+    def get_order(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "get_order",
+            lambda: order_provider.get_order(args["order_id"], customer_id=req.user_id),
+        )
+
+    def get_shipment(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "get_shipment",
+            lambda: logistics_provider.get_shipment(args["order_id"], customer_id=req.user_id),
+        )
+
+    def check_inventory(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "check_inventory",
+            lambda: inventory_provider.get_inventory(args["product_id"]),
+        )
+
+    def get_refund_status(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "get_refund_status",
+            lambda: refund_provider.get_refund_for_order(
+                args["order_id"], customer_id=req.user_id
+            ),
+        )
+
+    identifier = lambda description: {
+        "type": "string",
+        "description": description,
+        "minLength": 1,
+    }
+    return {
+        "get_product": make_tool(
+            "get_product",
+            "读取商品基础信息；数据来自 Business Provider 的测试/演示 backend。",
+            {"product_id": identifier("商品 SKU")},
+            get_product,
+            required=["product_id"],
+        ),
+        "get_order": make_tool(
+            "get_order",
+            "读取当前客户自己的订单状态和明细；customer_id 由请求身份确定。",
+            {"order_id": identifier("订单号")},
+            get_order,
+            required=["order_id"],
+        ),
+        "get_shipment": make_tool(
+            "get_shipment",
+            "读取当前客户自己的订单物流状态；customer_id 由请求身份确定。",
+            {"order_id": identifier("订单号")},
+            get_shipment,
+            required=["order_id"],
+        ),
+        "check_inventory": make_tool(
+            "check_inventory",
+            "读取商品库存快照；不会修改库存。",
+            {"product_id": identifier("商品 SKU")},
+            check_inventory,
+            required=["product_id"],
+        ),
+        "get_refund_status": make_tool(
+            "get_refund_status",
+            "读取当前客户订单的退款状态；不会创建或执行退款。",
+            {"order_id": identifier("订单号")},
+            get_refund_status,
+            required=["order_id"],
+        ),
     }
 
 

@@ -129,7 +129,7 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
      - routing_reason
      - routing_confidence
   -> 单 Agent 执行或并行多 Agent 执行
-  -> Agent 按需 tool_use：search_knowledge_base；业务事实后续由 Provider Tool 接入
+  -> Agent 按需 tool_use：search_knowledge_base 或只读业务 Provider Tool
   -> 注入记忆、tool_result、结构化实体和动态 Skills
   -> LLM 生成回复
   -> 写入工作记忆
@@ -249,7 +249,9 @@ T02 新增 `providers/`，为动态业务事实提供与存储解耦的只读接
 - `LogisticsProvider`：订单物流状态
 - `RefundProvider`：退款记录状态
 
-Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。当前实现是测试/演示用 JSON fixture 内存 Backend，未接入 `/chat`、Agent Tool 或真实外部电商系统。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误都有明确类型；退款资格、金额阈值、写操作和审批属于后续 Policy/HITL 任务。
+Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。`agents/tools.py` 的 `build_business_tools()` 将五类 Provider 接入 Agent 的只读工具，API lifespan 注入测试/演示用 JSON fixture 内存 Backend；这不是对真实外部电商系统的接入。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误会转换为稳定 Tool Result；写操作和审批属于后续 HITL 任务。
+
+`policies/` 已提供确定性的退款和取消资格判断：输入是 Provider 校验过的订单事实、请求客户标识、评估时间与金额；输出包含 `allow` / `deny` / `require_approval`、`reason_code`、`policy_version` 和解释。Policy Engine 不读取数据源，也不执行退款、取消或审批；这些执行控制留给 T05。
 
 ### 4. Redis + ChromaDB 记忆体系
 

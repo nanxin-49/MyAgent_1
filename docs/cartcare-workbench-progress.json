@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-27T15:34:25Z",
+  "updatedAt": "2026-09-28T08:20:46Z",
   "tasks": {
     "T01": {
       "status": "done",
@@ -8,19 +8,19 @@
       "note": "README 与核心 Wiki 已按真实 /chat 调用链修正：Memory → Intent → Orchestrator → Agent/Tool → Memory；RAG 仅由 Agent 按需调用 search_knowledge_base；Monitor 为后台观测；Eval 通过 /eval/run 独立触发；mcp/ 明确为自研工具层。"
     },
     "T02": {
-      "status": "verify",
+      "status": "done",
       "evidence": "providers/; tests/test_business_providers.py; tests/fixtures/business_provider_data.json; README.md; docs/CartCare-Codex-Workbench.html; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
-      "note": "已建立五类只读 Provider、BusinessBackend Protocol、结构化 Pydantic 模型和 typed errors；Python 3.12 临时环境中 Provider 专项测试 8 passed；当前仅使用明确标注的 JSON fixture 内存 Mock，未接入 Agent/API Tool。"
+      "note": "已建立五类只读 Provider、BusinessBackend Protocol、结构化 Pydantic 模型和 typed errors；Provider 专项测试通过。当前 backend 仍是明确标注的 JSON fixture 内存 Mock。"
     },
     "T03": {
-      "status": "todo",
-      "evidence": "",
-      "note": "读工具与写工具分离；统一 ToolResult；参数验证；错误类型；所有动态状态都来自 Provider。"
+      "status": "done",
+      "evidence": "agents/tools.py; api/main.py; providers/fixtures/business_provider_data.json; tests/test_business_tools.py; README.md; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
+      "note": "已接入 get_product、get_order、get_shipment、check_inventory、get_refund_status 五个只读 Agent Tools；工具只依赖 Provider，ownership 和 typed error 转换由确定性代码完成；未实现写操作、Policy 或 HITL。Python 3.12 uv 环境完整 pytest 27 passed。"
     },
     "T04": {
-      "status": "todo",
-      "evidence": "",
-      "note": "输入订单事实 + policy version，输出 allow/deny/require_approval + reason_code；至少覆盖退款时限、订单状态、金额阈值。"
+      "status": "verify",
+      "evidence": "policies/models.py; policies/engine.py; tests/test_policy_engine.py; README.md; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
+      "note": "独立确定性的 Refund/Cancel Policy Engine 已建立；仅消费 Provider 结构化事实，输出 allow/deny/require_approval、reason_code、policy_version 与 explanation；覆盖所有权、状态、7 天退款窗口、金额与审批条件，不执行动作或 HITL。Python 3.12 uv 环境完整 pytest 41 passed。"
     },
     "T05": {
       "status": "todo",
@@ -28,9 +28,9 @@
       "note": "定义 pending_action；approve/reject endpoint；checkpoint；重复 approval 不得导致重复执行。"
     },
     "T06": {
-      "status": "verify",
+      "status": "done",
       "evidence": ".github/workflows/tests.yml; Dockerfile; docker-compose.yml; requirements-dev.txt; README.md",
-      "note": "已建立 Python 3.12 GitHub Actions 测试入口；Dockerfile development target 包含 requirements-dev，docker-compose 应用服务保持 production target。Python 3.12 临时环境中 Agent + Provider 测试 19 passed；environment smoke 和完整 pytest 待 Docker/CI 实际执行后验收。本机 Docker CLI/ Desktop 已安装但 com.docker.service 为 Stopped，启动服务和访问 docker_engine named pipe 均被当前权限拒绝。"
+      "note": "已建立 Python 3.12 GitHub Actions 测试入口；Dockerfile development target 包含 requirements-dev，docker-compose 应用服务保持 production target。项目规范依赖已迁移到 pyproject.toml + uv.lock，uv run pytest 作为标准命令。"
     },
     "T07": {
       "status": "todo",

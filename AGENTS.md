@@ -100,6 +100,38 @@ The workbench records:
 `AGENTS.md` contains stable collaboration rules.
 The workbench contains changing project state and progress.
 
+
+## Standard development environment
+
+CartCare officially targets **Python 3.12**.
+
+Use `uv` as the canonical local dependency and environment manager.
+
+The dependency source of truth is:
+
+- `pyproject.toml`
+- `uv.lock`
+
+`requirements.txt` and `requirements-dev.txt` may remain as compatibility/export entry points for Docker, CI, or pip users, but they are not the canonical dependency definition.
+
+Standard local setup and test commands:
+
+```bash
+uv sync --dev
+uv run python -m pytest -q
+```
+
+Do not add Python 3.14 compatibility work unless a task explicitly requires it.
+
+### Chroma runtime contract
+
+Application code must access Chroma through the external Chroma server using `chromadb-client` / `chromadb.HttpClient`.
+
+Do not reintroduce `chromadb.PersistentClient` or an embedded/local Chroma fallback without an explicit architecture decision.
+
+If the Chroma service is unavailable, fail clearly instead of silently switching storage modes.
+
+
 ## Architecture principles
 
 ### RAG vs live business data
@@ -245,6 +277,12 @@ For state-changing actions also test:
 - duplicate execution
 - approval bypass
 - ownership violations
+
+The canonical local test command is:
+
+```bash
+uv run python -m pytest -q
+```
 
 If tests cannot run, report the exact reason.
 Do not claim success from unexecuted tests.

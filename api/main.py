@@ -68,6 +68,7 @@ async def lifespan(app: FastAPI):
     print(BANNER, flush=True)
 
     from agents.agent_orchestrator import AgentOrchestrator, Request, build_shared_rag_tools
+    from agents.tools import build_business_tools
     from core.intent_recognizer import IntentRecognizer
     from evaluation.evaluator import EndToEndEvaluator
     from mcp.knowledge_base import KnowledgeBase
@@ -75,6 +76,7 @@ async def lifespan(app: FastAPI):
     from memory.conversation_memory import MemoryManager
     from monitor.performance_monitor import PerformanceMonitor
     from core.skill_loader import SkillManager
+    from providers.mock_backend import InMemoryBusinessBackend
 
     cfg = _anthropic_cfg()
     logger.info(f"模型: {cfg['model']}  base_url: {cfg.get('base_url', '(官方)')}")
@@ -152,8 +154,21 @@ async def lifespan(app: FastAPI):
         supports_rerank=True,
         fallback=knowledge_fallback,
     ))
+    business_fixture = os.getenv(
+        "CARTCARE_BUSINESS_FIXTURE",
+        str(pathlib.Path(_ROOT) / "providers" / "fixtures" / "business_provider_data.json"),
+    )
+    business_backend = InMemoryBusinessBackend.from_fixture(business_fixture)
+    business_tools = build_business_tools(business_backend)
+    logger.info(
+        "业务只读工具已加载（测试/演示 backend）: %s",
+        ", ".join(sorted(business_tools)),
+    )
+
     if _orchestrator is not None:
-        _orchestrator.set_shared_tools(build_shared_rag_tools(_tool_manager))
+        shared_tools = build_shared_rag_tools(_tool_manager)
+        shared_tools.update(business_tools)
+        _orchestrator.set_shared_tools(shared_tools)
 
     # 性能监控（可选启动 Prometheus）
     prom_port = int(os.getenv("PROMETHEUS_PORT", "0")) or None
