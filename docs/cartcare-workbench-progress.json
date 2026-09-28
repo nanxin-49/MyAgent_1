@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-27T12:30:00Z",
+  "updatedAt": "2026-09-27T15:34:25Z",
   "tasks": {
     "T01": {
       "status": "done",
@@ -10,7 +10,7 @@
     "T02": {
       "status": "verify",
       "evidence": "providers/; tests/test_business_providers.py; tests/fixtures/business_provider_data.json; README.md; docs/CartCare-Codex-Workbench.html; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
-      "note": "已建立五类只读 Provider、BusinessBackend Protocol、结构化 Pydantic 模型和 typed errors；当前仅使用明确标注的 JSON fixture 内存 Mock，未接入 Agent/API Tool。"
+      "note": "已建立五类只读 Provider、BusinessBackend Protocol、结构化 Pydantic 模型和 typed errors；Python 3.12 临时环境中 Provider 专项测试 8 passed；当前仅使用明确标注的 JSON fixture 内存 Mock，未接入 Agent/API Tool。"
     },
     "T03": {
       "status": "todo",
@@ -29,8 +29,8 @@
     },
     "T06": {
       "status": "verify",
-      "evidence": "",
-      "note": "解决 ModuleNotFoundError；开发/CI 依赖含 pytest；至少 API、Provider、Policy、Tool、核心 Agent Loop 有 smoke tests。"
+      "evidence": ".github/workflows/tests.yml; Dockerfile; docker-compose.yml; requirements-dev.txt; README.md",
+      "note": "已建立 Python 3.12 GitHub Actions 测试入口；Dockerfile development target 包含 requirements-dev，docker-compose 应用服务保持 production target。Python 3.12 临时环境中 Agent + Provider 测试 19 passed；environment smoke 和完整 pytest 待 Docker/CI 实际执行后验收。本机 Docker CLI/ Desktop 已安装但 com.docker.service 为 Stopped，启动服务和访问 docker_engine named pipe 均被当前权限拒绝。"
     },
     "T07": {
       "status": "todo",

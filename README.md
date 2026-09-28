@@ -123,19 +123,25 @@ tests/                        pytest 测试与环境 smoke test
 
 ## 测试
 
-开发和测试依赖单独声明在 requirements-dev.txt，其中继承生产依赖并额外安装 pytest：
+项目使用 `uv` 管理 Python 3.12 开发环境。生产依赖和开发/测试依赖的规范声明分别位于 `pyproject.toml` 的 `project.dependencies` 与 `dependency-groups.dev`，锁定版本见 `uv.lock`：
 
 ~~~bash
-python -m pip install -r requirements-dev.txt
-python -m pytest -q
+uv sync --dev
+uv run python -m pytest -q
 ~~~
+
+`requirements.txt` 和 `requirements-dev.txt` 保留为 Docker、GitHub Actions 及其他 pip-based 使用方的兼容导出入口，不是 uv 的规范依赖来源。
+
+GitHub Actions 使用项目声明的 Python 3.12 执行同一条 `python -m pytest -q` 命令，配置见 `.github/workflows/tests.yml`。
 
 容器测试：
 
 ~~~bash
 docker build --target development -t cartcare-dev .
-docker run --rm cartcare-dev python -m pytest -q
+docker run --rm --entrypoint python cartcare-dev -m pytest -q
 ~~~
+
+`docker-compose.yml` 的应用服务构建的是 `production` target，用于运行服务，不包含 pytest；不要把 Compose 应用容器当作测试容器。
 
 ## 项目方向
 

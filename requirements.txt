@@ -1,3 +1,5 @@
+# Compatibility export for Docker and pip-based consumers.
+# Canonical dependency declarations and lockfile: pyproject.toml / uv.lock.
 # CartCare production/runtime dependencies
 
 # ── AI / LLM ──────────────────────────────────────────────────────────────────
@@ -11,7 +13,7 @@ python-multipart==0.0.12    # FastAPI 文件上传支持
 
 # ── 数据存储 ──────────────────────────────────────────────────────────────────
 redis==5.2.1
-chromadb==0.5.23           # 向量数据库（长期记忆）
+chromadb-client==0.5.23   # Chroma Server HTTP 客户端（长期记忆）
 
 # ── 监控 ──────────────────────────────────────────────────────────────────────
 prometheus-client==0.21.1
