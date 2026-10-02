@@ -1,0 +1,200 @@
+[
+  {
+    "id": "faq_policy",
+    "kind": "rag",
+    "message": "退款政策是什么？",
+    "expected": {
+      "intent": "refund",
+      "tool": "search_knowledge_base",
+      "allowed_tools": [
+        "search_knowledge_base"
+      ],
+      "document_id": "doc_8450205ee234ce108cbd",
+      "citation": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+      "expected_fact": "7 天",
+      "status": "usable",
+      "source": "demo:cartcare-default/refund-policy",
+      "policy_version": "refund-cancel-v1"
+    }
+  },
+  {
+    "id": "order_lookup",
+    "kind": "read",
+    "message": "查询我的订单，订单号 ORD-T09-ORDER。",
+    "tool": "get_order",
+    "arguments": {
+      "order_id": "ORD-T09-ORDER"
+    },
+    "expected": {
+      "intent": "order_status",
+      "tool": "get_order",
+      "allowed_tools": [
+        "get_order"
+      ],
+      "data_field": "order_id",
+      "data_value": "ORD-T09-ORDER"
+    }
+  },
+  {
+    "id": "logistics_lookup",
+    "kind": "read",
+    "message": "物流到哪里了？，订单号 ORD-T09-LOGISTICS。",
+    "tool": "get_shipment",
+    "arguments": {
+      "order_id": "ORD-T09-LOGISTICS"
+    },
+    "expected": {
+      "intent": "logistics",
+      "tool": "get_shipment",
+      "allowed_tools": [
+        "get_shipment",
+        "get_order"
+      ],
+      "data_field": "shipment_id",
+      "data_value": "SHP-ORD-T09-LOGISTICS"
+    }
+  },
+  {
+    "id": "inventory_lookup",
+    "kind": "clarification",
+    "message": "商品还有库存吗？",
+    "expected": {
+      "intent": "query",
+      "tool": null,
+      "allowed_tools": [],
+      "status": "clarification_required"
+    }
+  },
+  {
+    "id": "refund_allow",
+    "kind": "action",
+    "message": "退还我的订单，订单号 ORD-T09-REFUND-ALLOW。",
+    "tool": "request_refund",
+    "arguments": {
+      "order_id": "ORD-T09-REFUND-ALLOW"
+    },
+    "expected": {
+      "intent": "refund",
+      "tool": "request_refund",
+      "allowed_tools": [
+        "get_order",
+        "get_refund_status",
+        "get_shipment",
+        "search_knowledge_base",
+        "request_refund"
+      ],
+      "policy_decision": "allow",
+      "reason_code": "refund_eligible",
+      "status": "completed",
+      "approval_required": false
+    }
+  },
+  {
+    "id": "refund_approval",
+    "kind": "action",
+    "message": "请现在为我的演示订单 ORD-T09-REFUND-APPROVAL 提交 600 元部分退款申请；如需人工审批就暂停等待审批。",
+    "tool": "request_refund",
+    "arguments": {
+      "order_id": "ORD-T09-REFUND-APPROVAL",
+      "amount": 600
+    },
+    "expected": {
+      "intent": "refund",
+      "tool": "request_refund",
+      "allowed_tools": [
+        "get_order",
+        "get_refund_status",
+        "check_billing_fields",
+        "compare_amounts",
+        "request_refund"
+      ],
+      "policy_decision": "require_approval",
+      "reason_code": "amount_requires_approval",
+      "status": "awaiting_approval",
+      "approval_required": true
+    }
+  },
+  {
+    "id": "refund_deny",
+    "kind": "action",
+    "message": "请现在为已取消的演示订单 ORD-T09-REFUND-DENY 提交退款申请，并告诉我业务规则的决定。",
+    "tool": "request_refund",
+    "arguments": {
+      "order_id": "ORD-T09-REFUND-DENY"
+    },
+    "expected": {
+      "intent": "refund",
+      "tool": "request_refund",
+      "allowed_tools": [
+        "get_order",
+        "get_refund_status",
+        "check_billing_fields",
+        "search_knowledge_base",
+        "request_refund"
+      ],
+      "policy_decision": "deny",
+      "reason_code": "order_status_not_refundable",
+      "status": "rejected",
+      "approval_required": false
+    }
+  },
+  {
+    "id": "cancel_order",
+    "kind": "action",
+    "message": "取消我的订单，订单号 ORD-T09-CANCEL。",
+    "tool": "request_cancel_order",
+    "arguments": {
+      "order_id": "ORD-T09-CANCEL"
+    },
+    "expected": {
+      "intent": "request",
+      "tool": "request_cancel_order",
+      "allowed_tools": [
+        "get_order",
+        "get_shipment",
+        "inspect_request_context",
+        "request_cancel_order"
+      ],
+      "policy_decision": "allow",
+      "reason_code": "cancel_eligible",
+      "status": "completed",
+      "approval_required": false
+    }
+  },
+  {
+    "id": "ownership_violation",
+    "kind": "action",
+    "message": "请尝试取消演示订单 ORD-T09-OWNERSHIP，按系统订单归属核验后处理。",
+    "tool": "request_cancel_order",
+    "arguments": {
+      "order_id": "ORD-T09-OWNERSHIP"
+    },
+    "user_id": "customer-2",
+    "expected": {
+      "intent": "request",
+      "tool": "request_cancel_order",
+      "allowed_tools": [
+        "get_order",
+        "inspect_request_context",
+        "request_cancel_order"
+      ],
+      "policy_decision": "deny",
+      "reason_code": "unauthorized",
+      "status": "rejected",
+      "error_code": "unauthorized",
+      "approval_required": false
+    }
+  },
+  {
+    "id": "unsupported_request",
+    "kind": "unsupported",
+    "message": "请帮我预订机票",
+    "expected": {
+      "intent": "other",
+      "tool": null,
+      "allowed_tools": [],
+      "status": "unsupported",
+      "escalation": true
+    }
+  }
+]

@@ -369,3 +369,8 @@ CartCare 则是：
 ```
 
 它更像一个小型的 Multi-Agent Runtime，而不是单轮聊天机器人。
+
+
+## T10 topology 实验（待验收，生产架构未迁移）
+
+2026-10-02 独立实验比较当前 Multi 与复用 BaseAgent 的 Single Support Agent。三轮十类电商 case：两组 task success 均 24/30，Single 工具调用 59 vs 78、SDK 模型调用 76 vs 115、平均 chat-style 延迟 3937.1 vs 6633.3 ms；当前 workload 支持建议简化，尚未删除现有角色或改变生产 /chat。共同升级标记失败与 ownership ActionService 证据缺口仍需处理；没有触发 supporting Agent/Composer，不能宣称已验证协作收益。完整口径、case 明细与限制见 evaluation/reports/t10_topology_comparison.md。真实模型 + HTTP RAG + 模拟业务 backend 的实验结果不代表生产统计效果。

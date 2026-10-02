@@ -1,0 +1,186 @@
+{
+  "products": {
+    "SKU-1001": {
+      "product_id": "SKU-1001",
+      "name": "CartCare Demo Backpack",
+      "price": "129.90",
+      "currency": "CNY",
+      "active": true
+    }
+  },
+  "orders": {
+    "ORD-1001": {
+      "order_id": "ORD-1001",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-20T10:00:00Z"
+    },
+    "ORD-T09-ORDER": {
+      "order_id": "ORD-T09-ORDER",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    },
+    "ORD-T09-LOGISTICS": {
+      "order_id": "ORD-T09-LOGISTICS",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    },
+    "ORD-T09-REFUND-ALLOW": {
+      "order_id": "ORD-T09-REFUND-ALLOW",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    },
+    "ORD-T09-REFUND-APPROVAL": {
+      "order_id": "ORD-T09-REFUND-APPROVAL",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "800.00"
+        }
+      ],
+      "total_amount": "800.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    },
+    "ORD-T09-REFUND-DENY": {
+      "order_id": "ORD-T09-REFUND-DENY",
+      "customer_id": "customer-1",
+      "status": "cancelled",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    },
+    "ORD-T09-CANCEL": {
+      "order_id": "ORD-T09-CANCEL",
+      "customer_id": "customer-1",
+      "status": "pending",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    },
+    "ORD-T09-OWNERSHIP": {
+      "order_id": "ORD-T09-OWNERSHIP",
+      "customer_id": "customer-1",
+      "status": "pending",
+      "items": [
+        {
+          "product_id": "SKU-1001",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T09:18:57.553689+00:00"
+    }
+  },
+  "inventory": {
+    "SKU-1001": {
+      "product_id": "SKU-1001",
+      "available_quantity": 12,
+      "reserved_quantity": 2,
+      "as_of": "2026-09-27T10:00:00Z"
+    }
+  },
+  "shipments": {
+    "ORD-1001": {
+      "shipment_id": "SHP-1001",
+      "order_id": "ORD-1001",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-1001",
+      "status": "in_transit",
+      "estimated_delivery": "2026-09-29",
+      "updated_at": "2026-09-27T09:30:00Z"
+    },
+    "ORD-T09-ORDER": {
+      "shipment_id": "SHP-ORD-T09-ORDER",
+      "order_id": "ORD-T09-ORDER",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-1001",
+      "status": "in_transit",
+      "estimated_delivery": "2026-09-29",
+      "updated_at": "2026-10-02T09:18:57.553689+00:00"
+    },
+    "ORD-T09-LOGISTICS": {
+      "shipment_id": "SHP-ORD-T09-LOGISTICS",
+      "order_id": "ORD-T09-LOGISTICS",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-1001",
+      "status": "in_transit",
+      "estimated_delivery": "2026-09-29",
+      "updated_at": "2026-10-02T09:18:57.553689+00:00"
+    }
+  },
+  "refunds": {
+    "REF-1001": {
+      "refund_id": "REF-1001",
+      "order_id": "ORD-1001",
+      "customer_id": "customer-1",
+      "status": "requested",
+      "amount": "129.90",
+      "currency": "CNY",
+      "reason": "demo return request",
+      "created_at": "2026-09-27T08:00:00Z",
+      "updated_at": "2026-09-27T08:00:00Z"
+    }
+  }
+}
