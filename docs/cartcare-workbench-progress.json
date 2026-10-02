@@ -48,9 +48,9 @@
       "note": "用户于 2026-10-02 验收 T09 为 done。2026-09-30 的真实 /chat 十场景基线原样保留：在线 intent 7/10、Tool 选择 7/10、参数 6/6、unknown 升级 1/1、严格 E2E 6/10；component replay 单独报告。后续独立 RAG Online Integration Hardening 只复验 FAQ，2026-10-02 取得 usable、citation 和 grounding 证据，不重算 T09 历史指标。"
     },
     "T10": {
-      "status": "verify",
+      "status": "done",
       "evidence": "evaluation/reports/t10_topology_comparison.json; evaluation/reports/t10_topology_comparison.md; evaluation/reports/t10_complete/; tests/test_topology_comparison.py",
-      "note": "三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，未做生产迁移；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。待用户验收，不标 done。"
+      "note": "三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，未做生产迁移；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。"
     },
     "T11": {
       "status": "todo",
