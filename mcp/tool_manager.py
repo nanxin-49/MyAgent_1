@@ -25,6 +25,8 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from anthropic import AsyncAnthropic
 
 from core.llm_utils import extract_text_content
+from core.tool_contract import RetryPolicy, RiskLevel, ToolValidationError, execute_tool, validate_tool_input
+from mcp.rag_contract import RetrievalHit, RetrievalStatus
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,13 @@ class ToolResult:
     cached:         bool = False
     latency_ms:     float = 0.0
     reranked:       bool = False   # 是否经过重排
+    error_code:     Optional[str] = None
+    error_type:     Optional[str] = None
+    retryable:      bool = False
+    validated_input: Optional[Dict[str, Any]] = None
+    attempts:       int = 0
+    retrieval_status: Optional[str] = None
+    citations:      List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -118,10 +127,17 @@ class Tool:
     timeout_s:   float = 30.0
     supports_rerank: bool = False            # 是否支持结果重排
     fallback:    Optional[Callable] = None    # sync/async (params, context, error) -> Any
+    risk_level: RiskLevel = RiskLevel.READ
+    retry_policy: RetryPolicy = RetryPolicy()
+    idempotent: bool = True
 
     # 运行时状态（不参与构造）
     stats:   ToolStats    = field(default_factory=ToolStats, init=False)
     breaker: CircuitBreaker = field(default_factory=CircuitBreaker, init=False)
+
+    @property
+    def input_schema(self) -> Dict[str, Any]:
+        return self.schema
 
 
 # ── MCP 工具管理器 ────────────────────────────────────────────────────────────
@@ -169,7 +185,16 @@ class MCPToolManager:
         """
         tool = self._tools.get(name)
         if not tool:
-            return ToolResult(success=False, data=None, tool_name=name, error=f"工具不存在: {name}")
+            return ToolResult(success=False, data=None, tool_name=name, error=f"工具不存在: {name}",
+                              error_code="tool_not_found", error_type="validation")
+
+        try:
+            validated = validate_tool_input(tool.input_schema, params)
+        except ToolValidationError as exc:
+            return ToolResult(success=False, data=None, tool_name=name, error=str(exc),
+                              error_code=exc.code, error_type="validation")
+
+        use_cache = use_cache and tool.risk_level is RiskLevel.READ
 
         cache_rerank_top_k = rerank_top_k if rerank_top_k > 0 and tool.supports_rerank else 0
 
@@ -186,22 +211,25 @@ class MCPToolManager:
                     tool_name=name,
                     cached=True,
                     reranked=cached_reranked,
+                    validated_input=validated,
                 )
 
         # 熔断检查
         if not tool.breaker.allow():
             error = f"工具熔断中: {name}，请稍后重试"
-            return await self._fallback_result(tool, params, context, error)
+            return await self._fallback_result(tool, params, context, error,
+                                               error_code="circuit_open", retryable=True,
+                                               validated_input=validated)
 
         t0 = time.monotonic()
         tool.stats.total += 1
-        try:
-            # 参数校验（根据 JSON Schema 的 required 和 properties.type）
-            self._validate_params(tool, params)
+        async def invoke_handler() -> Any:
+            return await self._run_handler(tool, params, context)
 
-            data = await asyncio.wait_for(self._run_handler(tool, params, context), timeout=tool.timeout_s)
-            latency = (time.monotonic() - t0) * 1000
-
+        execution = await execute_tool(tool, params, invoke_handler)
+        latency = (time.monotonic() - t0) * 1000
+        if execution.success:
+            data = execution.data
             tool.stats.success += 1
             tool.stats.consecutive_fails = 0
             tool.stats.total_latency_ms += latency
@@ -214,25 +242,28 @@ class MCPToolManager:
                 data, reranked = await self._rerank(query, data, rerank_top_k), True
 
             # 写缓存：缓存最终返回结果，避免下次命中未重排的原始结果。
-            if tool.cache_ttl > 0:
+            if use_cache and tool.cache_ttl > 0:
                 self._set_cache(name, params, data, tool.cache_ttl, cache_rerank_top_k, reranked)
 
             return ToolResult(success=True, data=data, tool_name=name,
-                              latency_ms=latency, reranked=reranked)
+                              latency_ms=latency, reranked=reranked,
+                              validated_input=validated, attempts=execution.attempts)
 
-        except asyncio.TimeoutError:
-            tool.stats.failed += 1
-            tool.stats.consecutive_fails += 1
+        tool.stats.failed += 1
+        tool.stats.consecutive_fails += 1
+        if execution.retryable:
             tool.breaker.record_failure()
-            logger.error(f"工具超时: {name} ({tool.timeout_s}s)")
-            return await self._fallback_result(tool, params, context, "执行超时")
-
-        except Exception as ex:
-            tool.stats.failed += 1
-            tool.stats.consecutive_fails += 1
-            tool.breaker.record_failure()
-            logger.error(f"工具异常: {name} — {ex}")
-            return await self._fallback_result(tool, params, context, str(ex))
+        logger.error("工具异常: %s — %s", name, execution.error)
+        if not execution.retryable:
+            return ToolResult(success=False, data=execution.data, tool_name=name,
+                              error=execution.error, error_code=execution.error_code,
+                              error_type=execution.error_type, retryable=False,
+                              latency_ms=latency, validated_input=validated,
+                              attempts=execution.attempts)
+        return await self._fallback_result(tool, params, context, execution.error or "工具执行失败",
+                                           error_code=execution.error_code, error_type=execution.error_type,
+                                           retryable=execution.retryable, latency_ms=latency,
+                                           validated_input=validated, attempts=execution.attempts)
 
     async def _fallback_result(
         self,
@@ -240,10 +271,19 @@ class MCPToolManager:
         params: Dict[str, Any],
         context: Optional[Dict[str, Any]],
         error: str,
+        *,
+        error_code: Optional[str] = None,
+        error_type: Optional[str] = None,
+        retryable: bool = False,
+        latency_ms: float = 0.0,
+        validated_input: Optional[Dict[str, Any]] = None,
+        attempts: int = 0,
     ) -> ToolResult:
         """工具不可用时返回降级结果，而不是把空错误直接暴露给调用方。"""
-        if tool.fallback is None:
-            return ToolResult(success=False, data=None, tool_name=tool.name, error=error)
+        if tool.fallback is None or tool.risk_level is not RiskLevel.READ:
+            return ToolResult(success=False, data=None, tool_name=tool.name, error=error,
+                              error_code=error_code, error_type=error_type, retryable=retryable,
+                              latency_ms=latency_ms, validated_input=validated_input, attempts=attempts)
         try:
             data = tool.fallback(params, context, error)
             if asyncio.iscoroutine(data):
@@ -253,10 +293,18 @@ class MCPToolManager:
                 data=data,
                 tool_name=tool.name,
                 error=error,
+                error_code=error_code,
+                error_type=error_type,
+                retryable=retryable,
+                latency_ms=latency_ms,
+                validated_input=validated_input,
+                attempts=attempts,
             )
         except Exception as ex:
             logger.error(f"工具降级失败: {tool.name} — {ex}")
-            return ToolResult(success=False, data=None, tool_name=tool.name, error=f"{error}; fallback失败: {ex}")
+            return ToolResult(success=False, data=None, tool_name=tool.name, error=f"{error}; fallback失败: {ex}",
+                              error_code=error_code, error_type=error_type, retryable=retryable,
+                              latency_ms=latency_ms, validated_input=validated_input, attempts=attempts)
 
     async def _run_handler(
         self,
@@ -321,6 +369,11 @@ class MCPToolManager:
 
         这是解决"检索不全、召回不好"的完整方案。
         """
+        if not isinstance(query, str) or not query.strip() or top_k < 1:
+            return ToolResult(success=False, data=[], tool_name=tool_name,
+                              error="query 不能为空且 top_k 必须大于 0",
+                              error_code="invalid_arguments", error_type="validation",
+                              retrieval_status=RetrievalStatus.NO_ANSWER.value)
         # 1. 查询改写：生成多角度子查询
         sub_queries = await self.rewrite_query(query, n=3)
         logger.info(f"查询改写: {query!r} → {sub_queries}")
@@ -333,22 +386,53 @@ class MCPToolManager:
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # 3. 合并去重（按内容哈希去重）
-        seen, merged = set(), []
+        # 3. Only complete, high-enough, non-fallback hits may become answer evidence.
+        seen, merged, low_confidence = set(), [], []
+        degraded = False
         for r in results:
-            if isinstance(r, ToolResult) and r.success and isinstance(r.data, list):
-                for item in r.data:
-                    key = hashlib.md5(str(item).encode()).hexdigest()
-                    if key not in seen:
-                        seen.add(key)
-                        merged.append(item)
+            if not isinstance(r, ToolResult):
+                degraded = True
+                continue
+            if not r.success:
+                degraded = degraded or r.error_code not in {"no_results"}
+                continue
+            if r.error_code is not None:
+                degraded = True  # fallback was used
+            if not isinstance(r.data, list):
+                degraded = True
+                continue
+            for item in r.data:
+                if not isinstance(item, dict) or item.get("fallback"):
+                    degraded = True
+                    continue
+                try:
+                    hit = RetrievalHit.model_validate(item)
+                except Exception:
+                    degraded = True
+                    continue
+                normalized = hit.model_dump(mode="json")
+                if hit.retrieval_status is not RetrievalStatus.USABLE or hit.citation is None:
+                    low_confidence.append(normalized)
+                    continue
+                key = hit.citation.reference
+                if key not in seen:
+                    seen.add(key)
+                    merged.append(normalized)
 
         if not merged:
-            return ToolResult(success=False, data=[], tool_name=tool_name, error="所有子查询均无结果")
+            status = (RetrievalStatus.DEGRADED if degraded else
+                      RetrievalStatus.LOW_CONFIDENCE if low_confidence else RetrievalStatus.NO_ANSWER)
+            return ToolResult(success=False, data=low_confidence if status is RetrievalStatus.LOW_CONFIDENCE else [],
+                              tool_name=tool_name, error=f"RAG retrieval status: {status.value}",
+                              error_code=status.value, error_type="retrieval",
+                              retrieval_status=status.value)
 
         # 4. 重排：用 LLM 对合并结果按相关性打分，取 Top-K
         reranked = await self._rerank(query, merged, top_k)
-        return ToolResult(success=True, data=reranked, tool_name=tool_name, reranked=True)
+        citations = list({item["citation"]["reference"]: item["citation"]
+                          for item in reranked if isinstance(item, dict) and item.get("citation")}.values())
+        return ToolResult(success=True, data=reranked, tool_name=tool_name, reranked=True,
+                          retrieval_status=RetrievalStatus.USABLE.value, citations=citations)
 
     # ── 结果重排（解决召回不好）──────────────────────────────────────────────
 
@@ -420,26 +504,9 @@ class MCPToolManager:
 
     # ── 参数校验 ──────────────────────────────────────────────────────────────
 
-    _TYPE_MAP = {"string": str, "number": (int, float), "integer": int, "boolean": bool, "array": list, "object": dict}
-
     def _validate_params(self, tool: Tool, params: Dict[str, Any]) -> None:
-        """根据工具的 JSON Schema 校验参数，不合法时抛出 ValueError。"""
-        schema = tool.schema
-        required = schema.get("required", [])
-        properties = schema.get("properties", {})
-
-        for field in required:
-            if field not in params:
-                raise ValueError(f"工具 {tool.name} 缺少必需参数: {field}")
-
-        for key, value in params.items():
-            if key in properties:
-                expected_type = properties[key].get("type")
-                if expected_type and expected_type in self._TYPE_MAP:
-                    if not isinstance(value, self._TYPE_MAP[expected_type]):
-                        raise ValueError(
-                            f"工具 {tool.name} 参数 {key} 类型错误: 期望 {expected_type}，实际 {type(value).__name__}"
-                        )
+        """Compatibility entry point; Agent and RAG share this validator."""
+        validate_tool_input(tool.input_schema, params)
 
     @staticmethod
     def _clean_text(value: Any) -> str:

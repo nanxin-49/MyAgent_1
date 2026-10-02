@@ -21,6 +21,8 @@ import json
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, List, Optional, TYPE_CHECKING, Union
 
+from core.tool_contract import RetryPolicy, RiskLevel
+
 from providers import (
     InventoryProvider,
     LogisticsProvider,
@@ -46,6 +48,10 @@ class AgentToolSpec:
     description: str
     input_schema: Dict[str, Any]
     handler: AgentToolHandler
+    risk_level: RiskLevel = RiskLevel.READ
+    timeout_s: float | None = 30.0
+    retry_policy: RetryPolicy = RetryPolicy()
+    idempotent: bool = True
 
 
 def make_tool(
@@ -54,6 +60,10 @@ def make_tool(
     properties: Dict[str, Any],
     handler: AgentToolHandler,
     required: Optional[List[str]] = None,
+    risk_level: RiskLevel = RiskLevel.READ,
+    timeout_s: float | None = 30.0,
+    retry_policy: RetryPolicy = RetryPolicy(),
+    idempotent: bool = True,
 ) -> AgentToolSpec:
     """创建带 JSON Schema 的 Agent 工具。"""
     return AgentToolSpec(
@@ -66,6 +76,10 @@ def make_tool(
             "additionalProperties": False,
         },
         handler=handler,
+        risk_level=risk_level,
+        timeout_s=timeout_s,
+        retry_policy=retry_policy,
+        idempotent=idempotent,
     )
 
 
@@ -190,22 +204,29 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
     async def search_knowledge_base(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
         query = str(args.get("query") or req.message or "").strip()
         top_k = int(args.get("top_k", 5) or 5)
-        if not query:
-            return {"success": False, "error": "query 不能为空", "results": []}
+        if not query or top_k < 1:
+            return {"success": False, "error_code": "invalid_arguments", "error": "query 不能为空且 top_k 必须大于 0",
+                    "retrieval_status": "no_answer", "results": [], "citations": []}
         if tool_manager is None:
-            return {"success": False, "error": "RAG 工具未初始化", "results": []}
+            return {"success": False, "error_code": "dependency_failure", "error": "RAG 工具未初始化",
+                    "retrieval_status": "degraded", "results": [], "citations": []}
 
         result = await tool_manager.search_with_rewrite(
             "knowledge_search",
             query,
             top_k=top_k,
         )
-        if not getattr(result, "success", False):
+        status = getattr(result, "retrieval_status", None) or "degraded"
+        if not getattr(result, "success", False) or status != "usable":
             return {
                 "success": False,
                 "query": query,
-                "error": getattr(result, "error", "知识库检索失败"),
+                "error": getattr(result, "error", None) or "没有可靠的知识库依据",
+                "error_code": getattr(result, "error_code", None) or status,
+                "retrieval_status": status,
                 "results": [],
+                "citations": [],
+                "answer_guidance": "不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。",
                 "reranked": False,
             }
 
@@ -214,6 +235,8 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             "query": query,
             "top_k": top_k,
             "results": result.data,
+            "citations": getattr(result, "citations", []),
+            "retrieval_status": "usable",
             "reranked": bool(getattr(result, "reranked", False)),
         }
 
@@ -222,11 +245,12 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             "search_knowledge_base",
             "检索知识库并返回最相关的文档片段；可用于通用、技术、账单和升级场景。",
             {
-                "query": {"type": "string", "description": "用户问题或检索关键词"},
+                "query": {"type": "string", "description": "用户问题或检索关键词", "minLength": 1},
                 "top_k": {"type": "integer", "description": "返回结果条数"},
             },
             search_knowledge_base,
             required=["query"],
+            retry_policy=RetryPolicy(max_attempts=2),
         )
     }
 
@@ -385,6 +409,9 @@ def build_action_tools(action_service: Any) -> Dict[str, AgentToolSpec]:
             },
             request_refund,
             required=["order_id"],
+            risk_level=RiskLevel.DANGEROUS,
+            timeout_s=None,
+            idempotent=False,
         ),
         "request_cancel_order": make_tool(
             "request_cancel_order",
@@ -395,6 +422,9 @@ def build_action_tools(action_service: Any) -> Dict[str, AgentToolSpec]:
             },
             request_cancel_order,
             required=["order_id"],
+            risk_level=RiskLevel.DANGEROUS,
+            timeout_s=None,
+            idempotent=False,
         ),
     }
 def general_tools() -> Dict[str, AgentToolSpec]:

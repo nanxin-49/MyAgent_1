@@ -16,7 +16,6 @@
   - Agent 置信度低于阈值 → 自动升级到更高级 Agent 或转人工
 """
 import asyncio
-import inspect
 import json
 import logging
 import os
@@ -40,6 +39,7 @@ from agents.tools import (
 )
 from core.intent_recognizer import IntentCategory, IntentRecognizer, UrgencyLevel
 from core.llm_utils import extract_text_content
+from core.tool_contract import execute_tool, validate_tool_input
 
 logger = logging.getLogger(__name__)
 
@@ -226,11 +226,13 @@ class BaseAgent:
             ms = (time.monotonic() - t0) * 1000
             self.stats.total_ms += ms
             logger.error(f"{self.agent_type.value} 处理失败: {ex}")
+            receipt = self._last_action_receipt()
             return AgentResponse(
                 agent_type=self.agent_type,
-                content="抱歉，处理您的请求时出现问题，请稍后重试。",
-                success=False,
+                content=receipt or "抱歉，处理您的请求时出现问题，请稍后重试。",
+                success=receipt is not None,
                 latency_ms=ms,
+                tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
             )
 
@@ -284,44 +286,89 @@ class BaseAgent:
             for block in tool_uses:
                 name = self._block_value(block, "name")
                 tool_use_id = self._block_value(block, "id")
-                args = self._block_value(block, "input") or {}
+                args = self._block_value(block, "input")
+                if args is None:
+                    args = {}
                 spec = tools.get(name)
-                tool_t0 = time.monotonic()
                 call_success = True
                 result_success: Optional[bool] = None
                 error_text = ""
+                error_code: Optional[str] = None
+                error_type: Optional[str] = None
+                retryable = False
+                risk_level = spec.risk_level.value if spec else "unknown"
+                validated_input: Optional[Dict[str, Any]] = None
+                tool_latency_ms = 0.0
                 if spec is None:
                     call_success = False
                     result: Any = {"success": False, "error": f"工具不在 {self.agent_type.value} Agent 白名单中"}
                     error_text = result["error"]
+                    error_code = "tool_not_allowed"
+                    error_type = "permission"
                 else:
-                    try:
-                        self._validate_tool_input(spec, args)
-                        result = spec.handler(req, args)
-                        if inspect.isawaitable(result):
-                            result = await result
+                    execution = await execute_tool(spec, args, lambda: spec.handler(req, args))
+                    result = execution.agent_payload()
+                    call_success = execution.success
+                    error_code = execution.error_code
+                    error_type = execution.error_type
+                    retryable = execution.retryable
+                    error_text = execution.error or ""
+                    validated_input = execution.validated_input
+                    tool_latency_ms = execution.latency_ms
+                    if execution.attempts > 0:
                         tools_used.append(name)
-                        if isinstance(result, dict) and "success" in result:
-                            result_success = bool(result.get("success"))
-                    except Exception as ex:
-                        call_success = False
-                        logger.warning("Agent 工具 %s 执行失败: %s", name, ex)
-                        error_text = str(ex)
-                        result = {"success": False, "error": error_text}
-                tool_latency_ms = (time.monotonic() - tool_t0) * 1000
+                    if isinstance(result, dict) and "success" in result:
+                        result_success = bool(result.get("success"))
                 if not error_text and isinstance(result, dict):
-                    error_text = str(result.get("error", "") or "")
+                    detail = result.get("error", "")
+                    error_text = str(detail.get("message", "") if isinstance(detail, dict) else detail or "")
+                action_result = None
+                if risk_level == "dangerous" and isinstance(result, dict):
+                    action = result.get("action") if isinstance(result.get("action"), dict) else {}
+                    policy = action.get("policy_decision") if isinstance(action.get("policy_decision"), dict) else {}
+                    execution_result = action.get("execution_result") if isinstance(action.get("execution_result"), dict) else {}
+                    action_result = {
+                        "action_id": result.get("action_id"),
+                        "status": result.get("status"),
+                        "error_code": result.get("error_code"),
+                        "policy_decision": policy.get("decision"),
+                        "reason_code": policy.get("reason_code"),
+                        "policy_version": action.get("policy_version"),
+                        "execution_simulated": execution_result.get("simulated"),
+                    }
+                business_result = None
+                if isinstance(result, dict) and result.get("source") == "business_provider" and isinstance(result.get("data"), dict):
+                    business_result = {key: result["data"][key] for key in (
+                        "order_id", "product_id", "shipment_id", "refund_id", "status",
+                        "available_quantity", "total_amount", "amount",
+                    ) if key in result["data"]}
+                retrieval_hits = None
+                if name == "search_knowledge_base" and isinstance(result, dict) and isinstance(result.get("results"), list):
+                    retrieval_hits = [{key: item[key] for key in (
+                        "document_id", "source", "policy_version", "chunk_index", "score", "content", "citation"
+                    ) if key in item} for item in result["results"] if isinstance(item, dict)]
                 tool_traces.append(
                     {
+                        "request_id": req.request_id,
                         "agent_type": self.agent_type.value,
                         "tool_name": name,
+                        "risk_level": risk_level,
                         "tool_use_id": tool_use_id,
-                        "input": dict(args),
+                        "input": dict(args) if isinstance(args, dict) else args,
+                        "validated_input": validated_input,
                         "success": call_success,
                         "result_success": result_success,
+                        "error_code": error_code,
+                        "error_type": error_type,
+                        "retryable": retryable,
                         "latency_ms": round(tool_latency_ms, 1),
                         "cached": bool(result.get("cached")) if isinstance(result, dict) else False,
                         "reranked": bool(result.get("reranked")) if isinstance(result, dict) else False,
+                        "retrieval_status": result.get("retrieval_status") if isinstance(result, dict) else None,
+                        "citations": result.get("citations", []) if isinstance(result, dict) else [],
+                        "action_result": action_result,
+                        "business_result": business_result,
+                        "retrieval_hits": retrieval_hits,
                         "error": error_text,
                     }
                 )
@@ -338,7 +385,29 @@ class BaseAgent:
 
         self._last_tools_used = tools_used
         self._last_tool_traces = tool_traces
+        receipt = self._last_action_receipt()
+        if receipt is not None:
+            return receipt
         raise RuntimeError(f"{self.agent_type.value} 工具调用超过最大轮数")
+
+    def _last_action_receipt(self) -> Optional[str]:
+        """Report an observed action result if a later model step fails or loops."""
+        for trace in reversed(self._last_tool_traces):
+            action = trace.get("action_result")
+            if not isinstance(action, dict) or not action.get("status"):
+                continue
+            kind = "退款" if trace.get("tool_name") == "request_refund" else "取消订单"
+            action_id = action.get("action_id") or "未生成"
+            status = action["status"]
+            if status == "completed":
+                return f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。"
+            if status == "awaiting_approval":
+                return f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。"
+            if status == "rejected":
+                return f"{kind}请求已被拒绝，未执行。原因代码：{action.get('reason_code') or action.get('error_code') or 'unknown'}。动作编号：{action_id}。"
+            if status == "failed":
+                return f"{kind}请求处理失败，不能视为已执行。错误代码：{action.get('error_code') or 'unknown'}。动作编号：{action_id}。"
+        return None
 
     @staticmethod
     def _block_type(block: Any) -> Optional[str]:
@@ -354,27 +423,7 @@ class BaseAgent:
 
     @staticmethod
     def _validate_tool_input(spec: AgentToolSpec, args: Any) -> None:
-        if not isinstance(args, dict):
-            raise ValueError("工具参数必须是 JSON 对象")
-        schema = spec.input_schema
-        for field_name in schema.get("required", []):
-            if field_name not in args:
-                raise ValueError(f"缺少必需参数: {field_name}")
-        properties = schema.get("properties", {})
-        unknown = set(args) - set(properties)
-        if unknown and schema.get("additionalProperties") is False:
-            raise ValueError(f"不允许的工具参数: {', '.join(sorted(unknown))}")
-        type_map = {"string": str, "number": (int, float), "integer": int, "boolean": bool}
-        for key, value in args.items():
-            definition = properties.get(key, {})
-            expected = definition.get("type")
-            if expected in type_map and (
-                not isinstance(value, type_map[expected])
-                or (expected == "integer" and isinstance(value, bool))
-            ):
-                raise ValueError(f"参数 {key} 类型错误，期望 {expected}")
-            if expected == "string" and len(value) < int(definition.get("minLength", 0)):
-                raise ValueError(f"参数 {key} 不能为空")
+        validate_tool_input(spec.input_schema, args)
 
     def _build_system_prompt(self, req: Request) -> str:
         """把角色契约和动态 Skills 拼入 system prompt。"""

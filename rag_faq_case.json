@@ -1,0 +1,18 @@
+[
+  {
+    "id": "faq_policy",
+    "kind": "rag",
+    "message": "退款政策是什么？",
+    "expected": {
+      "intent": "refund",
+      "tool": "search_knowledge_base",
+      "allowed_tools": [
+        "search_knowledge_base"
+      ],
+      "document_id": "policy-refund-v1",
+      "citation": "policy-refund-v1@refund-v1#chunk-0",
+      "expected_fact": "7 天",
+      "status": "usable"
+    }
+  }
+]

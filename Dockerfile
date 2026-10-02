@@ -19,27 +19,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# 预下载 ChromaDB 内置的 ONNX embedding 模型（~79MB），避免运行时下载超时
-RUN python - <<'PY'
-import pathlib
-import shutil
-import tarfile
-import urllib.request
-
-url = "https://chroma-onnx-models.s3.amazonaws.com/all-MiniLM-L6-v2/onnx.tar.gz"
-dest_dir = pathlib.Path("/root/.cache/chroma/onnx_models/all-MiniLM-L6-v2")
-dest_dir.mkdir(parents=True, exist_ok=True)
-archive = dest_dir / "onnx.tar.gz"
-
-with urllib.request.urlopen(url, timeout=60) as response, open(archive, "wb") as target:
-    shutil.copyfileobj(response, target)
-
-with tarfile.open(archive, "r:gz") as tar:
-    tar.extractall(dest_dir)
-
-archive.unlink()
-PY
-
 # ── 阶段 3：生产镜像 ──────────────────────────────────────────────────────────
 FROM base AS production
 
@@ -49,9 +28,6 @@ RUN useradd -m -u 1000 echomind
 # 从依赖阶段复制已安装的包
 COPY --from=dependencies /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
-# 复制预下载的 ONNX 模型缓存
-COPY --from=dependencies --chown=echomind:echomind /root/.cache/chroma /home/echomind/.cache/chroma
-
 # 复制应用代码
 COPY --chown=echomind:echomind . .
 

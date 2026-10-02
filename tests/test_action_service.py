@@ -319,3 +319,47 @@ def test_agent_write_tool_round_trip_uses_action_service():
     tool_payload = json.loads(client.calls[1]["messages"][-1]["content"][0]["content"])
     assert tool_payload["status"] == "completed"
     assert tool_payload["action"]["policy_version"] == "refund-cancel-v1"
+    assert response.tool_traces[0]["action_result"]["status"] == "completed"
+    assert response.tool_traces[0]["action_result"]["policy_decision"] == "allow"
+    assert response.tool_traces[0]["action_result"]["execution_simulated"] is True
+
+
+def test_agent_max_tool_rounds_returns_observed_action_receipt_once():
+    service, backend = make_service(refunds=False)
+    client = _WriteToolClient()
+    client.responses = [type("Response", (), {"content": [_ToolUseBlock()]})() for _ in range(3)]
+    agent = BillingAgent(client, "test-model")
+    agent.set_shared_tools(build_action_tools(service))
+    response = asyncio.run(agent.handle(Request(
+        message="申请退款", user_id="customer-1", conv_id="conv-max-tool",
+        request_id="req-max-tool", intent=IntentCategory.REFUND,
+    )))
+    assert response.success is True
+    assert "动作已完成" in response.content
+    assert len(backend.calls) == 1
+    assert response.tools_used == ["request_refund"] * 3
+    assert all(trace["action_result"]["status"] == "completed" for trace in response.tool_traces)
+
+
+def test_agent_model_failure_after_action_preserves_action_receipt_and_trace():
+    service, backend = make_service(refunds=False)
+    class FailingMessages:
+        calls = 0
+
+        async def create(self, **kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                return type("Response", (), {"content": [_ToolUseBlock()]})()
+            raise RuntimeError("demo model unavailable after action")
+
+    client = type("FailingClient", (), {"messages": FailingMessages()})()
+    agent = BillingAgent(client, "test-model")
+    agent.set_shared_tools(build_action_tools(service))
+    response = asyncio.run(agent.handle(Request(
+        message="申请退款", user_id="customer-1", conv_id="conv-model-fail",
+        request_id="req-model-fail", intent=IntentCategory.REFUND,
+    )))
+    assert response.success is True
+    assert "动作已完成" in response.content
+    assert response.tools_used == ["request_refund"]
+    assert len(backend.calls) == 1

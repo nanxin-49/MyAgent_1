@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-09-28T09:15:00Z",
+  "updatedAt": "2026-10-02T07:08:01Z",
   "tasks": {
     "T01": {
       "status": "done",
@@ -23,7 +23,7 @@
       "note": "独立确定性的 Refund/Cancel Policy Engine 已建立；仅消费 Provider 结构化事实，输出 allow/deny/require_approval、reason_code、policy_version 与 explanation；覆盖所有权、状态、7 天退款窗口、金额与审批条件，不执行动作或 HITL。Python 3.12 uv 环境完整 pytest 56 passed。"
     },
     "T05": {
-      "status": "verify",
+      "status": "done",
       "evidence": "actions/models.py; actions/service.py; actions/backend.py; actions/executor.py; actions/store.py; agents/tools.py; api/main.py; tests/test_action_service.py; README.md; wiki/CartCare定位与技术亮点.md; wiki/重点代码.md",
       "note": "已建立 PendingAction、状态机、ActionService、approve/reject/resume、Provider+Policy 二次校验、幂等 Store 和明确标注的模拟 Action Backend；Agent write tools 只能请求敏感动作，不绕过 Policy；Python 3.12 uv 环境完整 pytest 56 passed。正式认证、持久化 Action Store 和真实外部业务系统留待后续。"
     },
@@ -33,19 +33,19 @@
       "note": "已建立 Python 3.12 GitHub Actions 测试入口；Dockerfile development target 包含 requirements-dev，docker-compose 应用服务保持 production target。项目规范依赖已迁移到 pyproject.toml + uv.lock，uv run pytest 作为标准命令。"
     },
     "T07": {
-      "status": "todo",
-      "evidence": "",
-      "note": "metadata 增 source/policy_version/effective_at/doc_type；结果返回 citations；建立低相关度阈值和无答案策略；先测 vector baseline 再决定 hybrid/rerank。"
+      "status": "done",
+      "evidence": "mcp/rag_contract.py; mcp/knowledge_base.py; mcp/tool_manager.py; agents/tools.py; agents/agent_orchestrator.py; api/main.py; tests/test_rag_contract.py; tests/test_tool_contract.py; README.md; wiki/重点代码.md; wiki/CartCare定位与技术亮点.md",
+      "note": "文档导入验证 source/doc_type/document_id；Policy 必须有 policy_version 与 effective_at。检索结果返回结构化 citation、usable/low_confidence/no_answer/degraded 状态；仅可靠命中可作为 Agent 依据，fallback 和旧 metadata 无 citation。保留 rewrite/rerank；1-Chroma distance 阈值 0.35 为待校准基线。用户本轮确认 T07 done；此前 Python 3.12 uv 完整 pytest 95 passed。"
     },
     "T08": {
-      "status": "todo",
-      "evidence": "",
-      "note": "统一 strict schema；read/write/dangerous 分级；timeout/retry/idempotency key；明确可重试与不可重试错误。"
+      "status": "done",
+      "evidence": "core/tool_contract.py; agents/tools.py; agents/agent_orchestrator.py; mcp/tool_manager.py; api/main.py; tests/test_tool_contract.py; tests/test_agent_orchestrator.py",
+      "note": "Agent Tools 和本地 RAG ToolManager 共享严格 schema 校验、read/write/dangerous 风险元数据、typed execution result 与 trace 字段；仅幂等读工具可自动重试可重试错误，危险动作无 Tool Runtime 自动重试或超时取消；RAG 缓存/熔断/改写/重排保留在原层。Python 3.12 uv 完整 pytest 77 passed，待用户验收。"
     },
     "T09": {
-      "status": "todo",
-      "evidence": "",
-      "note": "增加 routing accuracy、tool selection/args、Recall@K、citation accuracy、task success、policy violation、missed escalation、HITL correctness、loop rate、latency/cost。"
+      "status": "done",
+      "evidence": "evaluation/system_eval.py; evaluation/run_system_eval.py; evaluation/agent_trace_eval.py; evaluation/capture_online_eval.py; evaluation/prepare_online_eval.py; evaluation/system_cases.json; tests/test_system_eval.py; system_eval_report.json; t09_online_observations_final.json; t09_online_report.json; evaluation/README.md",
+      "note": "用户于 2026-10-02 验收 T09 为 done。2026-09-30 的真实 /chat 十场景基线原样保留：在线 intent 7/10、Tool 选择 7/10、参数 6/6、unknown 升级 1/1、严格 E2E 6/10；component replay 单独报告。后续独立 RAG Online Integration Hardening 只复验 FAQ，2026-10-02 取得 usable、citation 和 grounding 证据，不重算 T09 历史指标。"
     },
     "T10": {
       "status": "todo",
@@ -78,7 +78,7 @@
     "d4-body": ""
   },
   "globals": {
-    "verifyNotes": ""
+    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。"
   }
 }
 

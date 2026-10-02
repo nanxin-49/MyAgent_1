@@ -112,7 +112,7 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
 
 - 监控：看成功率、延迟、熔断、工具质量
 - 降权：运行差的 Agent 会被路由权重压低
-- 评测：意图识别 Accuracy / Macro-F1，回复质量 LLM-as-Judge
+- 评测：意图识别 Accuracy / Macro-F1，回复表达质量 LLM-as-Judge，以及确定性 Tool/RAG/Policy/HITL 专项指标
 
 这意味着它不是静态编排，而是一个会根据运行表现持续调整的客服运行时。
 
@@ -232,12 +232,16 @@ CartCare 使用 ChromaDB 构建知识库，用于存放退款政策、配送说�
   -> 多子查询并行召回
   -> 合并去重
   -> LLM 重排
-  -> Top-K 注入 Agent 上下文
+  -> 可引用命中进入 Agent Tool Result
 ```
 
 但不是所有请求都会触发 RAG。
 
 系统不会在 API 层固定预检索；Agent 只有在模型发出 `search_knowledge_base` tool_use 时才进入 RAG 工具循环。动态订单、物流、库存和退款状态不由 RAG 伪造。
+
+知识文档现在有 document ID、来源、类型、chunk 位置；Policy 类文档还要求版本与生效时间。检索结果提供结构化 citation，并由确定性阈值分成 `usable`、`low_confidence`、`no_answer`、`degraded`。只有 `usable` 内容可作为答复依据；fallback 没有真实文档 citation。分数是 `1 - Chroma distance` 的初始启发式，后续仍需评测校准。RAG 政策文字不能覆盖 PolicyEngine 的资格判定。
+
+演示知识库的 HTTP thin client 现在显式使用同一版本的字符 n-gram 向量进行导入和查询；这是小型词面向量基线，不宣称预训练语义能力。新演示 collection 与旧来源不明的记录隔离，可明确重建。真实 `/chat` FAQ 已验证可用检索、引用与“7 天”回答依据。
 
 ### 动态业务 Provider 层
 
@@ -249,11 +253,13 @@ T02 新增 `providers/`，为动态业务事实提供与存储解耦的只读接
 - `LogisticsProvider`：订单物流状态
 - `RefundProvider`：退款记录状态
 
-Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。`agents/tools.py` 的 `build_business_tools()` 将五类 Provider 接入 Agent 的只读工具，API lifespan 注入测试/演示用 JSON fixture 内存 Backend；这不是对真实外部电商系统的接入。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误会转换为稳定 Tool Result；写操作和审批属于后续 HITL 任务。
+Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。`agents/tools.py` 的 `build_business_tools()` 将五类 Provider 接入 Agent 的只读工具，API lifespan 注入测试/演示用 JSON fixture 内存 Backend；这不是对真实外部电商系统的接入。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误会转换为稳定 Tool Result；写动作请求与审批经过 ActionService。
 
 `policies/` 已提供确定性的退款和取消资格判断：输入是 Provider 校验过的订单事实、请求客户标识、评估时间与金额；输出包含 `allow` / `deny` / `require_approval`、`reason_code`、`policy_version` 和解释。Policy Engine 不读取数据源，也不执行退款、取消或审批；这些执行控制留给 T05。
 
 `actions/` 已建立 T05 控制闭环：`PendingAction` 记录敏感动作、Policy Result、审批状态、幂等键和执行结果；`ActionService` 在 request、approve、reject、resume 时重新校验 Provider facts 和 Policy，并通过明确标注的模拟 Action Backend 执行。该实现用于演示状态机和安全边界，不是支付渠道或真实商城集成。
+
+T08 的共享 Tool Contract 将 Agent Tools 与 RAG ToolManager 对齐为同一套严格 schema、read/write/dangerous 风险等级、typed error 和 trace 字段。自动重试仅允许幂等读工具的可重试失败；敏感动作仍由 ActionService 的业务幂等和审批状态机保护。
 
 ### 4. Redis + ChromaDB 记忆体系
 
@@ -314,7 +320,7 @@ Monitor 会定期采集：
 
 也就是说，监控不只是展示指标，还会影响后续路由选择。
 
-### 8. LLM-as-Judge 端到端评测
+### 8. 在线质量评测与确定性专项评测
 
 CartCare 内置 `/eval/run` 评测入口。
 
@@ -327,14 +333,14 @@ CartCare 内置 `/eval/run` 评测入口。
 - 回归检测
 - 优化建议
 
-LLM-as-Judge 会从四个维度评价回复：
+LLM-as-Judge 只从四个主观维度评价回复：
 
 - 相关性
-- 准确性
+- 清晰度
 - 完整性
 - 有用性
 
-这让项目不只是“能回答”，而是能持续评估回答质量。
+另有独立专项 runner 使用固定演示数据复放 Tool、RAG、Policy、HITL 和幂等路径，报告保留逐 case 证据、指标分子/分母和 RAG 阈值 sweep。该离线复放不代表已测得模型真实意图或 Tool 选择能力；这些仍要以在线 `/chat` 观测为准。
 
 ## 为什么它不是普通客服 Demo
 
