@@ -1,0 +1,1133 @@
+{
+  "mode": [
+    "component_replay"
+  ],
+  "case_count": 44,
+  "errors": [],
+  "metrics": {
+    "intent": {
+      "accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "tool": {
+      "tool_selection_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "argument_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "schema_validation_rate": {
+        "value": 1.0,
+        "numerator": 8,
+        "denominator": 8
+      },
+      "invocation_success_rate": {
+        "value": 1.0,
+        "numerator": 8,
+        "denominator": 8
+      },
+      "expected_business_outcome_rate": {
+        "value": 1.0,
+        "numerator": 8,
+        "denominator": 8
+      },
+      "technical_failure_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 8
+      },
+      "invalid_tool_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "unnecessary_tool_call_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "read_expected_business_outcome_rate": {
+        "value": 1.0,
+        "numerator": 3,
+        "denominator": 3
+      },
+      "write_expected_business_outcome_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "dangerous_expected_business_outcome_rate": {
+        "value": 1.0,
+        "numerator": 5,
+        "denominator": 5
+      }
+    },
+    "rag": {
+      "recall_at_3": {
+        "value": 1.0,
+        "numerator": 2,
+        "denominator": 2
+      },
+      "retrieval_status_accuracy": {
+        "value": 1.0,
+        "numerator": 5,
+        "denominator": 5
+      },
+      "citation_accuracy": {
+        "value": 1.0,
+        "numerator": 2,
+        "denominator": 2
+      },
+      "no_answer_accuracy": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1
+      },
+      "low_confidence_accuracy": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1
+      },
+      "degraded_accuracy": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1
+      },
+      "grounding_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "policy": {
+      "policy_decision_accuracy": {
+        "value": 1.0,
+        "numerator": 14,
+        "denominator": 14
+      },
+      "policy_violation_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 3
+      },
+      "ownership_bypass_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      }
+    },
+    "action": {
+      "approval_required_accuracy": {
+        "value": 1.0,
+        "numerator": 5,
+        "denominator": 5
+      },
+      "missed_approval_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "approval_bypass_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "duplicate_action_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 3
+      },
+      "idempotency_success_rate": {
+        "value": 1.0,
+        "numerator": 3,
+        "denominator": 3
+      }
+    },
+    "end_to_end": {
+      "task_success_rate": {
+        "value": 1.0,
+        "numerator": 9,
+        "denominator": 9
+      },
+      "expected_escalation_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "performance": {
+      "latency_mean_ms": 4.33,
+      "latency_samples": 17,
+      "token_cost": null
+    }
+  },
+  "threshold_sweep": [
+    {
+      "threshold": 0.2,
+      "usable_recall": {
+        "value": 1.0,
+        "numerator": 2,
+        "denominator": 2
+      },
+      "false_usable_rate": {
+        "value": 0.5,
+        "numerator": 2,
+        "denominator": 4
+      },
+      "no_answer_low_confidence_precision": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1
+      },
+      "no_answer_low_confidence_recall": {
+        "value": 0.5,
+        "numerator": 1,
+        "denominator": 2
+      }
+    },
+    {
+      "threshold": 0.35,
+      "usable_recall": {
+        "value": 1.0,
+        "numerator": 2,
+        "denominator": 2
+      },
+      "false_usable_rate": {
+        "value": 0.3333,
+        "numerator": 1,
+        "denominator": 3
+      },
+      "no_answer_low_confidence_precision": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1
+      },
+      "no_answer_low_confidence_recall": {
+        "value": 0.5,
+        "numerator": 1,
+        "denominator": 2
+      }
+    },
+    {
+      "threshold": 0.5,
+      "usable_recall": {
+        "value": 0.5,
+        "numerator": 1,
+        "denominator": 2
+      },
+      "false_usable_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "no_answer_low_confidence_precision": {
+        "value": 0.6667,
+        "numerator": 2,
+        "denominator": 3
+      },
+      "no_answer_low_confidence_recall": {
+        "value": 1.0,
+        "numerator": 2,
+        "denominator": 2
+      }
+    },
+    {
+      "threshold": 0.7,
+      "usable_recall": {
+        "value": 0.5,
+        "numerator": 1,
+        "denominator": 2
+      },
+      "false_usable_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "no_answer_low_confidence_precision": {
+        "value": 0.6667,
+        "numerator": 2,
+        "denominator": 3
+      },
+      "no_answer_low_confidence_recall": {
+        "value": 1.0,
+        "numerator": 2,
+        "denominator": 2
+      }
+    }
+  ],
+  "regressions": [],
+  "cases": [
+    {
+      "case_id": "faq_policy",
+      "domain": "rag",
+      "mode": "component_replay",
+      "expected": {
+        "relevant_document_ids": [
+          "policy-refund-v1"
+        ],
+        "allowed_citations": [
+          "policy-refund-v1@refund-v1#chunk-0"
+        ],
+        "status": "usable"
+      },
+      "observed": {
+        "status": "usable",
+        "hits": [
+          {
+            "document_id": "policy-refund-v1"
+          }
+        ],
+        "citations": [
+          "policy-refund-v1@refund-v1#chunk-0"
+        ]
+      },
+      "error": null
+    },
+    {
+      "case_id": "faq_policy",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "refund",
+        "tool": "search_knowledge_base",
+        "allowed_tools": [
+          "search_knowledge_base"
+        ],
+        "document_id": "policy-refund-v1",
+        "citation": "policy-refund-v1@refund-v1#chunk-0",
+        "expected_fact": "7 天",
+        "status": "usable"
+      },
+      "observed": {
+        "checks": {
+          "status": true,
+          "citation": true,
+          "document": true
+        },
+        "latency_ms": 63.303900009486824
+      },
+      "error": null
+    },
+    {
+      "case_id": "order_lookup",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "get_order",
+        "arguments": {
+          "order_id": "ORD-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "read",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "order_lookup",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "order_status",
+        "tool": "get_order",
+        "allowed_tools": [
+          "get_order"
+        ],
+        "data_field": "order_id",
+        "data_value": "ORD-1001"
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "provider_fact": true
+        },
+        "latency_ms": 5.227699992246926
+      },
+      "error": null
+    },
+    {
+      "case_id": "logistics_lookup",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "get_shipment",
+        "arguments": {
+          "order_id": "ORD-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "read",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "logistics_lookup",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "logistics",
+        "tool": "get_shipment",
+        "allowed_tools": [
+          "get_shipment",
+          "get_order"
+        ],
+        "data_field": "shipment_id",
+        "data_value": "SHP-1001"
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "provider_fact": true
+        },
+        "latency_ms": 0.8921000408008695
+      },
+      "error": null
+    },
+    {
+      "case_id": "inventory_lookup",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "check_inventory",
+        "arguments": {
+          "product_id": "SKU-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "product_id": "SKU-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "read",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "inventory_lookup",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "product_info",
+        "tool": "check_inventory",
+        "allowed_tools": [
+          "check_inventory",
+          "get_product"
+        ],
+        "data_field": "product_id",
+        "data_value": "SKU-1001"
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "provider_fact": true
+        },
+        "latency_ms": 0.6959000020287931
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_allow",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "approval_required": false
+      },
+      "observed": {
+        "status": "completed",
+        "approval_required": false,
+        "execution_count": 1
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_allow",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "allow",
+        "reason_code": "refund_eligible",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "allow",
+        "reason_code": "refund_eligible",
+        "executed_without_approval": false
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_allow",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "request_refund",
+        "arguments": {
+          "order_id": "ORD-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "dangerous",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_allow",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "refund",
+        "tool": "request_refund",
+        "allowed_tools": [
+          "get_order",
+          "get_refund_status",
+          "get_shipment",
+          "search_knowledge_base",
+          "request_refund"
+        ],
+        "policy_decision": "allow",
+        "reason_code": "refund_eligible",
+        "status": "completed",
+        "approval_required": false
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "status": true,
+          "policy": true
+        },
+        "latency_ms": 0.8464999846182764
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_approval",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "approval_required": true
+      },
+      "observed": {
+        "status": "awaiting_approval",
+        "approval_required": true,
+        "execution_count": 0
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_approval",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "require_approval",
+        "reason_code": "amount_requires_approval",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "require_approval",
+        "reason_code": "amount_requires_approval",
+        "executed_without_approval": false
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_approval",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "request_refund",
+        "arguments": {
+          "order_id": "ORD-1001",
+          "amount": 600
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001",
+          "amount": 600
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "dangerous",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_approval",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "refund",
+        "tool": "request_refund",
+        "allowed_tools": [
+          "get_order",
+          "get_refund_status",
+          "check_billing_fields",
+          "compare_amounts",
+          "request_refund"
+        ],
+        "policy_decision": "require_approval",
+        "reason_code": "amount_requires_approval",
+        "status": "awaiting_approval",
+        "approval_required": true
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "status": true,
+          "policy": true
+        },
+        "latency_ms": 0.6726999999955297
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_deny",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "approval_required": false
+      },
+      "observed": {
+        "status": "rejected",
+        "approval_required": false,
+        "execution_count": 0
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_deny",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "order_status_not_refundable",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "order_status_not_refundable",
+        "executed_without_approval": false
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_deny",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "request_refund",
+        "arguments": {
+          "order_id": "ORD-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "dangerous",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_deny",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "refund",
+        "tool": "request_refund",
+        "allowed_tools": [
+          "get_order",
+          "get_refund_status",
+          "check_billing_fields",
+          "search_knowledge_base",
+          "request_refund"
+        ],
+        "policy_decision": "deny",
+        "reason_code": "order_status_not_refundable",
+        "status": "rejected",
+        "approval_required": false
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "status": true,
+          "policy": true
+        },
+        "latency_ms": 0.658900011330843
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_order",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "approval_required": false
+      },
+      "observed": {
+        "status": "completed",
+        "approval_required": false,
+        "execution_count": 1
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_order",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "allow",
+        "reason_code": "cancel_eligible",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "allow",
+        "reason_code": "cancel_eligible",
+        "executed_without_approval": false
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_order",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "request_cancel_order",
+        "arguments": {
+          "order_id": "ORD-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "dangerous",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_order",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "request",
+        "tool": "request_cancel_order",
+        "allowed_tools": [
+          "get_order",
+          "get_shipment",
+          "inspect_request_context",
+          "request_cancel_order"
+        ],
+        "policy_decision": "allow",
+        "reason_code": "cancel_eligible",
+        "status": "completed",
+        "approval_required": false
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "status": true,
+          "policy": true
+        },
+        "latency_ms": 0.6932000396773219
+      },
+      "error": null
+    },
+    {
+      "case_id": "ownership_violation",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "approval_required": false
+      },
+      "observed": {
+        "status": "rejected",
+        "approval_required": false,
+        "execution_count": 0
+      },
+      "error": null
+    },
+    {
+      "case_id": "ownership_violation",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "unauthorized",
+        "ownership_violation": true
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "unauthorized",
+        "executed_without_approval": false
+      },
+      "error": null
+    },
+    {
+      "case_id": "ownership_violation",
+      "domain": "tool",
+      "mode": "component_replay",
+      "expected": {
+        "tool": "request_cancel_order",
+        "arguments": {
+          "order_id": "ORD-1001"
+        }
+      },
+      "observed": {
+        "validated_input": {
+          "order_id": "ORD-1001"
+        },
+        "invocation_success": true,
+        "expected_business_outcome": true,
+        "technical_failure": false,
+        "risk_level": "dangerous",
+        "latency_ms": 0.0
+      },
+      "error": null
+    },
+    {
+      "case_id": "ownership_violation",
+      "domain": "end_to_end",
+      "mode": "component_replay",
+      "expected": {
+        "intent": "request",
+        "tool": "request_cancel_order",
+        "allowed_tools": [
+          "get_order",
+          "inspect_request_context",
+          "request_cancel_order"
+        ],
+        "policy_decision": "deny",
+        "reason_code": "unauthorized",
+        "status": "rejected",
+        "error_code": "unauthorized",
+        "approval_required": false
+      },
+      "observed": {
+        "checks": {
+          "tool_executed": true,
+          "status": true,
+          "policy": true,
+          "error": true
+        },
+        "latency_ms": 0.5641999887302518
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_allow",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "allow",
+        "reason_code": "refund_eligible",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "allow",
+        "reason_code": "refund_eligible",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_expired",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "refund_window_expired",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "refund_window_expired",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_invalid_status",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "order_status_not_refundable",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "order_status_not_refundable",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_threshold",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "require_approval",
+        "reason_code": "amount_requires_approval",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "require_approval",
+        "reason_code": "amount_requires_approval",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_ownership",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "ownership_mismatch",
+        "ownership_violation": true
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "ownership_mismatch",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_duplicate",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "refund_already_in_progress",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "refund_already_in_progress",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_allow",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "allow",
+        "reason_code": "cancel_eligible",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "allow",
+        "reason_code": "cancel_eligible",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_deny",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "deny",
+        "reason_code": "order_status_not_cancellable",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "deny",
+        "reason_code": "order_status_not_cancellable",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "cancel_approval",
+      "domain": "policy",
+      "mode": "component_replay",
+      "expected": {
+        "decision": "require_approval",
+        "reason_code": "processing_order_requires_approval",
+        "ownership_violation": false
+      },
+      "observed": {
+        "decision": "require_approval",
+        "reason_code": "processing_order_requires_approval",
+        "policy_version": "refund-cancel-v1"
+      },
+      "error": null
+    },
+    {
+      "case_id": "refund_repeat",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "repeat": true
+      },
+      "observed": {
+        "status": "completed",
+        "reused": true,
+        "execution_count": 1
+      },
+      "error": null
+    },
+    {
+      "case_id": "duplicate_approval_resume",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "repeat": true
+      },
+      "observed": {
+        "status": "completed",
+        "reused": true,
+        "execution_count": 1,
+        "approved_status": "completed"
+      },
+      "error": null
+    },
+    {
+      "case_id": "reject_resume",
+      "domain": "action",
+      "mode": "component_replay",
+      "expected": {
+        "repeat": true
+      },
+      "observed": {
+        "status": "rejected",
+        "reused": true,
+        "execution_count": 0
+      },
+      "error": null
+    },
+    {
+      "case_id": "rag_policy",
+      "domain": "rag",
+      "mode": "component_replay",
+      "expected": {
+        "relevant_document_ids": [
+          "policy-refund-v1"
+        ],
+        "allowed_citations": [
+          "policy-refund-v1@refund-v1#chunk-0"
+        ],
+        "status": "usable"
+      },
+      "observed": {
+        "status": "usable",
+        "hits": [
+          {
+            "document_id": "policy-refund-v1"
+          }
+        ],
+        "citations": [
+          "policy-refund-v1@refund-v1#chunk-0"
+        ]
+      },
+      "error": null
+    },
+    {
+      "case_id": "rag_low",
+      "domain": "rag",
+      "mode": "component_replay",
+      "expected": {
+        "relevant_document_ids": [],
+        "allowed_citations": [],
+        "status": "low_confidence"
+      },
+      "observed": {
+        "status": "low_confidence",
+        "hits": [
+          {
+            "document_id": "faq-shipping-v1"
+          }
+        ],
+        "citations": []
+      },
+      "error": null
+    },
+    {
+      "case_id": "rag_no_answer",
+      "domain": "rag",
+      "mode": "component_replay",
+      "expected": {
+        "relevant_document_ids": [],
+        "allowed_citations": [],
+        "status": "no_answer"
+      },
+      "observed": {
+        "status": "no_answer",
+        "hits": [],
+        "citations": []
+      },
+      "error": null
+    },
+    {
+      "case_id": "rag_degraded",
+      "domain": "rag",
+      "mode": "component_replay",
+      "expected": {
+        "relevant_document_ids": [],
+        "allowed_citations": [],
+        "status": "degraded"
+      },
+      "observed": {
+        "status": "degraded",
+        "hits": [],
+        "citations": []
+      },
+      "error": null
+    }
+  ],
+  "scenario_count": 10,
+  "unmeasured_scenarios": [
+    "unsupported_request"
+  ],
+  "limitations": [
+    "component replay uses demo fixtures and scripted tool invocation; Agent tool selection and intent are unmeasured",
+    "unsupported/escalation requires a live /chat run; this scenario is catalogued but unmeasured offline",
+    "RAG sweep uses fixed illustrative distances, not a production retrieval corpus"
+  ]
+}

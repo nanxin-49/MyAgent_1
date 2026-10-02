@@ -1,12 +1,12 @@
-# EchoMind 定位与技术亮点
+# CartCare 定位与技术亮点
 
-这份文档面向第一次接触 EchoMind 的人，用来快速理解：这个项目是什么、现在的多 Agent 架构是什么、它和之前“只有 prompt 区分 Agent”的版本有什么不同，以及它为什么不只是一个客服聊天 Demo。
+这份文档面向第一次接触 CartCare 的人，用来快速理解：这个项目是什么、现在的多 Agent 架构是什么、它和之前“只有 prompt 区分 Agent”的版本有什么不同，以及它为什么不只是一个客服聊天 Demo。
 
 ## 一句话定位
 
-EchoMind 是一个面向复杂客服任务的多 Agent 客服编排运行时。
+CartCare 是一个面向复杂客服任务的多 Agent 客服编排运行时，并正在补齐面向电商动态事实的 Provider 层。
 
-它不是单个“客服机器人”，也不是简单把几个 prompt 拼在一起，而是一个把意图识别、知识检索、记忆、路由、工具、监控和评测串起来的协同系统。系统先理解用户问题，再决定由哪个 Agent 主处理、是否需要其他 Agent 辅助、是否应该查知识库、是否应该升级到人工，最后再把结果写回记忆和观测系统。
+它不是单个“客服机器人”，也不是简单把几个 prompt 拼在一起，而是一个把意图识别、知识检索、动态业务事实、记忆、路由、工具、监控和评测串起来的协同系统。系统先理解用户问题，再决定由哪个 Agent 主处理、是否需要其他 Agent 辅助、是否由 Agent 按需调用知识库或后续业务 Tool，最后再把结果写回记忆和观测系统。
 
 ## 它解决什么问题
 
@@ -30,11 +30,11 @@ EchoMind 是一个面向复杂客服任务的多 Agent 客服编排运行时。
 3. **难以迭代**  
    没有评测、监控和规则热更新，项目只能“看起来能聊”，很难持续优化。
 
-EchoMind 的目标就是把这些能力做成一条完整链路，而不是只做一个能说话的模型壳子。
+CartCare 的目标就是把这些能力做成一条完整链路，而不是只做一个能说话的模型壳子。
 
 ## 当前是什么架构
 
-现在的 EchoMind 不是“单 Agent + prompt 变体”的做法。  
+现在的 CartCare 不是“单 Agent + prompt 变体”的做法。  
 它当前是一个 **路由驱动的多 Agent 编排架构**，核心形态可以概括成：
 
 ```text
@@ -49,11 +49,11 @@ EchoMind 的目标就是把这些能力做成一条完整链路，而不是只�
 - 当请求同时覆盖多个业务域时，编排器会并行派发多个 Agent，再由 `ResponseComposer` 合并结果
 - 运行过程会把 Agent 成功率、延迟、工具质量回写到路由评分里，形成闭环
 
-这意味着，EchoMind 的多 Agent 设计重点不是“Agent 数量”，而是**路由、协作、降级和治理**。
+这意味着，CartCare 的多 Agent 设计重点不是“Agent 数量”，而是**路由、协作、降级和治理**。
 
 ## 和之前版本的不同
 
-如果只看最早的版本，EchoMind 更像：
+如果只看最早的版本，CartCare 更像：
 
 ```text
 用户消息 -> 一个编排器 -> 几个 prompt 不同的 Agent
@@ -112,7 +112,7 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
 
 - 监控：看成功率、延迟、熔断、工具质量
 - 降权：运行差的 Agent 会被路由权重压低
-- 评测：意图识别 Accuracy / Macro-F1，回复质量 LLM-as-Judge
+- 评测：意图识别 Accuracy / Macro-F1，回复表达质量 LLM-as-Judge，以及确定性 Tool/RAG/Policy/HITL 专项指标
 
 这意味着它不是静态编排，而是一个会根据运行表现持续调整的客服运行时。
 
@@ -123,14 +123,14 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
   -> /chat
   -> 读取 Redis 工作记忆、ChromaDB 历史摘要和用户画像
   -> 识别细粒度意图、意图组、置信度和结构化实体
-  -> 按意图判断是否触发 RAG 知识库检索
   -> 生成结构化路由决策
      - primary_agent
      - supporting_agents
      - routing_reason
      - routing_confidence
   -> 单 Agent 执行或并行多 Agent 执行
-  -> 注入记忆、知识库、结构化实体和动态 Skills
+  -> Agent 按需 tool_use：search_knowledge_base 或只读业务 Provider Tool
+  -> 注入记忆、tool_result、结构化实体和动态 Skills
   -> LLM 生成回复
   -> 写入工作记忆
   -> 异步更新用户画像
@@ -142,7 +142,7 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
 - 记忆解决上下文
 - 意图解决分流
 - 路由解决主辅协作
-- RAG 解决事实正确性
+- RAG 解决静态政策知识的 grounding；动态订单/物流/库存/退款事实由 Provider 提供
 - Skills 解决业务规范
 - 监控解决在线健康度
 - 评测解决迭代质量
@@ -151,7 +151,7 @@ Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式
 
 ### 1. 细粒度意图识别
 
-EchoMind 不只识别“咨询、投诉、技术、账单”这种粗粒度意图，还支持更贴近业务的细粒度分类。
+CartCare 不只识别“咨询、投诉、技术、账单”这种粗粒度意图，还支持更贴近业务的细粒度分类。
 
 例如：
 
@@ -183,7 +183,7 @@ EchoMind 不只识别“咨询、投诉、技术、账单”这种粗粒度意�
 
 ### 2. 结构化多 Agent 路由
 
-EchoMind 的多 Agent 路由不是简单“命中两个关键词就并行”。
+CartCare 的多 Agent 路由不是简单“命中两个关键词就并行”。
 
 当前实现是一个路由驱动的多 Agent 编排架构：
 
@@ -222,7 +222,7 @@ escalation
 
 ### 3. RAG 知识库增强
 
-EchoMind 使用 ChromaDB 构建知识库，用于存放退款政策、配送说明、技术排障、会员规则等文档。
+CartCare 使用 ChromaDB 构建知识库，用于存放退款政策、配送说明、技术排障、会员规则等文档。
 
 检索链路包括：
 
@@ -232,16 +232,38 @@ EchoMind 使用 ChromaDB 构建知识库，用于存放退款政策、配送说�
   -> 多子查询并行召回
   -> 合并去重
   -> LLM 重排
-  -> Top-K 注入 Agent 上下文
+  -> 可引用命中进入 Agent Tool Result
 ```
 
 但不是所有请求都会触发 RAG。
 
-系统会先识别意图，只有业务类问题才检索知识库。问候、反馈、转人工、未知意图不会触发 RAG，避免无效检索和上下文干扰。
+系统不会在 API 层固定预检索；Agent 只有在模型发出 `search_knowledge_base` tool_use 时才进入 RAG 工具循环。动态订单、物流、库存和退款状态不由 RAG 伪造。
+
+知识文档现在有 document ID、来源、类型、chunk 位置；Policy 类文档还要求版本与生效时间。检索结果提供结构化 citation，并由确定性阈值分成 `usable`、`low_confidence`、`no_answer`、`degraded`。只有 `usable` 内容可作为答复依据；fallback 没有真实文档 citation。分数是 `1 - Chroma distance` 的初始启发式，后续仍需评测校准。RAG 政策文字不能覆盖 PolicyEngine 的资格判定。
+
+演示知识库的 HTTP thin client 现在显式使用同一版本的字符 n-gram 向量进行导入和查询；这是小型词面向量基线，不宣称预训练语义能力。新演示 collection 与旧来源不明的记录隔离，可明确重建。真实 `/chat` FAQ 已验证可用检索、引用与“7 天”回答依据。
+
+### 动态业务 Provider 层
+
+T02 新增 `providers/`，为动态业务事实提供与存储解耦的只读接口：
+
+- `ProductProvider`：商品基础信息
+- `OrderProvider`：订单状态和订单明细
+- `InventoryProvider`：库存快照
+- `LogisticsProvider`：订单物流状态
+- `RefundProvider`：退款记录状态
+
+Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。`agents/tools.py` 的 `build_business_tools()` 将五类 Provider 接入 Agent 的只读工具，API lifespan 注入测试/演示用 JSON fixture 内存 Backend；这不是对真实外部电商系统的接入。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误会转换为稳定 Tool Result；写动作请求与审批经过 ActionService。
+
+`policies/` 已提供确定性的退款和取消资格判断：输入是 Provider 校验过的订单事实、请求客户标识、评估时间与金额；输出包含 `allow` / `deny` / `require_approval`、`reason_code`、`policy_version` 和解释。Policy Engine 不读取数据源，也不执行退款、取消或审批；这些执行控制留给 T05。
+
+`actions/` 已建立 T05 控制闭环：`PendingAction` 记录敏感动作、Policy Result、审批状态、幂等键和执行结果；`ActionService` 在 request、approve、reject、resume 时重新校验 Provider facts 和 Policy，并通过明确标注的模拟 Action Backend 执行。该实现用于演示状态机和安全边界，不是支付渠道或真实商城集成。
+
+T08 的共享 Tool Contract 将 Agent Tools 与 RAG ToolManager 对齐为同一套严格 schema、read/write/dangerous 风险等级、typed error 和 trace 字段。自动重试仅允许幂等读工具的可重试失败；敏感动作仍由 ActionService 的业务幂等和审批状态机保护。
 
 ### 4. Redis + ChromaDB 记忆体系
 
-EchoMind 把记忆拆成三层：
+CartCare 把记忆拆成三层：
 
 | 记忆类型 | 存储 | 作用 |
 |---|---|---|
@@ -264,13 +286,13 @@ Redis 读写使用异步客户端，ChromaDB 的同步操作放入线程池，�
 - 通用客服需要先澄清用户诉求
 - 涉及敏感信息时需要提醒用户不要公开密码或验证码
 
-EchoMind 支持从 `skills/` 目录加载 Markdown / JSON / TXT 规则文件，并根据 Agent 类型和关键词动态注入到 system prompt。
+CartCare 支持从 `skills/` 目录加载 Markdown / JSON / TXT 规则文件，并根据 Agent 类型和关键词动态注入到 system prompt。
 
 修改规则后可以通过接口热加载，不需要重启服务。
 
 ### 6. MCP 工具可靠性治理
 
-EchoMind 把知识库检索封装成工具，并加入完整的可靠性机制：
+CartCare 把知识库检索封装成工具，并加入完整的可靠性机制：
 
 - 参数校验
 - TTL 缓存
@@ -298,9 +320,9 @@ Monitor 会定期采集：
 
 也就是说，监控不只是展示指标，还会影响后续路由选择。
 
-### 8. LLM-as-Judge 端到端评测
+### 8. 在线质量评测与确定性专项评测
 
-EchoMind 内置 `/eval/run` 评测入口。
+CartCare 内置 `/eval/run` 评测入口。
 
 评测内容包括：
 
@@ -311,14 +333,14 @@ EchoMind 内置 `/eval/run` 评测入口。
 - 回归检测
 - 优化建议
 
-LLM-as-Judge 会从四个维度评价回复：
+LLM-as-Judge 只从四个主观维度评价回复：
 
 - 相关性
-- 准确性
+- 清晰度
 - 完整性
 - 有用性
 
-这让项目不只是“能回答”，而是能持续评估回答质量。
+另有独立专项 runner 使用固定演示数据复放 Tool、RAG、Policy、HITL 和幂等路径，报告保留逐 case 证据、指标分子/分母和 RAG 阈值 sweep。该离线复放不代表已测得模型真实意图或 Tool 选择能力；这些仍要以在线 `/chat` 观测为准。
 
 ## 为什么它不是普通客服 Demo
 
@@ -328,14 +350,15 @@ LLM-as-Judge 会从四个维度评价回复：
 用户输入 -> LLM 回复
 ```
 
-EchoMind 则是：
+CartCare 则是：
 
 ```text
 用户输入
   -> 意图识别
   -> 实体提取
   -> 记忆读取
-  -> 按意图 RAG
+  -> Agent 按需 tool_use 调用 RAG
+  -> Provider Tool（接入后）读取动态业务事实
   -> 结构化多 Agent 路由
   -> Skills 注入
   -> Agent 回复

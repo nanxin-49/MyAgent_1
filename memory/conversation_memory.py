@@ -104,7 +104,7 @@ class MemoryManager:
 
         self._redis = redis.from_url(redis_url, decode_responses=True)
 
-        # ChromaDB：优先连接独立服务（docker compose 模式），连不上则降级为本地嵌入式
+        # ChromaDB：只连接独立服务（docker compose 模式）；chroma_path 仅为兼容旧调用方保留。
         try:
             # HttpClient 默认也会初始化 ChromaDB telemetry；显式关闭避免 posthog 兼容性错误日志。
             chroma = chromadb.HttpClient(
@@ -114,12 +114,10 @@ class MemoryManager:
             )
             chroma.heartbeat()  # 测试连接
             logger.info(f"ChromaDB 已连接: {chroma_host}:{chroma_port}")
-        except Exception:
-            logger.info(f"ChromaDB 服务不可用，使用本地嵌入式模式: {chroma_path}")
-            chroma = chromadb.PersistentClient(
-                path=chroma_path,
-                settings=chromadb.Settings(anonymized_telemetry=False),
-            )
+        except Exception as exc:
+            message = f"无法连接 ChromaDB Server: {chroma_host}:{chroma_port}"
+            logger.error(message)
+            raise ConnectionError(message) from exc
 
         # 情景记忆：存储历史对话片段
         self._episodic = chroma.get_or_create_collection("episodic")

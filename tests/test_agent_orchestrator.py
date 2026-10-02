@@ -207,7 +207,8 @@ def test_tool_use_round_trip_executes_only_whitelisted_tool():
 
     client = ToolClient()
     agent = TechnicalAgent(client, "test-model")
-    response = asyncio.run(agent.handle(make_request()))
+    request = make_request()
+    response = asyncio.run(agent.handle(request))
 
     assert response.success is True
     assert response.tools_used == ["lookup_error_code"]
@@ -215,6 +216,11 @@ def test_tool_use_round_trip_executes_only_whitelisted_tool():
     trace = response.tool_traces[0]
     assert trace["agent_type"] == "technical"
     assert trace["tool_name"] == "lookup_error_code"
+    assert trace["request_id"] == request.request_id
+    assert trace["risk_level"] == "read"
+    assert trace["validated_input"] == {"error_code": "401"}
+    assert trace["error_code"] is None
+    assert trace["retryable"] is False
     assert trace["tool_use_id"] == "toolu_1"
     assert trace["input"] == {"error_code": "401"}
     assert trace["success"] is True

@@ -6,12 +6,11 @@
 评测维度：
   1. 意图识别准确率 —— 预测意图 vs 标注意图，计算 Accuracy / F1
   2. 响应质量评分 —— 用 LLM 作为评判者（LLM-as-Judge），
-     从相关性、准确性、完整性、有用性四个维度打分
+     仅从相关性、清晰度、完整性、有用性四个主观维度打分
   3. 端到端对话评测 —— 模拟完整多轮对话，评估整体体验
   4. 回归测试 —— 与历史基线对比，防止性能退化
 
-LLM-as-Judge 是评测 Agent 质量的关键技术：
-  人工标注成本高、主观性强；用 LLM 评判可以规模化、可重复。
+Tool、RAG、Policy 与动作正确性由确定性专项评测负责。
 """
 import asyncio
 import json
@@ -45,7 +44,7 @@ class IntentTestCase:
 class QualityScores:
     """LLM-as-Judge 评分结果。"""
     relevance:    float   # 相关性：回答是否针对问题
-    accuracy:     float   # 准确性：信息是否正确
+    clarity:      float   # 清晰度：表达是否易懂
     completeness: float   # 完整性：是否完整解决问题
     helpfulness:  float   # 有用性：用户是否能据此行动
     judge_failed: bool = False
@@ -53,7 +52,7 @@ class QualityScores:
 
     @property
     def overall(self) -> float:
-        return statistics.mean([self.relevance, self.accuracy, self.completeness, self.helpfulness])
+        return statistics.mean([self.relevance, self.clarity, self.completeness, self.helpfulness])
 
 
 @dataclass
@@ -86,8 +85,7 @@ class LLMJudge:
 
     为什么用 LLM 而不是人工？
     - 可规模化：数千条测试用例自动评测
-    - 可重复：相同输入得到稳定评分
-    - 多维度：同时评估相关性、准确性等多个维度
+    - 多维度：评估主观的表达质量
 
     注意：LLM Judge 本身也有偏差，建议定期用人工标注校准。
     """
@@ -100,11 +98,11 @@ Agent 响应: {response}
 
 请从以下四个维度评分（0.0-1.0），返回 JSON：
 - relevance: 响应是否直接针对用户问题（0=完全无关，1=完全相关）
-- accuracy: 信息是否准确无误（0=明显错误，1=完全正确）
+- clarity: 表达是否清晰易懂（0=难以理解，1=非常清晰）
 - completeness: 是否完整解决了用户需求（0=完全没解决，1=完全解决）
 - helpfulness: 用户能否据此采取行动（0=毫无帮助，1=非常有帮助）
 
-只返回 JSON，例如: {{"relevance": 0.9, "accuracy": 0.8, "completeness": 0.7, "helpfulness": 0.85}}"""
+只返回 JSON，例如: {{"relevance": 0.9, "clarity": 0.8, "completeness": 0.7, "helpfulness": 0.85}}"""
 
     def __init__(self, client: AsyncAnthropic, model: str):
         self._client = client
@@ -133,7 +131,7 @@ Agent 响应: {response}
             data = json.loads(raw[s:e])
             return QualityScores(
                 relevance=float(data.get("relevance", 0.5)),
-                accuracy=float(data.get("accuracy", 0.5)),
+                clarity=float(data.get("clarity", 0.5)),
                 completeness=float(data.get("completeness", 0.5)),
                 helpfulness=float(data.get("helpfulness", 0.5)),
             )
@@ -260,7 +258,7 @@ class EndToEndEvaluator:
         """
         results: List[EvalResult] = []
         all_scores: Dict[str, List[float]] = {
-            "relevance": [], "accuracy": [], "completeness": [], "helpfulness": []
+            "relevance": [], "clarity": [], "completeness": [], "helpfulness": []
         }
 
         # 1. 意图识别评测
@@ -357,7 +355,7 @@ class EndToEndEvaluator:
                 passed=passed,
                 scores={
                     "relevance": scores.relevance,
-                    "accuracy": scores.accuracy,
+                    "clarity": scores.clarity,
                     "completeness": scores.completeness,
                     "helpfulness": scores.helpfulness,
                     "overall": scores.overall,

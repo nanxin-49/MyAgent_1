@@ -1,10 +1,11 @@
 """
-EchoMind 智能客服系统 — FastAPI 入口
+CartCare 智能客服系统 — FastAPI 入口
 
-启动时打印小熊饼干图案。
+启动时打印 CartCare 启动标识。
 所有核心组件在 lifespan 中初始化，通过环境变量配置。
 """
 import asyncio
+import json
 import logging
 import os
 import pathlib
@@ -23,7 +24,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
+from actions import ActionResult
 
 load_dotenv()
 
@@ -33,13 +35,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-BANNER = r"""
-    ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ
-   ╔══════════════════════╗
-   ║   EchoMind  v2.0     ║
-   ║   智能客服 AI 系统    ║
-   ╚══════════════════════╝
-    ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ  ʕ•ᴥ•ʔ
+BANNER = """========================================
+ CartCare
+ E-commerce Support Agent
+========================================
 """
 
 # ── 全局组件（lifespan 中初始化）─────────────────────────────────────────────
@@ -49,6 +48,7 @@ _tool_manager = None
 _monitor      = None
 _evaluator    = None
 _skill_manager = None
+_action_service = None
 
 def _anthropic_cfg() -> Dict[str, Any]:
     key = os.getenv("ANTHROPIC_API_KEY", "")
@@ -66,18 +66,22 @@ def _anthropic_cfg() -> Dict[str, Any]:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _orchestrator, _memory, _tool_manager, _monitor, _evaluator, _skill_manager
+    global _orchestrator, _memory, _tool_manager, _monitor, _evaluator, _skill_manager, _action_service
 
     print(BANNER, flush=True)
 
     from agents.agent_orchestrator import AgentOrchestrator, Request, build_shared_rag_tools
+    from agents.tools import build_action_tools, build_business_tools
+    from actions import ActionService, InMemoryBusinessActionBackend
     from core.intent_recognizer import IntentRecognizer
     from evaluation.evaluator import EndToEndEvaluator
     from mcp.knowledge_base import KnowledgeBase
     from mcp.tool_manager import MCPToolManager, Tool
+    from core.tool_contract import RetryPolicy
     from memory.conversation_memory import MemoryManager
     from monitor.performance_monitor import PerformanceMonitor
     from core.skill_loader import SkillManager
+    from providers.mock_backend import InMemoryBusinessBackend
 
     cfg = _anthropic_cfg()
     logger.info(f"模型: {cfg['model']}  base_url: {cfg.get('base_url', '(官方)')}")
@@ -146,17 +150,40 @@ async def lifespan(app: FastAPI):
         schema={
             "type": "object",
             "properties": {
-                "query": {"type": "string"},
+                "query": {"type": "string", "minLength": 1},
                 "top_k": {"type": "integer"},
             },
             "required": ["query"],
+            "additionalProperties": False,
         },
         cache_ttl=300.0,
         supports_rerank=True,
         fallback=knowledge_fallback,
+        retry_policy=RetryPolicy(max_attempts=2),
     ))
+    business_fixture = os.getenv(
+        "CARTCARE_BUSINESS_FIXTURE",
+        str(pathlib.Path(_ROOT) / "providers" / "fixtures" / "business_provider_data.json"),
+    )
+    with open(business_fixture, "r", encoding="utf-8") as handle:
+        business_data = json.load(handle)
+    business_backend = InMemoryBusinessBackend(business_data)
+    action_backend = InMemoryBusinessActionBackend(business_data)
+    _action_service = ActionService(
+        business_backend=business_backend,
+        action_backend=action_backend,
+    )
+    business_tools = build_business_tools(business_backend)
+    business_tools.update(build_action_tools(_action_service))
+    logger.info(
+        "业务工具已加载（测试/演示 backend）: %s",
+        ", ".join(sorted(business_tools)),
+    )
+
     if _orchestrator is not None:
-        _orchestrator.set_shared_tools(build_shared_rag_tools(_tool_manager))
+        shared_tools = build_shared_rag_tools(_tool_manager)
+        shared_tools.update(business_tools)
+        _orchestrator.set_shared_tools(shared_tools)
 
     # 性能监控（可选启动 Prometheus）
     prom_port = int(os.getenv("PROMETHEUS_PORT", "0")) or None
@@ -179,18 +206,18 @@ async def lifespan(app: FastAPI):
         baseline_path=os.getenv("EVAL_BASELINE_PATH", "/app/data/eval/baseline.json"),
     )
 
-    logger.info("EchoMind 已就绪")
+    logger.info("CartCare 已就绪")
     yield
 
     await _monitor.stop()
     if _memory is not None:
         await _memory.close()
-    logger.info("EchoMind 已关闭")
+    logger.info("CartCare 已关闭")
 
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 app = FastAPI(
-    title="EchoMind 智能客服",
+    title="CartCare E-commerce Support Agent",
     version="2.0.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -227,9 +254,32 @@ class ChatResponse(BaseModel):
     escalated:   bool
     latency_ms:  float
     knowledge_used: bool = False
+    retrieval_status: Optional[str] = None
+    citations: List[Dict[str, Any]] = Field(default_factory=list)
     entities: Dict[str, List[str]] = Field(default_factory=dict)
     intent_confidence: float = 0.0
     intent_source_scores: Dict[str, float] = Field(default_factory=dict)
+
+
+def collect_rag_evidence(tool_traces: List[Dict[str, Any]]) -> tuple[Optional[str], List[Dict[str, Any]]]:
+    """Expose only usable retrieval citations; trace retrieval is not claim verification."""
+    rag_traces = [trace for trace in tool_traces if trace.get("tool_name") == "search_knowledge_base"]
+    citations = list({citation["reference"]: citation
+                      for trace in rag_traces if trace.get("retrieval_status") == "usable"
+                      for citation in trace.get("citations", []) if citation.get("reference")}.values())
+    return ("usable" if citations else rag_traces[-1].get("retrieval_status") if rag_traces else None), citations
+
+
+def render_rag_citations(response: str, citations: List[Dict[str, Any]]) -> str:
+    """Make validated retrieval references visible without citing degraded text."""
+    references = [item["reference"] for item in citations if item.get("reference")]
+    missing = [reference for reference in references if reference not in response]
+    return response + ("\n\n知识库引用：" + "；".join(missing) if missing else "")
+
+
+class ActionCommandRequest(BaseModel):
+    user_id: str = "anonymous"
+    request_id: Optional[str] = None
 
 
 class ToolTraceResponse(BaseModel):
@@ -318,10 +368,11 @@ async def chat(req: ChatRequest):
     # 5. 异步更新用户画像（不阻塞响应）
     asyncio.create_task(_memory.update_profile(req.user_id, conv_id))
 
+    retrieval_status, citations = collect_rag_evidence(result.tool_traces)
     return ChatResponse(
         conv_id=conv_id,
         request_id=result.request_id,
-        response=result.response,
+        response=render_rag_citations(result.response, citations),
         intent=result.intent.value if result.intent else "other",
         intent_group=intent_result.intent_group,
         agent_type=result.agent_type.value,
@@ -333,11 +384,56 @@ async def chat(req: ChatRequest):
         routing_confidence=result.routing_confidence,
         escalated=result.escalated,
         latency_ms=round(result.latency_ms, 1),
-        knowledge_used="search_knowledge_base" in result.tools_used,
+        knowledge_used=bool(citations),
+        retrieval_status=retrieval_status,
+        citations=citations,
         entities=intent_result.entities,
         intent_confidence=round(intent_result.confidence, 4),
         intent_source_scores=intent_result.source_scores,
     )
+
+
+@app.post("/actions/{action_id}/approve", response_model=ActionResult, tags=["Actions"])
+async def approve_action(action_id: str, req: ActionCommandRequest):
+    """Approve an awaiting demo action; repeated approvals are idempotent."""
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.approve(
+        action_id=action_id,
+        user_id=req.user_id,
+        request_id=req.request_id or str(uuid.uuid4()),
+    )
+
+
+@app.post("/actions/{action_id}/reject", response_model=ActionResult, tags=["Actions"])
+async def reject_action(action_id: str, req: ActionCommandRequest):
+    """Reject an awaiting demo action; rejection is terminal."""
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.reject(
+        action_id=action_id,
+        user_id=req.user_id,
+        request_id=req.request_id or str(uuid.uuid4()),
+    )
+
+
+@app.post("/actions/{action_id}/resume", response_model=ActionResult, tags=["Actions"])
+async def resume_action(action_id: str, req: ActionCommandRequest):
+    """Resume an approved demo action; completed actions are returned unchanged."""
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.resume(
+        action_id=action_id,
+        user_id=req.user_id,
+        request_id=req.request_id or str(uuid.uuid4()),
+    )
+
+
+@app.get("/actions/{action_id}", response_model=ActionResult, tags=["Actions"])
+async def get_action(action_id: str, user_id: str = "anonymous"):
+    if _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    return _action_service.get(action_id, user_id=user_id)
 
 
 async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) -> tuple[str, bool]:
@@ -352,7 +448,7 @@ async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) ->
         return "", False
     try:
         result = await _tool_manager.search_with_rewrite("knowledge_search", message, top_k=top_k)
-        if not result.success or not isinstance(result.data, list) or not result.data:
+        if result.retrieval_status != "usable" or not isinstance(result.data, list) or not result.data:
             return "", False
 
         parts = ["[知识库检索结果]"]
@@ -445,14 +541,23 @@ async def search(query: str, top_k: int = 5):
     """
     if _tool_manager is None:
         raise HTTPException(503, "服务未就绪")
+    if top_k < 1:
+        raise HTTPException(422, "top_k 必须大于 0")
     result = await _tool_manager.search_with_rewrite("knowledge_search", query, top_k=top_k)
-    return {"query": query, "results": result.data, "reranked": result.reranked}
+    return {"query": query, "results": result.data, "reranked": result.reranked,
+            "retrieval_status": result.retrieval_status, "citations": result.citations,
+            "success": result.success, "error_code": result.error_code}
 
 
 class DocInput(BaseModel):
     """单篇文档输入。"""
-    title:   str
+    document_id: Optional[str] = None
+    title: str
     content: str
+    source: str = "api:knowledge/add"
+    doc_type: str = "guide"
+    policy_version: Optional[str] = None
+    effective_at: Optional[str] = None
 
 
 class BatchDocInput(BaseModel):
@@ -486,13 +591,14 @@ async def add_knowledge(body: BatchDocInput):
     """
     批量导入文档到知识库。
 
-    文档会自动切片（每片 500 字）并存入 ChromaDB，ChromaDB 内置 Embedding 模型自动向量化。
+    文档会自动切片（每片 500 字），使用应用端版本化显式向量后存入 Chroma HTTP。
 
     示例请求体：
     ```json
     {
       "documents": [
-        {"title": "退款政策", "content": "用户在购买后 7 天内可以申请无理由退款..."},
+        {"title": "演示退款政策", "content": "示例政策内容...", "source": "demo:manual-policy",
+         "doc_type": "policy", "policy_version": "demo-v1", "effective_at": "2026-09-30T00:00:00Z"},
         {"title": "配送说明", "content": "标准配送 3-5 个工作日..."}
       ]
     }
@@ -502,7 +608,12 @@ async def add_knowledge(body: BatchDocInput):
     if tool is None:
         raise HTTPException(503, "知识库未初始化")
     kb = tool.handler.__self__
-    count = await kb.add_documents_async([{"title": d.title, "content": d.content} for d in body.documents])
+    try:
+        count = await kb.add_documents_async([d.model_dump(exclude_none=True) for d in body.documents])
+    except (ValidationError, ValueError) as exc:
+        detail = exc.errors(include_input=False, include_context=False) if isinstance(exc, ValidationError) else str(exc)
+        raise HTTPException(422, {"error": "文档 metadata 无效", "details": detail}) from exc
+    _tool_manager._cache.clear()
     total = await kb.doc_count_async()
     return {"message": f"成功导入 {count} 个文档片段", "added_chunks": count, "total_chunks": total}
 
@@ -538,12 +649,23 @@ async def upload_knowledge(file: UploadFile = File(...)):
                 raise HTTPException(400, "JSON 文件应为数组格式: [{title, content}, ...]")
         except _json.JSONDecodeError as e:
             raise HTTPException(400, f"JSON 解析失败: {e}")
+        for doc in docs:
+            if not isinstance(doc, dict):
+                raise HTTPException(422, "JSON 文档必须是对象")
+            doc.setdefault("source", f"upload:{filename}")
+            doc.setdefault("doc_type", "guide")
     else:
         # txt / md：整个文件作为一篇文档
         title = filename.rsplit(".", 1)[0] if "." in filename else filename
-        docs = [{"title": title, "content": text}]
+        docs = [{"title": title, "content": text, "source": f"upload:{filename}",
+                 "doc_type": "guide"}]
 
-    count = await kb.add_documents_async(docs)
+    try:
+        count = await kb.add_documents_async(docs)
+    except (ValidationError, ValueError) as exc:
+        detail = exc.errors(include_input=False, include_context=False) if isinstance(exc, ValidationError) else str(exc)
+        raise HTTPException(422, {"error": "文档 metadata 无效", "details": detail}) from exc
+    _tool_manager._cache.clear()
     total = await kb.doc_count_async()
     return {
         "message": f"文件 {filename} 导入成功",
@@ -616,7 +738,7 @@ async def run_eval(body: Optional[EvalRunInput] = None):
 # ── 交互式 CLI ────────────────────────────────────────────────────────────────
 async def _cli():
     print(BANNER)
-    print("EchoMind CLI — 输入 quit 退出\n")
+    print("CartCare CLI — 输入 quit 退出\n")
 
     from agents.agent_orchestrator import AgentOrchestrator, Request
     from memory.conversation_memory import MemoryManager, MsgRole
@@ -650,10 +772,10 @@ async def _cli():
         try:
             msg = input("你: ").strip()
         except (EOFError, KeyboardInterrupt):
-            print("\n再见 ʕ•ᴥ•ʔ")
+            print("\n再见")
             break
         if not msg or msg.lower() in ("quit", "exit", "退出"):
-            print("再见 ʕ•ᴥ•ʔ")
+            print("再见")
             break
 
         ctx = await mem.get_context(user_id, conv_id, query=msg)
@@ -667,7 +789,7 @@ async def _cli():
         await mem.add_message(user_id, conv_id, MsgRole.USER, msg)
         await mem.add_message(user_id, conv_id, MsgRole.ASSISTANT, result.response)
 
-        print(f"\nEchoMind [{result.agent_type.value}]: {result.response}\n")
+        print(f"\nCartCare [{result.agent_type.value}]: {result.response}\n")
 
     await mem.close()
 

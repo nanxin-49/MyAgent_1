@@ -516,7 +516,7 @@ def _markdown_report(raw: Dict[str, Any]) -> str:
     metrics = raw["metrics"]
     results = raw["cases"]
     lines = [
-        "# EchoMind As-Is Baseline Report",
+        "# CartCare As-Is Baseline Report",
         "",
         "> 本报告由 evaluation/run_baseline.py 生成。固定 Case 通过真实 HTTP POST /chat 运行；服务不可用时保留 BLOCKED，不用 Mock 结果替代。",
         "",
@@ -649,8 +649,8 @@ def _markdown_report(raw: Dict[str, Any]) -> str:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Run EchoMind As-Is baseline against POST /chat")
-    parser.add_argument("--base-url", default="http://localhost:8000", help="EchoMind API base URL")
+    parser = argparse.ArgumentParser(description="Run CartCare As-Is baseline against POST /chat")
+    parser.add_argument("--base-url", default="http://localhost:8000", help="CartCare API base URL")
     parser.add_argument("--cases", type=Path, default=CASES_PATH)
     parser.add_argument("--output-dir", type=Path, default=REPORT_DIR)
     parser.add_argument("--timeout", type=float, default=90.0)

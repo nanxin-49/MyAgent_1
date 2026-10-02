@@ -1,0 +1,27 @@
+{
+  "request_id": "82c035f9",
+  "checks": {
+    "real_chat_response": true,
+    "retrieval_status_usable": true,
+    "retrieval_hits_present": true,
+    "citations_present": true,
+    "knowledge_used": true,
+    "citation_matches_hit": true,
+    "grounded_fact": true,
+    "citation_in_final_answer": true
+  },
+  "all_passed": true,
+  "citations": [
+    {
+      "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+      "document_id": "doc_8450205ee234ce108cbd",
+      "chunk_index": 0,
+      "source": "demo:cartcare-default/refund-policy",
+      "policy_version": "refund-cancel-v1"
+    }
+  ],
+  "hit_count": 1,
+  "retrieval_status": "usable",
+  "threshold": 0.35,
+  "environment": "local API, real model, Chroma HTTP, demo knowledge"
+}

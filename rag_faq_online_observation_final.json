@@ -1,0 +1,259 @@
+[
+  {
+    "case_id": "faq_policy",
+    "captured_at": "2026-10-02T07:04:47.532520+00:00",
+    "base_url": "http://127.0.0.1:8003",
+    "run_id": "1d0f4daad2",
+    "user_id": "customer-1",
+    "message": "退款政策是什么？",
+    "mode": "online_chat_demo_backend",
+    "chat": {
+      "conv_id": "t09-1d0f4daad2-faq_policy",
+      "request_id": "82c035f9",
+      "response": "# 退款政策说明\n\n以下内容来自知识库中的退款政策文档（版本 `refund-cancel-v1`，演示用途），供你参考：\n\n## 一、当前可判断的政策要点\n\n- **申请时限**：订单创建后 **7 天内**、且订单状态符合要求时，可以请求退款。\n- **退款金额上限**：退款金额 **不能超过订单总额**；并且退款金额以**实际支付金额**和平台规则为准，不是订单原价。\n- **审批门槛**：退款金额 **超过 500 元** 需要 **人工审批**。\n- **最终结果**：退款请求是否可执行，由**实时订单事实和 PolicyEngine 决定**，不是提交即成功。\n\n## 二、需要核验的信息（目前尚未提供）\n\n你的会话中暂未提供订单号与金额，因此我还无法判断你具体这笔能否退款。请补充：\n\n1. **订单号或交易号**\n2. **支付金额与币种**（如使用了优惠券/余额，请一并说明）\n3. **支付时间**\n4. **支付渠道**（微信 / 支付宝 / 银行卡 / 企业转账 / 余额）\n5. **你的期望**：全额退款 / 部分退款 / 其他\n\n## 三、下一步处理路径\n\n1. 你提供订单号后，我可以协助查询订单状态与退款状态，核对是否符合上述条件。\n2. 符合条件且金额未超阈值 → 可提交退款申请，进入核验流程。\n3. 超过 500 元、涉及已使用服务/虚拟商品/活动价/企业合同/部分退款 → **需人工审核**，我无法在此直接承诺结果。\n\n## 四、时效边界（重要）\n\n- 退款**通过后通常原路退回**，但**不同支付渠道处理时间不同**，以支付渠道实际处理为准。\n- 关于具体到账天数，本次知识库检索**未返回可核实的信息**（检索结果低置信度），因此**我不能给出确定的到账时效**，建议以人工核实为准。\n- 我**不能承诺**退款一定成功、立即到账或无条件补偿。\n\n---\n\n如果你把**订单号**发给我，我可以立刻帮你查询这笔订单的当前状态，再判断下一步怎么走。\n\n知识库引用：doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+      "intent": "refund",
+      "intent_group": "billing",
+      "agent_type": "billing",
+      "agent_types": [
+        "billing"
+      ],
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "tools_used": [
+        "search_knowledge_base",
+        "search_knowledge_base"
+      ],
+      "routing_reason": "intent=refund, group=billing, primary=billing, supporting=none, scores=[billing=0.93, general=0.10, technical=0.00]",
+      "routing_confidence": 0.93,
+      "escalated": false,
+      "latency_ms": 9532.0,
+      "knowledge_used": true,
+      "retrieval_status": "usable",
+      "citations": [
+        {
+          "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+          "document_id": "doc_8450205ee234ce108cbd",
+          "chunk_index": 0,
+          "source": "demo:cartcare-default/refund-policy",
+          "policy_version": "refund-cancel-v1"
+        }
+      ],
+      "entities": {
+        "order_id": [],
+        "product": [],
+        "date": [],
+        "amount": [],
+        "error_code": []
+      },
+      "intent_confidence": 0.715,
+      "intent_source_scores": {
+        "llm": 0.95,
+        "embedding": 0.3779644730092272,
+        "pattern": 0.5
+      }
+    },
+    "request_id": "82c035f9",
+    "trace": {
+      "request_id": "82c035f9",
+      "timestamp": "2026-10-02T15:04:58.512915",
+      "intent": "refund",
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "tools_used": [
+        "search_knowledge_base",
+        "search_knowledge_base"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "82c035f9",
+          "agent_type": "billing",
+          "tool_name": "search_knowledge_base",
+          "risk_level": "read",
+          "tool_use_id": "call_00_bXY3d0DmZqK8eRSw0TQe5405",
+          "input": {
+            "query": "退款政策 退款规则 退款条件",
+            "top_k": 5
+          },
+          "validated_input": {
+            "query": "退款政策 退款规则 退款条件",
+            "top_k": 5
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 2938.0,
+          "cached": false,
+          "reranked": true,
+          "retrieval_status": "usable",
+          "citations": [
+            {
+              "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+              "document_id": "doc_8450205ee234ce108cbd",
+              "chunk_index": 0,
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1"
+            }
+          ],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": [
+            {
+              "document_id": "doc_8450205ee234ce108cbd",
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1",
+              "chunk_index": 0,
+              "score": 0.5741148402117935,
+              "content": "CartCare 模拟客服政策说明，仅用于演示。订单创建后 7 天内、订单状态符合要求时可以请求退款。退款金额不能超过订单总额；超过 500 元需人工审批。退款请求是否可执行由实时订单事实和 PolicyEngine 决定。此文档不代表真实商城承诺或支付渠道处理时效。",
+              "citation": {
+                "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+                "document_id": "doc_8450205ee234ce108cbd",
+                "chunk_index": 0,
+                "source": "demo:cartcare-default/refund-policy",
+                "policy_version": "refund-cancel-v1"
+              }
+            }
+          ],
+          "error": ""
+        },
+        {
+          "request_id": "82c035f9",
+          "agent_type": "billing",
+          "tool_name": "search_knowledge_base",
+          "risk_level": "read",
+          "tool_use_id": "call_01_1V79vxFPSI1Q4MLgDAne4960",
+          "input": {
+            "query": "退款到账时效 原路退回 退款流程",
+            "top_k": 3
+          },
+          "validated_input": {
+            "query": "退款到账时效 原路退回 退款流程",
+            "top_k": 3
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "low_confidence",
+          "error_type": "tool",
+          "retryable": false,
+          "latency_ms": 2015.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": "low_confidence",
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": [],
+          "error": "RAG retrieval status: low_confidence"
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 9532.0
+    },
+    "tool_traces": [
+      {
+        "request_id": "82c035f9",
+        "agent_type": "billing",
+        "tool_name": "search_knowledge_base",
+        "risk_level": "read",
+        "tool_use_id": "call_00_bXY3d0DmZqK8eRSw0TQe5405",
+        "input": {
+          "query": "退款政策 退款规则 退款条件",
+          "top_k": 5
+        },
+        "validated_input": {
+          "query": "退款政策 退款规则 退款条件",
+          "top_k": 5
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 2938.0,
+        "cached": false,
+        "reranked": true,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+            "document_id": "doc_8450205ee234ce108cbd",
+            "chunk_index": 0,
+            "source": "demo:cartcare-default/refund-policy",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": [
+          {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "source": "demo:cartcare-default/refund-policy",
+            "policy_version": "refund-cancel-v1",
+            "chunk_index": 0,
+            "score": 0.5741148402117935,
+            "content": "CartCare 模拟客服政策说明，仅用于演示。订单创建后 7 天内、订单状态符合要求时可以请求退款。退款金额不能超过订单总额；超过 500 元需人工审批。退款请求是否可执行由实时订单事实和 PolicyEngine 决定。此文档不代表真实商城承诺或支付渠道处理时效。",
+            "citation": {
+              "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+              "document_id": "doc_8450205ee234ce108cbd",
+              "chunk_index": 0,
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1"
+            }
+          }
+        ],
+        "error": ""
+      },
+      {
+        "request_id": "82c035f9",
+        "agent_type": "billing",
+        "tool_name": "search_knowledge_base",
+        "risk_level": "read",
+        "tool_use_id": "call_01_1V79vxFPSI1Q4MLgDAne4960",
+        "input": {
+          "query": "退款到账时效 原路退回 退款流程",
+          "top_k": 3
+        },
+        "validated_input": {
+          "query": "退款到账时效 原路退回 退款流程",
+          "top_k": 3
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "low_confidence",
+        "error_type": "tool",
+        "retryable": false,
+        "latency_ms": 2015.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": "low_confidence",
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": [],
+        "error": "RAG retrieval status: low_confidence"
+      }
+    ],
+    "routing": {
+      "primary_agent": "billing",
+      "supporting_agents": [],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false
+    },
+    "rag": {
+      "status": "usable",
+      "citations": [
+        {
+          "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+          "document_id": "doc_8450205ee234ce108cbd",
+          "chunk_index": 0,
+          "source": "demo:cartcare-default/refund-policy",
+          "policy_version": "refund-cancel-v1"
+        }
+      ]
+    },
+    "policy_action": [],
+    "elapsed_ms": 11000.0
+  }
+]

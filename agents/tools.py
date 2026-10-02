@@ -21,6 +21,18 @@ import json
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, List, Optional, TYPE_CHECKING, Union
 
+from core.tool_contract import RetryPolicy, RiskLevel
+
+from providers import (
+    InventoryProvider,
+    LogisticsProvider,
+    OrderProvider,
+    ProductProvider,
+    ProviderError,
+    RefundProvider,
+)
+from providers.interfaces import BusinessBackend
+
 if TYPE_CHECKING:
     from agents.agent_orchestrator import Request
 
@@ -36,6 +48,10 @@ class AgentToolSpec:
     description: str
     input_schema: Dict[str, Any]
     handler: AgentToolHandler
+    risk_level: RiskLevel = RiskLevel.READ
+    timeout_s: float | None = 30.0
+    retry_policy: RetryPolicy = RetryPolicy()
+    idempotent: bool = True
 
 
 def make_tool(
@@ -44,6 +60,10 @@ def make_tool(
     properties: Dict[str, Any],
     handler: AgentToolHandler,
     required: Optional[List[str]] = None,
+    risk_level: RiskLevel = RiskLevel.READ,
+    timeout_s: float | None = 30.0,
+    retry_policy: RetryPolicy = RetryPolicy(),
+    idempotent: bool = True,
 ) -> AgentToolSpec:
     """创建带 JSON Schema 的 Agent 工具。"""
     return AgentToolSpec(
@@ -56,6 +76,10 @@ def make_tool(
             "additionalProperties": False,
         },
         handler=handler,
+        risk_level=risk_level,
+        timeout_s=timeout_s,
+        retry_policy=retry_policy,
+        idempotent=idempotent,
     )
 
 
@@ -180,22 +204,29 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
     async def search_knowledge_base(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
         query = str(args.get("query") or req.message or "").strip()
         top_k = int(args.get("top_k", 5) or 5)
-        if not query:
-            return {"success": False, "error": "query 不能为空", "results": []}
+        if not query or top_k < 1:
+            return {"success": False, "error_code": "invalid_arguments", "error": "query 不能为空且 top_k 必须大于 0",
+                    "retrieval_status": "no_answer", "results": [], "citations": []}
         if tool_manager is None:
-            return {"success": False, "error": "RAG 工具未初始化", "results": []}
+            return {"success": False, "error_code": "dependency_failure", "error": "RAG 工具未初始化",
+                    "retrieval_status": "degraded", "results": [], "citations": []}
 
         result = await tool_manager.search_with_rewrite(
             "knowledge_search",
             query,
             top_k=top_k,
         )
-        if not getattr(result, "success", False):
+        status = getattr(result, "retrieval_status", None) or "degraded"
+        if not getattr(result, "success", False) or status != "usable":
             return {
                 "success": False,
                 "query": query,
-                "error": getattr(result, "error", "知识库检索失败"),
+                "error": getattr(result, "error", None) or "没有可靠的知识库依据",
+                "error_code": getattr(result, "error_code", None) or status,
+                "retrieval_status": status,
                 "results": [],
+                "citations": [],
+                "answer_guidance": "不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。",
                 "reranked": False,
             }
 
@@ -204,6 +235,8 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             "query": query,
             "top_k": top_k,
             "results": result.data,
+            "citations": getattr(result, "citations", []),
+            "retrieval_status": "usable",
             "reranked": bool(getattr(result, "reranked", False)),
         }
 
@@ -212,15 +245,188 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             "search_knowledge_base",
             "检索知识库并返回最相关的文档片段；可用于通用、技术、账单和升级场景。",
             {
-                "query": {"type": "string", "description": "用户问题或检索关键词"},
+                "query": {"type": "string", "description": "用户问题或检索关键词", "minLength": 1},
                 "top_k": {"type": "integer", "description": "返回结果条数"},
             },
             search_knowledge_base,
             required=["query"],
+            retry_policy=RetryPolicy(max_attempts=2),
         )
     }
 
 
+def _business_tool_success(tool_name: str, value: Any) -> Dict[str, Any]:
+    """Serialize a validated Provider model into the stable Agent tool result."""
+    return {
+        "success": True,
+        "tool_name": tool_name,
+        "data": value.model_dump(mode="json"),
+        "source": "business_provider",
+    }
+
+
+def _business_tool_error(tool_name: str, error: ProviderError) -> Dict[str, Any]:
+    """Expose typed Provider failures without leaking backend implementation details."""
+    return {
+        "success": False,
+        "tool_name": tool_name,
+        "data": None,
+        "source": "business_provider",
+        "error": error.to_dict(),
+    }
+
+
+def build_business_tools(backend: BusinessBackend) -> Dict[str, AgentToolSpec]:
+    """Build read-only business tools over injected Provider implementations.
+
+    The backend is deliberately injected at the composition root. Tool handlers
+    never read fixtures or storage directly, and customer ownership always comes
+    from the authenticated request identity represented by ``Request.user_id``.
+    """
+    product_provider = ProductProvider(backend)
+    order_provider = OrderProvider(backend)
+    inventory_provider = InventoryProvider(backend)
+    logistics_provider = LogisticsProvider(backend)
+    refund_provider = RefundProvider(backend)
+
+    def run(tool_name: str, operation: Callable[[], Any]) -> Dict[str, Any]:
+        try:
+            return _business_tool_success(tool_name, operation())
+        except ProviderError as exc:
+            return _business_tool_error(tool_name, exc)
+
+    def get_product(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run("get_product", lambda: product_provider.get_product(args["product_id"]))
+
+    def get_order(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "get_order",
+            lambda: order_provider.get_order(args["order_id"], customer_id=req.user_id),
+        )
+
+    def get_shipment(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "get_shipment",
+            lambda: logistics_provider.get_shipment(args["order_id"], customer_id=req.user_id),
+        )
+
+    def check_inventory(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "check_inventory",
+            lambda: inventory_provider.get_inventory(args["product_id"]),
+        )
+
+    def get_refund_status(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return run(
+            "get_refund_status",
+            lambda: refund_provider.get_refund_for_order(
+                args["order_id"], customer_id=req.user_id
+            ),
+        )
+
+    identifier = lambda description: {
+        "type": "string",
+        "description": description,
+        "minLength": 1,
+    }
+    return {
+        "get_product": make_tool(
+            "get_product",
+            "读取商品基础信息；数据来自 Business Provider 的测试/演示 backend。",
+            {"product_id": identifier("商品 SKU")},
+            get_product,
+            required=["product_id"],
+        ),
+        "get_order": make_tool(
+            "get_order",
+            "读取当前客户自己的订单状态和明细；customer_id 由请求身份确定。",
+            {"order_id": identifier("订单号")},
+            get_order,
+            required=["order_id"],
+        ),
+        "get_shipment": make_tool(
+            "get_shipment",
+            "读取当前客户自己的订单物流状态；customer_id 由请求身份确定。",
+            {"order_id": identifier("订单号")},
+            get_shipment,
+            required=["order_id"],
+        ),
+        "check_inventory": make_tool(
+            "check_inventory",
+            "读取商品库存快照；不会修改库存。",
+            {"product_id": identifier("商品 SKU")},
+            check_inventory,
+            required=["product_id"],
+        ),
+        "get_refund_status": make_tool(
+            "get_refund_status",
+            "读取当前客户订单的退款状态；不会创建或执行退款。",
+            {"order_id": identifier("订单号")},
+            get_refund_status,
+            required=["order_id"],
+        ),
+    }
+
+
+def build_action_tools(action_service: Any) -> Dict[str, AgentToolSpec]:
+    """Build request-only sensitive action tools over the ActionService.
+
+    The handlers never accept user identity or eligibility from the model. They
+    derive identity from ``Request.user_id`` and delegate policy, idempotency,
+    approval, and execution control to the injected service.
+    """
+
+    def request_refund(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return action_service.request_refund(
+            order_id=args["order_id"],
+            user_id=req.user_id,
+            request_id=req.request_id,
+            amount=args.get("amount"),
+            idempotency_key=args.get("idempotency_key"),
+        ).to_tool_result()
+
+    def request_cancel_order(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
+        return action_service.request_cancel(
+            order_id=args["order_id"],
+            user_id=req.user_id,
+            request_id=req.request_id,
+            idempotency_key=args.get("idempotency_key"),
+        ).to_tool_result()
+
+    identifier = lambda description: {
+        "type": "string",
+        "description": description,
+        "minLength": 1,
+    }
+    return {
+        "request_refund": make_tool(
+            "request_refund",
+            "请求退款；必须经过 Provider、Policy 和 ActionService，可能需要审批，不保证立即执行。",
+            {
+                "order_id": identifier("订单号"),
+                "amount": {"type": "number", "description": "可选退款金额"},
+                "idempotency_key": identifier("可选的重复请求幂等键"),
+            },
+            request_refund,
+            required=["order_id"],
+            risk_level=RiskLevel.DANGEROUS,
+            timeout_s=None,
+            idempotent=False,
+        ),
+        "request_cancel_order": make_tool(
+            "request_cancel_order",
+            "请求取消订单；必须经过 Provider、Policy 和 ActionService，不代表无条件取消成功。",
+            {
+                "order_id": identifier("订单号"),
+                "idempotency_key": identifier("可选的重复请求幂等键"),
+            },
+            request_cancel_order,
+            required=["order_id"],
+            risk_level=RiskLevel.DANGEROUS,
+            timeout_s=None,
+            idempotent=False,
+        ),
+    }
 def general_tools() -> Dict[str, AgentToolSpec]:
     return {
         "inspect_request_context": make_tool(
