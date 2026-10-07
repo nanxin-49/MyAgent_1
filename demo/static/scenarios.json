@@ -1,0 +1,62 @@
+[
+  {
+    "id": "faq_policy",
+    "label": "FAQ / policy",
+    "message": "退款政策是什么？",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "order_lookup",
+    "label": "Order lookup",
+    "message": "查询我的订单，订单号 ORD-T09-ORDER。",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "logistics_lookup",
+    "label": "Logistics lookup",
+    "message": "物流到哪里了？，订单号 ORD-T09-LOGISTICS。",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "inventory_lookup",
+    "label": "Inventory clarification",
+    "message": "商品还有库存吗？",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "refund_allow",
+    "label": "Refund allow",
+    "message": "退还我的订单，订单号 ORD-T09-REFUND-ALLOW。",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "refund_approval",
+    "label": "Refund require approval",
+    "message": "请现在为我的演示订单 ORD-T09-REFUND-APPROVAL 提交 600 元部分退款申请；如需人工审批就暂停等待审批。",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "refund_deny",
+    "label": "Refund deny",
+    "message": "请现在为已取消的演示订单 ORD-T09-REFUND-DENY 提交退款申请，并告诉我业务规则的决定。",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "cancel_order",
+    "label": "Cancel",
+    "message": "取消我的订单，订单号 ORD-T09-CANCEL。",
+    "user_id": "customer-1"
+  },
+  {
+    "id": "ownership_violation",
+    "label": "Ownership violation",
+    "message": "请尝试取消演示订单 ORD-T09-OWNERSHIP，按系统订单归属核验后处理。",
+    "user_id": "customer-2"
+  },
+  {
+    "id": "unsupported_request",
+    "label": "Unsupported request",
+    "message": "请帮我预订机票",
+    "user_id": "customer-1"
+  }
+]

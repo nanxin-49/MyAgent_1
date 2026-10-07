@@ -10,6 +10,7 @@ import logging
 import os
 import pathlib
 import sys
+import time
 import uuid
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
@@ -23,6 +24,8 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field, ValidationError
 from actions import ActionResult
@@ -236,6 +239,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_DEMO = pathlib.Path(_ROOT) / "demo" / "static"
+app.mount("/demo-assets", StaticFiles(directory=_DEMO), name="demo-assets")
+
+
+@app.get("/demo", include_in_schema=False)
+async def demo_ui():
+    return FileResponse(_DEMO / "index.html")
+
 
 # ── 请求/响应模型 ─────────────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
@@ -337,6 +348,8 @@ async def chat(req: ChatRequest):
     if _orchestrator is None or _memory is None:
         raise HTTPException(503, "服务未就绪")
 
+    request_start = time.monotonic()
+
     from agents.agent_orchestrator import Request as OrcReq
     from memory.conversation_memory import MsgRole
 
@@ -349,6 +362,7 @@ async def chat(req: ChatRequest):
     except RedisError as exc:
         raise HTTPException(status_code=503, detail={"error_code": "memory_unavailable",
             "message": "会话记忆暂不可用"}) from exc
+    read_ms = (time.monotonic() - request_start) * 1000
 
     # 2. 构建客服请求；历史直接提供给 Agent。
     history = [
@@ -369,12 +383,37 @@ async def chat(req: ChatRequest):
     # 3. 执行
     result = await _orchestrator.run(orch_req)
 
+    # Extend the existing bounded trace with counts, never raw memory or prompts.
+    trace = _orchestrator.get_tool_trace(result.request_id)
+    memory_observation = {
+        "read_status": "completed", "read_latency_ms": round(read_ms, 1),
+        "recent_message_count": len(mem_ctx.recent_messages),
+        "relevant_history_count": len(getattr(mem_ctx, "relevant_history", [])),
+        "profile_field_count": len(getattr(mem_ctx, "user_profile", {})),
+        "summary_present": bool(getattr(mem_ctx, "summary", "")),
+        "write_status": "started", "profile_update_status": "not_scheduled",
+    }
+    if trace is not None:
+        trace["memory"] = memory_observation
+
     # 4. 写入记忆
-    await _memory.add_message(req.user_id, conv_id, MsgRole.USER, req.message)
-    await _memory.add_message(req.user_id, conv_id, MsgRole.ASSISTANT, result.response)
+    write_start = time.monotonic()
+    try:
+        await _memory.add_message(req.user_id, conv_id, MsgRole.USER, req.message)
+        await _memory.add_message(req.user_id, conv_id, MsgRole.ASSISTANT, result.response)
+        memory_observation["write_status"] = "completed"
+    except Exception:
+        memory_observation["write_status"] = "failed"
+        raise
+    finally:
+        memory_observation["write_latency_ms"] = round((time.monotonic() - write_start) * 1000, 1)
 
     # 5. 异步更新用户画像（不阻塞响应）
     asyncio.create_task(_memory.update_profile(req.user_id, conv_id))
+    memory_observation["profile_update_status"] = "scheduled_unobserved"
+    if trace is not None:
+        trace["request_latency_ms"] = round((time.monotonic() - request_start) * 1000, 1)
+        trace["latency_scope"] = "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
 
     retrieval_status, citations = collect_rag_evidence(result.tool_traces)
     return ChatResponse(

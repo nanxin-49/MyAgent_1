@@ -28,6 +28,8 @@ Agent 负责理解、澄清、参数收集、选择工具和生成回复。生�
 
 ## 为什么简化
 
+T10 是 controlled demo workload，3 × 10 cases / topology，not production benchmark；表中延迟不是生产 SLA。
+
 T10 已验收 done。[完整报告](../evaluation/reports/t10_topology_comparison.md)保留三轮各十场景的原始证据。
 
 | 指标 | Multi（30） | Single（30） |
@@ -49,3 +51,11 @@ Multi 的最终样本未使用 supporting Agent 或 Composer；当前电商 work
 历史 T09 10 场景基线保持原样（intent 7/10、tool selection 7/10、arguments 6/6、unnecessary cases 5/10、strict E2E 6/10），不能与新 citation contract 直接混算。其他 Wiki 中的 Multi 描述属于历史材料，本文件与重点代码是当前权威说明。
 
 历史 [真实 Memory 验收](../evaluation/reports/support_production/memory_acceptance.md)记录旧实现的短期集成结果。T11 [新验收](../evaluation/reports/t11_memory_acceptance.md)保留原 16 项检查，新增演示订单状态变化后再次调用 Provider、异步偏好写入真实 Chroma，共 18/18；真实 Redis/Chroma 可选集成测试覆盖压缩、长期记录隔离与删除。Redis 读取故障返回 503 且 Agent 不执行。演示 user_id 仍非正式身份认证；长期记录按有效期读取，但物理过期清理尚未自动调度。
+
+## 演示与可观察性（T12）
+
+同源 `/demo` 是轻量静态展示层，十场景按钮仅填入用户消息；真实输出来自 `/chat`、`/trace/tool/{request_id}` 与既有 ActionService API。LLM 选择工具，Provider 提供事实，确定性 Policy 控制允许/拒绝/审批；UI 不补造工具结果或审批逻辑。
+
+引用卡片关联 Trace 的文档标题、source、reference 与 policy_version；非 usable 状态不显示为可靠 citation。动作卡片区分原始请求快照与最新 ActionResult，Approve 可能直接完成执行。Memory 只展示计数、摘要存在标志、读写状态和阶段耗时，后台画像标为 scheduled_unobserved；不展示原始记忆或隐藏推理。
+
+Trace 为进程内有界记录，早期 Memory 读失败无 Agent Trace；演示身份、内存 PendingAction、字符 n-gram 词面基线、unsupported 升级、外部商城/支付未接入和长期过期记录无后台物理清理等限制见当前 README。T11 18/18 是演示环境验收，不能代表生产规模稳定性。T12 等待用户验收。
