@@ -58,4 +58,4 @@ Multi 的最终样本未使用 supporting Agent 或 Composer；当前电商 work
 
 引用卡片关联 Trace 的文档标题、source、reference 与 policy_version；非 usable 状态不显示为可靠 citation。动作卡片区分原始请求快照与最新 ActionResult，Approve 可能直接完成执行。Memory 只展示计数、摘要存在标志、读写状态和阶段耗时，后台画像标为 scheduled_unobserved；不展示原始记忆或隐藏推理。
 
-Trace 为进程内有界记录，早期 Memory 读失败无 Agent Trace；演示身份、内存 PendingAction、字符 n-gram 词面基线、unsupported 升级、外部商城/支付未接入和长期过期记录无后台物理清理等限制见当前 README。T11 18/18 是演示环境验收，不能代表生产规模稳定性。T12 等待用户验收。
+Trace 为进程内有界记录，早期 Memory 读失败无 Agent Trace；演示身份、内存 PendingAction、字符 n-gram 词面基线、unsupported 升级、外部商城/支付未接入和长期过期记录无后台物理清理等限制见当前 README。T11 18/18 是演示环境验收，不能代表生产规模稳定性。T12 已于 2026-10-07 经用户验收 done。

@@ -1,6 +1,6 @@
 # T12 · Trace / Demo UI / README finishing
 
-状态建议：**verify**，等待用户最终验收。T01–T11 按本轮用户确认保持 done。
+最终状态：**done**，2026-10-07 用户已验收并授权通过完整阶段 PR 合入 main。T01–T11 按本轮用户确认保持 done。
 
 ## Changed files
 
@@ -91,6 +91,6 @@ README、Workbench/progress、两份核心 Wiki 已更新。Workbench 原 Memory
 
 ## Suggested task state / commit
 
-**T12 = verify**，实现与测试完成，等待用户验收后再标 done。
+**T12 = done**，实现与测试完成，2026-10-07 用户已确认验收。
 
 `feat(demo): finish trace UI and CartCare documentation`
