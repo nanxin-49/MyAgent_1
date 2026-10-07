@@ -18,7 +18,8 @@ from dotenv import load_dotenv
 from evaluation.capture_online_eval import _request
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORT = ROOT / "evaluation/reports/support_production/memory_acceptance.json"
+REPORT = Path(os.getenv("CARTCARE_MEMORY_ACCEPTANCE_REPORT",
+    str(ROOT / "evaluation/reports/support_production/memory_acceptance.json")))
 
 
 def _loopback_redis_url(configured: str) -> str:
@@ -82,8 +83,15 @@ async def run():
         # Fresh session; first turn must read the actual demo order and persist two messages.
         before = await api._memory.get_context(user_a, conv_a)
         checks["fresh_context_empty"] = not before.recent_messages and not before.relevant_history
-        first, first_trace = await _post(base, "查询我的订单 ORD-T09-LOGISTICS。", user_a, conv_a)
+        first, first_trace = await _post(base, "查询我的订单 ORD-T09-LOGISTICS。请用中文回复。", user_a, conv_a)
         stored = await api._memory.get_context(user_a, conv_a)
+        profile = {}
+        for _ in range(20):
+            profile = await api._memory._get_profile(user_a)
+            if profile:
+                break
+            await asyncio.sleep(.1)
+        checks["async_profile_explicit_preference"] = profile.get("preferences") == {"reply_language": "中文"}
         checks["first_order_lookup"] = any(t.get("tool_name") == "get_order" and
             (t.get("business_result") or {}).get("order_id") == "ORD-T09-LOGISTICS"
             for t in first_trace["tool_calls"])
@@ -98,6 +106,15 @@ async def run():
             for t in second_trace["tool_calls"])
         after_second = await api._memory.get_context(user_a, conv_a)
         checks["two_turns_persisted"] = len(after_second.recent_messages) == 4
+
+        # Change only this run's copied demo backend. The old assistant reply is now stale.
+        api._action_service._business_backend._data["orders"]["ORD-T09-LOGISTICS"]["status"] = "delivered"
+        refreshed, refreshed_trace = await _post(base,
+            "刚才那个订单现在是否已发货？请重新查询订单状态。", user_a, conv_a)
+        checks["dynamic_order_fact_refreshed"] = any(t.get("tool_name") == "get_order" and
+            t.get("validated_input", {}).get("order_id") == "ORD-T09-LOGISTICS" and
+            (t.get("business_result") or {}).get("status") == "delivered"
+            for t in refreshed_trace["tool_calls"])
 
         # Same user, new session; different user, same session key. Neither gets the first turn.
         same_user_other_session = await api._memory.get_context(user_a, conv_b)
@@ -128,24 +145,30 @@ async def run():
         finally:
             api._memory._redis = original_client
             await broken.aclose()
-        checks["redis_failure_fails_closed"] = failure_status == 500
+        checks["redis_failure_fails_closed"] = failure_status == 503
         checks["redis_failure_did_not_run_agent"] = len(api._orchestrator.get_recent_tool_traces(200)) == trace_count_before_failure
         checks["redis_recovery"] = (await api._memory.get_context(user_a, conv_a)).recent_messages != []
         observations = {"first_tools": first["tools_used"], "second_tools": second["tools_used"],
+            "refreshed_tools": refreshed["tools_used"],
             "isolated_tools": isolated["tools_used"], "first_order_ids": _tool_order_ids(first_trace),
             "second_order_ids": _tool_order_ids(second_trace), "isolated_order_ids": _tool_order_ids(isolated_trace),
             "redis_failure_http_status": failure_status, "messages_after_second": len(after_second.recent_messages)}
     finally:
         server.should_exit = True
         await server_task
-        for user, conv in ((user_a, conv_a), (user_a, conv_b), (user_b, conv_a)):
-            await redis_client.delete(f"wm:{user}:{conv}", f"summary:{user}:{conv}")
-        await redis_client.aclose()
+        try:
+            for user, conv in ((user_a, conv_a), (user_a, conv_b), (user_b, conv_a)):
+                await redis_client.delete(f"wm:{user}:{conv}", f"summary:{user}:{conv}")
+        except redis.RedisError:
+            pass  # Preserve the original dependency failure; test keys have a 24h TTL.
+        finally:
+            await redis_client.aclose()
         # Profile updates may have run asynchronously. Remove only our unique test users.
         try:
             import chromadb
             collection = chromadb.HttpClient(host="127.0.0.1", port=8001,
-                settings=chromadb.Settings(anonymized_telemetry=False)).get_collection("user_profile")
+                settings=chromadb.Settings(anonymized_telemetry=False)).get_collection(
+                    MemoryManager.PROFILE_COLLECTION)
             for user in (user_a, user_b):
                 collection.delete(ids=[f"user_profile:{user}"])
         except Exception:
@@ -157,17 +180,19 @@ async def run():
     report = {"mode": "actual HTTP /chat + real MemoryManager + running Redis/Chroma + real model",
               "checks": checks, "observations": observations,
               "scope": "Isolated demo users and copied fixture; no business module or prompt changes.",
-              "failure_contract": "Redis read failure propagates as HTTP 500; no Agent/tool execution or fabricated reply."}
+              "failure_contract": "Redis read failure returns HTTP 503; no Agent/tool execution or fabricated reply."}
     REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    lines = ["# Production Single: real Memory acceptance", "",
-        "Actual localhost HTTP `/chat` with the unchanged MemoryManager, running Redis/Chroma and real model.",
+    lines = ["# T11: real Memory acceptance", "",
+        "Actual localhost HTTP `/chat` with the T11 MemoryManager, running Redis/Chroma and real model.",
         "A copied demo business fixture uses isolated test customers; their Redis keys and profile records are removed after the run.",
         "", "| Check | Result |", "|---|---|"]
     lines.extend(f"| {name} | {'PASS' if passed else 'FAIL'} |" for name, passed in checks.items())
     lines += ["", "The second turn called `get_shipment` with the order ID from the first turn and returned the matching demo shipment.",
+        "After the copied demo order changed from shipped to delivered, a later turn called `get_order` again and observed the fresh Provider status.",
+        "An explicit response-language preference was written by the asynchronous profile update and read back from the real Chroma collection.",
         "The other user saw no order ID from the first conversation. OpenAPI marks old routing fields nullable and deprecated; response and trace return null.",
-        "A Redis connection failure returned HTTP 500 before Agent execution; restoring Redis recovered the original session. The existing error is generic HTTP 500, without a typed dependency response.",
-        "Compression, long-term episodic retrieval and profile quality were outside this acceptance. See memory_acceptance.json for check values and tool observations."]
+        "A Redis connection failure returned typed HTTP 503 before Agent execution; restoring Redis recovered the original session.",
+        "Compression, long-term retrieval and profile metadata are tested separately with a real Redis/Chroma opt-in test. See the adjacent JSON for check values and tool observations."]
     REPORT.with_suffix(".md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return int(not all(checks.values()))

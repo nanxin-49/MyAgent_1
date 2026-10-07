@@ -33,7 +33,7 @@ Monitor 和 Eval 也不在每次 /chat 内同步运行：Monitor 在后台采集
 - **Tool Contract**：`core/tool_contract.py` 为 Agent Tools 与本地 RAG ToolManager 提供同一套严格参数校验、read/write/dangerous 风险分级、typed execution result、超时和重试规则；只有幂等读工具的可重试失败才由 Tool Runtime 自动重试。敏感动作仍由 ActionService 控制。
 - **Business Provider**：providers/ 定义 Product、Order、Inventory、Logistics、Refund 的结构化只读 Provider 和 Backend Protocol；Agent Tools 只依赖 Provider，当前通过 API lifespan 注入明确标注的 JSON fixture 内存 Mock。
 - **RAG**：`mcp/rag_contract.py` 定义文档 metadata、检索命中和 citation；`mcp/knowledge_embeddings.py` 为小型演示知识库提供版本化字符 n-gram 向量（词面基线，不是预训练语义模型），导入与查询显式生成同空间向量，经 `chromadb-client` / `HttpClient` 存取；`mcp/tool_manager.py` 保留缓存、超时、熔断、fallback、查询改写和重排。检索状态分为 `usable`、`low_confidence`、`no_answer`、`degraded`，fallback 不产生 citation。该目录是自研工具层，不是标准 MCP SDK/transport 接入。
-- **Memory**：Redis 保存工作记忆，ChromaDB 保存情景摘要和用户画像；每轮 /chat 回写消息，画像更新异步执行。
+- **Memory**：Redis 按用户和会话保存 24 小时工作记忆；达到 15 条时保留最近 5 条和确定性引用摘要。独立 Chroma collection 只保存有来源、有效期的咨询主题（30 天）及用户明确提出的回复偏好（180 天）；动态订单/物流/退款状态始终重新查 Provider。画像更新异步执行。
 - **Monitor / Trace**：/monitor、/metrics 和 /trace/* 暴露运行时统计与工具 trace；Single runtime 不生成路由评分；SDK model calls 统计覆盖 Support 与 RAG，不包含 Memory/profile 与 SDK 内部 HTTP 重试。
 - **Eval**：`/eval/run` 独立运行意图和对话质量评测；`evaluation/run_system_eval.py` 用隔离的演示 fixture 复放确定性 Tool、RAG、Policy、HITL 场景；`evaluation/capture_online_eval.py` 与 `agent_trace_eval.py` 保存、评分真实 `/chat` 和 Tool Trace。2026-09-30 的 10 场景在线样本成功率为 6/10，RAG 检索降级且无 citation；这些演示环境观测不能代表生产效果。LLM-as-Judge 只评相关性、清晰度、完整性、有用性。
 - **Policy Engine**：`policies/` 对 Provider 结构化订单事实给出确定性的退款/取消资格决策（allow / deny / require_approval、reason_code、policy_version）；`refund-cancel-v1` 是示例规则，使用 7 天退款窗口和 500 CNY 自动处理阈值，已由 ActionService 接入模拟执行链。
@@ -174,9 +174,9 @@ docker run --rm --entrypoint python cartcare-dev -m pytest -q
 
 T10 已验收 done；历史报告不改写。Multi / Single 三轮 task success 均 24/30，Single 的工具调用 59 vs 78、模型调用 76 vs 115；该 workload 未使用 supporting Agent 或 Composer。生产 /chat 现使用 Single，旧 Multi 类为历史实验保留，不再用于生产 dispatch。
 
-[生产 HTTP 回归](evaluation/reports/support_production/regression.md)：1 × 10 cases，真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter。task success 8/10，引用 1/1，危险动作 4/5，安全违规 0；不必要调用 3/10，平均 HTTP 延迟 3686.0 ms。样本不能证明长期性能改善，也不验证 Redis/长期 Memory。unsupported escalation、ownership 严格证据缺口及未覆盖的协作任务仍为 follow-up。生产迁移建议 verify，T10 保持 done。
+[生产 HTTP 回归](evaluation/reports/support_production/regression.md)：1 × 10 cases，真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter。task success 8/10，引用 1/1，危险动作 4/5，安全违规 0；不必要调用 3/10，平均 HTTP 延迟 3686.0 ms。样本不能证明长期性能改善，也不验证 Redis/长期 Memory。unsupported escalation、ownership 严格证据缺口及未覆盖的协作任务仍为 follow-up。生产迁移已验收 done，T10 保持 done。
 
 API 新增 topology=single / agent_type=support；primary_agent、supporting_agents、routing_reason、routing_confidence 保留为 nullable deprecated 字段，当前返回 null。intent 相关字段也为空，不伪造 routing accuracy。消费这些旧字段的客户端应迁移到新字段。
 
-真实 Memory 集成验收见 [Memory acceptance](evaluation/reports/support_production/memory_acceptance.md)：未替换 `MemoryManager`，连接项目 Redis 和 Chroma，经 HTTP `/chat` 完成新会话订单查询、同会话第二轮沿用订单号查询物流、用户/会话隔离与 Trace/API 空值检查。Redis 读故障返回 HTTP 500，Agent 未执行，服务恢复后会话可继续读取。此轮仅验证短期工作记忆；压缩、长期情景检索与画像质量仍待专项验证。该 500 为现有通用错误响应，后续可改善为明确的依赖错误。
+历史[生产 Memory 验收](evaluation/reports/support_production/memory_acceptance.md)记录旧实现的 16 项真实 HTTP 检查，原报告不改写。T11 [新验收](evaluation/reports/t11_memory_acceptance.md)保留原 16 项并新增动态状态刷新、异步画像落库，共 18/18：会话沿用订单号，但 Provider 状态变化后再次查询。当前 Redis 读取故障返回明确的 HTTP 503，Agent 不执行。真实 Redis/Chroma 的压缩、隔离、长期记录元数据和删除另由可选集成测试覆盖；测试使用演示身份，不代表正式认证。
 历史 `evaluation/run_baseline.py` 消费新的 Single `/chat` 时，会把 intent/routing 指标标为未观测，避免从 `agent_type=support` 伪造 primary routing；历史 Multi 报告未改写。

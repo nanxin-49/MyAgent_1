@@ -129,13 +129,13 @@
     </section>
 
     <section id="single-migration">
-      <h2>Single Support production migration · verify</h2>
+      <h2>Single Support production migration · done</h2>
       <div class="work-item" data-task="SINGLE_MIGRATION">
-        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="agents/support_agent.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md"></div><div><label class="small">备注</label><textarea data-field="note">独立生产迁移；/chat=Single Support Agent；实际 HTTP 十场景 8/10，安全违规 0。此前十场景回归使用固定空 Memory；后续真实 Redis/MemoryManager 跨轮、隔离、故障和 API/Trace 验收通过。建议 done，待用户确认；长期 Memory 未验证。</textarea></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option selected>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="agents/support_agent.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md"></div><div><label class="small">备注</label><textarea data-field="note">用户已验收生产迁移 done。/chat=Single Support Agent；原十场景回归与 16 项真实 Memory 验收报告保留。T11 为独立的后续 Memory 边界改进。</textarea></div></div>
       </div>
-      <div class="callout">生产 topology = Single Support Agent。T10 保持 done；新迁移待用户验收。旧 Intent dispatch、specialist、supporting Agent、Composer 不再用于 /chat；旧类仅保留历史实验，业务安全层未改变。</div>
+      <div class="callout">生产 topology = Single Support Agent；T10 与生产迁移均已验收 done。旧 Intent dispatch、specialist、supporting Agent、Composer 不再用于 /chat；旧类仅保留历史实验，业务安全层未改变。</div>
       <p>133 passed；实际 HTTP /chat 十场景：task success 8/10、工具选择 9/10、参数 6/6、citation 1/1、dangerous 4/5、安全违规 0、不必要调用 3/10、tool calls 21、SDK calls 25、平均延迟 3686.0 ms。真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter；不验证 Redis/长期 Memory，单轮不能证明稳定性能变化。</p>
-      <p>证据：evaluation/reports/support_production/regression.md。unsupported escalation、ownership strict evidence 和未覆盖协作 workload 保留 follow-up。API topology=single / agent_type=support；旧 routing 字段 nullable deprecated。2026-10-07 真实 Memory 集成验收 16/16 checks 通过；Redis 故障返回现有通用 HTTP 500，Agent 未执行，恢复后会话可读。证据：evaluation/reports/support_production/memory_acceptance.md。</p>
+      <p>证据：evaluation/reports/support_production/regression.md。unsupported escalation、ownership strict evidence 和未覆盖协作 workload 保留 follow-up。API topology=single / agent_type=support；旧 routing 字段 nullable deprecated。历史真实 Memory 集成验收 16/16 checks 通过，旧报告中 Redis 故障为 HTTP 500；T11 新验收 18/18，通过明确的 HTTP 503 保持 fail-closed，并验证动态状态刷新与异步画像落库。证据：evaluation/reports/support_production/memory_acceptance.md 与 evaluation/reports/t11_memory_acceptance.md。</p>
     </section>
 
     <section id="scope">
@@ -265,7 +265,7 @@ Response
 
       <div class="work-item" data-task="T11">
         <div class="work-head"><div><div class="work-title">T11 · Memory 边界重构</div><div class="muted">客服 Agent 不应无限保存用户信息。</div></div><div class="meta"><span class="prio p2">P2</span><span class="owner both">共同</span></div></div>
-        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">保留 session context 与必要摘要；长期 profile 只保存低风险稳定偏好；订单、支付、退款状态不作为长期记忆事实。</textarea></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence" value="memory/conversation_memory.py; memory/policy.py; tests/test_memory_boundary.py; tests/test_memory_live_services.py; evaluation/reports/t11_memory_acceptance.md"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">Redis 工作记忆 24h；15 条压缩至摘要与最近 5 条。长期记录仅保留有来源与有效期的咨询主题、明确回复偏好；过期不读，有内部删除接口。真实 Redis/Chroma 隔离、压缩与删除测试通过；HTTP 原 16 项加动态 Provider 刷新、异步画像落库共 18/18。T11 建议 verify，待用户验收。</textarea></div></div>
       </div>
 
       <div class="work-item" data-task="T12">

@@ -53,9 +53,9 @@
       "note": "三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，实验完成时未做生产迁移；后续独立 Single production migration 为 verify；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。"
     },
     "T11": {
-      "status": "todo",
-      "evidence": "",
-      "note": "保留 session context 与必要摘要；长期 profile 只保存低风险稳定偏好；订单、支付、退款状态不作为长期记忆事实。"
+      "status": "verify",
+      "evidence": "memory/conversation_memory.py; memory/policy.py; tests/test_memory_boundary.py; tests/test_memory_live_services.py; evaluation/reports/t11_memory_acceptance.md",
+      "note": "T11 实现待验收：Redis 工作记忆 24h、15 条压缩至摘要+最近 5 条；长期咨询主题/明确偏好分别 30/180 天，有用户归属、来源和时间元数据，过期不读，内部删除接口可清理。真实 Redis/Chroma 集成测试通过；真实 HTTP /chat 保留原 16 项验收并新增 Provider 动态状态重新查询、异步画像落库，18/18 通过。Redis 读取故障返回 503 且 Agent 未执行。正式身份认证、长期物理过期清理调度不在本任务范围。"
     },
     "T12": {
       "status": "todo",
@@ -63,9 +63,9 @@
       "note": "展示 routing、tool、retrieval citation、policy decision、approval、latency；README 给出 3 个端到端 demo 和量化结果。"
     },
     "SINGLE_MIGRATION": {
-      "status": "verify",
+      "status": "done",
       "evidence": "agents/support_agent.py; api/main.py; tests/test_support_production.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md",
-      "note": "独立生产迁移：/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。实际 HTTP 10 cases task 8/10、citation 1/1、dangerous 4/5、安全违规 0；不必要调用 3/10，不能判断稳定变化。固定空 Memory adapter，不验证 Redis/长期 Memory。遗留失败保留 follow-up，等待用户验收。 2026-10-07 真实 Memory 验收：原有 MemoryManager + Redis/Chroma + HTTP /chat，订单跨轮沿用、用户/会话隔离、API/Trace nullable deprecated、Redis 故障 500 且 Agent 未执行均通过。建议 done，状态保留 verify 等用户确认。长期压缩/画像质量未验证；通用 500 可后续改进。"
+      "note": "用户已验收生产迁移 done。/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。原迁移 HTTP 回归与 16 项真实 Memory 验收报告原样保留；后续 T11 独立改善长期 Memory 与 Redis 故障响应。"
     }
   },
   "decisions": {
@@ -83,6 +83,6 @@
     "d4-body": ""
   },
   "globals": {
-    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。\n生产 topology = Single Support Agent；Single migration verify，T10 done。回归 133 passed；真实 HTTP 十场景 8/10；完整口径见 support_production/regression.md。\n2026-10-07 真实 Memory 验收通过，16/16 checks；见 support_production/memory_acceptance.md。迁移可建议 done；当前任务状态仍为 verify 待用户确认。"
+    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。\n生产 topology = Single Support Agent；Single migration 与 T10 均已由用户验收 done。原十场景回归见 support_production/regression.md；原 16 项 Memory 验收见 support_production/memory_acceptance.md。\nT11 Memory 边界重构建议 verify：完整测试 141 passed、2 skipped；开启真实 Redis/Chroma 可选集成测试时 143 passed；真实 HTTP 18/18（原 16 + 动态状态刷新 + 异步画像落库），见 t11_memory_acceptance.md。"
   }
 }

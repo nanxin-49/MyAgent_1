@@ -343,7 +343,12 @@ async def chat(req: ChatRequest):
     conv_id = req.conv_id or str(uuid.uuid4())
 
     # 1. 读取记忆上下文
-    mem_ctx = await _memory.get_context(req.user_id, conv_id, query=req.message)
+    from redis.exceptions import RedisError
+    try:
+        mem_ctx = await _memory.get_context(req.user_id, conv_id, query=req.message)
+    except RedisError as exc:
+        raise HTTPException(status_code=503, detail={"error_code": "memory_unavailable",
+            "message": "会话记忆暂不可用"}) from exc
 
     # 2. 构建客服请求；历史直接提供给 Agent。
     history = [

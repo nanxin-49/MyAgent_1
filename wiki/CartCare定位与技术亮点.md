@@ -6,7 +6,7 @@ CartCare 是 E-commerce Support Agent，面向 FAQ、政策、商品、订单、
 
 ```text
 POST /chat
-→ MemoryManager.get_context（原有 Redis / Chroma Memory）
+→ MemoryManager.get_context（Redis 工作记忆 / Chroma 筛选的长期记录）
 → SupportRuntime → SingleSupportAgent（BaseAgent，统一工具注册表）
     → RAG：静态 FAQ / 版本化政策
     → Providers：动态业务事实和 ownership
@@ -23,7 +23,7 @@ Agent 负责理解、澄清、参数收集、选择工具和生成回复。生�
 - Tool Contract 保留严格 schema、read/write/dangerous 风险元数据、timeout、retry、typed errors 和 trace。危险动作不能由模型提供 approved 标志绕过控制。
 - 退款和取消由确定性 PolicyEngine 决策；ActionService 管理 PendingAction、审批/拒绝/恢复、执行时二次校验与幂等。LLM 不直接执行业务写入。
 - RAG 经外部 Chroma HTTP 存取；字符 n-gram embedding 是演示词面基线。usable 命中才有可用引用；来源、document_id、policy_version 与 chunk 信息保留。阈值仍为 0.35，fallback 不能作为可靠依据。
-- Memory 架构未修改。Monitor 继续观测工具和 Agent 成功率/延迟；Single 不再计算或反馈路由惩罚。
+- Memory 的工作层按用户/会话隔离并设置 24 小时 TTL；15 条触发确定性压缩，保留最近 5 条、订单号引用及待澄清字段。Chroma 只接收有来源和有效期的咨询主题与明确回复偏好，分别保留 30/180 天；订单、物流、库存和退款状态不进入长期事实。Monitor 继续观测工具和 Agent 成功率/延迟；Single 不再计算或反馈路由惩罚。
 - Trace 标记 topology=single、agent_type=support。模型调用统计覆盖 Support 与 RAG SDK 调用，不包含 Memory/profile 和 SDK 内部重试；不保存隐藏推理。
 
 ## 为什么简化
@@ -44,8 +44,8 @@ Multi 的最终样本未使用 supporting Agent 或 Composer；当前电商 work
 
 [真实生产入口回归](../evaluation/reports/support_production/regression.md)为一轮实际 HTTP /chat、真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter：task success 8/10、工具选择 9/10、参数 6/6 observable、引用 1/1、危险动作正确性 4/5、安全违规 0；不必要调用 3/10、工具调用 21、模型调用 25、平均 HTTP 延迟 3686.0 ms。
 
-结果支持实验 Single 与生产入口的主要行为一致。不必要调用比例较历史 Single 高，单轮不能判定稳定变化；未验证 Redis/长期 Memory，也不能用这些演示样本宣称真实生产效果。unsupported escalation（0/1）、ownership 严格任务证据缺口、technical/真实协作 workload 未覆盖均保留为 follow-up，没有同时修改 prompt 或业务规则。生产迁移状态为 verify，等待用户验收。
+结果支持实验 Single 与生产入口的主要行为一致。不必要调用比例较历史 Single 高，单轮不能判定稳定变化；该十场景回归未验证 Redis/长期 Memory，也不能用这些演示样本宣称真实生产效果。unsupported escalation（0/1）、ownership 严格任务证据缺口、technical/真实协作 workload 未覆盖均保留为 follow-up，没有同时修改 prompt 或业务规则。生产迁移已验收 done。
 
 历史 T09 10 场景基线保持原样（intent 7/10、tool selection 7/10、arguments 6/6、unnecessary cases 5/10、strict E2E 6/10），不能与新 citation contract 直接混算。其他 Wiki 中的 Multi 描述属于历史材料，本文件与重点代码是当前权威说明。
 
-后续 [真实 Memory 验收](../evaluation/reports/support_production/memory_acceptance.md)已补齐短期集成证据：真实 Redis/Chroma、原有 MemoryManager、真实模型与 HTTP `/chat` 的跨轮订单号沿用、用户/会话隔离和服务故障路径均通过。之前的十场景回归仍为固定空 Memory 条件，不混作 Memory 验收。压缩、长期情景检索与画像质量未在本轮验证；迁移现可建议 done，Workbench 保持 verify 待用户确认。
+历史 [真实 Memory 验收](../evaluation/reports/support_production/memory_acceptance.md)记录旧实现的短期集成结果。T11 [新验收](../evaluation/reports/t11_memory_acceptance.md)保留原 16 项检查，新增演示订单状态变化后再次调用 Provider、异步偏好写入真实 Chroma，共 18/18；真实 Redis/Chroma 可选集成测试覆盖压缩、长期记录隔离与删除。Redis 读取故障返回 503 且 Agent 不执行。演示 user_id 仍非正式身份认证；长期记录按有效期读取，但物理过期清理尚未自动调度。
