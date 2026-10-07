@@ -211,7 +211,8 @@ class PerformanceMonitor:
                 self._prom["agent_success_rate"].labels(agent=agent_key).set(sr)
                 self._prom["agent_latency_ms"].labels(agent=agent_key).observe(ms)
 
-            routing_penalties[agent_key] = self._routing_penalty(sr, ms)
+            if getattr(self._orchestrator, "supports_routing", True):
+                routing_penalties[agent_key] = self._routing_penalty(sr, ms)
 
         # ── 工具指标 ──────────────────────────────────────────────────────────
         for tool_name, s in tool_stats.items():
@@ -236,9 +237,10 @@ class PerformanceMonitor:
 
         # ── 路由优化建议 ──────────────────────────────────────────────────────
         updater = getattr(self._orchestrator, "update_routing_penalties", None)
-        if updater:
+        if updater and getattr(self._orchestrator, "supports_routing", True):
             updater(routing_penalties)
-        self._generate_routing_suggestions(agent_stats)
+        if getattr(self._orchestrator, "supports_routing", True):
+            self._generate_routing_suggestions(agent_stats)
 
     @staticmethod
     def _routing_penalty(success_rate: float, avg_ms: float) -> float:

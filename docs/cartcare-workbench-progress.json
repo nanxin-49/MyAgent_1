@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-02T09:29:34.562166+00:00",
+  "updatedAt": "2026-10-02T11:57:37.941629+00:00",
   "tasks": {
     "T01": {
       "status": "done",
@@ -50,7 +50,7 @@
     "T10": {
       "status": "done",
       "evidence": "evaluation/reports/t10_topology_comparison.json; evaluation/reports/t10_topology_comparison.md; evaluation/reports/t10_complete/; tests/test_topology_comparison.py",
-      "note": "三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，未做生产迁移；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。"
+      "note": "三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，实验完成时未做生产迁移；后续独立 Single production migration 为 verify；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。"
     },
     "T11": {
       "status": "todo",
@@ -61,6 +61,11 @@
       "status": "todo",
       "evidence": "",
       "note": "展示 routing、tool、retrieval citation、policy decision、approval、latency；README 给出 3 个端到端 demo 和量化结果。"
+    },
+    "SINGLE_MIGRATION": {
+      "status": "verify",
+      "evidence": "agents/support_agent.py; api/main.py; tests/test_support_production.py; evaluation/reports/support_production/regression.md",
+      "note": "独立生产迁移：/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。实际 HTTP 10 cases task 8/10、citation 1/1、dangerous 4/5、安全违规 0；不必要调用 3/10，不能判断稳定变化。固定空 Memory adapter，不验证 Redis/长期 Memory。遗留失败保留 follow-up，等待用户验收。"
     }
   },
   "decisions": {
@@ -70,14 +75,14 @@
     "d2-date": "",
     "d2-title": "退款规则不交给 LLM",
     "d2-body": "LLM 可以识别退款意图并收集信息，但退款资格、金额阈值、订单状态约束由 Policy Engine 决定。",
-    "d3-date": "",
-    "d3-title": "Multi-Agent 先验证后保留",
-    "d3-body": "当前四 Agent 结构不是默认正确答案。先实现业务 Tool/Policy，再用实验比较 single-agent + tools 和 multi-agent。",
+    "d3-date": "2026-10-02",
+    "d3-title": "T10 验收后采用 Single Support Agent",
+    "d3-body": "当前 workload task success 相同且 Single 调用较少，生产 /chat 切换 Single；旧 Multi 仅保留历史实验。协作收益未覆盖。",
     "d4-date": "",
     "d4-title": "",
     "d4-body": ""
   },
   "globals": {
-    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。"
+    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。\n生产 topology = Single Support Agent；Single migration verify，T10 done。回归 133 passed；真实 HTTP 十场景 8/10；完整口径见 support_production/regression.md。"
   }
 }

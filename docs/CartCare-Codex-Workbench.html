@@ -114,8 +114,8 @@
       <h2>1. 当前事实基线（Codex 已核验）</h2>
       <div class="callout">原则：只有能从真实调用关系或可执行路径证明的能力，才标为“已验证”。README 描述只能作为文档，不作为事实基线。</div>
 
-      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>/chat 主链路：</strong>Memory → Intent → Orchestrator → Agent LLM / Tool Calling。RAG 不是 API 前置固定阶段，而是 Agent 选择 <code>search_knowledge_base</code> 后触发。</div><div class="muted">api/main.py / agents/tools.py</div></div>
-      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>当前 Agent：</strong>General / Technical / Billing / Escalation。Technical 仍包含 401/500/login/crash；Billing 包含 billing/refund/invoice/payment/subscription，业务范围尚未完全收敛到电商。</div><div class="muted">agent_orchestrator.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>/chat 主链路：</strong>Memory/context → SupportRuntime → SingleSupportAgent → shared Tool Contract。RAG 不是 API 前置固定阶段，而是 Agent 选择 <code>search_knowledge_base</code> 后触发。</div><div class="muted">api/main.py / agents/tools.py</div></div>
+      <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>当前 Agent：</strong>Single Support Agent。旧 General / Technical / Billing / Escalation 保留为历史/T10 experiment，不参与生产 dispatch。</div><div class="muted">agent_orchestrator.py</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Tool Runtime：</strong>Agent Tools 与本地 RAG ToolManager 共用 strict schema、risk/timeout/retry 元数据、typed result 和 trace 字段；仅幂等读工具自动重试可重试错误，危险动作仍由 ActionService 控制。Agent 最大 3 轮；RAG Manager 保留缓存、熔断、fallback、改写和重排。</div><div class="muted">core/tool_contract.py / agents/agent_orchestrator.py / mcp/tool_manager.py</div></div>
       <div class="baseline-item"><div><span class="truth verified">已复验</span></div><div><strong>RAG：</strong>ChromaDB Server + <code>chromadb-client</code> / <code>HttpClient</code>；导入与查询显式使用同版本字符 n-gram 演示向量，独立 cosine collection 具有可重建的来源 metadata。2026-10-02 真实 /chat FAQ 返回 usable、hit、citation、knowledge_used，并在回答中显示引用；“7 天”可从命中追踪。旧来源不明 collection 保留；0.35 阈值未修改。</div><div class="muted">mcp/knowledge_embeddings.py / mcp/knowledge_base.py / rag_faq_online_verification.json</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>Memory：</strong>Redis working memory + Chroma episodic + user_profile；有 LLM 压缩摘要。但客服长期记忆边界还需要重新定义。</div><div class="muted">conversation_memory.py</div></div>
@@ -124,8 +124,18 @@
       <div class="baseline-item"><div><span class="truth risk">设计限制</span></div><div><strong>认证与 ownership：</strong>当前没有正式认证主体，demo identity 仍来自请求体；但 Provider、Policy 和 ActionService 会用该 identity 与订单事实做确定性 ownership 校验。</div><div class="muted">api/main.py / providers/ / policies/ / actions/</div></div>
       <div class="baseline-item"><div><span class="truth verified">已观测</span></div><div><strong>Eval：</strong>/eval/run 保留意图与主观质量评测；独立 component replay 覆盖 Tool/RAG/Policy/HITL。另有 10 类真实 /chat 演示环境样本：intent 7/10、Tool 选择 7/10、参数 6/6、严格 E2E 6/10、FAQ citation/grounding 0/1。两类报告分开保存，不代表生产效果。</div><div class="muted">evaluation/system_eval.py; evaluation/agent_trace_eval.py; t09_online_report.json</div></div>
       <div class="baseline-item"><div><span class="truth verified">已验证</span></div><div><strong>开发与测试环境：</strong>项目标准固定为 Python 3.12 + uv；<code>pyproject.toml</code> + <code>uv.lock</code> 为依赖事实源。2026-09-30 本地执行 <code>uv run python -m pytest -q</code> 完整测试为 112 passed（pytest cache 写入警告）；先前 GitHub Actions 的 Python 3.12 CI 已成功。当前 Windows Docker daemon 权限问题属于本机基础设施问题。</div><div class="muted">pyproject.toml / uv.lock / .github/workflows/tests.yml</div></div>
-      <div class="baseline-item"><div><span class="truth risk">设计债</span></div><div><strong>Monitor routing penalty：</strong>每类 Agent 当前只有一个实例，因此同类性能降权没有实际候选竞争价值。</div><div class="muted">performance_monitor.py</div></div>
+      <div class="baseline-item"><div><span class="truth risk">设计债</span></div><div><strong>Monitor routing penalty：</strong>生产 Single 已停止路由评分/建议；旧 Multi 的降权逻辑仅用于历史实验。</div><div class="muted">performance_monitor.py</div></div>
       <div class="baseline-item"><div><span class="truth risk">命名风险</span></div><div><strong>mcp/ 不是标准 MCP 实现：</strong>目前是自研本地工具框架，requirements 中没有标准 MCP SDK/client/server/transport。</div><div class="muted">mcp/tool_manager.py</div></div>
+    </section>
+
+    <section id="single-migration">
+      <h2>Single Support production migration · verify</h2>
+      <div class="work-item" data-task="SINGLE_MIGRATION">
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="agents/support_agent.py; evaluation/reports/support_production/regression.md"></div><div><label class="small">备注</label><textarea data-field="note">独立生产迁移；/chat=Single Support Agent；实际 HTTP 十场景 8/10，安全违规 0。固定空 Memory adapter，不验证 Redis/长期 Memory。等待用户验收。</textarea></div></div>
+      </div>
+      <div class="callout">生产 topology = Single Support Agent。T10 保持 done；新迁移待用户验收。旧 Intent dispatch、specialist、supporting Agent、Composer 不再用于 /chat；旧类仅保留历史实验，业务安全层未改变。</div>
+      <p>133 passed；实际 HTTP /chat 十场景：task success 8/10、工具选择 9/10、参数 6/6、citation 1/1、dangerous 4/5、安全违规 0、不必要调用 3/10、tool calls 21、SDK calls 25、平均延迟 3686.0 ms。真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter；不验证 Redis/长期 Memory，单轮不能证明稳定性能变化。</p>
+      <p>证据：evaluation/reports/support_production/regression.md。unsupported escalation、ownership strict evidence 和未覆盖协作 workload 保留 follow-up。API topology=single / agent_type=support；旧 routing 字段 nullable deprecated。</p>
     </section>
 
     <section id="scope">
@@ -162,7 +172,7 @@ Context Builder
   └─ safe customer context
   │
   ▼
-Intent + Risk Understanding
+Single Support Agent（不依赖 Intent dispatch）
   │
   ▼
 Agent Runtime / Harness
@@ -250,7 +260,7 @@ Response
 
       <div class="work-item" data-task="T10">
         <div class="work-head"><div><div class="work-title">T10 · Multi-Agent 简化实验</div><div class="muted">用实验决定是否保留 General / Technical / Billing / Escalation。</div></div><div class="meta"><span class="prio p2">P2</span><span class="owner both">共同</span></div></div>
-        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option selected>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence" value="evaluation/reports/t10_topology_comparison.md"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，未做生产迁移；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。</textarea></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option>verify</option><option selected>done</option></select></div><div><label class="small">证据/PR/Commit</label><input type="text" data-field="evidence" value="evaluation/reports/t10_topology_comparison.md"></div><div><label class="small">DoD / 备注</label><textarea data-field="note">三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，实验完成时未做生产迁移；后续独立 Single production migration 为 verify；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。</textarea></div></div>
       </div>
 
       <div class="work-item" data-task="T11">
@@ -269,7 +279,7 @@ Response
       <p class="muted">用来记录“为什么这样改”，避免 Codex 只看到任务，不知道取舍。可以自由修改。</p>
       <div class="decision"><input data-decision="d1-date" type="text" placeholder="日期"><input data-decision="d1-title" type="text" value="RAG 与动态数据分离"><textarea data-decision="d1-body">政策/FAQ 走 RAG；订单/物流/库存/退款状态必须走 Provider/API/DB。原因：动态事实需要实时、可验证的 source of truth。</textarea></div>
       <div class="decision"><input data-decision="d2-date" type="text" placeholder="日期"><input data-decision="d2-title" type="text" value="退款规则不交给 LLM"><textarea data-decision="d2-body">LLM 可以识别退款意图并收集信息，但退款资格、金额阈值、订单状态约束由 Policy Engine 决定。</textarea></div>
-      <div class="decision"><input data-decision="d3-date" type="text" placeholder="日期"><input data-decision="d3-title" type="text" value="Multi-Agent 先验证后保留"><textarea data-decision="d3-body">当前四 Agent 结构不是默认正确答案。先实现业务 Tool/Policy，再用实验比较 single-agent + tools 和 multi-agent。</textarea></div>
+      <div class="decision"><input data-decision="d3-date" type="text" placeholder="日期"><input data-decision="d3-title" type="text" value="Multi-Agent 先验证后保留"><textarea data-decision="d3-body">T10 done：相同 task success，Single 调用较少；生产 /chat 切换 Single，旧 Multi 保留历史实验，真实协作收益未覆盖。</textarea></div>
       <div class="decision"><input data-decision="d4-date" type="text" value="2026-09-28"><input data-decision="d4-title" type="text" value="标准环境固定为 Python 3.12 + uv"><textarea data-decision="d4-body">pyproject.toml + uv.lock 作为依赖事实源；本地使用 uv sync --dev / uv run python -m pytest -q。Chroma 使用独立 Server + chromadb-client/HttpClient，不再使用 PersistentClient fallback。原因：提升 Windows 与 CI 的可复现性，避免 chroma-hnswlib 本地编译依赖。</textarea></div>
     </section>
 

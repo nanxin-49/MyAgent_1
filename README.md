@@ -2,7 +2,7 @@
 
 E-commerce Support Agent
 
-CartCare 是一个面向电商客服场景的可观测、多 Agent 编排运行时。当前代码已经接通记忆、意图识别、路由、Agent 工具调用、Skills 注入、知识库检索、只读业务 Provider Tools、确定性 Policy Engine 和模拟后端的 HITL 控制链；尚未接入真实外部电商系统。
+CartCare 是一个面向电商客服场景的可观测的 Single Support Agent 运行时。当前代码已经接通记忆、Agent 工具调用、Skills 注入、知识库检索、只读业务 Provider Tools、确定性 Policy Engine 和模拟后端的 HITL 控制链；尚未接入真实外部电商系统。
 
 ## 当前真实主链路
 
@@ -11,40 +11,37 @@ POST /chat 的实际调用关系如下：
 ~~~text
 请求
   -> MemoryManager.get_context()
-  -> AgentOrchestrator.recognize_intent()
-  -> 构造 Request（intent / entities / urgency / history / memory context）
-  -> AgentOrchestrator.run()
-       -> 生成 RoutingDecision
-       -> General / Technical / Billing / Escalation Agent
-       -> LLM 回复；必要时按 Agent 白名单执行工具调用（最多 3 轮）
-            -> search_knowledge_base（Agent 按需触发的 RAG 工具）
-            -> get_product / get_order / get_shipment / check_inventory / get_refund_status（只读 Provider Tools）
-            -> request_refund / request_cancel_order（ActionService；Policy、幂等和审批控制）
+  -> 构造 Request（history / memory context；不依赖 intent dispatch）
+  -> SupportRuntime.run() -> SingleSupportAgent（继承 BaseAgent）
+       -> LLM 回复；必要时执行统一工具注册表中的工具（最多 3 轮）
+            -> search_knowledge_base（Agent 按需触发 RAG）
+            -> get_product / get_order / get_shipment / check_inventory / get_refund_status
+            -> request_refund / request_cancel_order（ActionService；Policy、幂等和审批）
   -> 写回用户消息和 Agent 回复
   -> 异步更新用户画像
-  -> 返回 ChatResponse（路由、工具、升级和延迟信息）
+  -> 返回 ChatResponse（topology=single、agent_type=support、工具、引用、升级、延迟）
 ~~~
 
-RAG 不是 /chat 的 API 前置固定阶段。Agent 是否调用 `search_knowledge_base` 由模型在角色工具白名单内决定；只有获得可引用的 `usable` 命中时，`knowledge_used` 才为 true，响应中的 `citations` 是检索来源，不等于逐句事实核验。需要直接调试检索状态、改写、召回和重排时使用 POST /search。
+RAG 不是 /chat 的 API 前置固定阶段。Agent 是否调用 `search_knowledge_base` 由模型在统一工具注册表内决定；只有获得可引用的 `usable` 命中时，`knowledge_used` 才为 true，响应中的 `citations` 是检索来源，不等于逐句事实核验。需要直接调试检索状态、改写、召回和重排时使用 POST /search。
 
-Monitor 和 Eval 也不在每次 /chat 内同步运行：Monitor 在应用生命周期中后台采集统计并更新路由惩罚，POST /eval/run 才会显式启动意图和端到端评测。
+Monitor 和 Eval 也不在每次 /chat 内同步运行：Monitor 在后台采集统计，Single runtime 不使用路由惩罚。POST /eval/run 显式启动对话质量评测；只有请求 intent_cases 才做额外的意图诊断。
 
 ## 当前能力边界
 
-- **Agent / Intent**：IntentRecognizer 输出 intent、intent_group、confidence、urgency 和 entities；Orchestrator 路由到四类 Agent，复杂请求可主辅并行。
+- **Agent / Intent**：生产 topology = Single Support Agent；/chat 绕过 classifier、specialist dispatch、supporting Agent 与 Composer。IntentRecognizer 仅保留给显式评测诊断；旧 Multi 在 T10 runner 中保留。
 - **Tool**：agents/tools.py 提供确定性的请求分析、字段检查、技术排障、金额比较、人工交接摘要、共享 RAG 工具、五个只读业务查询工具和两个受控敏感动作请求工具。
 - **Tool Contract**：`core/tool_contract.py` 为 Agent Tools 与本地 RAG ToolManager 提供同一套严格参数校验、read/write/dangerous 风险分级、typed execution result、超时和重试规则；只有幂等读工具的可重试失败才由 Tool Runtime 自动重试。敏感动作仍由 ActionService 控制。
 - **Business Provider**：providers/ 定义 Product、Order、Inventory、Logistics、Refund 的结构化只读 Provider 和 Backend Protocol；Agent Tools 只依赖 Provider，当前通过 API lifespan 注入明确标注的 JSON fixture 内存 Mock。
 - **RAG**：`mcp/rag_contract.py` 定义文档 metadata、检索命中和 citation；`mcp/knowledge_embeddings.py` 为小型演示知识库提供版本化字符 n-gram 向量（词面基线，不是预训练语义模型），导入与查询显式生成同空间向量，经 `chromadb-client` / `HttpClient` 存取；`mcp/tool_manager.py` 保留缓存、超时、熔断、fallback、查询改写和重排。检索状态分为 `usable`、`low_confidence`、`no_answer`、`degraded`，fallback 不产生 citation。该目录是自研工具层，不是标准 MCP SDK/transport 接入。
 - **Memory**：Redis 保存工作记忆，ChromaDB 保存情景摘要和用户画像；每轮 /chat 回写消息，画像更新异步执行。
-- **Monitor / Trace**：/monitor、/metrics 和 /trace/* 暴露运行时统计与工具 trace；Monitor 的后台任务会把表现反馈给路由评分。
+- **Monitor / Trace**：/monitor、/metrics 和 /trace/* 暴露运行时统计与工具 trace；Single runtime 不生成路由评分；SDK model calls 统计覆盖 Support 与 RAG，不包含 Memory/profile 与 SDK 内部 HTTP 重试。
 - **Eval**：`/eval/run` 独立运行意图和对话质量评测；`evaluation/run_system_eval.py` 用隔离的演示 fixture 复放确定性 Tool、RAG、Policy、HITL 场景；`evaluation/capture_online_eval.py` 与 `agent_trace_eval.py` 保存、评分真实 `/chat` 和 Tool Trace。2026-09-30 的 10 场景在线样本成功率为 6/10，RAG 检索降级且无 citation；这些演示环境观测不能代表生产效果。LLM-as-Judge 只评相关性、清晰度、完整性、有用性。
 - **Policy Engine**：`policies/` 对 Provider 结构化订单事实给出确定性的退款/取消资格决策（allow / deny / require_approval、reason_code、policy_version）；`refund-cancel-v1` 是示例规则，使用 7 天退款窗口和 500 CNY 自动处理阈值，已由 ActionService 接入模拟执行链。
 - **Action / HITL**：`actions/` 提供 PendingAction、ActionService、审批/拒绝/恢复、幂等和明确标注的模拟写后端；真实外部系统、正式认证和持久化 Action Store 仍未接入。
 
 ## 你可以先看什么
 
-- [技术亮点](wiki/技术亮点.md)
+- [定位与技术亮点](wiki/CartCare定位与技术亮点.md)
 - [重点代码](wiki/重点代码.md)
 - [业务流程说明](wiki/业务流程说明.md)
 - [完整使用指南](wiki/完整使用指南.md)
@@ -99,7 +96,7 @@ docker compose logs -f echomind
 
 | 入口 | 作用 |
 |---|---|
-| POST /chat | 真实客服主链路：记忆、意图、路由、Agent/Tool、回写 |
+| POST /chat | 真实客服主链路：记忆、Single Support Agent/Tool、回写 |
 | POST /search | 独立调试 RAG 查询改写、召回、去重和重排 |
 | POST /knowledge/add / POST /knowledge/upload | 写入知识库文档 |
 | GET /knowledge/stats | 查看知识库片段数 |
@@ -172,3 +169,11 @@ docker run --rm --entrypoint python cartcare-dev -m pytest -q
 ## 项目方向
 
 后续仍需处理已观测的 Agent 路由/Tool 选择偏差、持久化 Action Store 与真实业务适配器。所有动态订单、物流、库存、支付和退款事实都应来自 Provider/API/DB；RAG 只承载静态或半静态政策知识。
+
+## Single 迁移与历史证据
+
+T10 已验收 done；历史报告不改写。Multi / Single 三轮 task success 均 24/30，Single 的工具调用 59 vs 78、模型调用 76 vs 115；该 workload 未使用 supporting Agent 或 Composer。生产 /chat 现使用 Single，旧 Multi 类为历史实验保留，不再用于生产 dispatch。
+
+[生产 HTTP 回归](evaluation/reports/support_production/regression.md)：1 × 10 cases，真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter。task success 8/10，引用 1/1，危险动作 4/5，安全违规 0；不必要调用 3/10，平均 HTTP 延迟 3686.0 ms。样本不能证明长期性能改善，也不验证 Redis/长期 Memory。unsupported escalation、ownership 严格证据缺口及未覆盖的协作任务仍为 follow-up。生产迁移建议 verify，T10 保持 done。
+
+API 新增 topology=single / agent_type=support；primary_agent、supporting_agents、routing_reason、routing_confidence 保留为 nullable deprecated 字段，当前返回 null。intent 相关字段也为空，不伪造 routing accuracy。消费这些旧字段的客户端应迁移到新字段。
