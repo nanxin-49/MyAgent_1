@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-02T07:08:01Z",
+  "updatedAt": "2026-10-07T07:33:10.505185+00:00",
   "tasks": {
     "T01": {
       "status": "done",
@@ -48,19 +48,24 @@
       "note": "用户于 2026-10-02 验收 T09 为 done。2026-09-30 的真实 /chat 十场景基线原样保留：在线 intent 7/10、Tool 选择 7/10、参数 6/6、unknown 升级 1/1、严格 E2E 6/10；component replay 单独报告。后续独立 RAG Online Integration Hardening 只复验 FAQ，2026-10-02 取得 usable、citation 和 grounding 证据，不重算 T09 历史指标。"
     },
     "T10": {
-      "status": "todo",
-      "evidence": "",
-      "note": "对比 single agent + tools 与当前 multi-agent：任务成功率、误路由、token、延迟、复杂度。若没有明显收益，合并 Agent。"
+      "status": "done",
+      "evidence": "evaluation/reports/t10_topology_comparison.json; evaluation/reports/t10_topology_comparison.md; evaluation/reports/t10_complete/; tests/test_topology_comparison.py",
+      "note": "三轮真实模型 paired comparison 完成（60 样本）：Multi/Single task success 均 24/30；tool selection 均 27/30；参数均 18/18 observable；不必要调用场景 10/30 vs 5/30；tool calls 78 vs 59；model calls 115 vs 76；平均延迟 6633.3 vs 3937.1 ms。当前 workload 支持建议简化，实验完成时未做生产迁移；后续独立 Single production migration 为 verify；共同升级标记缺陷 0/3、ownership 严格 action 证据缺口、协作未覆盖已记录；保留历史 T09。用户已验收 T10 为 done；生产迁移为独立任务。"
     },
     "T11": {
-      "status": "todo",
-      "evidence": "",
-      "note": "保留 session context 与必要摘要；长期 profile 只保存低风险稳定偏好；订单、支付、退款状态不作为长期记忆事实。"
+      "status": "done",
+      "evidence": "memory/conversation_memory.py; memory/policy.py; tests/test_memory_boundary.py; tests/test_memory_live_services.py; evaluation/reports/t11_memory_acceptance.md",
+      "note": "T11 用户已验收 done：Redis 工作记忆 24h、15 条压缩至摘要+最近 5 条；长期咨询主题/明确偏好分别 30/180 天，有用户归属、来源和时间元数据，过期不读，内部删除接口可清理。真实 Redis/Chroma 集成测试通过；真实 HTTP /chat 保留原 16 项验收并新增 Provider 动态状态重新查询、异步画像落库，18/18 通过。Redis 读取故障返回 503 且 Agent 未执行。正式身份认证、长期物理过期清理调度不在本任务范围。"
     },
     "T12": {
-      "status": "todo",
-      "evidence": "",
-      "note": "展示 routing、tool、retrieval citation、policy decision、approval、latency；README 给出 3 个端到端 demo 和量化结果。"
+      "status": "done",
+      "evidence": "demo/; api/main.py; agents/agent_orchestrator.py (trace projection); tests/test_demo_ui.py; tests/demo_ui.test.cjs; docs/t12-trace-demo-validation.md; docs/t12-demo-observations.json",
+      "note": "2026-10-07 用户已验收 T12 并授权通过完整阶段 PR 合入 main。实现与验证完成。/demo 十场景消费既有 /chat、Trace、Action API；风险/校验输入/业务与helper结果、引用标题/来源/版本、Policy/HITL、Memory计数/读写状态与阶段耗时均展示。Python 152 passed（含真实 Redis/Chroma）、JS 12 passed、lock/语法/diff 检查通过；真实浏览器 FAQ usable、退款待审批、Resume不绕过、Approve模拟completed。业务规则未改；T10/T11仍为演示环境证据。"
+    },
+    "SINGLE_MIGRATION": {
+      "status": "done",
+      "evidence": "agents/support_agent.py; api/main.py; tests/test_support_production.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md",
+      "note": "用户已验收生产迁移 done。/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。原迁移 HTTP 回归与 16 项真实 Memory 验收报告原样保留；后续 T11 独立改善长期 Memory 与 Redis 故障响应。"
     }
   },
   "decisions": {
@@ -70,15 +75,14 @@
     "d2-date": "",
     "d2-title": "退款规则不交给 LLM",
     "d2-body": "LLM 可以识别退款意图并收集信息，但退款资格、金额阈值、订单状态约束由 Policy Engine 决定。",
-    "d3-date": "",
-    "d3-title": "Multi-Agent 先验证后保留",
-    "d3-body": "当前四 Agent 结构不是默认正确答案。先实现业务 Tool/Policy，再用实验比较 single-agent + tools 和 multi-agent。",
+    "d3-date": "2026-10-02",
+    "d3-title": "T10 验收后采用 Single Support Agent",
+    "d3-body": "当前 workload task success 相同且 Single 调用较少，生产 /chat 切换 Single；旧 Multi 仅保留历史实验。协作收益未覆盖。",
     "d4-date": "",
     "d4-title": "",
     "d4-body": ""
   },
   "globals": {
-    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。"
+    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。\n生产 topology = Single Support Agent；Single migration 与 T10 均已由用户验收 done。原十场景回归见 support_production/regression.md；原 16 项 Memory 验收见 support_production/memory_acceptance.md。\nT11 用户已验收 done：完整测试 141 passed、2 skipped；开启真实 Redis/Chroma 可选集成测试时 143 passed；真实 HTTP 18/18（原 16 + 动态状态刷新 + 异步画像落库），见 t11_memory_acceptance.md。\nT12 done（2026-10-07 用户验收）：Python 152 passed（开启真实 Redis/Chroma opt-in），JS 12 passed；两个真实浏览器场景与截图见 docs/t12-trace-demo-validation.md。T01–T11 用户已确认 done。"
   }
 }
-

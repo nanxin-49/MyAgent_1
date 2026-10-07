@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CartCare · Support Agent Demo</title><link rel="stylesheet" href="/demo-assets/style.css">
+<script defer src="/demo-assets/demo.js"></script></head>
+<body><main>
+<header><span class="eyebrow">E-COMMERCE SUPPORT AGENT</span><h1>CartCare <span>Live Demo</span></h1>
+<p>LLM 选择工具 · Provider 提供事实 · 确定性规则控制动作 · Trace 展示执行证据</p></header>
+<aside>演示身份与内存业务后端，未接真实商城或支付。场景按钮仅填入消息；实际结果以 API 为准。
+退款场景需先生成新鲜 fixture 并重启服务；已完成动作会改变内存状态。<a href="/docs">API 文档</a></aside>
+<section><h2>选择场景</h2><div id="scenarios" class="scenarios"></div></section>
+<form id="chat-form"><div class="fields"><label>Demo user_id<input id="user-id" value="customer-1" required></label>
+<label>会话 conv_id（留空新建）<input id="conv-id" placeholder="响应后自动沿用"></label></div>
+<label>用户输入<textarea id="message" rows="3" required placeholder="例如：退款政策是什么？"></textarea></label>
+<div class="toolbar"><button type="submit">发送 /chat</button><button type="button" id="new-conversation">新会话</button><span id="status" role="status" aria-live="polite"></span></div></form>
+<div id="turns" aria-live="polite"></div>
+<footer>Client → API → MemoryManager → SingleSupportAgent → Tool Runtime → RAG / Providers / ActionService → Response / Trace<br>Eval 独立触发；引用证明检索来源，不代表逐句事实核验。</footer>
+</main></body></html>

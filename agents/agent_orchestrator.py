@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 # ── 数据结构 ──────────────────────────────────────────────────────────────────
 
 class AgentType(Enum):
+    SUPPORT = "support"      # Production single topology; never a specialist dispatch target.
     GENERAL   = "general"    # 通用客服
     TECHNICAL = "technical"  # 技术支持
     BILLING   = "billing"    # 账单/退款
@@ -345,8 +346,23 @@ class BaseAgent:
                 retrieval_hits = None
                 if name == "search_knowledge_base" and isinstance(result, dict) and isinstance(result.get("results"), list):
                     retrieval_hits = [{key: item[key] for key in (
-                        "document_id", "source", "policy_version", "chunk_index", "score", "content", "citation"
+                        "document_id", "title", "source", "policy_version", "chunk_index", "score", "content", "citation"
                     ) if key in item} for item in result["results"] if isinstance(item, dict)]
+                # Deterministic helper outputs only; never retain raw context or prompts.
+                helper_result = None
+                if name in {
+                    "inspect_request_context", "suggest_required_fields", "lookup_error_code",
+                    "build_diagnostic_plan", "check_billing_fields", "compare_amounts",
+                    "create_handoff_summary",
+                } and isinstance(result, dict):
+                    helper_result = {key: result[key] for key in (
+                        "intent", "intent_group", "urgency", "intent_confidence", "entities",
+                        "context_available", "requested_focus", "required_fields", "known_entities",
+                        "error_code", "meaning", "next_steps", "server_log_checked", "environment",
+                        "reproduced", "diagnostic_steps", "fields", "missing_fields",
+                        "can_confirm_refund", "reason", "success", "error", "amount_a", "amount_b",
+                        "difference", "interpretation", "request_id", "sensitive_data_required",
+                    ) if key in result}
                 tool_traces.append(
                     {
                         "request_id": req.request_id,
@@ -369,6 +385,7 @@ class BaseAgent:
                         "action_result": action_result,
                         "business_result": business_result,
                         "retrieval_hits": retrieval_hits,
+                        "helper_result": helper_result,
                         "error": error_text,
                     }
                 )

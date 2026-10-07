@@ -1,0 +1,2384 @@
+[
+  {
+    "case_id": "faq_policy",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-88692ef937244342aa678443a98cf288",
+      "request_id": "f52ddb98",
+      "response": "以下是 CartCare 的退款政策要点：\n\n**基本规则**\n- 订单创建后 **7 天内**，且订单状态符合要求时，可以请求退款。\n- 退款金额**不能超过订单总额**。\n- 单笔退款金额**超过 500 元需人工审批**。\n\n**处理说明**\n- 退款请求是否可执行，取决于**实时的订单状态**和平台政策引擎（PolicyEngine）的判定，不是提交即成功。\n- 退款通常原路退回，但**到账时间以支付渠道实际处理为准**，各渠道有所不同。\n\n**需要提供的核验信息**\n如需申请退款，请提供：\n- 订单号\n- 支付时间与支付渠道（微信/支付宝/银行卡等）\n- 实际支付金额、是否使用优惠券或余额\n\n**边界提示**\n以上为演示性政策说明，不构成真实商城承诺；具体结果需按您的订单实际情况核验。\n\n如果您有一个具体订单想申请退款，可以把订单号发给我，我帮您查询订单和退款状态，并说明下一步。\n\n知识库引用：doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "search_knowledge_base"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 4766.0,
+      "knowledge_used": true,
+      "retrieval_status": "usable",
+      "citations": [
+        {
+          "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+          "document_id": "doc_8450205ee234ce108cbd",
+          "chunk_index": 0,
+          "source": "demo:cartcare-default/refund-policy",
+          "policy_version": "refund-cancel-v1"
+        }
+      ],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 3,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "f52ddb98",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "search_knowledge_base"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "f52ddb98",
+          "agent_type": "support",
+          "tool_name": "search_knowledge_base",
+          "risk_level": "read",
+          "tool_use_id": "call_00_wxKjM84RV6XaKwyhAeUk5797",
+          "input": {
+            "query": "退款政策",
+            "top_k": 5
+          },
+          "validated_input": {
+            "query": "退款政策",
+            "top_k": 5
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 2235.0,
+          "cached": false,
+          "reranked": true,
+          "retrieval_status": "usable",
+          "citations": [
+            {
+              "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+              "document_id": "doc_8450205ee234ce108cbd",
+              "chunk_index": 0,
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1"
+            }
+          ],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": [
+            {
+              "document_id": "doc_8450205ee234ce108cbd",
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1",
+              "chunk_index": 0,
+              "score": 0.7333333638813715,
+              "content": "CartCare 模拟客服政策说明，仅用于演示。订单创建后 7 天内、订单状态符合要求时可以请求退款。退款金额不能超过订单总额；超过 500 元需人工审批。退款请求是否可执行由实时订单事实和 PolicyEngine 决定。此文档不代表真实商城承诺或支付渠道处理时效。",
+              "citation": {
+                "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+                "document_id": "doc_8450205ee234ce108cbd",
+                "chunk_index": 0,
+                "source": "demo:cartcare-default/refund-policy",
+                "policy_version": "refund-cancel-v1"
+              }
+            }
+          ],
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 4766.0,
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 239,
+          "output_tokens": 80,
+          "latency_ms": 1109.0
+        },
+        {
+          "stage": "rag_rewrite_or_rerank",
+          "model": "deepseek-flash",
+          "input_tokens": 95,
+          "output_tokens": 256,
+          "latency_ms": 2157.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 492,
+          "output_tokens": 225,
+          "latency_ms": 1422.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "f52ddb98",
+        "agent_type": "support",
+        "tool_name": "search_knowledge_base",
+        "risk_level": "read",
+        "tool_use_id": "call_00_wxKjM84RV6XaKwyhAeUk5797",
+        "input": {
+          "query": "退款政策",
+          "top_k": 5
+        },
+        "validated_input": {
+          "query": "退款政策",
+          "top_k": 5
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 2235.0,
+        "cached": false,
+        "reranked": true,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+            "document_id": "doc_8450205ee234ce108cbd",
+            "chunk_index": 0,
+            "source": "demo:cartcare-default/refund-policy",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": [
+          {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "source": "demo:cartcare-default/refund-policy",
+            "policy_version": "refund-cancel-v1",
+            "chunk_index": 0,
+            "score": 0.7333333638813715,
+            "content": "CartCare 模拟客服政策说明，仅用于演示。订单创建后 7 天内、订单状态符合要求时可以请求退款。退款金额不能超过订单总额；超过 500 元需人工审批。退款请求是否可执行由实时订单事实和 PolicyEngine 决定。此文档不代表真实商城承诺或支付渠道处理时效。",
+            "citation": {
+              "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0",
+              "document_id": "doc_8450205ee234ce108cbd",
+              "chunk_index": 0,
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1"
+            }
+          }
+        ],
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 239,
+        "output_tokens": 80,
+        "latency_ms": 1109.0
+      },
+      {
+        "stage": "rag_rewrite_or_rerank",
+        "model": "deepseek-flash",
+        "input_tokens": 95,
+        "output_tokens": 256,
+        "latency_ms": 2157.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 492,
+        "output_tokens": 225,
+        "latency_ms": 1422.0
+      }
+    ],
+    "elapsed_ms": 4813.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "order_lookup",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-71b2560976044ade913541f78143e7a5",
+      "request_id": "3023bc9f",
+      "response": "已为你查到订单 **ORD-T09-ORDER** 的信息：\n\n- **订单状态**：已发货（shipped）\n- **商品**：SKU-1001 × 1，单价 ¥129.90\n- **订单金额**：¥129.90（CNY）\n- **下单时间**：2026-09-30 11:52\n\n订单目前已发货。如需查看物流进度、退款状态或申请售后，告诉我你的需求即可；查物流的话我可以接着帮你确认。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 2171.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "3023bc9f",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "3023bc9f",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_0SQfxjl8j1R2C2v4mzTG5564",
+          "input": {
+            "order_id": "ORD-T09-ORDER"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-ORDER"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": {
+            "order_id": "ORD-T09-ORDER",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 2171.0,
+      "model_call_count": 2,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 188,
+          "output_tokens": 57,
+          "latency_ms": 687.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 249,
+          "output_tokens": 147,
+          "latency_ms": 1484.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "3023bc9f",
+        "agent_type": "support",
+        "tool_name": "get_order",
+        "risk_level": "read",
+        "tool_use_id": "call_00_0SQfxjl8j1R2C2v4mzTG5564",
+        "input": {
+          "order_id": "ORD-T09-ORDER"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-ORDER"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": {
+          "order_id": "ORD-T09-ORDER",
+          "status": "shipped",
+          "total_amount": "129.90"
+        },
+        "retrieval_hits": null,
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 188,
+        "output_tokens": 57,
+        "latency_ms": 687.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 249,
+        "output_tokens": 147,
+        "latency_ms": 1484.0
+      }
+    ],
+    "elapsed_ms": 2171.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "logistics_lookup",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-6d0c52851d9d4807b48cdd9ed593e145",
+      "request_id": "cc8315ce",
+      "response": "已经帮你查到订单 **ORD-T09-LOGISTICS** 的物流信息：\n\n- 承运商：demo-carrier\n- 运单号：TRACK-1001\n- 当前状态：**运输中（in_transit）**\n- 预计送达：2026-09-29\n- 物流最后更新：2026-10-02\n\n需要提醒的是：**预计送达日期（09-29）已过，但包裹目前仍显示运输中**，信息更新时间也晚于预计送达日。这通常意味着运输有延迟或轨迹未及时更新。\n\n下一步建议：\n1. 你可以先用运单号 **TRACK-1001** 在承运商官网核对最新轨迹；\n2. 如果超过预计时间仍无更新、或显示异常，我可以帮你进一步核实订单状态，必要时升级人工跟进。\n\n需要我帮你查一下这个订单本身的详情或当前状态吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_shipment"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 3125.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "cc8315ce",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_shipment"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "cc8315ce",
+          "agent_type": "support",
+          "tool_name": "get_shipment",
+          "risk_level": "read",
+          "tool_use_id": "call_00_FiYQdRzVU8XThaPBkmNX8935",
+          "input": {
+            "order_id": "ORD-T09-LOGISTICS"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-LOGISTICS"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": {
+            "order_id": "ORD-T09-LOGISTICS",
+            "shipment_id": "SHP-ORD-T09-LOGISTICS",
+            "status": "in_transit"
+          },
+          "retrieval_hits": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 3125.0,
+      "model_call_count": 2,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 191,
+          "output_tokens": 78,
+          "latency_ms": 1000.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 155,
+          "output_tokens": 304,
+          "latency_ms": 2125.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "cc8315ce",
+        "agent_type": "support",
+        "tool_name": "get_shipment",
+        "risk_level": "read",
+        "tool_use_id": "call_00_FiYQdRzVU8XThaPBkmNX8935",
+        "input": {
+          "order_id": "ORD-T09-LOGISTICS"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-LOGISTICS"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": {
+          "order_id": "ORD-T09-LOGISTICS",
+          "shipment_id": "SHP-ORD-T09-LOGISTICS",
+          "status": "in_transit"
+        },
+        "retrieval_hits": null,
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 191,
+        "output_tokens": 78,
+        "latency_ms": 1000.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 155,
+        "output_tokens": 304,
+        "latency_ms": 2125.0
+      }
+    ],
+    "elapsed_ms": 3141.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "inventory_lookup",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-a71c8b30565543028189864a3a1c6e54",
+      "request_id": "310ef134",
+      "response": "您好！想帮您查库存，还需要您提供一下**商品信息**：\n\n- 商品 SKU 编号（最准确），或\n- 商品名称／链接\n\n提供后我会查询该商品的库存快照，把当前可售情况告诉您～\n\n补充说明：库存查询只读取快照，不会锁定或预留库存；实际下单时以订单提交结果为准。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "suggest_required_fields"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 2297.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "310ef134",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "suggest_required_fields"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "310ef134",
+          "agent_type": "support",
+          "tool_name": "suggest_required_fields",
+          "risk_level": "read",
+          "tool_use_id": "call_00_Umu5G3ORyNcjnl7oC4hl5278",
+          "input": {},
+          "validated_input": {},
+          "success": true,
+          "result_success": null,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 2297.0,
+      "model_call_count": 2,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 245,
+          "output_tokens": 97,
+          "latency_ms": 1047.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 249,
+          "output_tokens": 90,
+          "latency_ms": 1250.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "310ef134",
+        "agent_type": "support",
+        "tool_name": "suggest_required_fields",
+        "risk_level": "read",
+        "tool_use_id": "call_00_Umu5G3ORyNcjnl7oC4hl5278",
+        "input": {},
+        "validated_input": {},
+        "success": true,
+        "result_success": null,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 245,
+        "output_tokens": 97,
+        "latency_ms": 1047.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 249,
+        "output_tokens": 90,
+        "latency_ms": 1250.0
+      }
+    ],
+    "elapsed_ms": 2297.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "refund_allow",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-f9f69003240b4cdc9f66afadd1bf1de6",
+      "request_id": "de4b0b88",
+      "response": "你的退款申请已处理完成，结果如下：\n\n**退款结果**\n- 订单号：ORD-T09-REFUND-ALLOW\n- 退款金额：129.90 CNY（订单原价，实际到账以支付渠道为准）\n- 审核结果：符合退款条件，已通过（policy: refund-cancel-v1，无需人工审批）\n- 处理状态：已完成\n- 流水号：act_b956dfa68a744d19\n\n**关于到账**\n退款通常原路退回，具体到账时间以支付渠道实际处理为准，不同渠道（微信、支付宝、银行卡等）耗时不同。如果显示已退款但你长时间未收到，建议检查原支付账户及渠道通知；超过常规时间仍未到账，可凭上面的流水号联系人工核实退款流水。\n\n需要我帮你确认其他订单或补充支付渠道信息吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "request_refund"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 3235.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 3,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "de4b0b88",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "request_refund"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "de4b0b88",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_qhHB9Bw38KGdKzF8hb8k3345",
+          "input": {
+            "order_id": "ORD-T09-REFUND-ALLOW"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-ALLOW"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": {
+            "order_id": "ORD-T09-REFUND-ALLOW",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "error": ""
+        },
+        {
+          "request_id": "de4b0b88",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_01_E782zk4NbTQGJ0FQviaA1949",
+          "input": {
+            "order_id": "ORD-T09-REFUND-ALLOW"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-ALLOW"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "未找到 refund"
+        },
+        {
+          "request_id": "de4b0b88",
+          "agent_type": "support",
+          "tool_name": "request_refund",
+          "risk_level": "dangerous",
+          "tool_use_id": "call_00_iqv9794smtxKgtKzJkFq6817",
+          "input": {
+            "order_id": "ORD-T09-REFUND-ALLOW"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-ALLOW"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": {
+            "action_id": "act_b956dfa68a744d19",
+            "status": "completed",
+            "error_code": null,
+            "policy_decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "execution_simulated": true
+          },
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 3235.0,
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 154,
+          "output_tokens": 135,
+          "latency_ms": 1031.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 252,
+          "output_tokens": 138,
+          "latency_ms": 860.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 402,
+          "output_tokens": 212,
+          "latency_ms": 1344.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "de4b0b88",
+        "agent_type": "support",
+        "tool_name": "get_order",
+        "risk_level": "read",
+        "tool_use_id": "call_00_qhHB9Bw38KGdKzF8hb8k3345",
+        "input": {
+          "order_id": "ORD-T09-REFUND-ALLOW"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-ALLOW"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": {
+          "order_id": "ORD-T09-REFUND-ALLOW",
+          "status": "shipped",
+          "total_amount": "129.90"
+        },
+        "retrieval_hits": null,
+        "error": ""
+      },
+      {
+        "request_id": "de4b0b88",
+        "agent_type": "support",
+        "tool_name": "get_refund_status",
+        "risk_level": "read",
+        "tool_use_id": "call_01_E782zk4NbTQGJ0FQviaA1949",
+        "input": {
+          "order_id": "ORD-T09-REFUND-ALLOW"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-ALLOW"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "not_found",
+        "error_type": "provider",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "未找到 refund"
+      },
+      {
+        "request_id": "de4b0b88",
+        "agent_type": "support",
+        "tool_name": "request_refund",
+        "risk_level": "dangerous",
+        "tool_use_id": "call_00_iqv9794smtxKgtKzJkFq6817",
+        "input": {
+          "order_id": "ORD-T09-REFUND-ALLOW"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-ALLOW"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": {
+          "action_id": "act_b956dfa68a744d19",
+          "status": "completed",
+          "error_code": null,
+          "policy_decision": "allow",
+          "reason_code": "refund_eligible",
+          "policy_version": "refund-cancel-v1",
+          "execution_simulated": true
+        },
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 154,
+        "output_tokens": 135,
+        "latency_ms": 1031.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 252,
+        "output_tokens": 138,
+        "latency_ms": 860.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 402,
+        "output_tokens": 212,
+        "latency_ms": 1344.0
+      }
+    ],
+    "elapsed_ms": 3265.0,
+    "backend_executions": [
+      {
+        "operation": "refund",
+        "order_id": "ORD-T09-REFUND-ALLOW",
+        "action_id": "act_b956dfa68a744d19"
+      }
+    ]
+  },
+  {
+    "case_id": "refund_approval",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-ec36e22f4574456aa64db57fcde69a13",
+      "request_id": "9a9dfc8a",
+      "response": "退款申请已提交，目前状态为「等待审批」，需要暂停等待人工审核结果。具体如下：\n\n**订单信息**\n- 订单号：ORD-T09-REFUND-APPROVAL\n- 订单状态：已发货\n- 订单金额：800.00 CNY\n- 申请退款金额：600.00 CNY（部分退款）\n\n**审批情况**\n- 提交结果：已进入等待审批（未执行退款）\n- 审批原因：退款金额 600.00 元超过自动处理阈值 500.00 元，需人工审批\n- 申请单号（action_id）：act_d0998c86fcad4e04\n\n**下一步**\n- 该申请需人工/财务审核后才会决定是否通过，我无法确认一定通过，也无法承诺到账时间。\n- 审核通过后，退款通常按原路退回，实际到账时间以支付渠道处理为准。\n- 请保留好支付凭证。退回金额也会以实际支付金额和平台规则为准（该单为部分退款）。\n\n需要我为你生成一份交接摘要，交给人工客服跟进这笔审批吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "request_refund"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": true,
+      "latency_ms": 6156.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 3,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "9a9dfc8a",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "request_refund"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "9a9dfc8a",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_UZxYaiKs46gwb0jndCGh3888",
+          "input": {
+            "order_id": "ORD-T09-REFUND-APPROVAL"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-APPROVAL"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": {
+            "order_id": "ORD-T09-REFUND-APPROVAL",
+            "status": "shipped",
+            "total_amount": "800.00"
+          },
+          "retrieval_hits": null,
+          "error": ""
+        },
+        {
+          "request_id": "9a9dfc8a",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_01_EnSgmMK9jIsnVPnMNtAv7343",
+          "input": {
+            "order_id": "ORD-T09-REFUND-APPROVAL"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-APPROVAL"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "未找到 refund"
+        },
+        {
+          "request_id": "9a9dfc8a",
+          "agent_type": "support",
+          "tool_name": "request_refund",
+          "risk_level": "dangerous",
+          "tool_use_id": "call_00_ESSJkoeZsPPEOUysvp2C1309",
+          "input": {
+            "order_id": "ORD-T09-REFUND-APPROVAL",
+            "amount": 600,
+            "idempotency_key": "ORD-T09-REFUND-APPROVAL-600-partial-1"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-APPROVAL",
+            "amount": 600,
+            "idempotency_key": "ORD-T09-REFUND-APPROVAL-600-partial-1"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": {
+            "action_id": "act_d0998c86fcad4e04",
+            "status": "awaiting_approval",
+            "error_code": null,
+            "policy_decision": "require_approval",
+            "reason_code": "amount_requires_approval",
+            "policy_version": "refund-cancel-v1",
+            "execution_simulated": null
+          },
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": ""
+        }
+      ],
+      "escalated": true,
+      "latency_ms": 6156.0,
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 172,
+          "output_tokens": 348,
+          "latency_ms": 2110.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 229,
+          "output_tokens": 226,
+          "latency_ms": 1875.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 438,
+          "output_tokens": 379,
+          "latency_ms": 2171.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "9a9dfc8a",
+        "agent_type": "support",
+        "tool_name": "get_order",
+        "risk_level": "read",
+        "tool_use_id": "call_00_UZxYaiKs46gwb0jndCGh3888",
+        "input": {
+          "order_id": "ORD-T09-REFUND-APPROVAL"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-APPROVAL"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": {
+          "order_id": "ORD-T09-REFUND-APPROVAL",
+          "status": "shipped",
+          "total_amount": "800.00"
+        },
+        "retrieval_hits": null,
+        "error": ""
+      },
+      {
+        "request_id": "9a9dfc8a",
+        "agent_type": "support",
+        "tool_name": "get_refund_status",
+        "risk_level": "read",
+        "tool_use_id": "call_01_EnSgmMK9jIsnVPnMNtAv7343",
+        "input": {
+          "order_id": "ORD-T09-REFUND-APPROVAL"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-APPROVAL"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "not_found",
+        "error_type": "provider",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "未找到 refund"
+      },
+      {
+        "request_id": "9a9dfc8a",
+        "agent_type": "support",
+        "tool_name": "request_refund",
+        "risk_level": "dangerous",
+        "tool_use_id": "call_00_ESSJkoeZsPPEOUysvp2C1309",
+        "input": {
+          "order_id": "ORD-T09-REFUND-APPROVAL",
+          "amount": 600,
+          "idempotency_key": "ORD-T09-REFUND-APPROVAL-600-partial-1"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-APPROVAL",
+          "amount": 600,
+          "idempotency_key": "ORD-T09-REFUND-APPROVAL-600-partial-1"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": {
+          "action_id": "act_d0998c86fcad4e04",
+          "status": "awaiting_approval",
+          "error_code": null,
+          "policy_decision": "require_approval",
+          "reason_code": "amount_requires_approval",
+          "policy_version": "refund-cancel-v1",
+          "execution_simulated": null
+        },
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 172,
+        "output_tokens": 348,
+        "latency_ms": 2110.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 229,
+        "output_tokens": 226,
+        "latency_ms": 1875.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 438,
+        "output_tokens": 379,
+        "latency_ms": 2171.0
+      }
+    ],
+    "elapsed_ms": 6156.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "refund_deny",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-afef8d7fc9394df6bc7ca7de781f02a6",
+      "request_id": "5427bfca",
+      "response": "退款请求已被拒绝，未执行。原因代码：order_status_not_refundable。动作编号：act_4629421123d448a6。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "inspect_request_context",
+        "search_knowledge_base",
+        "check_billing_fields",
+        "request_refund"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 6032.0,
+      "knowledge_used": false,
+      "retrieval_status": "low_confidence",
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 4,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "5427bfca",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "inspect_request_context",
+        "search_knowledge_base",
+        "check_billing_fields",
+        "request_refund"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "5427bfca",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_vZS8BYGjtegRA4xpmTHB7786",
+          "input": {
+            "order_id": "ORD-T09-REFUND-DENY"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-DENY"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": {
+            "order_id": "ORD-T09-REFUND-DENY",
+            "status": "cancelled",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "error": ""
+        },
+        {
+          "request_id": "5427bfca",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_01_Mo9h7nFy3y2miWyz0yZU5609",
+          "input": {
+            "order_id": "ORD-T09-REFUND-DENY"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-DENY"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "未找到 refund"
+        },
+        {
+          "request_id": "5427bfca",
+          "agent_type": "support",
+          "tool_name": "inspect_request_context",
+          "risk_level": "read",
+          "tool_use_id": "call_02_t9DKIzu7qxXE92DWMmkq0388",
+          "input": {
+            "focus": "refund"
+          },
+          "validated_input": {
+            "focus": "refund"
+          },
+          "success": true,
+          "result_success": null,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": ""
+        },
+        {
+          "request_id": "5427bfca",
+          "agent_type": "support",
+          "tool_name": "search_knowledge_base",
+          "risk_level": "read",
+          "tool_use_id": "call_00_L1GMelkaaHu9xZhMaapJ0341",
+          "input": {
+            "query": "已取消订单 退款申请 规则",
+            "top_k": 5
+          },
+          "validated_input": {
+            "query": "已取消订单 退款申请 规则",
+            "top_k": 5
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "low_confidence",
+          "error_type": "tool",
+          "retryable": false,
+          "latency_ms": 1688.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": "low_confidence",
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": [],
+          "error": "RAG retrieval status: low_confidence"
+        },
+        {
+          "request_id": "5427bfca",
+          "agent_type": "support",
+          "tool_name": "check_billing_fields",
+          "risk_level": "read",
+          "tool_use_id": "call_01_OIRxbataPf7wC9IP7t7H3149",
+          "input": {
+            "payment_channel": "微信"
+          },
+          "validated_input": {
+            "payment_channel": "微信"
+          },
+          "success": true,
+          "result_success": null,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": ""
+        },
+        {
+          "request_id": "5427bfca",
+          "agent_type": "support",
+          "tool_name": "request_refund",
+          "risk_level": "dangerous",
+          "tool_use_id": "call_00_m0phkfuEp0Y68CJElBhJ0940",
+          "input": {
+            "order_id": "ORD-T09-REFUND-DENY",
+            "amount": 129.9,
+            "idempotency_key": "refund-ORD-T09-REFUND-DENY-1"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-REFUND-DENY",
+            "amount": 129.9,
+            "idempotency_key": "refund-ORD-T09-REFUND-DENY-1"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "order_status_not_refundable",
+          "error_type": "action",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": {
+            "action_id": "act_4629421123d448a6",
+            "status": "rejected",
+            "error_code": "order_status_not_refundable",
+            "policy_decision": "deny",
+            "reason_code": "order_status_not_refundable",
+            "policy_version": "refund-cancel-v1",
+            "execution_simulated": null
+          },
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "订单状态 cancelled 不满足退款条件"
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 6032.0,
+      "model_call_count": 4,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 166,
+          "output_tokens": 191,
+          "latency_ms": 1204.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 379,
+          "output_tokens": 201,
+          "latency_ms": 1296.0
+        },
+        {
+          "stage": "rag_rewrite_or_rerank",
+          "model": "deepseek-flash",
+          "input_tokens": 101,
+          "output_tokens": 256,
+          "latency_ms": 1672.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 251,
+          "output_tokens": 251,
+          "latency_ms": 1844.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "5427bfca",
+        "agent_type": "support",
+        "tool_name": "get_order",
+        "risk_level": "read",
+        "tool_use_id": "call_00_vZS8BYGjtegRA4xpmTHB7786",
+        "input": {
+          "order_id": "ORD-T09-REFUND-DENY"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-DENY"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": {
+          "order_id": "ORD-T09-REFUND-DENY",
+          "status": "cancelled",
+          "total_amount": "129.90"
+        },
+        "retrieval_hits": null,
+        "error": ""
+      },
+      {
+        "request_id": "5427bfca",
+        "agent_type": "support",
+        "tool_name": "get_refund_status",
+        "risk_level": "read",
+        "tool_use_id": "call_01_Mo9h7nFy3y2miWyz0yZU5609",
+        "input": {
+          "order_id": "ORD-T09-REFUND-DENY"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-DENY"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "not_found",
+        "error_type": "provider",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "未找到 refund"
+      },
+      {
+        "request_id": "5427bfca",
+        "agent_type": "support",
+        "tool_name": "inspect_request_context",
+        "risk_level": "read",
+        "tool_use_id": "call_02_t9DKIzu7qxXE92DWMmkq0388",
+        "input": {
+          "focus": "refund"
+        },
+        "validated_input": {
+          "focus": "refund"
+        },
+        "success": true,
+        "result_success": null,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": ""
+      },
+      {
+        "request_id": "5427bfca",
+        "agent_type": "support",
+        "tool_name": "search_knowledge_base",
+        "risk_level": "read",
+        "tool_use_id": "call_00_L1GMelkaaHu9xZhMaapJ0341",
+        "input": {
+          "query": "已取消订单 退款申请 规则",
+          "top_k": 5
+        },
+        "validated_input": {
+          "query": "已取消订单 退款申请 规则",
+          "top_k": 5
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "low_confidence",
+        "error_type": "tool",
+        "retryable": false,
+        "latency_ms": 1688.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": "low_confidence",
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": [],
+        "error": "RAG retrieval status: low_confidence"
+      },
+      {
+        "request_id": "5427bfca",
+        "agent_type": "support",
+        "tool_name": "check_billing_fields",
+        "risk_level": "read",
+        "tool_use_id": "call_01_OIRxbataPf7wC9IP7t7H3149",
+        "input": {
+          "payment_channel": "微信"
+        },
+        "validated_input": {
+          "payment_channel": "微信"
+        },
+        "success": true,
+        "result_success": null,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": ""
+      },
+      {
+        "request_id": "5427bfca",
+        "agent_type": "support",
+        "tool_name": "request_refund",
+        "risk_level": "dangerous",
+        "tool_use_id": "call_00_m0phkfuEp0Y68CJElBhJ0940",
+        "input": {
+          "order_id": "ORD-T09-REFUND-DENY",
+          "amount": 129.9,
+          "idempotency_key": "refund-ORD-T09-REFUND-DENY-1"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-REFUND-DENY",
+          "amount": 129.9,
+          "idempotency_key": "refund-ORD-T09-REFUND-DENY-1"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "order_status_not_refundable",
+        "error_type": "action",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": {
+          "action_id": "act_4629421123d448a6",
+          "status": "rejected",
+          "error_code": "order_status_not_refundable",
+          "policy_decision": "deny",
+          "reason_code": "order_status_not_refundable",
+          "policy_version": "refund-cancel-v1",
+          "execution_simulated": null
+        },
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "订单状态 cancelled 不满足退款条件"
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 166,
+        "output_tokens": 191,
+        "latency_ms": 1204.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 379,
+        "output_tokens": 201,
+        "latency_ms": 1296.0
+      },
+      {
+        "stage": "rag_rewrite_or_rerank",
+        "model": "deepseek-flash",
+        "input_tokens": 101,
+        "output_tokens": 256,
+        "latency_ms": 1672.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 251,
+        "output_tokens": 251,
+        "latency_ms": 1844.0
+      }
+    ],
+    "elapsed_ms": 6032.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "cancel_order",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-ccbeaf20664a4916a58618a3dc5c5891",
+      "request_id": "245b9211",
+      "response": "已为你完成取消 ✅\n\n- 订单号：ORD-T09-CANCEL\n- 商品：SKU-1001 ×1\n- 金额：129.90 CNY\n- 取消结果：已通过（符合取消条件，无需人工审批），状态：completed\n- 处理单号：act_0c4cea449e3d4f06\n\n由于订单此前为「待处理」且未发货，取消已顺利生效，款项将按原支付渠道退回。这里先说明一下：退款到账时间取决于支付渠道，我无法承诺具体到账时间。\n\n如果你需要，我可以帮你查询这笔订单的退款状态；另外若还有其他订单需要处理，也可以直接告诉我订单号。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order",
+        "get_shipment",
+        "request_cancel_order"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 4391.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 3,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "245b9211",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_shipment",
+        "request_cancel_order"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "245b9211",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_qsCTouGdzPMp31Sw0wNW8864",
+          "input": {
+            "order_id": "ORD-T09-CANCEL"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-CANCEL"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": {
+            "order_id": "ORD-T09-CANCEL",
+            "status": "pending",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "error": ""
+        },
+        {
+          "request_id": "245b9211",
+          "agent_type": "support",
+          "tool_name": "get_shipment",
+          "risk_level": "read",
+          "tool_use_id": "call_01_3r1jJ0ABSydogsmW67XM1398",
+          "input": {
+            "order_id": "ORD-T09-CANCEL"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-CANCEL"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "未找到 shipment"
+        },
+        {
+          "request_id": "245b9211",
+          "agent_type": "support",
+          "tool_name": "request_cancel_order",
+          "risk_level": "dangerous",
+          "tool_use_id": "call_00_vtywC7S7qAtVDrNSfRQE4832",
+          "input": {
+            "order_id": "ORD-T09-CANCEL",
+            "idempotency_key": "cancel-ORD-T09-CANCEL-1"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-CANCEL",
+            "idempotency_key": "cancel-ORD-T09-CANCEL-1"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": {
+            "action_id": "act_0c4cea449e3d4f06",
+            "status": "completed",
+            "error_code": null,
+            "policy_decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "execution_simulated": true
+          },
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 4391.0,
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 189,
+          "output_tokens": 161,
+          "latency_ms": 1328.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 306,
+          "output_tokens": 161,
+          "latency_ms": 1641.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 460,
+          "output_tokens": 170,
+          "latency_ms": 1422.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "245b9211",
+        "agent_type": "support",
+        "tool_name": "get_order",
+        "risk_level": "read",
+        "tool_use_id": "call_00_qsCTouGdzPMp31Sw0wNW8864",
+        "input": {
+          "order_id": "ORD-T09-CANCEL"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-CANCEL"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": {
+          "order_id": "ORD-T09-CANCEL",
+          "status": "pending",
+          "total_amount": "129.90"
+        },
+        "retrieval_hits": null,
+        "error": ""
+      },
+      {
+        "request_id": "245b9211",
+        "agent_type": "support",
+        "tool_name": "get_shipment",
+        "risk_level": "read",
+        "tool_use_id": "call_01_3r1jJ0ABSydogsmW67XM1398",
+        "input": {
+          "order_id": "ORD-T09-CANCEL"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-CANCEL"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "not_found",
+        "error_type": "provider",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "未找到 shipment"
+      },
+      {
+        "request_id": "245b9211",
+        "agent_type": "support",
+        "tool_name": "request_cancel_order",
+        "risk_level": "dangerous",
+        "tool_use_id": "call_00_vtywC7S7qAtVDrNSfRQE4832",
+        "input": {
+          "order_id": "ORD-T09-CANCEL",
+          "idempotency_key": "cancel-ORD-T09-CANCEL-1"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-CANCEL",
+          "idempotency_key": "cancel-ORD-T09-CANCEL-1"
+        },
+        "success": true,
+        "result_success": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": {
+          "action_id": "act_0c4cea449e3d4f06",
+          "status": "completed",
+          "error_code": null,
+          "policy_decision": "allow",
+          "reason_code": "cancel_eligible",
+          "policy_version": "refund-cancel-v1",
+          "execution_simulated": true
+        },
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": ""
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 189,
+        "output_tokens": 161,
+        "latency_ms": 1328.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 306,
+        "output_tokens": 161,
+        "latency_ms": 1641.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 460,
+        "output_tokens": 170,
+        "latency_ms": 1422.0
+      }
+    ],
+    "elapsed_ms": 4391.0,
+    "backend_executions": [
+      {
+        "operation": "cancel",
+        "order_id": "ORD-T09-CANCEL",
+        "action_id": "act_0c4cea449e3d4f06"
+      }
+    ]
+  },
+  {
+    "case_id": "ownership_violation",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-d6f32e55ffab4b189181d969a6d87e61",
+      "request_id": "600bbee4",
+      "response": "## 核验结果\n\n**无法处理这笔订单取消**，原因如下：\n\n1. **归属核验未通过**：系统返回「当前 customer 无权访问该 order」，即订单 `ORD-T09-OWNERSHIP` 不在你当前账号（customer-2）名下。\n2. **退款记录**：该订单号下未查询到对应退款记录。\n\n## 说明与边界\n\n- 出于账号与隐私安全，客服只能操作**当前登录账号本人**名下的订单，不能跨账号取消或退款，这是硬性限制，无法通过人工绕过。\n- 因此我不会对这笔订单发起取消请求——即使提交，也会因归属校验失败被拦截。\n\n## 下一步请你确认\n\n请补充以下任一信息，我再继续帮你处理：\n\n- **该订单实际的归属账号**：如果你是这笔订单的本人，请用**下单时的账号**登录后再次发起取消；\n- **正确的订单号**：如果你要取消的是其他订单，请提供你账号下的订单号；\n- 若你确认为企业/代下单等特殊场景，需要**额外的授权核验**，我会为你整理信息转接人工客服。\n\n另外，如果你要取消的就是你自己名下的其他订单，请直接告诉我订单号，我可以立即核验状态并判断是否可取消（能否取消还取决于订单当前所处的履约阶段，不保证一定成功）。\n\n请问需要我继续帮你查哪一笔订单？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order",
+        "get_refund_status"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": true,
+      "latency_ms": 3609.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "600bbee4",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_refund_status"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "600bbee4",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_9RJZyIDwMPHRruc6gZgv2412",
+          "input": {
+            "order_id": "ORD-T09-OWNERSHIP"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-OWNERSHIP"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "unauthorized",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "当前 customer 无权访问该 order"
+        },
+        {
+          "request_id": "600bbee4",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_01_2KSqYjbLOMRpsqhtJFQi4598",
+          "input": {
+            "order_id": "ORD-T09-OWNERSHIP"
+          },
+          "validated_input": {
+            "order_id": "ORD-T09-OWNERSHIP"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "error": "未找到 refund"
+        }
+      ],
+      "escalated": true,
+      "latency_ms": 3609.0,
+      "model_call_count": 2,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 198,
+          "output_tokens": 139,
+          "latency_ms": 1109.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 255,
+          "output_tokens": 399,
+          "latency_ms": 2500.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [
+      {
+        "request_id": "600bbee4",
+        "agent_type": "support",
+        "tool_name": "get_order",
+        "risk_level": "read",
+        "tool_use_id": "call_00_9RJZyIDwMPHRruc6gZgv2412",
+        "input": {
+          "order_id": "ORD-T09-OWNERSHIP"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-OWNERSHIP"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "unauthorized",
+        "error_type": "provider",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "当前 customer 无权访问该 order"
+      },
+      {
+        "request_id": "600bbee4",
+        "agent_type": "support",
+        "tool_name": "get_refund_status",
+        "risk_level": "read",
+        "tool_use_id": "call_01_2KSqYjbLOMRpsqhtJFQi4598",
+        "input": {
+          "order_id": "ORD-T09-OWNERSHIP"
+        },
+        "validated_input": {
+          "order_id": "ORD-T09-OWNERSHIP"
+        },
+        "success": false,
+        "result_success": false,
+        "error_code": "not_found",
+        "error_type": "provider",
+        "retryable": false,
+        "latency_ms": 0.0,
+        "cached": false,
+        "reranked": false,
+        "retrieval_status": null,
+        "citations": [],
+        "action_result": null,
+        "business_result": null,
+        "retrieval_hits": null,
+        "error": "未找到 refund"
+      }
+    ],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 198,
+        "output_tokens": 139,
+        "latency_ms": 1109.0
+      },
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 255,
+        "output_tokens": 399,
+        "latency_ms": 2500.0
+      }
+    ],
+    "elapsed_ms": 3625.0,
+    "backend_executions": []
+  },
+  {
+    "case_id": "unsupported_request",
+    "topology": "single_agent",
+    "run": 1,
+    "mode": "production_http_real_model_demo_backend_frozen_memory",
+    "chat": {
+      "conv_id": "support-regression-00c47ac826cc4b7a9c382157e2676a0c",
+      "request_id": "233cac67",
+      "response": "您好！机票预订不在我的服务范围内，我是 CartCare 电商客服助手，主要负责商品、订单、物流和售后相关问题。😊\n\n如果您有以下需求，我可以帮忙处理：\n- 查询商品信息或库存\n- 查询订单状态、物流进度\n- 退款、取消订单等售后问题\n\n预订机票建议您通过航空公司官网或携程、飞猪等出行平台办理。请问还有什么其他可以帮到您的吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 969.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 1,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile"
+    },
+    "trace": {
+      "request_id": "233cac67",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 969.0,
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 244,
+          "output_tokens": 93,
+          "latency_ms": 969.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"
+    },
+    "tool_traces": [],
+    "model_calls": [
+      {
+        "stage": "support",
+        "model": "deepseek-flash",
+        "input_tokens": 244,
+        "output_tokens": 93,
+        "latency_ms": 969.0
+      }
+    ],
+    "elapsed_ms": 969.0,
+    "backend_executions": []
+  }
+]

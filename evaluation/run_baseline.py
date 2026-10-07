@@ -155,19 +155,21 @@ def _run_case(case: Dict[str, Any], base_url: str, timeout: float) -> Dict[str, 
     tools_used = list(last.get("tools_used") or trace.get("tools_used") or [])
     actual_supporting = list(last.get("supporting_agents") or [])
     actual_agent_types = list(last.get("agent_types") or [])
+    single_topology = last.get("topology") == "single"
     actual = {
+        "topology": last.get("topology"),
         "intent": last.get("intent"),
         "intent_group": last.get("intent_group"),
         "intent_confidence": last.get("intent_confidence"),
         "intent_source_scores": last.get("intent_source_scores", {}),
         "entities": last.get("entities", {}),
         "urgency": "N/A",
-        "primary_agent": last.get("primary_agent") or last.get("agent_type"),
+        "primary_agent": last.get("primary_agent"),
         "supporting_agents": actual_supporting,
         "agent_types": actual_agent_types,
         "routing_confidence": last.get("routing_confidence"),
         "routing_reason": last.get("routing_reason", ""),
-        "multi_agent": bool(actual_supporting) or len(actual_agent_types) > 1,
+        "multi_agent": None if single_topology else bool(actual_supporting) or len(actual_agent_types) > 1,
         "tools_used": tools_used,
         "tool_traces": trace_tools,
         "knowledge_used": bool(last.get("knowledge_used")),
@@ -189,16 +191,16 @@ def _run_case(case: Dict[str, Any], base_url: str, timeout: float) -> Dict[str, 
 
     expected_supporting = expected.get("supporting_agents")
     checks: Dict[str, Optional[bool]] = {
-        "intent": _expected_intent_matches(expected.get("intent"), actual.get("intent")),
-        "primary_routing": actual.get("primary_agent") == expected.get("primary_agent"),
+        "intent": None if single_topology else _expected_intent_matches(expected.get("intent"), actual.get("intent")),
+        "primary_routing": None if single_topology else actual.get("primary_agent") == expected.get("primary_agent"),
         "supporting_routing": (
             set(actual_supporting) == _as_set(expected_supporting)
-            if expected_supporting is not None
+            if expected_supporting is not None and not single_topology
             else None
         ),
         "multi_agent": (
             actual["multi_agent"] == bool(expected.get("multi_agent"))
-            if expected.get("multi_agent") is not None
+            if expected.get("multi_agent") is not None and not single_topology
             else None
         ),
     }
@@ -263,15 +265,16 @@ def _run_case(case: Dict[str, Any], base_url: str, timeout: float) -> Dict[str, 
 def _metric_summary(results: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     runnable = [item for item in results if item.get("status") != "blocked"]
     blocked = [item for item in results if item.get("status") == "blocked"]
+    routed = [item for item in runnable if item.get("actual", {}).get("topology") != "single"]
 
     labels = [
         _canonical_expected_intent(
             item.get("expected", {}).get("intent"),
             item.get("actual", {}).get("intent"),
         )
-        for item in runnable
+        for item in routed
     ]
-    predictions = [str(item.get("actual", {}).get("intent")) for item in runnable]
+    predictions = [str(item.get("actual", {}).get("intent")) for item in routed]
     valid_pairs = [
         (ground_truth, prediction)
         for ground_truth, prediction in zip(labels, predictions)
@@ -310,17 +313,17 @@ def _metric_summary(results: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         ]
         return round(sum(bool(value) for value in values) / len(values), 4) if values else None
 
-    primary_values = [item for item in runnable if item.get("expected", {}).get("primary_agent")]
+    primary_values = [item for item in routed if item.get("expected", {}).get("primary_agent")]
     support_values = [
         item
-        for item in runnable
+        for item in routed
         if item.get("expected", {}).get("supporting_agents") is not None
     ]
     expected_multi = [
-        item for item in runnable if item.get("expected", {}).get("multi_agent") is True
+        item for item in routed if item.get("expected", {}).get("multi_agent") is True
     ]
     unexpected_multi = [
-        item for item in runnable if item.get("expected", {}).get("multi_agent") is False
+        item for item in routed if item.get("expected", {}).get("multi_agent") is False
     ]
     rag_required = [
         item for item in runnable if item.get("expected", {}).get("rag") == "required"
@@ -418,10 +421,10 @@ def _metric_summary(results: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         "supporting_f1": round(_f1(support_precision, support_recall), 4) if support_values else None,
         "multi_agent_trigger_rate": (
             round(
-                sum(item["actual"].get("multi_agent", False) for item in runnable) / len(runnable),
+                sum(item["actual"].get("multi_agent", False) for item in routed) / len(routed),
                 4,
             )
-            if runnable
+            if routed
             else None
         ),
         "expected_multi_agent_recall": check_rate("multi_agent", expected_multi),

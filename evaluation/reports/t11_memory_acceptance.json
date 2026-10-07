@@ -1,0 +1,54 @@
+{
+  "mode": "actual HTTP /chat + real MemoryManager + running Redis/Chroma + real model",
+  "checks": {
+    "real_memory_manager": true,
+    "fresh_context_empty": true,
+    "async_profile_explicit_preference": true,
+    "first_order_lookup": true,
+    "redis_write_read": true,
+    "request_path": true,
+    "second_turn_uses_order_number": true,
+    "two_turns_persisted": true,
+    "dynamic_order_fact_refreshed": true,
+    "session_isolation": true,
+    "user_isolation": true,
+    "other_user_no_order_leak": true,
+    "schema_nullable_deprecated": true,
+    "response_trace_null_compatible": true,
+    "trace_tool_consistent": true,
+    "redis_failure_fails_closed": true,
+    "redis_failure_did_not_run_agent": true,
+    "redis_recovery": true
+  },
+  "observations": {
+    "first_tools": [
+      "get_order",
+      "get_shipment"
+    ],
+    "second_tools": [
+      "get_order",
+      "get_shipment"
+    ],
+    "refreshed_tools": [
+      "get_order",
+      "get_shipment"
+    ],
+    "isolated_tools": [
+      "inspect_request_context",
+      "suggest_required_fields"
+    ],
+    "first_order_ids": [
+      "ORD-T09-LOGISTICS",
+      "ORD-T09-LOGISTICS"
+    ],
+    "second_order_ids": [
+      "ORD-T09-LOGISTICS",
+      "ORD-T09-LOGISTICS"
+    ],
+    "isolated_order_ids": [],
+    "redis_failure_http_status": 503,
+    "messages_after_second": 4
+  },
+  "scope": "Isolated demo users and copied fixture; no business module or prompt changes.",
+  "failure_contract": "Redis read failure returns HTTP 503; no Agent/tool execution or fabricated reply."
+}

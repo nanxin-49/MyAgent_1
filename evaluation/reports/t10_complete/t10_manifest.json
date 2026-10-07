@@ -1,0 +1,35 @@
+{
+  "source_commit": "99fc43a662748553435aab4ae92b359878b0e487",
+  "branch": "experiment/t10-agent-topology",
+  "frozen_at": "2026-10-02T09:18:57.553689+00:00",
+  "runs": 3,
+  "case_count": 10,
+  "model": "deepseek-flash",
+  "base_url": "https://api.deepseek.com/anthropic",
+  "agent_temperature": 0.2,
+  "agent_max_tokens": 1200,
+  "cases_hash": "038c77869ca82bfcbb5086e7bf146f75ee6eae3769992d3fe21dd29a51f237de",
+  "fixture_hash": "731977b0685eb4dccb976583a73a5470318e517697c23942b3b232a8baacf347",
+  "rag_collection": "cartcare_demo_knowledge_chargram_v1",
+  "rag_hash": "89b56cc9a86a33e43eb406011990155900270dd34f0cff7ff77a075b23fc76ec",
+  "rag_threshold": 0.35,
+  "chroma_host": "127.0.0.1",
+  "chroma_port": 8001,
+  "historical_hashes": {
+    "t09_online_cases.json": "2ca992e625467c3aa0663630c74e9eb58d7b6c490b4afb3fd1614b37c9fce5da",
+    "t09_online_fixture.json": "15c1b3c1bc827da084a59cfcea911d2543fcd94d82276a31ec836b2fb3304f50",
+    "t09_online_observations_final.json": "40e48f2967e9626671d8e8de8ad498fd54a746843cfaee82317b703b6fff84c6",
+    "t09_online_report.json": "149119c087d0ed4e5ebc2541aa68ea02b8df030079ca53af385b7c7c4d6ece17"
+  },
+  "context": "empty fixed context/history for fresh sessions",
+  "cache": "fresh manager per case/arm; original cache/rewrite/rerank semantics",
+  "skills_hash": "d9f7e8ffcfb00ffe3ef71c2dacc73de9f66081eff71396c6881f2014ae5c1e91",
+  "runner_sources": {
+    "evaluation\\run_topology_comparison.py": "5df25e1c80be0438180ee608ad0a0410a4fec9cc1fc21d5c234d49036ccbc9ca",
+    "evaluation\\topology_experiment.py": "a51010bd1aae74c65f7921b7bcf1adb057e23d714ed54c2d3ab61bc811f6a68a",
+    "evaluation\\topology_eval.py": "276f272578dbf1ea3f2e19387b0c91c4f531654a190b36679f87a4018c394bf4"
+  },
+  "rag_unchanged": true,
+  "historical_unchanged": true,
+  "complete": true
+}

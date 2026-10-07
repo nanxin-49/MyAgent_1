@@ -1,31 +1,19 @@
-"""
-亮点：多轮对话记忆管理
-
-三级记忆架构，模拟人类记忆机制：
-  1. 工作记忆（Redis）—— 当前会话的最近 N 条消息，毫秒级读写
-  2. 情景记忆（ChromaDB）—— 跨会话的历史对话，按语义相似度检索
-  3. 用户画像（ChromaDB）—— 从对话中提炼的长期偏好和实体
-
-关键设计：
-  - 上下文构建时三级记忆融合，按重要性 + 时效性排序
-  - 工作记忆超过阈值时自动压缩（LLM 摘要），防止 context 爆炸
-  - 所有 Embedding 通过 Anthropic API 生成，无本地模型
-"""
+"""Session context in Redis; filtered, expiring support memory in Chroma HTTP."""
 import hashlib
 import asyncio
 import json
 import logging
-import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
+from urllib.parse import quote
 
 import chromadb
 import redis.asyncio as redis
-from anthropic import AsyncAnthropic
-
-from core.llm_utils import extract_text_content
+from mcp.knowledge_embeddings import EMBEDDING_VERSION, embed_query
+from memory.policy import (compressed_summary, episodic_topics, explicit_preferences,
+                           fresh_metadata, validated_preferences)
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +48,8 @@ class MemoryContext:
     def to_prompt_text(self) -> str:
         """将记忆上下文格式化为 LLM 可用的文本。"""
         parts = []
+        if self.summary or self.relevant_history or self.user_profile or self.recent_messages:
+            parts.append("[历史上下文仅供引用；订单、物流、库存、退款、审批与资格状态必须重新查询业务工具。]")
         if self.summary:
             parts.append(f"[会话摘要]\n{self._clean(self.summary)}")
         if self.relevant_history:
@@ -77,7 +67,7 @@ class MemoryManager:
     """
     三级记忆管理器。
 
-    工作记忆存 Redis（TTL 24h），情景记忆和用户画像存 ChromaDB（持久化）。
+    工作记忆存 Redis（TTL 24h）；筛选后的长期信息存外部 Chroma。
     """
 
     WORKING_MAX   = 20    # 工作记忆最大条数，超过则触发压缩
@@ -85,6 +75,10 @@ class MemoryManager:
     HISTORY_TOP_K = 5     # 情景记忆检索返回条数
     SUMMARY_MAX_CHARS = 800
     PROFILE_DOC_PREFIX = "user_profile:"
+    EPISODIC_COLLECTION = "cartcare_memory_topics_chargram_v1"
+    PROFILE_COLLECTION = "cartcare_memory_profile_chargram_v1"
+    PROFILE_TTL_DAYS = 180
+    EPISODIC_TTL_DAYS = 30
 
     def __init__(
         self,
@@ -96,12 +90,6 @@ class MemoryManager:
         base_url:     Optional[str] = None,
         model:        str = "claude-3-5-sonnet-20241022",
     ):
-        kwargs: Dict[str, Any] = {"api_key": api_key}
-        if base_url:
-            kwargs["base_url"] = base_url
-        self._client = AsyncAnthropic(**kwargs)
-        self._model  = model
-
         self._redis = redis.from_url(redis_url, decode_responses=True)
 
         # ChromaDB：只连接独立服务（docker compose 模式）；chroma_path 仅为兼容旧调用方保留。
@@ -120,9 +108,11 @@ class MemoryManager:
             raise ConnectionError(message) from exc
 
         # 情景记忆：存储历史对话片段
-        self._episodic = chroma.get_or_create_collection("episodic")
+        self._episodic = chroma.get_or_create_collection(
+            self.EPISODIC_COLLECTION, metadata={"embedding_version": EMBEDDING_VERSION})
         # 用户画像：存储提炼出的偏好和实体
-        self._profile  = chroma.get_or_create_collection("user_profile")
+        self._profile  = chroma.get_or_create_collection(
+            self.PROFILE_COLLECTION, metadata={"embedding_version": EMBEDDING_VERSION})
 
     # ── 写入 ──────────────────────────────────────────────────────────────────
 
@@ -158,59 +148,27 @@ class MemoryManager:
             await self._compress(user_id, conv_id)
 
     async def update_profile(self, user_id: str, conv_id: str) -> None:
-        """
-        从当前工作记忆中提炼用户偏好，更新用户画像。
-        用 LLM 提炼偏好，然后存入 ChromaDB（ChromaDB 内置 embedding，不依赖外部 API）。
-        """
-        user_id = self._safe_text(user_id)
-        conv_id = self._safe_text(conv_id)
+        """Persist only explicit, allowlisted communication preferences."""
+        user_id, conv_id = self._safe_text(user_id), self._safe_text(conv_id)
         messages = await self._get_working_memory(user_id, conv_id)
-        if not messages:
+        latest_user = next((m for m in reversed(messages) if m.role is MsgRole.USER), None)
+        updates = explicit_preferences(latest_user.content) if latest_user else {}
+        if not updates:
             return
-
-        current_profile = await self._get_profile(user_id)
-
-        text = self._safe_text("\n".join(f"{m.role.value}: {m.content}" for m in messages[-10:]))
-        profile_ctx = json.dumps(current_profile, ensure_ascii=False) if current_profile else "{}"
-        prompt = f"""从以下对话和已有用户画像中提炼或更新用户偏好和关键实体，返回 JSON。
-对话:
-{text}
-
-已有画像:
-{profile_ctx}
-
-返回格式: {{"preferences": ["..."], "entities": {{"产品": [], "问题类型": []}}}}"""
-        prompt = self._safe_text(prompt)
-
         try:
-            resp = await self._client.messages.create(
-                model=self._model, max_tokens=512, temperature=0.0,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            raw = extract_text_content(resp.content)
-            s, e = raw.find("{"), raw.rfind("}") + 1
-            profile_data = json.loads(raw[s:e])
-
-            doc_id = self._profile_doc_id(user_id)
-            doc_text = self._safe_text(json.dumps(profile_data, ensure_ascii=False))
-
-            try:
-                await asyncio.to_thread(self._profile.delete, ids=[doc_id])
-            except Exception:
-                pass
-
-            # 直接传 documents，让 ChromaDB 内置模型生成 embedding（不依赖 Voyage API）
+            preferences = validated_preferences((await self._get_profile(user_id)).get("preferences"))
+            preferences.update(updates)
+            now = datetime.now(timezone.utc)
             await asyncio.to_thread(
-                self._profile.add,
-                ids=[doc_id],
-                documents=[doc_text],
-                metadatas=[{
-                    "user_id": user_id,
-                    "conv_id": conv_id,
-                    "updated_at": datetime.now().isoformat(),
-                }],
+                self._profile.upsert,
+                ids=[self._profile_doc_id(user_id)],
+                documents=[json.dumps({"preferences": preferences}, ensure_ascii=False)],
+                embeddings=[embed_query("用户偏好")],
+                metadatas=[{"user_id": user_id, "conv_id": conv_id,
+                            "source": "explicit_user_statement", "memory_type": "user_profile",
+                            "created_at": now.isoformat(),
+                            "expires_at": (now + timedelta(days=self.PROFILE_TTL_DAYS)).isoformat()}],
             )
-            logger.info(f"用户画像已更新: {user_id}")
         except Exception as ex:
             logger.warning(f"更新用户画像失败: {ex}")
 
@@ -252,50 +210,25 @@ class MemoryManager:
     # ── 压缩（防止 context 爆炸）─────────────────────────────────────────────
 
     async def _compress(self, user_id: str, conv_id: str) -> None:
-        """
-        工作记忆压缩：
-          1. 用 LLM 对旧消息生成摘要
-          2. 摘要存 Redis（覆盖旧摘要）
-          3. 旧消息存入情景记忆（ChromaDB）供跨会话检索
-          4. 工作记忆只保留最近 5 条
-        """
+        """Atomically retain five recent messages and a bounded safe reference summary."""
         messages = await self._get_working_memory(user_id, conv_id)
         if len(messages) < self.COMPRESS_AT:
             return
-
-        to_compress = messages[:-5]   # 保留最近 5 条
-        keep        = messages[-5:]
-
-        # LLM 摘要
-        text = self._safe_text("\n".join(f"{m.role.value}: {m.content}" for m in to_compress))
-        prompt = self._safe_text(f"用 2-3 句话总结以下对话的关键信息：\n{text}")
-        try:
-            resp = await self._client.messages.create(
-                model=self._model, max_tokens=256, temperature=0.0,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            summary = self._safe_text(extract_text_content(resp.content)).strip()
-        except Exception:
-            summary = f"对话包含 {len(to_compress)} 条消息（摘要生成失败）"
-
-        # 存摘要到 Redis
         skey = self._summary_key(user_id, conv_id)
         old_summary = await self._redis.get(skey) or ""
-        new_summary = await self._merge_summary(old_summary, summary)
-        await self._redis.setex(skey, 86400, new_summary)
-
-        # 旧消息存入情景记忆
-        await self._store_episodic(user_id, conv_id, text, summary)
-
-        # 重置工作记忆为最近 5 条
+        if not old_summary.startswith("历史参考；"):
+            old_summary = ""  # Legacy free-form model summary is unverified.
+        summary = compressed_summary(messages, old_summary)[:self.SUMMARY_MAX_CHARS]
         key = self._wm_key(user_id, conv_id)
-        await self._redis.delete(key)
-        for m in reversed(keep):
-            await self._redis.lpush(key, json.dumps({
-                "role": m.role.value, "content": m.content,
-                "ts": m.timestamp.isoformat(), "metadata": m.metadata,
-            }))
-        await self._redis.expire(key, 86400)
+        async with self._redis.pipeline(transaction=True) as pipe:
+            if summary:
+                pipe.setex(skey, 86400, summary)
+            else:
+                pipe.delete(skey)
+            pipe.ltrim(key, 0, 4)  # Redis list is newest first; retain concurrent writes.
+            pipe.expire(key, 86400)
+            await pipe.execute()
+        await self._store_episodic(user_id, conv_id, episodic_topics(messages[:-5]))
         logger.info(f"工作记忆压缩完成: {user_id}/{conv_id}，摘要 {len(summary)} 字")
 
     # ── 内部辅助 ──────────────────────────────────────────────────────────────
@@ -315,58 +248,53 @@ class MemoryManager:
         return msgs
 
     async def _search_episodic(self, user_id: str, conv_id: str, query: str) -> List[str]:
-        """语义检索情景记忆。ChromaDB 内置 embedding，不依赖外部 API。"""
+        """Return only unexpired, sourced support topics for this user."""
         query_text = self._safe_text(query).strip()
         if not query_text:
             return []
         try:
-            results = await self._query_episodic(
-                query_text,
-                n_results=self.HISTORY_TOP_K,
-                where={"user_id": self._safe_text(user_id), "conv_id": self._safe_text(conv_id)},
-            )
-            docs = self._extract_docs(results)
+            results = await self._query_episodic(query_text, n_results=self.HISTORY_TOP_K,
+                where={"$and": [{"user_id": user_id}, {"conv_id": conv_id}]})
+            docs = self._verified_episodic_docs(results, user_id)
             if len(docs) < self.HISTORY_TOP_K:
-                fallback = await self._query_episodic(
-                    query_text,
-                    n_results=self.HISTORY_TOP_K,
-                    where={"user_id": self._safe_text(user_id)},
-                )
-                docs.extend(self._extract_docs(fallback))
-            return self._dedupe_texts(docs)[: self.HISTORY_TOP_K]
+                fallback = await self._query_episodic(query_text, n_results=self.HISTORY_TOP_K,
+                    where={"user_id": user_id})
+                docs.extend(self._verified_episodic_docs(fallback, user_id))
+            return self._dedupe_texts(docs)[:self.HISTORY_TOP_K]
         except Exception as ex:
             logger.warning(f"情景记忆检索失败: {ex}")
             return []
 
-    async def _store_episodic(self, user_id: str, conv_id: str, text: str, summary: str) -> None:
-        """将压缩后的对话片段存入情景记忆。ChromaDB 内置 embedding，不依赖外部 API。"""
+    async def _store_episodic(self, user_id: str, conv_id: str, topics: List[str]) -> None:
+        """Keep only deduplicated non-sensitive topics, never the raw transcript."""
+        if not topics:
+            return
         try:
-            user_id = self._safe_text(user_id)
-            conv_id = self._safe_text(conv_id)
-            text = self._safe_text(text)
-            summary = self._safe_text(summary)
-            doc_id = hashlib.md5(f"{user_id}{conv_id}{time.time()}".encode()).hexdigest()
-            # 直接传 documents，ChromaDB 内置模型自动生成 embedding
+            now = datetime.now(timezone.utc)
+            digest = ", ".join(topics)
+            doc_id = hashlib.sha256(f"{user_id}:{conv_id}:{digest}".encode()).hexdigest()
             await asyncio.to_thread(
-                self._episodic.add,
+                self._episodic.upsert,
                 ids=[doc_id],
-                documents=[summary],
+                documents=[f"用户曾咨询 {digest}；后续必须重新检索当前政策。"],
+                embeddings=[embed_query(digest)],
                 metadatas=[{"user_id": user_id, "conv_id": conv_id,
-                            "ts": datetime.now().isoformat(), "full_text": self._safe_text(text[:500])}],
+                            "source": "explicit_user_topic", "memory_type": "support_topic",
+                            "created_at": now.isoformat(),
+                            "expires_at": (now + timedelta(days=self.EPISODIC_TTL_DAYS)).isoformat()}],
             )
         except Exception as ex:
             logger.warning(f"存储情景记忆失败: {ex}")
 
     async def _get_profile(self, user_id: str) -> Dict[str, Any]:
-        """获取用户画像（取最新一条）。"""
+        """Ignore legacy, expired or inferred profile records."""
         try:
-            doc_id = self._profile_doc_id(user_id)
-            direct = await asyncio.to_thread(self._profile.get, ids=[doc_id])
-            if direct.get("documents"):
-                return json.loads(direct["documents"][0])
-
-            results = await asyncio.to_thread(self._profile.get, where={"user_id": user_id})
-            return self._latest_profile_from_results(results)
+            direct = await asyncio.to_thread(self._profile.get, ids=[self._profile_doc_id(user_id)])
+            if direct.get("documents") and direct.get("metadatas") and fresh_metadata(
+                direct["metadatas"][0], user_id=user_id, memory_type="user_profile",
+                source="explicit_user_statement"):
+                preferences = validated_preferences(json.loads(direct["documents"][0]).get("preferences"))
+                return {"preferences": preferences} if preferences else {}
         except Exception:
             pass
         return {}
@@ -375,13 +303,30 @@ class MemoryManager:
         """关闭异步 Redis 连接。"""
         await self._redis.aclose()
 
+    async def delete_session(self, user_id: str, conv_id: str) -> None:
+        """Forget one session without deleting the user's explicit preferences."""
+        user_id, conv_id = self._safe_text(user_id), self._safe_text(conv_id)
+        await self._redis.delete(self._wm_key(user_id, conv_id), self._summary_key(user_id, conv_id))
+        await asyncio.to_thread(self._episodic.delete,
+            where={"$and": [{"user_id": user_id}, {"conv_id": conv_id}]})
+
+    async def delete_user_memory(self, user_id: str) -> None:
+        """Internal deletion hook; no public endpoint until identity is authenticated."""
+        user_id = self._safe_text(user_id)
+        component = quote(user_id, safe="")
+        for prefix in ("wm", "summary"):
+            async for key in self._redis.scan_iter(match=f"{prefix}:{component}:*"):
+                await self._redis.delete(key)
+        await asyncio.to_thread(self._episodic.delete, where={"user_id": user_id})
+        await asyncio.to_thread(self._profile.delete, ids=[self._profile_doc_id(user_id)])
+
     @staticmethod
     def _wm_key(user_id: str, conv_id: str) -> str:
-        return f"wm:{user_id}:{conv_id}"
+        return f"wm:{quote(user_id, safe='')}:{quote(conv_id, safe='')}"
 
     @staticmethod
     def _summary_key(user_id: str, conv_id: str) -> str:
-        return f"summary:{user_id}:{conv_id}"
+        return f"summary:{quote(user_id, safe='')}:{quote(conv_id, safe='')}"
 
     @classmethod
     def _profile_doc_id(cls, user_id: str) -> str:
@@ -415,18 +360,19 @@ class MemoryManager:
     ) -> Dict[str, Any]:
         return await asyncio.to_thread(
             self._episodic.query,
-            query_texts=[query_text],
+            query_embeddings=[embed_query(query_text)],
             n_results=n_results,
             where=where,
+            include=["documents", "metadatas"],
         )
 
     @staticmethod
-    def _extract_docs(results: Dict[str, Any]) -> List[str]:
-        docs = results.get("documents") or []
-        if not docs:
-            return []
-        first = docs[0] if isinstance(docs[0], list) else docs
-        return [doc for doc in first if isinstance(doc, str) and doc.strip()]
+    def _verified_episodic_docs(results: Dict[str, Any], user_id: str) -> List[str]:
+        documents = (results.get("documents") or [[]])[0]
+        metadatas = (results.get("metadatas") or [[]])[0]
+        return [doc for doc, metadata in zip(documents, metadatas)
+                if isinstance(doc, str) and doc.strip() and fresh_metadata(
+                    metadata, user_id=user_id, memory_type="support_topic", source="explicit_user_topic")]
 
     @staticmethod
     def _dedupe_texts(values: List[str]) -> List[str]:
@@ -439,64 +385,3 @@ class MemoryManager:
             seen.add(text)
             deduped.append(text)
         return deduped
-
-    async def _merge_summary(self, old_summary: str, new_summary: str) -> str:
-        old_summary = self._safe_text(old_summary).strip()
-        new_summary = self._safe_text(new_summary).strip()
-        if not old_summary:
-            return new_summary[: self.SUMMARY_MAX_CHARS]
-        if not new_summary:
-            return old_summary[: self.SUMMARY_MAX_CHARS]
-
-        prompt = self._safe_text(
-            f"""你是对话摘要器。请把下面两段摘要合并为一段不超过 {self.SUMMARY_MAX_CHARS} 个中文字符的摘要。
-保留：用户偏好、关键实体、待办事项、约束条件、未解决问题。
-只输出摘要正文，不要编号，不要解释。
-
-旧摘要:
-{old_summary}
-
-新增摘要:
-{new_summary}
-"""
-        )
-        try:
-            resp = await self._client.messages.create(
-                model=self._model,
-                max_tokens=256,
-                temperature=0.0,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            merged = self._safe_text(extract_text_content(resp.content)).strip()
-            if merged:
-                return merged[: self.SUMMARY_MAX_CHARS]
-        except Exception as ex:
-            logger.warning(f"合并摘要失败，回退为截断拼接: {ex}")
-
-        merged = self._safe_text(f"{old_summary}\n{new_summary}").strip()
-        return merged[-self.SUMMARY_MAX_CHARS :]
-
-    @staticmethod
-    def _latest_profile_from_results(results: Dict[str, Any]) -> Dict[str, Any]:
-        documents = results.get("documents") or []
-        metadatas = results.get("metadatas") or []
-        if not documents:
-            return {}
-
-        candidates: List[tuple[str, Dict[str, Any], str]] = []
-        for idx, doc in enumerate(documents):
-            if not doc:
-                continue
-            metadata = metadatas[idx] if idx < len(metadatas) and isinstance(metadatas[idx], dict) else {}
-            ts = str(metadata.get("updated_at") or metadata.get("ts") or "")
-            candidates.append((ts, metadata, doc))
-
-        if not candidates:
-            return {}
-
-        candidates.sort(key=lambda item: item[0], reverse=True)
-        latest_doc = candidates[0][2]
-        try:
-            return json.loads(latest_doc)
-        except Exception:
-            return {}

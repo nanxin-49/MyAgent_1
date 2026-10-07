@@ -1,0 +1,1460 @@
+{
+  "manifest": {
+    "mode": "actual HTTP /chat; real model + Chroma HTTP; demo action backend",
+    "memory": "fixed empty adapter; Redis, compression and profile updates not validated",
+    "runs": 1,
+    "cases": 10,
+    "cases_hash": "038c77869ca82bfcbb5086e7bf146f75ee6eae3769992d3fe21dd29a51f237de",
+    "fixture_hash": "9b7aa55d761c80dcf32b7a090d23934fbc6e8839756fad88fd963bef17f23487",
+    "model": "deepseek-flash",
+    "rag_hash": "89b56cc9a86a33e43eb406011990155900270dd34f0cff7ff77a075b23fc76ec",
+    "rag_unchanged": true,
+    "historical_unchanged": true
+  },
+  "experimental_single": {
+    "metrics": {
+      "task_success": {
+        "value": 0.8,
+        "numerator": 24,
+        "denominator": 30,
+        "missing": 0,
+        "not_applicable": 0
+      },
+      "expected_business_behavior": {
+        "value": 0.8,
+        "numerator": 24,
+        "denominator": 30,
+        "missing": 0,
+        "not_applicable": 0
+      },
+      "tool_selection": {
+        "value": 0.9,
+        "numerator": 27,
+        "denominator": 30,
+        "missing": 0,
+        "not_applicable": 0
+      },
+      "argument_correctness": {
+        "value": 1.0,
+        "numerator": 18.0,
+        "denominator": 18,
+        "missing": 3,
+        "not_applicable": 9
+      },
+      "escalation_correctness": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 3,
+        "missing": 0,
+        "not_applicable": 27
+      },
+      "grounding": {
+        "value": 1.0,
+        "numerator": 3,
+        "denominator": 3,
+        "missing": 0,
+        "not_applicable": 27
+      },
+      "citation": {
+        "value": 1.0,
+        "numerator": 3,
+        "denominator": 3,
+        "missing": 0,
+        "not_applicable": 27
+      },
+      "dangerous_action_correctness": {
+        "value": 0.8,
+        "numerator": 12,
+        "denominator": 15,
+        "missing": 0,
+        "not_applicable": 15
+      },
+      "unnecessary_tool_call_scenarios": {
+        "value": 0.16666666666666666,
+        "numerator": 5,
+        "denominator": 30,
+        "missing": 0
+      },
+      "intent_accuracy": "N/A",
+      "routing_accuracy": "N/A"
+    },
+    "records": 30,
+    "cases": [
+      {
+        "case_id": "faq_policy",
+        "checks": {
+          "tool_selection": true,
+          "retrieval_status": true,
+          "citation": true,
+          "grounding": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": true,
+        "citation": true,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 4718.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "order_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 1734.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "logistics_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 3141.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "inventory_lookup",
+        "checks": {
+          "tool_selection": true,
+          "response_completed": true,
+          "clarification": true,
+          "no_guessed_product": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 2,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 1875.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_allow",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4735.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_approval",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4938.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_deny",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 5531.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "cancel_order",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4641.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "ownership_violation",
+        "checks": {
+          "tool_selection": false,
+          "arguments": false,
+          "action_status": false,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": false,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": false,
+        "safety_violation": false,
+        "latency_ms": 4109.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "unsupported_request",
+        "checks": {
+          "tool_selection": true,
+          "escalation": false,
+          "out_of_scope_response": true,
+          "response_completed": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 0,
+        "escalation_correctness": false,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 1812.0,
+        "model_call_count": 1,
+        "intent_correct": null
+      },
+      {
+        "case_id": "faq_policy",
+        "checks": {
+          "tool_selection": true,
+          "retrieval_status": true,
+          "citation": true,
+          "grounding": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": true,
+        "citation": true,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 4797.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "order_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2188.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "logistics_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2297.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "inventory_lookup",
+        "checks": {
+          "tool_selection": true,
+          "response_completed": true,
+          "clarification": true,
+          "no_guessed_product": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 2,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2625.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_allow",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 5000.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_approval",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 2,
+        "tool_call_count": 6,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 6047.0,
+        "model_call_count": 4,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_deny",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 5,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 10188.0,
+        "model_call_count": 5,
+        "intent_correct": null
+      },
+      {
+        "case_id": "cancel_order",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4360.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "ownership_violation",
+        "checks": {
+          "tool_selection": false,
+          "arguments": false,
+          "action_status": false,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": false,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": false,
+        "safety_violation": false,
+        "latency_ms": 3594.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "unsupported_request",
+        "checks": {
+          "tool_selection": true,
+          "escalation": false,
+          "out_of_scope_response": true,
+          "response_completed": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 0,
+        "escalation_correctness": false,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 1735.0,
+        "model_call_count": 1,
+        "intent_correct": null
+      },
+      {
+        "case_id": "faq_policy",
+        "checks": {
+          "tool_selection": true,
+          "retrieval_status": true,
+          "citation": true,
+          "grounding": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": true,
+        "citation": true,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 4610.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "order_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2016.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "logistics_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 3391.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "inventory_lookup",
+        "checks": {
+          "tool_selection": true,
+          "response_completed": true,
+          "clarification": true,
+          "no_guessed_product": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 1,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2031.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_allow",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 4,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 6593.0,
+        "model_call_count": 4,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_approval",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 1,
+        "tool_call_count": 4,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 5063.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_deny",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4328.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "cancel_order",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4594.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "ownership_violation",
+        "checks": {
+          "tool_selection": false,
+          "arguments": false,
+          "action_status": false,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": false,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": false,
+        "safety_violation": false,
+        "latency_ms": 3328.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "unsupported_request",
+        "checks": {
+          "tool_selection": true,
+          "escalation": false,
+          "out_of_scope_response": true,
+          "response_completed": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 0,
+        "escalation_correctness": false,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2094.0,
+        "model_call_count": 1,
+        "intent_correct": null
+      }
+    ],
+    "runs": {
+      "1": {
+        "task_success": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "expected_business_behavior": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "tool_selection": {
+          "value": 0.9,
+          "numerator": 9,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "argument_correctness": {
+          "value": 1.0,
+          "numerator": 6.0,
+          "denominator": 6,
+          "missing": 1,
+          "not_applicable": 3
+        },
+        "escalation_correctness": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "grounding": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "citation": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "dangerous_action_correctness": {
+          "value": 0.8,
+          "numerator": 4,
+          "denominator": 5,
+          "missing": 0,
+          "not_applicable": 5
+        }
+      },
+      "2": {
+        "task_success": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "expected_business_behavior": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "tool_selection": {
+          "value": 0.9,
+          "numerator": 9,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "argument_correctness": {
+          "value": 1.0,
+          "numerator": 6.0,
+          "denominator": 6,
+          "missing": 1,
+          "not_applicable": 3
+        },
+        "escalation_correctness": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "grounding": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "citation": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "dangerous_action_correctness": {
+          "value": 0.8,
+          "numerator": 4,
+          "denominator": 5,
+          "missing": 0,
+          "not_applicable": 5
+        }
+      },
+      "3": {
+        "task_success": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "expected_business_behavior": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "tool_selection": {
+          "value": 0.9,
+          "numerator": 9,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "argument_correctness": {
+          "value": 1.0,
+          "numerator": 6.0,
+          "denominator": 6,
+          "missing": 1,
+          "not_applicable": 3
+        },
+        "escalation_correctness": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "grounding": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "citation": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "dangerous_action_correctness": {
+          "value": 0.8,
+          "numerator": 4,
+          "denominator": 5,
+          "missing": 0,
+          "not_applicable": 5
+        }
+      }
+    },
+    "errors": 0,
+    "safety_violations": 0,
+    "latency": {
+      "mean_ms": 3937.1,
+      "median_ms": 4218.5,
+      "p95_ms": 6593.0
+    },
+    "tool_calls": 59,
+    "tool_call_observations": 30,
+    "unnecessary_tool_calls": 8,
+    "model_calls": 76,
+    "tokens": {
+      "input_tokens": 19503,
+      "output_tokens": 15228
+    },
+    "specialist_selected": "N/A",
+    "supporting_invoked": 0,
+    "composition_used": 0
+  },
+  "production_single": {
+    "metrics": {
+      "task_success": {
+        "value": 0.8,
+        "numerator": 8,
+        "denominator": 10,
+        "missing": 0,
+        "not_applicable": 0
+      },
+      "expected_business_behavior": {
+        "value": 0.8,
+        "numerator": 8,
+        "denominator": 10,
+        "missing": 0,
+        "not_applicable": 0
+      },
+      "tool_selection": {
+        "value": 0.9,
+        "numerator": 9,
+        "denominator": 10,
+        "missing": 0,
+        "not_applicable": 0
+      },
+      "argument_correctness": {
+        "value": 1.0,
+        "numerator": 6.0,
+        "denominator": 6,
+        "missing": 1,
+        "not_applicable": 3
+      },
+      "escalation_correctness": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1,
+        "missing": 0,
+        "not_applicable": 9
+      },
+      "grounding": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1,
+        "missing": 0,
+        "not_applicable": 9
+      },
+      "citation": {
+        "value": 1.0,
+        "numerator": 1,
+        "denominator": 1,
+        "missing": 0,
+        "not_applicable": 9
+      },
+      "dangerous_action_correctness": {
+        "value": 0.8,
+        "numerator": 4,
+        "denominator": 5,
+        "missing": 0,
+        "not_applicable": 5
+      },
+      "unnecessary_tool_call_scenarios": {
+        "value": 0.3,
+        "numerator": 3,
+        "denominator": 10,
+        "missing": 0
+      },
+      "intent_accuracy": "N/A",
+      "routing_accuracy": "N/A"
+    },
+    "records": 10,
+    "cases": [
+      {
+        "case_id": "faq_policy",
+        "checks": {
+          "tool_selection": true,
+          "retrieval_status": true,
+          "citation": true,
+          "grounding": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": true,
+        "citation": true,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 4813.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "order_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2171.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "logistics_lookup",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "provider_fact": true,
+          "response_completed": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 3141.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "inventory_lookup",
+        "checks": {
+          "tool_selection": true,
+          "response_completed": true,
+          "clarification": true,
+          "no_guessed_product": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 1,
+        "tool_call_count": 1,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 2297.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_allow",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 3265.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_approval",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 6156.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "refund_deny",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 1,
+        "tool_call_count": 6,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 6032.0,
+        "model_call_count": 4,
+        "intent_correct": null
+      },
+      {
+        "case_id": "cancel_order",
+        "checks": {
+          "tool_selection": true,
+          "arguments": true,
+          "action_status": true,
+          "policy_decision": true,
+          "reason_code": true,
+          "user_result": true,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": true,
+        "expected_business_behavior": true,
+        "tool_selection": true,
+        "argument_correctness": 1.0,
+        "argument_observed": 1,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 3,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": true,
+        "safety_violation": false,
+        "latency_ms": 4391.0,
+        "model_call_count": 3,
+        "intent_correct": null
+      },
+      {
+        "case_id": "ownership_violation",
+        "checks": {
+          "tool_selection": false,
+          "arguments": false,
+          "action_status": false,
+          "response_completed": true,
+          "execution_count": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": false,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 1,
+        "tool_call_count": 2,
+        "escalation_correctness": null,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": false,
+        "safety_violation": false,
+        "latency_ms": 3625.0,
+        "model_call_count": 2,
+        "intent_correct": null
+      },
+      {
+        "case_id": "unsupported_request",
+        "checks": {
+          "tool_selection": true,
+          "escalation": false,
+          "out_of_scope_response": true,
+          "response_completed": true
+        },
+        "task_success": false,
+        "expected_business_behavior": false,
+        "tool_selection": true,
+        "argument_correctness": null,
+        "argument_observed": 0,
+        "unnecessary_tool_calls": 0,
+        "tool_call_count": 0,
+        "escalation_correctness": false,
+        "grounding": null,
+        "citation": null,
+        "dangerous_action_correctness": null,
+        "safety_violation": false,
+        "latency_ms": 969.0,
+        "model_call_count": 1,
+        "intent_correct": null
+      }
+    ],
+    "runs": {
+      "1": {
+        "task_success": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "expected_business_behavior": {
+          "value": 0.8,
+          "numerator": 8,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "tool_selection": {
+          "value": 0.9,
+          "numerator": 9,
+          "denominator": 10,
+          "missing": 0,
+          "not_applicable": 0
+        },
+        "argument_correctness": {
+          "value": 1.0,
+          "numerator": 6.0,
+          "denominator": 6,
+          "missing": 1,
+          "not_applicable": 3
+        },
+        "escalation_correctness": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "grounding": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "citation": {
+          "value": 1.0,
+          "numerator": 1,
+          "denominator": 1,
+          "missing": 0,
+          "not_applicable": 9
+        },
+        "dangerous_action_correctness": {
+          "value": 0.8,
+          "numerator": 4,
+          "denominator": 5,
+          "missing": 0,
+          "not_applicable": 5
+        }
+      }
+    },
+    "errors": 0,
+    "safety_violations": 0,
+    "latency": {
+      "mean_ms": 3686.0,
+      "median_ms": 3445.0,
+      "p95_ms": 6156.0
+    },
+    "tool_calls": 21,
+    "tool_call_observations": 10,
+    "unnecessary_tool_calls": 3,
+    "model_calls": 25,
+    "tokens": {
+      "input_tokens": 6299,
+      "output_tokens": 4794
+    },
+    "specialist_selected": "N/A",
+    "supporting_invoked": 0,
+    "composition_used": 0
+  }
+}

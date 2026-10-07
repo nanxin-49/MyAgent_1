@@ -1,371 +1,61 @@
 # CartCare 定位与技术亮点
 
-这份文档面向第一次接触 CartCare 的人，用来快速理解：这个项目是什么、现在的多 Agent 架构是什么、它和之前“只有 prompt 区分 Agent”的版本有什么不同，以及它为什么不只是一个客服聊天 Demo。
+CartCare 是 E-commerce Support Agent，面向 FAQ、政策、商品、订单、物流、库存和售后场景。生产 topology = **Single Support Agent**。当前外部业务使用明确标注的 JSON fixture / 内存演示后端，尚未接入真实商城或支付系统。
 
-## 一句话定位
-
-CartCare 是一个面向复杂客服任务的多 Agent 客服编排运行时，并正在补齐面向电商动态事实的 Provider 层。
-
-它不是单个“客服机器人”，也不是简单把几个 prompt 拼在一起，而是一个把意图识别、知识检索、动态业务事实、记忆、路由、工具、监控和评测串起来的协同系统。系统先理解用户问题，再决定由哪个 Agent 主处理、是否需要其他 Agent 辅助、是否由 Agent 按需调用知识库或后续业务 Tool，最后再把结果写回记忆和观测系统。
-
-## 它解决什么问题
-
-真实客服场景并不是简单问答。
-
-用户常常会同时提到：
-
-- 订单、物流、会员、积分等通用咨询
-- 登录失败、401/500、页面崩溃等技术问题
-- 退款、发票、重复扣款、支付失败等账务问题
-- 转人工、投诉、紧急处理等升级诉求
-
-如果只用一个 Agent，通常会出现三类问题：
-
-1. **分流不准**  
-   技术问题被普通客服回答，账单问题被技术 Agent 忽略。
-
-2. **上下文断裂**  
-   多轮对话里用户补充订单号、金额、错误码后，系统无法稳定延续。
-
-3. **难以迭代**  
-   没有评测、监控和规则热更新，项目只能“看起来能聊”，很难持续优化。
-
-CartCare 的目标就是把这些能力做成一条完整链路，而不是只做一个能说话的模型壳子。
-
-## 当前是什么架构
-
-现在的 CartCare 不是“单 Agent + prompt 变体”的做法。  
-它当前是一个 **路由驱动的多 Agent 编排架构**，核心形态可以概括成：
+## 当前架构
 
 ```text
-意图识别 -> 路由决策 -> 单 Agent / 并行多 Agent 执行 -> 响应合并 -> 记忆回写 -> 监控/评测反馈
+POST /chat
+→ MemoryManager.get_context（Redis 工作记忆 / Chroma 筛选的长期记录）
+→ SupportRuntime → SingleSupportAgent（BaseAgent，统一工具注册表）
+    → RAG：静态 FAQ / 版本化政策
+    → Providers：动态业务事实和 ownership
+    → ActionService：Policy / PendingAction / HITL / idempotency
+→ Memory 回写、异步 profile 更新
+→ ChatResponse、Trace
 ```
 
-更具体一点：
+Agent 负责理解、澄清、参数收集、选择工具和生成回复。生产请求不经过 Intent → specialist dispatch，也不调用 supporting Agent 或 Composer。IntentRecognizer 仅用于显式评测诊断，不决定 /chat 的执行 Agent。
 
-- `IntentRecognizer` 先做三路融合意图识别
-- `AgentOrchestrator` 基于意图、实体、关键词、运行状态做路由
-- `GeneralAgent / TechnicalAgent / BillingAgent / EscalationAgent` 不是同一种 prompt 的简单拷贝，而是有各自角色契约、工具白名单、输入输出边界的运行时角色
-- 当请求同时覆盖多个业务域时，编排器会并行派发多个 Agent，再由 `ResponseComposer` 合并结果
-- 运行过程会把 Agent 成功率、延迟、工具质量回写到路由评分里，形成闭环
+## 工程边界
 
-这意味着，CartCare 的多 Agent 设计重点不是“Agent 数量”，而是**路由、协作、降级和治理**。
+- 动态事实来自 Provider；RAG 不替代订单、物流、库存或退款状态查询。
+- Tool Contract 保留严格 schema、read/write/dangerous 风险元数据、timeout、retry、typed errors 和 trace。危险动作不能由模型提供 approved 标志绕过控制。
+- 退款和取消由确定性 PolicyEngine 决策；ActionService 管理 PendingAction、审批/拒绝/恢复、执行时二次校验与幂等。LLM 不直接执行业务写入。
+- RAG 经外部 Chroma HTTP 存取；字符 n-gram embedding 是演示词面基线。usable 命中才有可用引用；来源、document_id、policy_version 与 chunk 信息保留。阈值仍为 0.35，fallback 不能作为可靠依据。
+- Memory 的工作层按用户/会话隔离并设置 24 小时 TTL；15 条触发确定性压缩，保留最近 5 条、订单号引用及待澄清字段。Chroma 只接收有来源和有效期的咨询主题与明确回复偏好，分别保留 30/180 天；订单、物流、库存和退款状态不进入长期事实。Monitor 继续观测工具和 Agent 成功率/延迟；Single 不再计算或反馈路由惩罚。
+- Trace 标记 topology=single、agent_type=support。模型调用统计覆盖 Support 与 RAG SDK 调用，不包含 Memory/profile 和 SDK 内部重试；不保存隐藏推理。
 
-## 和之前版本的不同
+## 为什么简化
 
-如果只看最早的版本，CartCare 更像：
+T10 是 controlled demo workload，3 × 10 cases / topology，not production benchmark；表中延迟不是生产 SLA。
 
-```text
-用户消息 -> 一个编排器 -> 几个 prompt 不同的 Agent
-```
+T10 已验收 done。[完整报告](../evaluation/reports/t10_topology_comparison.md)保留三轮各十场景的原始证据。
 
-而现在不是这样了。当前版本的关键变化有四个：
+| 指标 | Multi（30） | Single（30） |
+|---|---:|---:|
+| task success | 24/30 | 24/30 |
+| 不必要调用场景 | 10/30 | 5/30 |
+| 平均延迟 ms | 6633.3 | 3937.1 |
+| tool calls | 78 | 59 |
+| model calls | 115 | 76 |
 
-### 1. 从“prompt 区分”变成“角色契约区分”
+Multi 的最终样本未使用 supporting Agent 或 Composer；当前电商 workload 没有验证协作收益。相同任务成功率、较少工具/模型调用及较少 routing 层支持迁移到 Single。旧 Multi 类保留供 evaluation/run_topology_comparison.py 回归，不再描述为生产架构。
 
-现在每个 Agent 都有自己的 `AgentProfile`，里面不只是角色名，还包括：
+## 生产迁移验证与限制
 
-- `role`
-- `mission`
-- `workflow`
-- `input_contract`
-- `output_contract`
-- `handoff_conditions`
-- `tool_scope`
+[真实生产入口回归](../evaluation/reports/support_production/regression.md)为一轮实际 HTTP /chat、真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter：task success 8/10、工具选择 9/10、参数 6/6 observable、引用 1/1、危险动作正确性 4/5、安全违规 0；不必要调用 3/10、工具调用 21、模型调用 25、平均 HTTP 延迟 3686.0 ms。
 
-这意味着 Agent 的差异不只是“说话风格不同”，而是：
+结果支持实验 Single 与生产入口的主要行为一致。不必要调用比例较历史 Single 高，单轮不能判定稳定变化；该十场景回归未验证 Redis/长期 Memory，也不能用这些演示样本宣称真实生产效果。unsupported escalation（0/1）、ownership 严格任务证据缺口、technical/真实协作 workload 未覆盖均保留为 follow-up，没有同时修改 prompt 或业务规则。生产迁移已验收 done。
 
-- 接收什么输入
-- 产出什么结构
-- 能用哪些工具
-- 什么情况下必须升级
+历史 T09 10 场景基线保持原样（intent 7/10、tool selection 7/10、arguments 6/6、unnecessary cases 5/10、strict E2E 6/10），不能与新 citation contract 直接混算。其他 Wiki 中的 Multi 描述属于历史材料，本文件与重点代码是当前权威说明。
 
-这比单纯换 prompt 稳定得多。
+历史 [真实 Memory 验收](../evaluation/reports/support_production/memory_acceptance.md)记录旧实现的短期集成结果。T11 [新验收](../evaluation/reports/t11_memory_acceptance.md)保留原 16 项检查，新增演示订单状态变化后再次调用 Provider、异步偏好写入真实 Chroma，共 18/18；真实 Redis/Chroma 可选集成测试覆盖压缩、长期记录隔离与删除。Redis 读取故障返回 503 且 Agent 不执行。演示 user_id 仍非正式身份认证；长期记录按有效期读取，但物理过期清理尚未自动调度。
 
-### 2. 从“单点路由”变成“结构化路由 + 主辅协作”
+## 演示与可观察性（T12）
 
-现在编排器不只是选一个 Agent，而是会生成 `RoutingDecision`：
+同源 `/demo` 是轻量静态展示层，十场景按钮仅填入用户消息；真实输出来自 `/chat`、`/trace/tool/{request_id}` 与既有 ActionService API。LLM 选择工具，Provider 提供事实，确定性 Policy 控制允许/拒绝/审批；UI 不补造工具结果或审批逻辑。
 
-- `primary_agent`
-- `supporting_agents`
-- `routing_reason`
-- `routing_confidence`
+引用卡片关联 Trace 的文档标题、source、reference 与 policy_version；非 usable 状态不显示为可靠 citation。动作卡片区分原始请求快照与最新 ActionResult，Approve 可能直接完成执行。Memory 只展示计数、摘要存在标志、读写状态和阶段耗时，后台画像标为 scheduled_unobserved；不展示原始记忆或隐藏推理。
 
-这允许系统处理复合问题。  
-比如“登录报错 + 重复扣款”，可以由技术 Agent 主处理，账单 Agent 辅助处理，而不是强行塞给一个模型回答。
-
-### 3. 从“一个 Agent 一套能力”变成“共享工具 + 角色白名单”
-
-现在工具已经集中到 `agents/tools.py`，并且：
-
-- 有共享 RAG 工具
-- 有通用工具
-- 有技术工具
-- 有账单工具
-- 有升级工具
-
-Agent 不再是“看 prompt 自己决定能不能调用什么”，而是显式受工具白名单约束。
-
-### 4. 从“能回答”变成“可治理”
-
-现在系统里有：
-
-- 监控：看成功率、延迟、熔断、工具质量
-- 降权：运行差的 Agent 会被路由权重压低
-- 评测：意图识别 Accuracy / Macro-F1，回复表达质量 LLM-as-Judge，以及确定性 Tool/RAG/Policy/HITL 专项指标
-
-这意味着它不是静态编排，而是一个会根据运行表现持续调整的客服运行时。
-
-## 核心处理链路
-
-```text
-用户请求
-  -> /chat
-  -> 读取 Redis 工作记忆、ChromaDB 历史摘要和用户画像
-  -> 识别细粒度意图、意图组、置信度和结构化实体
-  -> 生成结构化路由决策
-     - primary_agent
-     - supporting_agents
-     - routing_reason
-     - routing_confidence
-  -> 单 Agent 执行或并行多 Agent 执行
-  -> Agent 按需 tool_use：search_knowledge_base 或只读业务 Provider Tool
-  -> 注入记忆、tool_result、结构化实体和动态 Skills
-  -> LLM 生成回复
-  -> 写入工作记忆
-  -> 异步更新用户画像
-  -> Monitor 和 Evaluator 形成观测与评测闭环
-```
-
-这条链路的重点不是“流程长”，而是每一步都在解决一个独立问题：
-
-- 记忆解决上下文
-- 意图解决分流
-- 路由解决主辅协作
-- RAG 解决静态政策知识的 grounding；动态订单/物流/库存/退款事实由 Provider 提供
-- Skills 解决业务规范
-- 监控解决在线健康度
-- 评测解决迭代质量
-
-## 核心技术亮点
-
-### 1. 细粒度意图识别
-
-CartCare 不只识别“咨询、投诉、技术、账单”这种粗粒度意图，还支持更贴近业务的细粒度分类。
-
-例如：
-
-| 细粒度意图 | 归一化意图组 | 示例 |
-|---|---|---|
-| `logistics` | `query` | 快递什么时候到 |
-| `refund` | `billing` | 退款多久到账 |
-| `invoice` | `billing` | 帮我开发票 |
-| `payment_issue` | `billing` | 为什么重复扣款 |
-| `technical_login` | `technical` | 登录一直报 401 |
-| `technical_crash` | `technical` | 应用一直崩溃 |
-| `human_handoff` | `escalation` | 我要找人工客服 |
-
-意图识别使用三路融合：
-
-- **LLM**：负责语义理解和上下文判断
-- **Embedding / 本地哈希向量**：负责模板相似度匹配
-- **Pattern**：负责关键词兜底
-
-最终输出的不只是 `intent`，还包括：
-
-- `intent_group`
-- `intent_confidence`
-- `intent_source_scores`
-- `urgency`
-- `entities`
-
-这让意图识别不只是分类器，而是后续路由、澄清和升级的结构化输入层。
-
-### 2. 结构化多 Agent 路由
-
-CartCare 的多 Agent 路由不是简单“命中两个关键词就并行”。
-
-当前实现是一个路由驱动的多 Agent 编排架构：
-
-1. 先通过意图识别得到业务方向
-2. 再按意图、关键词和实体打分
-3. 选出主 Agent
-4. 对足够强的其他领域选择辅助 Agent
-5. 必要时并行执行并合并结果
-
-系统内部的打分逻辑并不只是“谁像就选谁”，还会考虑：
-
-- 意图类别
-- 关键词命中
-- 结构化实体
-- 当前 Agent 是否可用
-- 在线表现和监控降权
-
-#### 现在的路由结构
-
-```text
-general
-technical
-billing
-escalation
-```
-
-主处理 Agent 由 `primary_agent` 表示，辅助 Agent 由 `supporting_agents` 表示。  
-如果是复合问题，系统会让多个 Agent 同时工作，而不是强行交给单个模型拼答案。
-
-#### 和之前版本的区别
-
-之前更像是“某个 Agent 负责一个 prompt 版本”。  
-现在是“多个具备契约和白名单的运行时角色 + 一个可解释的路由层 + 一个结果合并层”。
-
-这两个层次完全不是一回事。
-
-### 3. RAG 知识库增强
-
-CartCare 使用 ChromaDB 构建知识库，用于存放退款政策、配送说明、技术排障、会员规则等文档。
-
-检索链路包括：
-
-```text
-原始问题
-  -> 查询改写
-  -> 多子查询并行召回
-  -> 合并去重
-  -> LLM 重排
-  -> 可引用命中进入 Agent Tool Result
-```
-
-但不是所有请求都会触发 RAG。
-
-系统不会在 API 层固定预检索；Agent 只有在模型发出 `search_knowledge_base` tool_use 时才进入 RAG 工具循环。动态订单、物流、库存和退款状态不由 RAG 伪造。
-
-知识文档现在有 document ID、来源、类型、chunk 位置；Policy 类文档还要求版本与生效时间。检索结果提供结构化 citation，并由确定性阈值分成 `usable`、`low_confidence`、`no_answer`、`degraded`。只有 `usable` 内容可作为答复依据；fallback 没有真实文档 citation。分数是 `1 - Chroma distance` 的初始启发式，后续仍需评测校准。RAG 政策文字不能覆盖 PolicyEngine 的资格判定。
-
-演示知识库的 HTTP thin client 现在显式使用同一版本的字符 n-gram 向量进行导入和查询；这是小型词面向量基线，不宣称预训练语义能力。新演示 collection 与旧来源不明的记录隔离，可明确重建。真实 `/chat` FAQ 已验证可用检索、引用与“7 天”回答依据。
-
-### 动态业务 Provider 层
-
-T02 新增 `providers/`，为动态业务事实提供与存储解耦的只读接口：
-
-- `ProductProvider`：商品基础信息
-- `OrderProvider`：订单状态和订单明细
-- `InventoryProvider`：库存快照
-- `LogisticsProvider`：订单物流状态
-- `RefundProvider`：退款记录状态
-
-Provider 通过 `BusinessBackend` Protocol 读取结构化数据，并将结果校验为 Pydantic 模型。`agents/tools.py` 的 `build_business_tools()` 将五类 Provider 接入 Agent 的只读工具，API lifespan 注入测试/演示用 JSON fixture 内存 Backend；这不是对真实外部电商系统的接入。`NotFoundError`、`UnauthorizedError`、`ProviderDependencyError` 和数据校验错误会转换为稳定 Tool Result；写动作请求与审批经过 ActionService。
-
-`policies/` 已提供确定性的退款和取消资格判断：输入是 Provider 校验过的订单事实、请求客户标识、评估时间与金额；输出包含 `allow` / `deny` / `require_approval`、`reason_code`、`policy_version` 和解释。Policy Engine 不读取数据源，也不执行退款、取消或审批；这些执行控制留给 T05。
-
-`actions/` 已建立 T05 控制闭环：`PendingAction` 记录敏感动作、Policy Result、审批状态、幂等键和执行结果；`ActionService` 在 request、approve、reject、resume 时重新校验 Provider facts 和 Policy，并通过明确标注的模拟 Action Backend 执行。该实现用于演示状态机和安全边界，不是支付渠道或真实商城集成。
-
-T08 的共享 Tool Contract 将 Agent Tools 与 RAG ToolManager 对齐为同一套严格 schema、read/write/dangerous 风险等级、typed error 和 trace 字段。自动重试仅允许幂等读工具的可重试失败；敏感动作仍由 ActionService 的业务幂等和审批状态机保护。
-
-### 4. Redis + ChromaDB 记忆体系
-
-CartCare 把记忆拆成三层：
-
-| 记忆类型 | 存储 | 作用 |
-|---|---|---|
-| 工作记忆 | Redis | 当前会话最近消息 |
-| 情景记忆 | ChromaDB `episodic` | 历史对话摘要，支持语义检索 |
-| 用户画像 | ChromaDB `user_profile` | 用户偏好和关键实体 |
-
-Redis 读写使用异步客户端，ChromaDB 的同步操作放入线程池，减少主请求链路阻塞。
-
-当前会话消息过多时，系统会压缩旧消息，生成摘要，保留最近几轮对话，避免上下文无限膨胀。
-
-### 5. 动态 Skills 注入
-
-知识库解决的是“业务事实是什么”，Skills 解决的是“客服应该怎么处理”。
-
-例如：
-
-- 技术支持需要先收集错误码、版本、操作步骤
-- 账单退款不能承诺立即到账
-- 通用客服需要先澄清用户诉求
-- 涉及敏感信息时需要提醒用户不要公开密码或验证码
-
-CartCare 支持从 `skills/` 目录加载 Markdown / JSON / TXT 规则文件，并根据 Agent 类型和关键词动态注入到 system prompt。
-
-修改规则后可以通过接口热加载，不需要重启服务。
-
-### 6. MCP 工具可靠性治理
-
-CartCare 把知识库检索封装成工具，并加入完整的可靠性机制：
-
-- 参数校验
-- TTL 缓存
-- 超时控制
-- 熔断器
-- fallback 降级
-- 查询改写
-- LLM 重排
-- 工具成功率和延迟统计
-
-这让工具调用不只是“能调”，还具备可治理、可观测和可降级能力。
-
-### 7. Monitor 在线观测和路由降权
-
-Monitor 会定期采集：
-
-- Agent 成功率
-- Agent 平均延迟
-- 工具成功率
-- 工具平均延迟
-- 连续失败次数
-- 熔断状态
-
-如果某个 Agent 表现变差，Monitor 会写回 `monitor_penalty`，影响后续 `routing_score`。
-
-也就是说，监控不只是展示指标，还会影响后续路由选择。
-
-### 8. 在线质量评测与确定性专项评测
-
-CartCare 内置 `/eval/run` 评测入口。
-
-评测内容包括：
-
-- 意图识别 Accuracy
-- Macro-F1
-- 端到端 Agent 回复质量
-- LLM-as-Judge 四维评分
-- 回归检测
-- 优化建议
-
-LLM-as-Judge 只从四个主观维度评价回复：
-
-- 相关性
-- 清晰度
-- 完整性
-- 有用性
-
-另有独立专项 runner 使用固定演示数据复放 Tool、RAG、Policy、HITL 和幂等路径，报告保留逐 case 证据、指标分子/分母和 RAG 阈值 sweep。该离线复放不代表已测得模型真实意图或 Tool 选择能力；这些仍要以在线 `/chat` 观测为准。
-
-## 为什么它不是普通客服 Demo
-
-普通客服 Demo 通常只有：
-
-```text
-用户输入 -> LLM 回复
-```
-
-CartCare 则是：
-
-```text
-用户输入
-  -> 意图识别
-  -> 实体提取
-  -> 记忆读取
-  -> Agent 按需 tool_use 调用 RAG
-  -> Provider Tool（接入后）读取动态业务事实
-  -> 结构化多 Agent 路由
-  -> Skills 注入
-  -> Agent 回复
-  -> 记忆写入
-  -> 画像更新
-  -> 监控反馈
-  -> 评测回归
-```
-
-它更像一个小型的 Multi-Agent Runtime，而不是单轮聊天机器人。
+Trace 为进程内有界记录，早期 Memory 读失败无 Agent Trace；演示身份、内存 PendingAction、字符 n-gram 词面基线、unsupported 升级、外部商城/支付未接入和长期过期记录无后台物理清理等限制见当前 README。T11 18/18 是演示环境验收，不能代表生产规模稳定性。T12 已于 2026-10-07 经用户验收 done。

@@ -10,6 +10,7 @@ import logging
 import os
 import pathlib
 import sys
+import time
 import uuid
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
@@ -23,6 +24,8 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field, ValidationError
 from actions import ActionResult
@@ -70,7 +73,8 @@ async def lifespan(app: FastAPI):
 
     print(BANNER, flush=True)
 
-    from agents.agent_orchestrator import AgentOrchestrator, Request, build_shared_rag_tools
+    from agents.support_agent import SupportRuntime
+    from agents.tools import build_shared_rag_tools
     from agents.tools import build_action_tools, build_business_tools
     from actions import ActionService, InMemoryBusinessActionBackend
     from core.intent_recognizer import IntentRecognizer
@@ -86,7 +90,7 @@ async def lifespan(app: FastAPI):
     cfg = _anthropic_cfg()
     logger.info(f"模型: {cfg['model']}  base_url: {cfg.get('base_url', '(官方)')}")
 
-    # 意图识别器（Orchestrator 内部也会创建，这里单独暴露给 Evaluator）
+    # 可选意图诊断，仅用于显式请求的评测，不参与 /chat dispatch。
     recognizer = IntentRecognizer(
         api_key=cfg["api_key"],
         base_url=cfg.get("base_url"),
@@ -101,8 +105,8 @@ async def lifespan(app: FastAPI):
     )
     _skill_manager.load()
 
-    # Agent 编排器
-    _orchestrator = AgentOrchestrator(
+    # 单客服 Agent runtime
+    _orchestrator = SupportRuntime(
         api_key=cfg["api_key"],
         base_url=cfg.get("base_url"),
         model=cfg["model"],
@@ -161,6 +165,9 @@ async def lifespan(app: FastAPI):
         fallback=knowledge_fallback,
         retry_policy=RetryPolicy(max_attempts=2),
     ))
+    from core.model_observation import ObservedClient
+    _tool_manager._client = ObservedClient(_tool_manager._client, "rag_rewrite_or_rerank")
+
     business_fixture = os.getenv(
         "CARTCARE_BUSINESS_FIXTURE",
         str(pathlib.Path(_ROOT) / "providers" / "fixtures" / "business_provider_data.json"),
@@ -212,6 +219,8 @@ async def lifespan(app: FastAPI):
     await _monitor.stop()
     if _memory is not None:
         await _memory.close()
+    if _orchestrator is not None:
+        await _orchestrator.close()
     logger.info("CartCare 已关闭")
 
 
@@ -230,6 +239,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_DEMO = pathlib.Path(_ROOT) / "demo" / "static"
+app.mount("/demo-assets", StaticFiles(directory=_DEMO), name="demo-assets")
+
+
+@app.get("/demo", include_in_schema=False)
+async def demo_ui():
+    return FileResponse(_DEMO / "index.html")
+
 
 # ── 请求/响应模型 ─────────────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
@@ -242,23 +259,26 @@ class ChatResponse(BaseModel):
     conv_id:     str
     request_id:  str = ""
     response:    str
-    intent:      str
-    intent_group: str = "other"
+    topology: str = "single"
+    intent: Optional[str] = None
+    intent_group: Optional[str] = None
     agent_type:  str
     agent_types: List[str] = Field(default_factory=list)
-    primary_agent: str = ""
-    supporting_agents: List[str] = Field(default_factory=list)
+    primary_agent: Optional[str] = Field(default=None, deprecated=True)
+    supporting_agents: Optional[List[str]] = Field(default=None, deprecated=True)
     tools_used: List[str] = Field(default_factory=list)
-    routing_reason: str = ""
-    routing_confidence: float = 0.0
+    routing_reason: Optional[str] = Field(default=None, deprecated=True)
+    routing_confidence: Optional[float] = Field(default=None, deprecated=True)
     escalated:   bool
     latency_ms:  float
     knowledge_used: bool = False
     retrieval_status: Optional[str] = None
     citations: List[Dict[str, Any]] = Field(default_factory=list)
     entities: Dict[str, List[str]] = Field(default_factory=dict)
-    intent_confidence: float = 0.0
-    intent_source_scores: Dict[str, float] = Field(default_factory=dict)
+    intent_confidence: Optional[float] = None
+    intent_source_scores: Optional[Dict[str, float]] = None
+    model_call_count: int = 0
+    model_observation_scope: str = "support + RAG SDK calls; excludes Memory/profile"
 
 
 def collect_rag_evidence(tool_traces: List[Dict[str, Any]]) -> tuple[Optional[str], List[Dict[str, Any]]]:
@@ -323,10 +343,12 @@ async def reload_skills():
 async def chat(req: ChatRequest):
     """
     主对话接口。完整流程：
-      记忆读取 → 意图识别 → Agent 路由 → 执行 → 记忆写入
+      记忆读取 → SingleSupportAgent / Tool Contract → 记忆写入
     """
     if _orchestrator is None or _memory is None:
         raise HTTPException(503, "服务未就绪")
+
+    request_start = time.monotonic()
 
     from agents.agent_orchestrator import Request as OrcReq
     from memory.conversation_memory import MsgRole
@@ -334,15 +356,20 @@ async def chat(req: ChatRequest):
     conv_id = req.conv_id or str(uuid.uuid4())
 
     # 1. 读取记忆上下文
-    mem_ctx = await _memory.get_context(req.user_id, conv_id, query=req.message)
+    from redis.exceptions import RedisError
+    try:
+        mem_ctx = await _memory.get_context(req.user_id, conv_id, query=req.message)
+    except RedisError as exc:
+        raise HTTPException(status_code=503, detail={"error_code": "memory_unavailable",
+            "message": "会话记忆暂不可用"}) from exc
+    read_ms = (time.monotonic() - request_start) * 1000
 
-    # 2. 构建编排请求（含对话历史，用于意图识别上下文）
+    # 2. 构建客服请求；历史直接提供给 Agent。
     history = [
         {"role": m.role.value, "content": m.content}
         for m in mem_ctx.recent_messages[-5:]
     ] if mem_ctx.recent_messages else None
 
-    intent_result = await _orchestrator.recognize_intent(req.message, history=history)
     full_context = mem_ctx.to_prompt_text()
 
     orch_req = OrcReq(
@@ -351,45 +378,58 @@ async def chat(req: ChatRequest):
         conv_id=conv_id,
         context=full_context,
         history=history,
-        entities=intent_result.entities,
-        intent=intent_result.intent,
-        intent_group=intent_result.intent_group,
-        urgency=intent_result.urgency,
-        intent_confidence=intent_result.confidence,
     )
 
     # 3. 执行
     result = await _orchestrator.run(orch_req)
 
+    # Extend the existing bounded trace with counts, never raw memory or prompts.
+    trace = _orchestrator.get_tool_trace(result.request_id)
+    memory_observation = {
+        "read_status": "completed", "read_latency_ms": round(read_ms, 1),
+        "recent_message_count": len(mem_ctx.recent_messages),
+        "relevant_history_count": len(getattr(mem_ctx, "relevant_history", [])),
+        "profile_field_count": len(getattr(mem_ctx, "user_profile", {})),
+        "summary_present": bool(getattr(mem_ctx, "summary", "")),
+        "write_status": "started", "profile_update_status": "not_scheduled",
+    }
+    if trace is not None:
+        trace["memory"] = memory_observation
+
     # 4. 写入记忆
-    await _memory.add_message(req.user_id, conv_id, MsgRole.USER, req.message)
-    await _memory.add_message(req.user_id, conv_id, MsgRole.ASSISTANT, result.response)
+    write_start = time.monotonic()
+    try:
+        await _memory.add_message(req.user_id, conv_id, MsgRole.USER, req.message)
+        await _memory.add_message(req.user_id, conv_id, MsgRole.ASSISTANT, result.response)
+        memory_observation["write_status"] = "completed"
+    except Exception:
+        memory_observation["write_status"] = "failed"
+        raise
+    finally:
+        memory_observation["write_latency_ms"] = round((time.monotonic() - write_start) * 1000, 1)
 
     # 5. 异步更新用户画像（不阻塞响应）
     asyncio.create_task(_memory.update_profile(req.user_id, conv_id))
+    memory_observation["profile_update_status"] = "scheduled_unobserved"
+    if trace is not None:
+        trace["request_latency_ms"] = round((time.monotonic() - request_start) * 1000, 1)
+        trace["latency_scope"] = "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
 
     retrieval_status, citations = collect_rag_evidence(result.tool_traces)
     return ChatResponse(
         conv_id=conv_id,
         request_id=result.request_id,
         response=render_rag_citations(result.response, citations),
-        intent=result.intent.value if result.intent else "other",
-        intent_group=intent_result.intent_group,
-        agent_type=result.agent_type.value,
-        agent_types=[agent_type.value for agent_type in result.agent_types],
-        primary_agent=result.primary_agent.value if result.primary_agent else result.agent_type.value,
-        supporting_agents=[agent_type.value for agent_type in result.supporting_agents],
+        topology="single",
+        agent_type="support",
+        agent_types=["support"],
         tools_used=result.tools_used,
-        routing_reason=result.routing_reason,
-        routing_confidence=result.routing_confidence,
+        model_call_count=len(result.model_calls),
         escalated=result.escalated,
         latency_ms=round(result.latency_ms, 1),
         knowledge_used=bool(citations),
         retrieval_status=retrieval_status,
         citations=citations,
-        entities=intent_result.entities,
-        intent_confidence=round(intent_result.confidence, 4),
-        intent_source_scores=intent_result.source_scores,
     )
 
 
@@ -701,7 +741,7 @@ async def run_eval(body: Optional[EvalRunInput] = None):
             for c in body.intent_cases
         ]
     else:
-        intent_cases = DEFAULT_INTENT_CASES
+        intent_cases = []
 
     if body and body.dialog_cases is not None:
         dialog_cases = [
@@ -737,61 +777,21 @@ async def run_eval(body: Optional[EvalRunInput] = None):
 
 # ── 交互式 CLI ────────────────────────────────────────────────────────────────
 async def _cli():
-    print(BANNER)
+    """CLI shares production initialization and the same guarded chat path."""
     print("CartCare CLI — 输入 quit 退出\n")
-
-    from agents.agent_orchestrator import AgentOrchestrator, Request
-    from memory.conversation_memory import MemoryManager, MsgRole
-    from core.skill_loader import SkillManager
-
-    cfg = _anthropic_cfg()
-    skill_manager = SkillManager(
-        root_dir=os.getenv("ECHOMIND_SKILLS_DIR", str(pathlib.Path(_ROOT) / "skills")),
-        max_prompt_chars=int(os.getenv("ECHOMIND_SKILLS_MAX_PROMPT_CHARS", "5000")),
-    )
-    skill_manager.load()
-    orch = AgentOrchestrator(
-        api_key=cfg["api_key"],
-        base_url=cfg.get("base_url"),
-        model=cfg["model"],
-        skill_manager=skill_manager,
-    )
-    mem  = MemoryManager(
-        redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
-        chroma_host=os.getenv("CHROMA_HOST", "localhost"),
-        chroma_port=int(os.getenv("CHROMA_PORT", "8000")),
-        chroma_path=os.getenv("CHROMA_PERSIST_DIRECTORY", "/tmp/chroma"),
-        api_key=cfg["api_key"],
-        base_url=cfg.get("base_url"),
-        model=cfg["model"],
-    )
-
-    user_id, conv_id = "cli_user", str(uuid.uuid4())
-
-    while True:
-        try:
-            msg = input("你: ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\n再见")
-            break
-        if not msg or msg.lower() in ("quit", "exit", "退出"):
-            print("再见")
-            break
-
-        ctx = await mem.get_context(user_id, conv_id, query=msg)
-        history = [
-            {"role": m.role.value, "content": m.content}
-            for m in ctx.recent_messages[-5:]
-        ] if ctx.recent_messages else None
-        req = Request(message=msg, user_id=user_id, conv_id=conv_id, context=ctx.to_prompt_text(), history=history)
-        result = await orch.run(req)
-
-        await mem.add_message(user_id, conv_id, MsgRole.USER, msg)
-        await mem.add_message(user_id, conv_id, MsgRole.ASSISTANT, result.response)
-
-        print(f"\nCartCare [{result.agent_type.value}]: {result.response}\n")
-
-    await mem.close()
+    async with lifespan(app):
+        conv_id = str(uuid.uuid4())
+        while True:
+            try:
+                msg = input("你: ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print("\n再见")
+                break
+            if not msg or msg.lower() in ("quit", "exit", "退出"):
+                print("再见")
+                break
+            result = await chat(ChatRequest(message=msg, user_id="cli_user", conv_id=conv_id))
+            print(f"\nCartCare [{result.agent_type}]: {result.response}\n")
 
 
 if __name__ == "__main__":
