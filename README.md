@@ -177,3 +177,6 @@ T10 已验收 done；历史报告不改写。Multi / Single 三轮 task success 
 [生产 HTTP 回归](evaluation/reports/support_production/regression.md)：1 × 10 cases，真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter。task success 8/10，引用 1/1，危险动作 4/5，安全违规 0；不必要调用 3/10，平均 HTTP 延迟 3686.0 ms。样本不能证明长期性能改善，也不验证 Redis/长期 Memory。unsupported escalation、ownership 严格证据缺口及未覆盖的协作任务仍为 follow-up。生产迁移建议 verify，T10 保持 done。
 
 API 新增 topology=single / agent_type=support；primary_agent、supporting_agents、routing_reason、routing_confidence 保留为 nullable deprecated 字段，当前返回 null。intent 相关字段也为空，不伪造 routing accuracy。消费这些旧字段的客户端应迁移到新字段。
+
+真实 Memory 集成验收见 [Memory acceptance](evaluation/reports/support_production/memory_acceptance.md)：未替换 `MemoryManager`，连接项目 Redis 和 Chroma，经 HTTP `/chat` 完成新会话订单查询、同会话第二轮沿用订单号查询物流、用户/会话隔离与 Trace/API 空值检查。Redis 读故障返回 HTTP 500，Agent 未执行，服务恢复后会话可继续读取。此轮仅验证短期工作记忆；压缩、长期情景检索与画像质量仍待专项验证。该 500 为现有通用错误响应，后续可改善为明确的依赖错误。
+历史 `evaluation/run_baseline.py` 消费新的 Single `/chat` 时，会把 intent/routing 指标标为未观测，避免从 `agent_type=support` 伪造 primary routing；历史 Multi 报告未改写。

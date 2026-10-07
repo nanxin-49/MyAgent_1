@@ -14,6 +14,7 @@ from evaluation.topology_experiment import SingleSupportAgent as ExperimentalAge
 from tests.test_topology_comparison import CATALOG, NOW, FakeClient
 from evaluation.prepare_online_eval import prepare
 from evaluation.topology_experiment import isolated_business
+from evaluation import run_baseline
 
 
 class EmptyMemory:
@@ -118,3 +119,23 @@ def test_support_dangerous_schema_cannot_skip_policy_and_idempotency():
     args = {"order_id": "ORD-T09-CANCEL", "idempotency_key": "production-repeat"}
     first, second = cancel.handler(req, args), cancel.handler(req, args)
     assert first["action_id"] == second["action_id"] and len(backend.calls) == 1
+
+
+def test_historical_baseline_consumer_treats_single_routing_as_unobserved(monkeypatch):
+    chat = {"request_id": "single-test", "topology": "single", "agent_type": "support",
+            "agent_types": ["support"], "intent": None, "primary_agent": None,
+            "supporting_agents": None, "routing_reason": None, "routing_confidence": None,
+            "response": "请提供订单号", "tools_used": [], "latency_ms": 5}
+    monkeypatch.setattr(run_baseline, "_json_request", lambda _base, path, *args, **kwargs:
+        {"trace": {"request_id": "single-test", "tool_calls": [], "primary_agent": None,
+                   "supporting_agents": None}} if path.startswith("/trace/") else chat)
+    row = run_baseline._run_case({"id": "nullable", "messages": ["订单状态"],
+        "expected": {"intent": "order_status", "primary_agent": "general",
+                     "supporting_agents": [], "multi_agent": False}}, "http://localhost", 5)
+    assert row["actual"]["primary_agent"] is None
+    assert all(row["checks"][key] is None for key in
+               ("intent", "primary_routing", "supporting_routing", "multi_agent"))
+    metrics = run_baseline._metric_summary([row])
+    assert metrics["intent_accuracy"] is None
+    assert metrics["primary_routing_accuracy"] is None
+    assert metrics["multi_agent_trigger_rate"] is None

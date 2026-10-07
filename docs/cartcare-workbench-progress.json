@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-02T11:57:37.941629+00:00",
+  "updatedAt": "2026-10-07T02:49:45.116149+00:00",
   "tasks": {
     "T01": {
       "status": "done",
@@ -64,8 +64,8 @@
     },
     "SINGLE_MIGRATION": {
       "status": "verify",
-      "evidence": "agents/support_agent.py; api/main.py; tests/test_support_production.py; evaluation/reports/support_production/regression.md",
-      "note": "独立生产迁移：/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。实际 HTTP 10 cases task 8/10、citation 1/1、dangerous 4/5、安全违规 0；不必要调用 3/10，不能判断稳定变化。固定空 Memory adapter，不验证 Redis/长期 Memory。遗留失败保留 follow-up，等待用户验收。"
+      "evidence": "agents/support_agent.py; api/main.py; tests/test_support_production.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md",
+      "note": "独立生产迁移：/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。实际 HTTP 10 cases task 8/10、citation 1/1、dangerous 4/5、安全违规 0；不必要调用 3/10，不能判断稳定变化。固定空 Memory adapter，不验证 Redis/长期 Memory。遗留失败保留 follow-up，等待用户验收。 2026-10-07 真实 Memory 验收：原有 MemoryManager + Redis/Chroma + HTTP /chat，订单跨轮沿用、用户/会话隔离、API/Trace nullable deprecated、Redis 故障 500 且 Agent 未执行均通过。建议 done，状态保留 verify 等用户确认。长期压缩/画像质量未验证；通用 500 可后续改进。"
     }
   },
   "decisions": {
@@ -83,6 +83,6 @@
     "d4-body": ""
   },
   "globals": {
-    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。\n生产 topology = Single Support Agent；Single migration verify，T10 done。回归 133 passed；真实 HTTP 十场景 8/10；完整口径见 support_production/regression.md。"
+    "verifyNotes": "2026-10-02 独立 RAG Online Integration Hardening：显式同版本 embedding、版本化演示 collection、受来源保护的重建命令；真实 Chroma HTTP 与 /chat FAQ 复验见 rag_faq_online_verification.json。旧来源不明 collection 保留。\n生产 topology = Single Support Agent；Single migration verify，T10 done。回归 133 passed；真实 HTTP 十场景 8/10；完整口径见 support_production/regression.md。\n2026-10-07 真实 Memory 验收通过，16/16 checks；见 support_production/memory_acceptance.md。迁移可建议 done；当前任务状态仍为 verify 待用户确认。"
   }
 }

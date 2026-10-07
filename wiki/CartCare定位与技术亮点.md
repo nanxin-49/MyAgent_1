@@ -47,3 +47,5 @@ Multi 的最终样本未使用 supporting Agent 或 Composer；当前电商 work
 结果支持实验 Single 与生产入口的主要行为一致。不必要调用比例较历史 Single 高，单轮不能判定稳定变化；未验证 Redis/长期 Memory，也不能用这些演示样本宣称真实生产效果。unsupported escalation（0/1）、ownership 严格任务证据缺口、technical/真实协作 workload 未覆盖均保留为 follow-up，没有同时修改 prompt 或业务规则。生产迁移状态为 verify，等待用户验收。
 
 历史 T09 10 场景基线保持原样（intent 7/10、tool selection 7/10、arguments 6/6、unnecessary cases 5/10、strict E2E 6/10），不能与新 citation contract 直接混算。其他 Wiki 中的 Multi 描述属于历史材料，本文件与重点代码是当前权威说明。
+
+后续 [真实 Memory 验收](../evaluation/reports/support_production/memory_acceptance.md)已补齐短期集成证据：真实 Redis/Chroma、原有 MemoryManager、真实模型与 HTTP `/chat` 的跨轮订单号沿用、用户/会话隔离和服务故障路径均通过。之前的十场景回归仍为固定空 Memory 条件，不混作 Memory 验收。压缩、长期情景检索与画像质量未在本轮验证；迁移现可建议 done，Workbench 保持 verify 待用户确认。

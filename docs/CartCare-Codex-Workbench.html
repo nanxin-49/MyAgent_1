@@ -131,11 +131,11 @@
     <section id="single-migration">
       <h2>Single Support production migration · verify</h2>
       <div class="work-item" data-task="SINGLE_MIGRATION">
-        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="agents/support_agent.py; evaluation/reports/support_production/regression.md"></div><div><label class="small">备注</label><textarea data-field="note">独立生产迁移；/chat=Single Support Agent；实际 HTTP 十场景 8/10，安全违规 0。固定空 Memory adapter，不验证 Redis/长期 Memory。等待用户验收。</textarea></div></div>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="agents/support_agent.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md"></div><div><label class="small">备注</label><textarea data-field="note">独立生产迁移；/chat=Single Support Agent；实际 HTTP 十场景 8/10，安全违规 0。此前十场景回归使用固定空 Memory；后续真实 Redis/MemoryManager 跨轮、隔离、故障和 API/Trace 验收通过。建议 done，待用户确认；长期 Memory 未验证。</textarea></div></div>
       </div>
       <div class="callout">生产 topology = Single Support Agent。T10 保持 done；新迁移待用户验收。旧 Intent dispatch、specialist、supporting Agent、Composer 不再用于 /chat；旧类仅保留历史实验，业务安全层未改变。</div>
       <p>133 passed；实际 HTTP /chat 十场景：task success 8/10、工具选择 9/10、参数 6/6、citation 1/1、dangerous 4/5、安全违规 0、不必要调用 3/10、tool calls 21、SDK calls 25、平均延迟 3686.0 ms。真实模型和 Chroma HTTP、演示业务后端、固定空 Memory adapter；不验证 Redis/长期 Memory，单轮不能证明稳定性能变化。</p>
-      <p>证据：evaluation/reports/support_production/regression.md。unsupported escalation、ownership strict evidence 和未覆盖协作 workload 保留 follow-up。API topology=single / agent_type=support；旧 routing 字段 nullable deprecated。</p>
+      <p>证据：evaluation/reports/support_production/regression.md。unsupported escalation、ownership strict evidence 和未覆盖协作 workload 保留 follow-up。API topology=single / agent_type=support；旧 routing 字段 nullable deprecated。2026-10-07 真实 Memory 集成验收 16/16 checks 通过；Redis 故障返回现有通用 HTTP 500，Agent 未执行，恢复后会话可读。证据：evaluation/reports/support_production/memory_acceptance.md。</p>
     </section>
 
     <section id="scope">
