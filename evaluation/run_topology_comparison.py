@@ -92,11 +92,14 @@ async def run_case(arm, case, fixture, now, cfg, kb, skills, args, run):
     events, execution, clients = [], {"invoked_agents": [], "agent_attempts": [],
                                      "supporting_invoked": [], "composition_used": False}, []
     business, service, write_backend = isolated_business(fixture, now)
+    from core.auth import Principal
+    fixture_user = case.get("user_id", "customer-1")
     rag, rag_client = rag_manager(cfg, kb, events)
     clients.append(rag_client)
     req = Request(message=case["message"], user_id=case.get("user_id", "customer-1"),
                   conv_id=f"t10-{uuid.uuid4().hex}", context=case.get("context", ""),
-                  history=case.get("history"))
+                  history=case.get("history"),
+                  principal=Principal(f"topology-fixture:{fixture_user}", fixture_user, frozenset({"customer"})))
     record = {"case_id": case["id"], "topology": arm, "run": run,
               "mode": "real_model_chat_style_demo_backend", "request_id": req.request_id,
               "context_hash": digest({"context": req.context, "history": req.history}),

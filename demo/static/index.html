@@ -9,6 +9,10 @@
 <aside>演示身份与内存业务后端，未接真实商城或支付。场景按钮仅填入消息；实际结果以 API 为准。
 退款场景需先生成新鲜 fixture 并重启服务；已完成动作会改变内存状态。<a href="/docs">API 文档</a></aside>
 <section><h2>选择场景</h2><div id="scenarios" class="scenarios"></div></section>
+<section><h2>受控本地 Demo 凭据</h2><p>需服务端显式启用回环 Demo Auth。凭据仅留在本页内存；客户凭据须匹配下方 user_id。审核与 Trace 使用独立权限。</p>
+<label>客户 Bearer token<input id="customer-token" type="password" autocomplete="off"></label>
+<label>Reviewer Bearer token<input id="reviewer-token" type="password" autocomplete="off"></label>
+<label>Admin Bearer token（Trace）<input id="admin-token" type="password" autocomplete="off"></label></section>
 <form id="chat-form"><div class="fields"><label>Demo user_id<input id="user-id" value="customer-1" required></label>
 <label>会话 conv_id（留空新建）<input id="conv-id" placeholder="响应后自动沿用"></label></div>
 <label>用户输入<textarea id="message" rows="3" required placeholder="例如：退款政策是什么？"></textarea></label>

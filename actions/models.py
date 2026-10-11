@@ -47,6 +47,8 @@ class PendingAction(BaseModel):
     error_code: str | None = None
     error_message: str | None = None
     execution_result: dict[str, Any] | None = None
+    reviewed_by: str | None = None
+    requested_by: str | None = None
 
 
 class ActionResult(BaseModel):

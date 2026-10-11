@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from threading import RLock
 from typing import Any, Callable
+from core.auth import Principal
 
 from policies import PolicyDecision, PolicyDecisionType, PolicyEngine
 from providers import OrderProvider, RefundProvider
@@ -50,7 +51,11 @@ class ActionService:
         request_id: str,
         amount: Any = None,
         idempotency_key: str | None = None,
+        principal: Principal | None = None,
     ) -> ActionResult:
+        denied = self._customer_gate(principal, user_id)
+        if denied:
+            return denied
         return self._request(
             ActionType.REFUND,
             order_id=order_id,
@@ -58,6 +63,7 @@ class ActionService:
             request_id=request_id,
             amount=amount,
             idempotency_key=idempotency_key,
+            actor_subject=principal.subject_id,
         )
 
     def request_cancel(
@@ -67,7 +73,11 @@ class ActionService:
         user_id: str,
         request_id: str,
         idempotency_key: str | None = None,
+        principal: Principal | None = None,
     ) -> ActionResult:
+        denied = self._customer_gate(principal, user_id)
+        if denied:
+            return denied
         return self._request(
             ActionType.CANCEL_ORDER,
             order_id=order_id,
@@ -75,14 +85,25 @@ class ActionService:
             request_id=request_id,
             amount=None,
             idempotency_key=idempotency_key,
+            actor_subject=principal.subject_id,
         )
 
-    def approve(self, *, action_id: str, user_id: str, request_id: str) -> ActionResult:
+    def approve(self, *, action_id: str, user_id: str, request_id: str,
+                principal: Principal | None = None) -> ActionResult:
         with self._lock:
-            action = self._owned_action(action_id, user_id)
-            if isinstance(action, ActionResult):
-                return action
+            if not isinstance(principal, Principal):
+                return self._simple_error("unauthenticated", "需要有效认证")
+            if "reviewer" not in principal.roles:
+                return self._simple_error("forbidden", "需要审核权限")
+            action = self._store.get(action_id)
+            if action is None or (user_id and action.user_id != user_id):
+                return self._simple_error("not_found", "未找到可访问的动作")
+            if (action.user_id not in principal.review_customers
+                or principal.customer_id == action.user_id
+                or action.requested_by == principal.subject_id):
+                return self._simple_error("forbidden", "动作不在独立审核范围内")
             if action.status is ActionStatus.AWAITING_APPROVAL:
+                action.reviewed_by = principal.subject_id
                 action.status = ActionStatus.APPROVED
                 action.updated_at = self._now()
                 self._store.save(action)
@@ -96,7 +117,11 @@ class ActionService:
                 return self._result(action, reused=True)
             return self._invalid_transition(action, "approve")
 
-    def reject(self, *, action_id: str, user_id: str, request_id: str) -> ActionResult:
+    def reject(self, *, action_id: str, user_id: str, request_id: str,
+               principal: Principal | None = None) -> ActionResult:
+        denied = self._customer_gate(principal, user_id)
+        if denied:
+            return denied
         with self._lock:
             action = self._owned_action(action_id, user_id)
             if isinstance(action, ActionResult):
@@ -117,7 +142,11 @@ class ActionService:
                 return self._result(action, reused=True)
             return self._invalid_transition(action, "reject")
 
-    def resume(self, *, action_id: str, user_id: str, request_id: str) -> ActionResult:
+    def resume(self, *, action_id: str, user_id: str, request_id: str,
+               principal: Principal | None = None) -> ActionResult:
+        denied = self._customer_gate(principal, user_id)
+        if denied:
+            return denied
         with self._lock:
             action = self._owned_action(action_id, user_id)
             if isinstance(action, ActionResult):
@@ -135,9 +164,19 @@ class ActionService:
                 return self._result(action, reused=True)
             return self._invalid_transition(action, "resume")
 
-    def get(self, action_id: str, *, user_id: str) -> ActionResult:
+    def get(self, action_id: str, *, user_id: str, principal: Principal | None = None) -> ActionResult:
+        denied = self._customer_gate(principal, user_id)
+        if denied:
+            return denied
         with self._lock:
             return self._result_or_error(self._owned_action(action_id, user_id))
+
+    def _customer_gate(self, principal, user_id):
+        if not isinstance(principal, Principal):
+            return self._simple_error("unauthenticated", "需要有效认证")
+        if "customer" not in principal.roles or principal.customer_id != user_id:
+            return self._simple_error("forbidden", "客户身份与权限不匹配")
+        return None
 
     def _request(
         self,
@@ -148,6 +187,7 @@ class ActionService:
         request_id: str,
         amount: Any,
         idempotency_key: str | None,
+        actor_subject: str,
     ) -> ActionResult:
         if not all(isinstance(value, str) and value.strip() for value in (order_id, user_id, request_id)):
             return self._simple_error("invalid_action_input", "action 输入缺少 order_id、user_id 或 request_id")
@@ -195,6 +235,7 @@ class ActionService:
             action = self._new_action(
                 action_type, order_id, user_id, request_id, parsed_amount, key, policy
             )
+            action.requested_by = actor_subject
             if policy.decision is PolicyDecisionType.DENY:
                 action.status = ActionStatus.REJECTED
                 action.error_code = policy.reason_code

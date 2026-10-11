@@ -18,6 +18,7 @@ from actions import ActionService, InMemoryBusinessActionBackend
 from agents.agent_orchestrator import Request
 from agents.tools import build_action_tools, build_business_tools
 from core.tool_contract import execute_tool
+from core.auth import Principal
 from mcp.rag_contract import RetrievalStatus, build_hit
 from mcp.tool_manager import MCPToolManager, Tool
 from policies import PolicyEngine
@@ -89,7 +90,10 @@ async def _scenario(case: dict[str, Any]) -> list[SystemEvalCase]:
     spec = tools[case["tool"]]
     arguments = case["arguments"]
     user_id = case.get("user_id", "customer-1")
-    request = Request(message=case["message"], user_id=user_id, conv_id=f"eval-{case_id}", request_id=f"eval-{case_id}")
+    # Isolated component replay owns this synthetic fixture identity; no HTTP trust.
+    principal = Principal(f"component-replay:{user_id}", user_id, frozenset({"customer"}))
+    request = Request(message=case["message"], user_id=user_id, conv_id=f"eval-{case_id}",
+                      request_id=f"eval-{case_id}", principal=principal)
     result = await execute_tool(spec, arguments, lambda: spec.handler(request, arguments))
     payload = result.data if isinstance(result.data, dict) else {}
     checks: dict[str, bool] = {"tool_executed": result.attempts == 1}

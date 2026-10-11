@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-11T20:03:59+08:00",
+  "updatedAt": "2026-10-11T20:36:22+08:00",
   "tasks": {
     "A03-lite": {
       "status": "verify",
       "outcome": "fixed",
-      "issue_id": "N03",
-      "issues": { "N03": "fixed", "N02-auth": "known_open", "N02-ops": "known_open" },
-      "evidence": "providers/implementations.py; providers/errors.py; tests/test_provider_safety.py; tests/test_business_tools.py; docs/engineering/ADR-auth-and-provider-safety.md",
-      "note": "2026-10-11 A03-lite/N03=fixed，verify待用户验收。HEAD=b00344be38e83af5d1f13d81b8d0f2f4a628a950，开始工作区干净，N01已在HEAD。本轮仅Provider错误安全：_read在model_validate前检查可确定归属，校验诊断仅类型/数量，from None抑制常规异常链；to_dict固定公开消息与空details，读工具unauthorized映射not_found，内部typed code/ActionService不变。原审查N03与PROVIDER_ERROR_LEAK证据复核，脚本/JSON只读哈希未变。新增12个安全用例，首轮6 failed；相关Provider/Tool/Action专项58 passed，完整176 passed/2 skipped/1既有AnyIO警告；uv lock --check 53 packages与git diff --check通过。Fake SDK/Memory HTTP回显验证/chat、Trace、模型第二次tool_result不含标记；没有真实模型、live Redis/Chroma或部署验收。N02可信身份/审批/Trace授权未实施，不宣称公网安全。README/核心Wiki无需更新架构；公开读错误码兼容变化见ADR。独立练习：合法owner的total_amount含合成标记，测试invalid_data/空details/无泄露及内部安全类型计数。未提交/推送，不自动开始其他任务。"
+      "issue_id": "N02",
+      "issues": { "N03": "fixed", "N02-auth": "fixed", "N02-ops": "fixed" },
+      "evidence": "core/auth.py; api/main.py; actions/service.py; tests/test_auth_boundary.py; tests/test_provider_safety.py; docs/engineering/ADR-auth-and-provider-safety.md",
+      "note": "2026-10-11 A03-lite/N02-auth与N02-ops=fixed，verify待用户验收。HEAD=cfa7d0781275bc164e21ee909d0f9a1cfbabdad7；起始干净，N01/N03已在HEAD。HTTP AuthAdapter→Principal→API/Tool→Provider/ActionService gates；默认拒绝，body身份冲突403，未认证401；独立reviewer按review_customers且非同owner/同requested_by主体审批，记录requested_by/reviewed_by，owner保留。Trace/Knowledge/Skills/Eval/Monitor/Metrics/Search要求admin。Demo需显式development+回环绑定/peer/Host及服务端Bearer映射，无默认凭据；页面分开三类token，CLI经过Adapter。红测11 failed；最终N02/N01/N03专项80 passed（37/31/12）；完整213 passed/2 skipped/1既有AnyIO警告；JS12 passed含tokenheader验证；lock53 packages/diff/JSON通过。初版测试API不兼容及两个旧测试身份适配问题已修，未放宽认证。compileall沙箱pycache权限失败后正常权限通过。真实模型/live Redis-Chroma/支付/容器/部署/CI未跑；历史证据只读且hash不变。仅N02，N10状态隔离及跨进程Store/生产认证和网络边界仍未解决。README/两份核心Wiki/ADR同步新契约。独立练习：范围外reviewer审批403且状态/actor/执行不变，再合法审批两次验证owner/actor/单次执行。未提交/推送，停止待验收。",
+      "N03_history": "2026-10-11 A03-lite/N03=fixed，verify待用户验收。HEAD=b00344be38e83af5d1f13d81b8d0f2f4a628a950，开始工作区干净，N01已在HEAD。本轮仅Provider错误安全：_read在model_validate前检查可确定归属，校验诊断仅类型/数量，from None抑制常规异常链；to_dict固定公开消息与空details，读工具unauthorized映射not_found，内部typed code/ActionService不变。原审查N03与PROVIDER_ERROR_LEAK证据复核，脚本/JSON只读哈希未变。新增12个安全用例，首轮6 failed；相关Provider/Tool/Action专项58 passed，完整176 passed/2 skipped/1既有AnyIO警告；uv lock --check 53 packages与git diff --check通过。Fake SDK/Memory HTTP回显验证/chat、Trace、模型第二次tool_result不含标记；没有真实模型、live Redis/Chroma或部署验收。N02可信身份/审批/Trace授权未实施，不宣称公网安全。README/核心Wiki无需更新架构；公开读错误码兼容变化见ADR。独立练习：合法owner的total_amount含合成标记，测试invalid_data/空details/无泄露及内部安全类型计数。未提交/推送，不自动开始其他任务。"
     },
     "A04": {
       "status": "verify",

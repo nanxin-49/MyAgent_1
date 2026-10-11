@@ -1,9 +1,12 @@
+from tests.auth_helpers import customer, reviewer
 """Production HTTP wiring and deterministic safety; fake SDK is not online evidence."""
 import asyncio
 from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
+
+pytestmark = pytest.mark.usefixtures("authenticated_http")
 from fastapi.testclient import TestClient
 
 from api import main
@@ -59,8 +62,8 @@ def test_chat_uses_support_and_guarded_shared_tools(monkeypatch, case):
     monkeypatch.setattr(main, "_orchestrator", runtime)
     monkeypatch.setattr(main, "_memory", EmptyMemory())
     monkeypatch.setattr(main, "_action_service", service)
-    http = TestClient(main.app)  # no lifespan: use isolated deterministic dependencies
-    response = http.post("/chat", json={"message": case["message"], "user_id": case.get("user_id", "customer-1")})
+    http = TestClient(main.app, headers={"Authorization": "Bearer test-customer-1"})  # no lifespan: use isolated deterministic dependencies
+    response = http.post("/chat", headers={"Authorization": "Bearer test-" + case.get("user_id", "customer-1")}, json={"message": case["message"], "user_id": case.get("user_id", "customer-1")})
     assert response.status_code == 200
     body = response.json()
     assert body["topology"] == "single" and body["agent_type"] == "support"
@@ -86,7 +89,7 @@ def test_chat_uses_support_and_guarded_shared_tools(monkeypatch, case):
         action_id = action["action_id"]
         assert http.post(f"/actions/{action_id}/resume", json={"user_id": "customer-1"}).json()["status"] == "awaiting_approval"
         for _ in range(2):
-            assert http.post(f"/actions/{action_id}/approve", json={"user_id": "customer-1"}).json()["status"] == "completed"
+            assert http.post(f"/actions/{action_id}/approve", headers={"Authorization": "Bearer test-reviewer"}, json={"user_id": "customer-1"}).json()["status"] == "completed"
         assert len(backend.calls) == 1
 
 
@@ -98,7 +101,7 @@ def test_production_prompt_and_registry_equal_accepted_single():
     experiment = ExperimentalAgent(FakeClient("unused", {}), "test")
     experiment.set_shared_tools(tools)
     experiment.profile = replace(experiment.profile, tool_scope=tuple(experiment.get_tools()))
-    request = Request("退款", "customer-1", "test")
+    request = Request("退款", "customer-1", "test", principal=customer('customer-1'))
     assert production._build_system_prompt(request) == experiment._build_system_prompt(request)
     assert production.profile.temperature == experiment.profile.temperature
     assert production.profile.max_tokens == experiment.profile.max_tokens
@@ -111,11 +114,11 @@ def test_support_dangerous_schema_cannot_skip_policy_and_idempotency():
     runtime = SupportRuntime("test", "test", client=FakeClient("request_refund",
         {"order_id": "ORD-T09-REFUND-APPROVAL", "amount": 600, "approved": True}))
     runtime.set_shared_tools(tools)
-    result = asyncio.run(runtime.run(Request("退款", "customer-1", "test")))
+    result = asyncio.run(runtime.run(Request("退款", "customer-1", "test", principal=customer('customer-1'))))
     assert not backend.calls and not service._store._actions
     assert result.tool_traces[0]["error_type"] == "validation"
     cancel = tools["request_cancel_order"]
-    req = Request("取消", "customer-1", "test")
+    req = Request("取消", "customer-1", "test", principal=customer('customer-1'))
     args = {"order_id": "ORD-T09-CANCEL", "idempotency_key": "production-repeat"}
     first, second = cancel.handler(req, args), cancel.handler(req, args)
     assert first["action_id"] == second["action_id"] and len(backend.calls) == 1

@@ -12,12 +12,12 @@ class Element {
   addEventListener(event, handler) {this.events[event] = handler;}
 }
 function browser(responses = []) {
-  const ids = Object.fromEntries(['chat-form','scenarios','message','user-id','conv-id','status','turns','new-conversation'].map(id => [id, new Element(id)]));
+  const ids = Object.fromEntries(['chat-form','scenarios','message','user-id','conv-id','status','turns','new-conversation','customer-token','reviewer-token','admin-token'].map(id => [id, new Element(id)]));
   const all = Object.values(ids), requests = [];
   const context = {document: {getElementById: id => ids[id], createElement: tag => {
     const el = new Element(tag); all.push(el); return el;
   }, querySelectorAll: () => all}, fetch: async (url, options) => {
-    requests.push({url, body: options?.body ? JSON.parse(options.body) : undefined});
+    requests.push({url, headers: options?.headers, body: options?.body ? JSON.parse(options.body) : undefined});
     const result = url.includes('scenarios.json') ? [] : responses.shift();
     if (result instanceof Error) throw result;
     return {ok: true, status: 200, json: async () => result, text: async () => JSON.stringify(result)};
@@ -60,11 +60,14 @@ for (const command of ['Approve','Reject','Resume']) {
         policy_decision: 'require_approval', reason_code: 'amount_requires_approval', policy_version: 'v1'}}]}};
     const card = b.CartCareDemo.renderTurn({message: 'refund', user_id: 'customer-1'}, chat, envelope);
     b.ids['user-id'].value = 'customer-2';
+    b.ids['customer-token'].value = 'customer-credential';
+    b.ids['reviewer-token'].value = 'reviewer-credential';
     await b.all.find(el => el.textContent === command).events.click();
     const request = b.requests.at(-1);
     assert.equal(request.url, `/actions/action-1/${command.toLowerCase()}`);
     assert.equal(request.body.user_id, 'customer-1');
     assert.equal(request.body.request_id, 'req-1');
+    assert.equal(request.headers.Authorization, command === 'Approve' ? 'Bearer reviewer-credential' : 'Bearer customer-credential');
     assert.ok(text(card).includes(`${command}: ${status}`));
     assert.ok(text(card).includes('require_approval'));
     assert.equal(envelope.trace.tool_calls[0].action_result.status, 'awaiting_approval');
@@ -73,9 +76,13 @@ for (const command of ['Approve','Reject','Resume']) {
 test('chat smoke fetches matching trace and retains answer if trace unavailable', async () => {
   const b = browser([chat, new Error('trace unavailable')]);
   b.ids.message.value = 'hello'; b.ids['user-id'].value = 'customer-1';
+  b.ids['customer-token'].value = 'customer-credential';
+  b.ids['admin-token'].value = 'admin-credential';
   await b.ids['chat-form'].events.submit({preventDefault() {}});
   assert.equal(b.requests[1].url, '/chat');
   assert.equal(b.requests[2].url, '/trace/tool/req-1');
+  assert.equal(b.requests[1].headers.Authorization, 'Bearer customer-credential');
+  assert.equal(b.requests[2].headers.Authorization, 'Bearer admin-credential');
   assert.equal(b.ids['conv-id'].value, 'conv-1');
   assert.ok(text(b.ids.turns).includes(chat.response));
   assert.ok(text(b.ids.turns).includes('trace unavailable'));

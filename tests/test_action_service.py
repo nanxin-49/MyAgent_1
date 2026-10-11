@@ -1,3 +1,4 @@
+from tests.auth_helpers import customer, reviewer
 import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -52,7 +53,7 @@ def test_refund_allow_executes_once():
 
     result = service.request_refund(
         order_id="ORD-1001", user_id="customer-1", request_id="req-1"
-    )
+    , principal=customer('customer-1'))
 
     assert result.status is ActionStatus.COMPLETED
     assert result.action.policy_decision.reason_code == "refund_eligible"
@@ -69,14 +70,14 @@ def test_refund_requires_approval_then_approve_executes():
         user_id="customer-1",
         request_id="req-2",
         amount="600.00",
-    )
+    principal=customer('customer-1'))
     assert pending.status is ActionStatus.AWAITING_APPROVAL
     assert pending.action.policy_decision.reason_code == "amount_requires_approval"
     assert backend.calls == []
 
     completed = service.approve(
         action_id=pending.action_id, user_id="customer-1", request_id="approve-1"
-    )
+    , principal=reviewer('customer-1'))
     assert completed.status is ActionStatus.COMPLETED
     assert len(backend.calls) == 1
 
@@ -85,14 +86,14 @@ def test_reject_is_terminal_and_never_executes():
     service, backend = make_service(refunds=False, total="800.00")
     pending = service.request_refund(
         order_id="ORD-1001", user_id="customer-1", request_id="req-3", amount="600"
-    )
+    , principal=customer('customer-1'))
 
     rejected = service.reject(
         action_id=pending.action_id, user_id="customer-1", request_id="reject-1"
-    )
+    , principal=customer('customer-1'))
     resumed = service.resume(
         action_id=pending.action_id, user_id="customer-1", request_id="resume-1"
-    )
+    , principal=customer('customer-1'))
 
     assert rejected.status is ActionStatus.REJECTED
     assert resumed.status is ActionStatus.REJECTED
@@ -103,14 +104,14 @@ def test_policy_deny_cannot_be_bypassed_by_approval_or_resume():
     service, backend = make_service(refunds=False, status="shipped")
     denied = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-4"
-    )
+    , principal=customer('customer-1'))
 
     approved = service.approve(
         action_id=denied.action_id, user_id="customer-1", request_id="approve-2"
-    )
+    , principal=reviewer('customer-1'))
     resumed = service.resume(
         action_id=denied.action_id, user_id="customer-1", request_id="resume-2"
-    )
+    , principal=customer('customer-1'))
 
     assert denied.status is ActionStatus.REJECTED
     assert denied.action.error_code == "order_status_not_cancellable"
@@ -124,7 +125,7 @@ def test_cancel_allowed_for_pending_order():
 
     result = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-5"
-    )
+    , principal=customer('customer-1'))
 
     assert result.status is ActionStatus.COMPLETED
     assert result.action.action_type is ActionType.CANCEL_ORDER
@@ -136,7 +137,7 @@ def test_ownership_violation_is_rejected_without_execution():
 
     result = service.request_cancel(
         order_id="ORD-1001", user_id="customer-2", request_id="req-6"
-    )
+    , principal=customer('customer-2'))
 
     assert result.status is ActionStatus.REJECTED
     assert result.error_code == "unauthorized"
@@ -147,10 +148,10 @@ def test_same_idempotency_key_returns_existing_action():
     service, backend = make_service(refunds=False, status="pending")
     first = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-7", idempotency_key="idem-7"
-    )
+    , principal=customer('customer-1'))
     second = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="retry-7", idempotency_key="idem-7"
-    )
+    , principal=customer('customer-1'))
 
     assert second.action_id == first.action_id
     assert second.reused is True
@@ -161,10 +162,10 @@ def test_idempotency_key_is_scoped_to_user_and_action():
     service, backend = make_service(refunds=False, status="pending")
     first = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-7a", idempotency_key="same"
-    )
+    , principal=customer('customer-1'))
     other_user = service.request_cancel(
         order_id="ORD-1001", user_id="customer-2", request_id="req-7b", idempotency_key="same"
-    )
+    , principal=customer('customer-2'))
 
     assert first.action_id != other_user.action_id
     assert other_user.error_code == "unauthorized"
@@ -175,10 +176,10 @@ def test_derived_idempotency_key_deduplicates_agent_retries():
     service, backend = make_service(refunds=False, status="pending")
     first = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-8"
-    )
+    , principal=customer('customer-1'))
     second = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="retry-8"
-    )
+    , principal=customer('customer-1'))
 
     assert second.action_id == first.action_id
     assert second.reused is True
@@ -190,10 +191,10 @@ def test_n01_same_parameters_reuse_normalized_amount(key_kind):
     service, backend = make_service()
     key = None if key_kind == "derived" else "n01-same"
     first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-first", amount="10.00", idempotency_key=key)
+        request_id="n01-first", amount="10.00", idempotency_key=key, principal=customer('customer-1'))
     retry_key = first.action.idempotency_key if key_kind == "internal" else key
     second = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-retry", amount="1E1", idempotency_key=retry_key)
+        request_id="n01-retry", amount="1E1", idempotency_key=retry_key, principal=customer('customer-1'))
     assert first.status is second.status is ActionStatus.COMPLETED
     assert second.action_id == first.action_id and second.reused
     assert len(backend.calls) == 1
@@ -207,16 +208,16 @@ def test_n01_changed_parameters_conflict_without_old_result(key_kind, changed):
     other["order_id"] = "ORD-N01"
     service._business_backend._data["orders"]["ORD-N01"] = other
     first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-first", amount="10", idempotency_key="n01-conflict")
+        request_id="n01-first", amount="10", idempotency_key="n01-conflict", principal=customer('customer-1'))
     key = first.action.idempotency_key if key_kind == "internal" else "n01-conflict"
     second = service.request_refund(
         order_id="ORD-N01" if changed == "order" else "ORD-1001",
         user_id="customer-1", request_id="n01-change",
-        amount="20" if changed == "amount" else "10", idempotency_key=key)
+        amount="20" if changed == "amount" else "10", idempotency_key=key, principal=customer('customer-1'))
     assert not second.success and second.error_code == "idempotency_conflict"
     assert second.action is None and second.action_id is None and not second.reused
     assert len(backend.calls) == 1
-    assert service.get(action_id=first.action_id, user_id="customer-1").action.amount == Decimal("10")
+    assert service.get(action_id=first.action_id, user_id="customer-1", principal=customer('customer-1')).action.amount == Decimal("10")
 
 
 @pytest.mark.parametrize("order_id", ["ORD-1001", "ORD-N01-OTHER"])
@@ -226,9 +227,9 @@ def test_n01_cross_user_internal_key_does_not_disclose_action(order_id):
     other.update(order_id="ORD-N01-OTHER", customer_id="customer-2")
     service._business_backend._data["orders"]["ORD-N01-OTHER"] = other
     first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-first", amount="10", idempotency_key="n01-private")
+        request_id="n01-first", amount="10", idempotency_key="n01-private", principal=customer('customer-1'))
     result = service.request_refund(order_id=order_id, user_id="customer-2",
-        request_id="n01-other", amount="10", idempotency_key=first.action.idempotency_key)
+        request_id="n01-other", amount="10", idempotency_key=first.action.idempotency_key, principal=customer('customer-2'))
     assert not result.success and result.error_code == "unauthorized"
     payload = json.dumps(result.to_tool_result())
     assert first.action_id not in payload and "customer-1" not in payload
@@ -242,7 +243,7 @@ def test_n01_concurrent_duplicates_execute_once():
     def request(index):
         start.wait(timeout=5)
         return service.request_refund(order_id="ORD-1001", user_id="customer-1",
-            request_id=f"n01-thread-{index}", amount="10.00", idempotency_key="n01-parallel")
+            request_id=f"n01-thread-{index}", amount="10.00", idempotency_key="n01-parallel", principal=customer('customer-1'))
     with ThreadPoolExecutor(max_workers=8) as pool:
         results = list(pool.map(request, range(8)))
     assert all(result.status is ActionStatus.COMPLETED for result in results)
@@ -254,9 +255,9 @@ def test_n01_concurrent_duplicates_execute_once():
 def test_n01_internal_key_cannot_reuse_another_action_type():
     service, backend = make_service(status="pending")
     first = service.request_cancel(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-cancel", idempotency_key="n01-kind")
+        request_id="n01-cancel", idempotency_key="n01-kind", principal=customer('customer-1'))
     result = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-refund", idempotency_key=first.action.idempotency_key)
+        request_id="n01-refund", idempotency_key=first.action.idempotency_key, principal=customer('customer-1'))
     assert result.error_code == "idempotency_conflict" and result.action is None
     assert len(backend.calls) == 1
 
@@ -264,11 +265,11 @@ def test_n01_internal_key_cannot_reuse_another_action_type():
 def test_n01_pending_retry_does_not_bypass_approval():
     service, backend = make_service(total="800.00")
     first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-pending", amount="600", idempotency_key="n01-approval")
+        request_id="n01-pending", amount="600", idempotency_key="n01-approval", principal=customer('customer-1'))
     retry = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-pending-retry", amount="600.00", idempotency_key="n01-approval")
+        request_id="n01-pending-retry", amount="600.00", idempotency_key="n01-approval", principal=customer('customer-1'))
     conflict = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-lower", amount="10", idempotency_key="n01-approval")
+        request_id="n01-lower", amount="10", idempotency_key="n01-approval", principal=customer('customer-1'))
     assert retry.status is ActionStatus.AWAITING_APPROVAL and retry.reused
     assert retry.action_id == first.action_id
     assert conflict.error_code == "idempotency_conflict" and conflict.action is None
@@ -278,12 +279,12 @@ def test_n01_pending_retry_does_not_bypass_approval():
 def test_n01_rejected_retry_preserves_original_key_binding():
     service, backend = make_service()
     first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-bound", amount="10", idempotency_key="n01-binding")
+        request_id="n01-bound", amount="10", idempotency_key="n01-binding", principal=customer('customer-1'))
     rejected = service.request_refund(order_id="ORD-MISSING", user_id="customer-1",
-        request_id="n01-missing", amount="10", idempotency_key="n01-binding")
+        request_id="n01-missing", amount="10", idempotency_key="n01-binding", principal=customer('customer-1'))
     assert rejected.error_code == "not_found" and rejected.action is None
     retry = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-bound-retry", amount="10", idempotency_key="n01-binding")
+        request_id="n01-bound-retry", amount="10", idempotency_key="n01-binding", principal=customer('customer-1'))
     assert retry.reused and retry.action_id == first.action_id
     assert len(backend.calls) == 1
 
@@ -291,9 +292,9 @@ def test_n01_rejected_retry_preserves_original_key_binding():
 def test_n01_omitted_amount_matches_effective_total():
     service, backend = make_service(total="100.00")
     first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-total", idempotency_key="n01-total-key")
+        request_id="n01-total", idempotency_key="n01-total-key", principal=customer('customer-1'))
     retry = service.request_refund(order_id="ORD-1001", user_id="customer-1",
-        request_id="n01-total-retry", amount="1E2", idempotency_key="n01-total-key")
+        request_id="n01-total-retry", amount="1E2", idempotency_key="n01-total-key", principal=customer('customer-1'))
     assert retry.reused and retry.action_id == first.action_id
     assert len(backend.calls) == 1
 
@@ -302,16 +303,16 @@ def test_duplicate_approval_and_resume_do_not_execute_twice():
     service, backend = make_service(refunds=False, total="800.00")
     pending = service.request_refund(
         order_id="ORD-1001", user_id="customer-1", request_id="req-9", amount="600"
-    )
+    , principal=customer('customer-1'))
     first = service.approve(
         action_id=pending.action_id, user_id="customer-1", request_id="approve-9"
-    )
+    , principal=reviewer('customer-1'))
     second = service.approve(
         action_id=pending.action_id, user_id="customer-1", request_id="approve-9-retry"
-    )
+    , principal=reviewer('customer-1'))
     resumed = service.resume(
         action_id=pending.action_id, user_id="customer-1", request_id="resume-9"
-    )
+    , principal=customer('customer-1'))
 
     assert first.status is ActionStatus.COMPLETED
     assert second.reused is True
@@ -323,13 +324,13 @@ def test_policy_is_rechecked_before_approved_execution():
     service, backend = make_service(refunds=False, total="800.00")
     pending = service.request_refund(
         order_id="ORD-1001", user_id="customer-1", request_id="req-10", amount="600"
-    )
+    , principal=customer('customer-1'))
     # Simulate authoritative state changing while approval is pending.
     service._business_backend._data["orders"]["ORD-1001"]["status"] = "cancelled"
 
     result = service.approve(
         action_id=pending.action_id, user_id="customer-1", request_id="approve-10"
-    )
+    , principal=reviewer('customer-1'))
 
     assert result.status is ActionStatus.REJECTED
     assert result.action.error_code == "policy_changed"
@@ -341,7 +342,7 @@ def test_dependency_failure_is_persisted_without_execution():
 
     result = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-11"
-    )
+    , principal=customer('customer-1'))
 
     assert result.status is ActionStatus.FAILED
     assert result.error_code == "dependency_failure"
@@ -358,7 +359,7 @@ def test_action_backend_failure_is_persisted():
     )
     result = service.request_cancel(
         order_id="ORD-1001", user_id="customer-1", request_id="req-12"
-    )
+    , principal=customer('customer-1'))
 
     assert result.status is ActionStatus.FAILED
     assert result.error_code == "gateway_failure"
@@ -368,11 +369,11 @@ def test_illegal_state_transition_is_rejected():
     service, _ = make_service(refunds=False, total="800.00")
     pending = service.request_refund(
         order_id="ORD-1001", user_id="customer-1", request_id="req-13", amount="600"
-    )
+    , principal=customer('customer-1'))
     pending.action.status = ActionStatus.PENDING
     result = service.reject(
         action_id=pending.action_id, user_id="customer-1", request_id="reject-13"
-    )
+    , principal=customer('customer-1'))
 
     assert result.status is ActionStatus.PENDING
     assert result.error_code == "invalid_state_transition"
@@ -424,7 +425,7 @@ def test_agent_write_tool_round_trip_uses_action_service():
         intent=IntentCategory.REFUND,
         intent_group="billing",
         urgency=UrgencyLevel.MEDIUM,
-    )
+    principal=customer('customer-1'))
 
     response = asyncio.run(agent.handle(request))
 
@@ -448,7 +449,7 @@ def test_agent_max_tool_rounds_returns_observed_action_receipt_once():
     response = asyncio.run(agent.handle(Request(
         message="申请退款", user_id="customer-1", conv_id="conv-max-tool",
         request_id="req-max-tool", intent=IntentCategory.REFUND,
-    )))
+    principal=customer('customer-1'))))
     assert response.success is True
     assert "动作已完成" in response.content
     assert len(backend.calls) == 1
@@ -473,7 +474,7 @@ def test_agent_model_failure_after_action_preserves_action_receipt_and_trace():
     response = asyncio.run(agent.handle(Request(
         message="申请退款", user_id="customer-1", conv_id="conv-model-fail",
         request_id="req-model-fail", intent=IntentCategory.REFUND,
-    )))
+    principal=customer('customer-1'))))
     assert response.success is True
     assert "动作已完成" in response.content
     assert response.tools_used == ["request_refund"]

@@ -4,6 +4,8 @@ import traceback
 from types import SimpleNamespace
 
 import pytest
+
+pytestmark = pytest.mark.usefixtures("authenticated_http")
 from fastapi.testclient import TestClient
 
 from api import main
@@ -101,7 +103,7 @@ def test_n03_http_trace_and_model_tool_result_are_safe(monkeypatch, customer):
     runtime.set_shared_tools(tools)
     monkeypatch.setattr(main, "_orchestrator", runtime)
     monkeypatch.setattr(main, "_memory", EmptyMemory())
-    http = TestClient(main.app)  # No lifespan: only injected Fake SDK/Memory/backend.
+    http = TestClient(main.app, headers={"Authorization": f"Bearer test-{customer}"})  # No lifespan: only injected Fake SDK/Memory/backend.
     try:
         response = http.post("/chat", json={"message": "查询订单", "user_id": customer})
         assert response.status_code == 200

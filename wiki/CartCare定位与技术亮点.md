@@ -6,11 +6,12 @@ CartCare 是 E-commerce Support Agent，面向 FAQ、政策、商品、订单、
 
 ```text
 POST /chat
+→ AuthAdapter → Verified Principal（身份冲突拒绝，默认未认证拒绝）
 → MemoryManager.get_context（Redis 工作记忆 / Chroma 筛选的长期记录）
 → SupportRuntime → SingleSupportAgent（BaseAgent，统一工具注册表）
     → RAG：静态 FAQ / 版本化政策
     → Providers：动态业务事实和 ownership
-    → ActionService：Policy / PendingAction / HITL / idempotency
+    → ActionService：Principal gate / Policy / PendingAction / reviewer HITL / idempotency
 → Memory 回写、异步 profile 更新
 → ChatResponse、Trace
 ```
@@ -22,6 +23,7 @@ Agent 负责理解、澄清、参数收集、选择工具和生成回复。生�
 - 动态事实来自 Provider；RAG 不替代订单、物流、库存或退款状态查询。
 - Tool Contract 保留严格 schema、read/write/dangerous 风险元数据、timeout、retry、typed errors 和 trace。危险动作不能由模型提供 approved 标志绕过控制。
 - 退款和取消由确定性 PolicyEngine 决策；ActionService 管理 PendingAction、审批/拒绝/恢复、执行时二次校验与幂等。LLM 不直接执行业务写入。
+- 需要人工审核的动作由范围内独立reviewer批准；动作owner与审核主体分开记录。Trace和管理接口要求admin。受控回环Demo Auth仅用于本地演示，不等于生产认证；详见README/ADR。
 - RAG 经外部 Chroma HTTP 存取；字符 n-gram embedding 是演示词面基线。usable 命中才有可用引用；来源、document_id、policy_version 与 chunk 信息保留。阈值仍为 0.35，fallback 不能作为可靠依据。
 - Memory 的工作层按用户/会话隔离并设置 24 小时 TTL；15 条触发确定性压缩，保留最近 5 条、订单号引用及待澄清字段。Chroma 只接收有来源和有效期的咨询主题与明确回复偏好，分别保留 30/180 天；订单、物流、库存和退款状态不进入长期事实。Monitor 继续观测工具和 Agent 成功率/延迟；Single 不再计算或反馈路由惩罚。
 - Trace 标记 topology=single、agent_type=support。模型调用统计覆盖 Support 与 RAG SDK 调用，不包含 Memory/profile 和 SDK 内部重试；不保存隐藏推理。

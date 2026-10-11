@@ -35,8 +35,13 @@
     document.querySelectorAll("button,input,textarea").forEach(el => {el.disabled = value;});
   }
   async function request(path, body) {
-    const response = await fetch(path, body === undefined ? {} : {
-      method: "POST", headers: {"Content-Type": "application/json"}, body: pretty(body)});
+    const credential = path.startsWith("/trace/") ? "admin-token"
+      : path.endsWith("/approve") ? "reviewer-token" : "customer-token";
+    const token = $(credential)?.value.trim();
+    const headers = {"Content-Type": "application/json"};
+    if (token) headers.Authorization = "Bearer " + token;
+    const response = await fetch(path, body === undefined ? {headers} : {
+      method: "POST", headers, body: pretty(body)});
     const text = await response.text();
     let data;
     try {data = JSON.parse(text);} catch {throw new Error(`HTTP ${response.status}: ${text.slice(0, 200)}`);}

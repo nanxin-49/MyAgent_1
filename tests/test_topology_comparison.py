@@ -1,3 +1,4 @@
+from tests.auth_helpers import customer, reviewer
 """Deterministic experiment wiring/measurement tests, not Agent quality evidence."""
 import asyncio
 import json
@@ -74,7 +75,7 @@ def test_single_shares_registry_and_has_no_classifier_role_packet():
     shared = bind_tools(agent, tools, None)
     assert set(agent.get_tools()) == set(shared) | set(helper_tools())
     assert agent.get_tools()["request_refund"] is tools["request_refund"]
-    req = Request("查询 ORD-T09-ORDER", "customer-1", "test")
+    req = Request("查询 ORD-T09-ORDER", "customer-1", "test", principal=customer('customer-1'))
     assert agent._build_role_packet(req) == ""
     result = asyncio.run(agent.handle(req))
     assert req.intent is None and req.entities == {}
@@ -85,11 +86,11 @@ def test_single_cannot_bypass_approval_ownership_or_isolation():
     fixture, _ = prepare(NOW)
     tools, service, backend = isolated_business(fixture, NOW)
     other_tools, other_service, other_backend = isolated_business(fixture, NOW)
-    req = Request("退款", "customer-1", "test")
+    req = Request("退款", "customer-1", "test", principal=customer('customer-1'))
     result = tools["request_refund"].handler(req, {"order_id": "ORD-T09-REFUND-APPROVAL", "amount": 600})
     assert result["status"] == "awaiting_approval" and backend.calls == []
     assert other_service._store._actions == {} and other_backend.calls == []
-    denied = tools["request_cancel_order"].handler(Request("取消", "customer-2", "test"),
+    denied = tools["request_cancel_order"].handler(Request("取消", "customer-2", "test", principal=customer('customer-2')),
                                                      {"order_id": "ORD-T09-OWNERSHIP"})
     assert denied["status"] == "rejected" and backend.calls == []
     done = tools["request_cancel_order"].handler(req, {"order_id": "ORD-T09-CANCEL", "idempotency_key": "same"})

@@ -22,7 +22,8 @@ if _ROOT not in sys.path:
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Response, UploadFile, File
+from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Depends
+from core.auth import Principal, get_principal, require_admin, require_reviewer, customer_identity
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -251,7 +252,7 @@ async def demo_ui():
 # ── 请求/响应模型 ─────────────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
     message:     str
-    user_id:     str = "anonymous"
+    user_id:     Optional[str] = None
     conv_id:     Optional[str] = None
 
 
@@ -298,7 +299,7 @@ def render_rag_citations(response: str, citations: List[Dict[str, Any]]) -> str:
 
 
 class ActionCommandRequest(BaseModel):
-    user_id: str = "anonymous"
+    user_id: Optional[str] = None
     request_id: Optional[str] = None
 
 
@@ -320,7 +321,7 @@ async def health():
     return {"status": "ok", "agents": _orchestrator.get_stats()}
 
 
-@app.get("/skills", tags=["Skills"])
+@app.get("/skills", tags=["Skills"], dependencies=[Depends(require_admin)])
 async def skills_summary():
     """查看当前已加载的 Skills，便于确认热加载结果和排查解析错误。"""
     if _skill_manager is None:
@@ -328,7 +329,7 @@ async def skills_summary():
     return _skill_manager.summary()
 
 
-@app.post("/skills/reload", tags=["Skills"])
+@app.post("/skills/reload", tags=["Skills"], dependencies=[Depends(require_admin)])
 async def reload_skills():
     """运行时重新扫描 Skill 目录，不需要重启服务。"""
     if _skill_manager is None:
@@ -340,11 +341,12 @@ async def reload_skills():
 
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
     """
     主对话接口。完整流程：
       记忆读取 → SingleSupportAgent / Tool Contract → 记忆写入
     """
+    user_id = customer_identity(principal, req.user_id)
     if _orchestrator is None or _memory is None:
         raise HTTPException(503, "服务未就绪")
 
@@ -358,7 +360,7 @@ async def chat(req: ChatRequest):
     # 1. 读取记忆上下文
     from redis.exceptions import RedisError
     try:
-        mem_ctx = await _memory.get_context(req.user_id, conv_id, query=req.message)
+        mem_ctx = await _memory.get_context(user_id, conv_id, query=req.message)
     except RedisError as exc:
         raise HTTPException(status_code=503, detail={"error_code": "memory_unavailable",
             "message": "会话记忆暂不可用"}) from exc
@@ -374,7 +376,8 @@ async def chat(req: ChatRequest):
 
     orch_req = OrcReq(
         message=req.message,
-        user_id=req.user_id,
+        user_id=user_id,
+        principal=principal,
         conv_id=conv_id,
         context=full_context,
         history=history,
@@ -399,8 +402,8 @@ async def chat(req: ChatRequest):
     # 4. 写入记忆
     write_start = time.monotonic()
     try:
-        await _memory.add_message(req.user_id, conv_id, MsgRole.USER, req.message)
-        await _memory.add_message(req.user_id, conv_id, MsgRole.ASSISTANT, result.response)
+        await _memory.add_message(user_id, conv_id, MsgRole.USER, req.message)
+        await _memory.add_message(user_id, conv_id, MsgRole.ASSISTANT, result.response)
         memory_observation["write_status"] = "completed"
     except Exception:
         memory_observation["write_status"] = "failed"
@@ -409,7 +412,7 @@ async def chat(req: ChatRequest):
         memory_observation["write_latency_ms"] = round((time.monotonic() - write_start) * 1000, 1)
 
     # 5. 异步更新用户画像（不阻塞响应）
-    asyncio.create_task(_memory.update_profile(req.user_id, conv_id))
+    asyncio.create_task(_memory.update_profile(user_id, conv_id))
     memory_observation["profile_update_status"] = "scheduled_unobserved"
     if trace is not None:
         trace["request_latency_ms"] = round((time.monotonic() - request_start) * 1000, 1)
@@ -434,46 +437,63 @@ async def chat(req: ChatRequest):
 
 
 @app.post("/actions/{action_id}/approve", response_model=ActionResult, tags=["Actions"])
-async def approve_action(action_id: str, req: ActionCommandRequest):
+async def approve_action(action_id: str, req: ActionCommandRequest,
+                         principal: Principal = Depends(require_reviewer)):
     """Approve an awaiting demo action; repeated approvals are idempotent."""
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
-    return _action_service.approve(
+    return _action_http_result(_action_service.approve(
         action_id=action_id,
-        user_id=req.user_id,
+        user_id=req.user_id or "",
+        principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    )
+    ))
 
 
 @app.post("/actions/{action_id}/reject", response_model=ActionResult, tags=["Actions"])
-async def reject_action(action_id: str, req: ActionCommandRequest):
+async def reject_action(action_id: str, req: ActionCommandRequest,
+                        principal: Principal = Depends(get_principal)):
     """Reject an awaiting demo action; rejection is terminal."""
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
-    return _action_service.reject(
+    user_id = customer_identity(principal, req.user_id)
+    return _action_http_result(_action_service.reject(
         action_id=action_id,
-        user_id=req.user_id,
+        user_id=user_id,
+        principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    )
+    ))
 
 
 @app.post("/actions/{action_id}/resume", response_model=ActionResult, tags=["Actions"])
-async def resume_action(action_id: str, req: ActionCommandRequest):
+async def resume_action(action_id: str, req: ActionCommandRequest,
+                        principal: Principal = Depends(get_principal)):
     """Resume an approved demo action; completed actions are returned unchanged."""
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
-    return _action_service.resume(
+    user_id = customer_identity(principal, req.user_id)
+    return _action_http_result(_action_service.resume(
         action_id=action_id,
-        user_id=req.user_id,
+        user_id=user_id,
+        principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    )
+    ))
 
 
 @app.get("/actions/{action_id}", response_model=ActionResult, tags=["Actions"])
-async def get_action(action_id: str, user_id: str = "anonymous"):
+async def get_action(action_id: str, user_id: Optional[str] = None,
+                     principal: Principal = Depends(get_principal)):
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
-    return _action_service.get(action_id, user_id=user_id)
+    owner = customer_identity(principal, user_id)
+    return _action_http_result(_action_service.get(action_id, user_id=owner, principal=principal))
+
+
+def _action_http_result(result: ActionResult) -> ActionResult:
+    statuses = {"unauthenticated": 401, "forbidden": 403, "unauthorized": 404, "not_found": 404}
+    if result.error_code in statuses:
+        raise HTTPException(statuses[result.error_code], "未找到可访问的动作" if statuses[result.error_code] == 404 else result.message)
+    return result
 
 
 async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) -> tuple[str, bool]:
@@ -538,7 +558,7 @@ def _should_use_knowledge(message: str, intent=None) -> bool:
     return len(msg) >= 4 or any(kw in msg for kw in business_keywords)
 
 
-@app.get("/monitor")
+@app.get("/monitor", dependencies=[Depends(require_admin)])
 async def monitor_summary():
     """实时监控摘要：Agent 成功率、工具统计、告警、优化建议。"""
     if _monitor is None:
@@ -546,7 +566,7 @@ async def monitor_summary():
     return _monitor.summary()
 
 
-@app.get("/trace/tool/{request_id}", response_model=ToolTraceResponse)
+@app.get("/trace/tool/{request_id}", response_model=ToolTraceResponse, dependencies=[Depends(require_admin)])
 async def get_tool_trace(request_id: str):
     """查看某次请求的工具调用明细。"""
     if _orchestrator is None:
@@ -559,7 +579,7 @@ async def get_tool_trace(request_id: str):
     )
 
 
-@app.get("/trace/tools", response_model=RecentToolTracesResponse)
+@app.get("/trace/tools", response_model=RecentToolTracesResponse, dependencies=[Depends(require_admin)])
 async def list_recent_tool_traces(limit: int = 20):
     """查看最近 N 次请求的工具调用明细。"""
     if _orchestrator is None:
@@ -567,13 +587,13 @@ async def list_recent_tool_traces(limit: int = 20):
     return RecentToolTracesResponse(items=_orchestrator.get_recent_tool_traces(limit=limit))
 
 
-@app.get("/metrics")
+@app.get("/metrics", dependencies=[Depends(require_admin)])
 async def prometheus_metrics():
     """Prometheus 指标入口。"""
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
-@app.post("/search")
+@app.post("/search", dependencies=[Depends(require_admin)])
 async def search(query: str, top_k: int = 5):
     """
     演示检索优化链路：查询改写 → 并行召回 → 重排 → Top-K。
@@ -626,7 +646,7 @@ class EvalRunInput(BaseModel):
     dialog_cases: Optional[List[EvalDialogInput]] = None
 
 
-@app.post("/knowledge/add", tags=["知识库"])
+@app.post("/knowledge/add", tags=["知识库"], dependencies=[Depends(require_admin)])
 async def add_knowledge(body: BatchDocInput):
     """
     批量导入文档到知识库。
@@ -658,7 +678,7 @@ async def add_knowledge(body: BatchDocInput):
     return {"message": f"成功导入 {count} 个文档片段", "added_chunks": count, "total_chunks": total}
 
 
-@app.post("/knowledge/upload", tags=["知识库"])
+@app.post("/knowledge/upload", tags=["知识库"], dependencies=[Depends(require_admin)])
 async def upload_knowledge(file: UploadFile = File(...)):
     """
     上传文件导入知识库。
@@ -714,7 +734,7 @@ async def upload_knowledge(file: UploadFile = File(...)):
     }
 
 
-@app.get("/knowledge/stats", tags=["知识库"])
+@app.get("/knowledge/stats", tags=["知识库"], dependencies=[Depends(require_admin)])
 async def knowledge_stats():
     """查看知识库统计信息（文档片段总数）。"""
     tool = _tool_manager._tools.get("knowledge_search") if _tool_manager else None
@@ -724,7 +744,7 @@ async def knowledge_stats():
     return {"total_chunks": await kb.doc_count_async()}
 
 
-@app.post("/eval/run")
+@app.post("/eval/run", dependencies=[Depends(require_admin)])
 async def run_eval(body: Optional[EvalRunInput] = None):
     """运行内置评测用例，返回评测报告。"""
     if _evaluator is None:
@@ -779,6 +799,14 @@ async def run_eval(body: Optional[EvalRunInput] = None):
 async def _cli():
     """CLI shares production initialization and the same guarded chat path."""
     print("CartCare CLI — 输入 quit 退出\n")
+    from starlette.requests import Request as HttpRequest
+    from core.auth import get_auth_adapter
+    token = os.getenv("CARTCARE_CLI_TOKEN", "")
+    local_request = HttpRequest({"type": "http", "method": "POST", "path": "/chat",
+        "scheme": "http", "server": ("127.0.0.1", 8000), "client": ("127.0.0.1", 0),
+        "headers": [(b"host", b"localhost"), (b"authorization", ("Bearer " + token).encode())], "app": app})
+    principal = get_auth_adapter(local_request).verify(local_request)
+    user_id = customer_identity(principal)
     async with lifespan(app):
         conv_id = str(uuid.uuid4())
         while True:
@@ -790,7 +818,7 @@ async def _cli():
             if not msg or msg.lower() in ("quit", "exit", "退出"):
                 print("再见")
                 break
-            result = await chat(ChatRequest(message=msg, user_id="cli_user", conv_id=conv_id))
+            result = await chat(ChatRequest(message=msg, user_id=user_id, conv_id=conv_id), principal=principal)
             print(f"\nCartCare [{result.agent_type}]: {result.response}\n")
 
 

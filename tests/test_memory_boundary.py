@@ -4,6 +4,9 @@ import json
 from datetime import datetime, timedelta, timezone
 
 from fastapi.testclient import TestClient
+import pytest
+
+pytestmark = pytest.mark.usefixtures("authenticated_http")
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from api import main as api
@@ -232,6 +235,6 @@ def test_redis_read_failure_returns_typed_503_before_agent(monkeypatch):
             assert False, "Agent must not run after Memory read failure"
     monkeypatch.setattr(api, "_memory", BrokenMemory())
     monkeypatch.setattr(api, "_orchestrator", NeverAgent())
-    response = TestClient(api.app).post("/chat", json={"message": "查询订单", "user_id": "u"})
+    response = TestClient(api.app, headers={"Authorization": "Bearer test-u"}).post("/chat", json={"message": "查询订单", "user_id": "u"})
     assert response.status_code == 503
     assert response.json()["detail"]["error_code"] == "memory_unavailable"

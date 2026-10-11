@@ -2,6 +2,8 @@
 from types import SimpleNamespace
 
 import pytest
+
+pytestmark = pytest.mark.usefixtures("authenticated_http")
 from fastapi.testclient import TestClient
 
 from api import main
@@ -16,7 +18,7 @@ from evaluation.topology_experiment import isolated_business
 
 
 def test_demo_static_smoke():
-    http = TestClient(main.app)
+    http = TestClient(main.app, headers={"Authorization": "Bearer test-customer-1"})
     assert http.get('/demo').status_code == 200
     assert 'CartCare' in http.get('/demo').text
     assert http.get('/demo-assets/demo.js').status_code == 200
@@ -44,7 +46,7 @@ def test_chat_trace_rendering_contract(monkeypatch, status):
     runtime.set_shared_tools(build_shared_rag_tools(Rag()))
     monkeypatch.setattr(main, '_orchestrator', runtime)
     monkeypatch.setattr(main, '_memory', Memory())
-    http = TestClient(main.app)
+    http = TestClient(main.app, headers={"Authorization": "Bearer test-customer-1"})
     body = http.post('/chat', json={'message': '退款政策', 'user_id': 'customer-1'}).json()
     envelope = http.get('/trace/tool/' + body['request_id']).json()
     assert envelope['found']
@@ -80,7 +82,7 @@ def test_memory_write_failure_is_not_rendered_as_completed(monkeypatch):
     runtime = SupportRuntime('test', 'test', client=client)
     monkeypatch.setattr(main, '_orchestrator', runtime)
     monkeypatch.setattr(main, '_memory', BrokenMemory())
-    http = TestClient(main.app, raise_server_exceptions=False)
+    http = TestClient(main.app, raise_server_exceptions=False, headers={"Authorization": "Bearer test-customer-1"})
     assert http.post('/chat', json={'message': '你好'}).status_code == 500
     trace = http.get('/trace/tools').json()['items'][0]
     assert trace['memory']['write_status'] == 'failed'
@@ -95,7 +97,7 @@ def test_demo_reject_and_resume_http_contract(monkeypatch):
     monkeypatch.setattr(main, '_orchestrator', runtime)
     monkeypatch.setattr(main, '_memory', EmptyMemory())
     monkeypatch.setattr(main, '_action_service', service)
-    http = TestClient(main.app)
+    http = TestClient(main.app, headers={"Authorization": "Bearer test-customer-1"})
     chat = http.post('/chat', json={'message': '退款', 'user_id': 'customer-1'}).json()
     original = http.get('/trace/tool/' + chat['request_id']).json()['trace']['tool_calls'][0]
     action = original['action_result']

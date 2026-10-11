@@ -289,31 +289,41 @@ def build_business_tools(backend: BusinessBackend) -> Dict[str, AgentToolSpec]:
     logistics_provider = LogisticsProvider(backend)
     refund_provider = RefundProvider(backend)
 
-    def run(tool_name: str, operation: Callable[[], Any]) -> Dict[str, Any]:
+    def run(tool_name: str, operation: Callable[[], Any], req: Request) -> Dict[str, Any]:
+        from core.auth import Principal
+        if not isinstance(req.principal, Principal):
+            return {"success": False, "data": None,
+                    "error": {"code": "unauthenticated", "message": "需要有效认证"}}
+        if "customer" not in req.principal.roles or req.principal.customer_id != req.user_id:
+            return {"success": False, "data": None,
+                    "error": {"code": "forbidden", "message": "客户身份与权限不匹配"}}
         try:
             return _business_tool_success(tool_name, operation())
         except ProviderError as exc:
             return _business_tool_error(tool_name, exc)
 
     def get_product(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
-        return run("get_product", lambda: product_provider.get_product(args["product_id"]))
+        return run("get_product", lambda: product_provider.get_product(args["product_id"]), req)
 
     def get_order(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
         return run(
             "get_order",
             lambda: order_provider.get_order(args["order_id"], customer_id=req.user_id),
+            req,
         )
 
     def get_shipment(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
         return run(
             "get_shipment",
             lambda: logistics_provider.get_shipment(args["order_id"], customer_id=req.user_id),
+            req,
         )
 
     def check_inventory(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
         return run(
             "check_inventory",
             lambda: inventory_provider.get_inventory(args["product_id"]),
+            req,
         )
 
     def get_refund_status(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -322,6 +332,7 @@ def build_business_tools(backend: BusinessBackend) -> Dict[str, AgentToolSpec]:
             lambda: refund_provider.get_refund_for_order(
                 args["order_id"], customer_id=req.user_id
             ),
+            req,
         )
 
     identifier = lambda description: {
@@ -383,6 +394,7 @@ def build_action_tools(action_service: Any) -> Dict[str, AgentToolSpec]:
             request_id=req.request_id,
             amount=args.get("amount"),
             idempotency_key=args.get("idempotency_key"),
+            principal=req.principal,
         ).to_tool_result()
 
     def request_cancel_order(req: Request, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -391,6 +403,7 @@ def build_action_tools(action_service: Any) -> Dict[str, AgentToolSpec]:
             user_id=req.user_id,
             request_id=req.request_id,
             idempotency_key=args.get("idempotency_key"),
+            principal=req.principal,
         ).to_tool_result()
 
     identifier = lambda description: {

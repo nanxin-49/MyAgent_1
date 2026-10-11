@@ -1,3 +1,4 @@
+from tests.auth_helpers import customer, reviewer
 import asyncio
 import json
 from pathlib import Path
@@ -21,7 +22,7 @@ def make_request(user_id: str = "customer-1") -> Request:
         intent=IntentCategory.ORDER_STATUS,
         intent_group="order",
         urgency=UrgencyLevel.LOW,
-    )
+    principal=customer(user_id))
 
 
 @pytest.fixture()
