@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Callable, Generic, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError
@@ -53,13 +54,13 @@ class _BaseProvider(Generic[ModelT]):
                 f"读取 {self.resource_type} 依赖失败",
                 resource_type=self.resource_type,
                 resource_id=resource_id,
-            ) from exc
+            ) from None
         except Exception as exc:
             raise ProviderDependencyError(
                 f"读取 {self.resource_type} 依赖失败",
                 resource_type=self.resource_type,
                 resource_id=resource_id,
-            ) from exc
+            ) from None
 
         if raw is None:
             raise NotFoundError(
@@ -68,22 +69,33 @@ class _BaseProvider(Generic[ModelT]):
                 resource_id=resource_id,
             )
 
+        # Fail closed before model validation can inspect another customer's fields.
+        if owner_id is not None and (
+            not isinstance(raw, Mapping) or raw.get("customer_id") != owner_id
+        ):
+            raise UnauthorizedError(
+                f"当前 customer 无权访问该 {self.resource_type}",
+                resource_type=self.resource_type,
+                resource_id=resource_id,
+            )
+
         try:
             model = model_type.model_validate(raw)
         except ValidationError as exc:
+            errors = exc.errors(include_url=False, include_input=False, include_context=False)
             raise ProviderDataError(
                 f"{self.resource_type} 数据未通过模型校验",
                 resource_type=self.resource_type,
                 resource_id=resource_id,
-                details={"validation_errors": exc.errors(include_url=False)},
-            ) from exc
+                details={"validation_error_count": len(errors),
+                         "validation_error_types": sorted({error["type"] for error in errors})},
+            ) from None
 
         if owner_id is not None and getattr(model, "customer_id", None) != owner_id:
             raise UnauthorizedError(
                 f"当前 customer 无权访问该 {self.resource_type}",
                 resource_type=self.resource_type,
                 resource_id=resource_id,
-                details={"customer_id": owner_id},
             )
         return model
 

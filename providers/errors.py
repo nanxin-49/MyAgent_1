@@ -25,12 +25,27 @@ class ProviderError(Exception):
         self.details = details or {}
 
     def to_dict(self) -> Dict[str, Any]:
+        """Public projection: never serialize diagnostic messages or record details.
+
+        Internal typed codes remain available to deterministic business logic.
+        Read-tool consumers cannot distinguish a missing resource from a foreign one.
+        """
+        messages = {
+            "invalid_input": "查询参数无效",
+            "not_found": "未找到可访问的业务记录",
+            "invalid_data": "业务数据暂不可用",
+            "dependency_failure": "业务查询暂不可用",
+            "provider_error": "业务查询失败",
+        }
+        code = "not_found" if self.code == "unauthorized" else self.code
+        if code not in messages:
+            code = "provider_error"
         return {
-            "code": self.code,
-            "message": self.message,
+            "code": code,
+            "message": messages[code],
             "resource_type": self.resource_type,
             "resource_id": self.resource_id,
-            "details": self.details,
+            "details": {},
         }
 
 

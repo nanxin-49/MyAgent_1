@@ -52,7 +52,7 @@ def test_order_ownership_is_checked_by_provider(tools):
     result = tools["get_order"].handler(make_request("customer-2"), {"order_id": "ORD-1001"})
 
     assert result["success"] is False
-    assert result["error"]["code"] == "unauthorized"
+    assert result["error"]["code"] == "not_found"
     assert result["error"]["resource_id"] == "ORD-1001"
 
 
