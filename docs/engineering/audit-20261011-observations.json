@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-10-11T09:09:51.763868+00:00",
+  "head": "09efd3443d2e7b6e03fba7d13fe660c483b30583",
+  "working_tree": "uncommitted organization changes plus audit artifacts",
+  "python": "3.12.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "scope": "isolated fake dependencies; no live-service or real-model acceptance",
+  "observations": [
+    {
+      "issue": "IDEMPOTENCY",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "mismatched_amount_requested": "20",
+      "returned_amount": "10",
+      "internal_key_cross_user_returned_owner": "customer-1",
+      "backend_executions": 1,
+      "qualification": "Cross-user reproduction requires the returned internal key; ordinary same external key is scoped."
+    },
+    {
+      "issue": "REFUND_READ_WRITE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "action_status": "completed",
+      "execution_status": "completed",
+      "order_status": "refund_pending",
+      "refund_record": null
+    },
+    {
+      "issue": "KNOWLEDGE_UPDATE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "stored_chunks": 3,
+      "same_version_conflicting_reference": "audit-policy@v1#chunk-0",
+      "usable_policy_versions": [
+        "v1",
+        "v1",
+        "v2"
+      ],
+      "qualification": "Fake distances force recall; this confirms lifecycle/citation defects, not real ranking quality."
+    },
+    {
+      "issue": "PROVIDER_ERROR_LEAK",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "error_code": "invalid_data",
+      "synthetic_other_owner_input_visible": true,
+      "qualification": "Requires malformed backend record; normal valid records enforce ownership."
+    },
+    {
+      "issue": "ACTION_SUCCESS_MEMORY_FAILURE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "http_status": 500,
+      "action_status": "completed",
+      "backend_executions": 1
+    },
+    {
+      "issue": "TRACE_NO_AUTH",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "http_status": 200,
+      "headers_have_credentials": false,
+      "retrieved_trace_count": 1
+    },
+    {
+      "issue": "APPROVAL_CLIENT_IDENTITY",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "http_status": 200,
+      "trusted_principal_or_reviewer_supplied": false,
+      "action_status": "completed",
+      "qualification": "Known demo approval adapter limitation; owner checks exist but caller identity is untrusted."
+    },
+    {
+      "issue": "HEALTH_READINESS",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "health_http_status": 200,
+      "chat_http_status": 503,
+      "dependency": "synthetic Redis read failure"
+    },
+    {
+      "issue": "READ_TIMEOUT_WORKERS",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "attempts": 2,
+      "completed_at_return": 0,
+      "completed_after_return": 2
+    },
+    {
+      "issue": "PROM_DEFAULT",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "registered_business_metrics": []
+    },
+    {
+      "issue": "PROM_DISTRIBUTION_ALERTS",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "request_latency_histogram_observations": [
+        4000,
+        4000,
+        4000
+      ],
+      "new_requests_during_collections": 0,
+      "duplicate_alerts": 3
+    },
+    {
+      "issue": "RERANK_EMPTY_USABLE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "model_rerank_output": "[]",
+      "retrieval_status": "usable",
+      "success": true,
+      "result_count": 0,
+      "citation_count": 0
+    },
+    {
+      "issue": "MEMORY_COMPRESSION_RACE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "concurrent_writes": 6,
+      "retained_messages": 5,
+      "first_concurrent_order_reference_lost": true,
+      "qualification": "Controlled interleaving, not a measured frequency under real Redis traffic."
+    },
+    {
+      "issue": "PROFILE_UPDATE_RACE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "triggering_preference": "English",
+      "persisted": false,
+      "qualification": "Scheduled update runs after a later user message; it reads latest, not the triggering message."
+    },
+    {
+      "issue": "EVAL_SHARED_STATE",
+      "evidence_kind": "isolated_fake_dependency_reproduction",
+      "defect_reproduced": true,
+      "backend_executions": 1,
+      "business_order_status": "cancelled",
+      "qualification": "Reproduces evaluator using bound runtime; startup binds the same runtime as /chat."
+    }
+  ]
+}

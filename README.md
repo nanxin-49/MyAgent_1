@@ -142,7 +142,7 @@ git diff --check
 
 Node 仅用于静态 UI 语法和渲染 / API 消费契约测试，浏览器使用页面不需 Node。Demo 单元测试使用 fake SDK / Memory / DOM；不能称为真实模型或真实商城集成。原 API 回归覆盖危险 schema、ownership、审批、拒绝、恢复与幂等。真实 Redis / Chroma 可选测试需 `CARTCARE_TEST_LIVE_MEMORY=1`；真实 Chroma RAG 可选测试见 `tests/test_rag_http_integration.py`。
 
-Windows 默认 uv cache 若受权限限制，可设置 `$env:UV_CACHE_DIR = Join-Path $PWD '.uv-cache'` 后重试。
+uv 缓存统一位于 `cash/cache/uv`（由 pyproject.toml 配置），pytest 缓存位于 `cash/cache/pytest`。若已有 `UV_CACHE_DIR` 指向旧 `.uv-cache`，请改为 `$env:UV_CACHE_DIR = Join-Path $PWD 'cash/cache/uv'`；显式环境变量优先于项目配置。
 
 ## Known limitations
 
@@ -155,4 +155,8 @@ Windows 默认 uv cache 若受权限限制，可设置 `$env:UV_CACHE_DIR = Join
 - Trace 的工具结果为业务 / 动作 / 检索摘要及确定性 helper 白名单输出，非完整原始输出；早期 Memory 读失败无 Agent trace，后台画像完成状态未追踪。
 - 没有生产 SLA、真实支付成功率、完整客服交接集成或大规模负载证据。
 
-当前权威核心说明：[定位与技术亮点](wiki/CartCare定位与技术亮点.md)、[重点代码](wiki/重点代码.md)、[Workbench](docs/CartCare-Codex-Workbench.html)。其他 Wiki 保留历史材料，不作为当前架构依据。
+当前核心说明：本 README、[定位与技术亮点](wiki/CartCare定位与技术亮点.md)、[重点代码](wiki/重点代码.md)。另见 [CartCare 与原始 EchoMind 的差别](docs/CartCare-vs-EchoMind.md)。
+
+[Workbench](docs/CartCare-Codex-Workbench.html) / progress JSON 保留任务与验收记录，[hardening](docs/hardening/README.md) 保留后续任务入口。旧 Wiki / 配图、本机 IDE 状态、旧嵌入式数据和缓存已归档到本机 `cash/`，不上传、不进入镜像；历史验收报告继续保留并版本化。
+
+根目录保留 uv、Docker、CI、pytest 和原部署脚本需要的标准入口，`.venv` 原地保留。T09 / FAQ JSON 已原样归入 `evaluation/reports/t09/` 与 `evaluation/reports/rag_http/`；新评测临时输出进入 `data/evaluation/`。目录职责、移动原因与恢复方法见 [文件组织说明](docs/project-organization.md) 和 [逐项迁移清单](docs/project-file-moves.json)。

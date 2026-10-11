@@ -6,7 +6,7 @@ From the repository root with Python 3.12:
 
 ```bash
 uv sync --dev
-uv run python -m evaluation.run_system_eval --output system_eval_report.json
+uv run python -m evaluation.run_system_eval --output data/evaluation/system_eval_report.json
 ```
 
 To compare with a saved JSON report, add `--baseline previous_report.json`. Keep that baseline in a separate file from `--output`. A nonzero safety rate is an immediate regression; ordinary positive metrics flag drops greater than 5%.
@@ -19,18 +19,20 @@ Tool metrics distinguish read/write/dangerous risk and report `invocation_succes
 
 ## T09 online `/chat` evidence
 
-The 2026-09-30 run used the current local API on port 8003, a real configured model, Redis and Chroma HTTP, with an isolated **demo** business fixture. It captured all ten scenarios in `t09_online_observations_final.json`, including full ChatResponse, request ID, routing, Tool Trace, RAG status/citations, and policy/action result when present. `t09_online_report.json` is the scored online Agent report. `system_eval_report.json` remains the separate component replay report.
+The 2026-09-30 run used the current local API on port 8003, a real configured model, Redis and Chroma HTTP, with an isolated **demo** business fixture. It captured all ten scenarios in [`t09_online_observations_final.json`](reports/t09/t09_online_observations_final.json), including full ChatResponse, request ID, routing, Tool Trace, RAG status/citations, and policy/action result when present. [`t09_online_report.json`](reports/t09/t09_online_report.json) is the scored online Agent report. [`system_eval_report.json`](reports/t09/system_eval_report.json) remains the separate component replay report.
 
 To repeat the run, create the dated demo fixture with `uv run python -m evaluation.prepare_online_eval`, start the current API with `CARTCARE_BUSINESS_FIXTURE` pointing to that fixture and the configured Redis/Chroma services, then run:
 
 ```bash
-uv run python -m evaluation.capture_online_eval --base-url http://127.0.0.1:8003 --cases t09_online_cases.json --output t09_online_observations_final.json
-uv run python -m evaluation.agent_trace_eval --cases t09_online_cases.json --observations t09_online_observations_final.json --output t09_online_report.json
+uv run python -m evaluation.capture_online_eval --base-url http://127.0.0.1:8003 --cases data/evaluation/t09_online_cases.json --output data/evaluation/t09_online_observations.json
+uv run python -m evaluation.agent_trace_eval --cases data/evaluation/t09_online_cases.json --observations data/evaluation/t09_online_observations.json --output data/evaluation/t09_online_report.json
 ```
+
+These commands reuse the commerce scenarios against the current Single runtime; they do not recreate the historical Multi baseline. Current routing / intent fields are unobserved, and new results must stay separate from the accepted 2026-09-30 report.
 
 The run observed intent 7/10, expected Tool selection 7/10, arguments 6/6 when the target Tool was invoked, unnecessary Tool calls 5/10, and strict end-to-end scenario success 6/10. Unsupported-request escalation was observed in 1/1, although its intent label and Tool use missed the case expectations. The FAQ RAG case returned `degraded`, with citation and grounding both 0/1. Online Agent metrics are a single demo-environment sample, not production quality estimates. The 0.35 runtime threshold was unchanged.
 
-The original 2026-09-30 T09 sample is intentionally unchanged: Chroma's thin HTTP client lacked an embedding function then, and its legacy collection lacked T07 provenance. A separate 2026-10-02 RAG integration fix added explicit versioned vectors and a new demo collection. `rag_faq_online_observation_final.json` and `rag_faq_online_verification.json` hold the later FAQ-only `/chat` evidence; do not recalculate the original ten-case baseline from that single retest. Fallback text still has no citation.
+The original 2026-09-30 T09 sample is intentionally unchanged: Chroma's thin HTTP client lacked an embedding function then, and its legacy collection lacked T07 provenance. A separate 2026-10-02 RAG integration fix added explicit versioned vectors and a new demo collection. [`rag_faq_online_observation_final.json`](reports/rag_http/rag_faq_online_observation_final.json) and [`rag_faq_online_verification.json`](reports/rag_http/rag_faq_online_verification.json) hold the later FAQ-only `/chat` evidence; do not recalculate the original ten-case baseline from that single retest. Fallback text still has no citation.
 
 ## Online baseline
 
@@ -55,7 +57,7 @@ The original 2026-09-30 T09 sample is intentionally unchanged: Chroma's thin HTT
 
 服务不可用时，Runner 会为每条 Case 保存 status=blocked 和原始连接错误，不会用 Mock 结果冒充 E2E 结果。
 
-`POST /eval/run` separately runs IntentRecognizer accuracy/Macro-F1 and Agent replies with the subjective LLM judge. This older HTTP baseline includes legacy non-commerce cases; align it with T09 scenarios before comparing online Agent quality with the component replay.
+`POST /eval/run` uses SupportRuntime for Agent replies and the subjective LLM judge. IntentRecognizer accuracy/Macro-F1 is diagnostic and runs only when explicit intent cases are supplied. This older HTTP baseline includes legacy non-commerce cases; align it with T09 scenarios before comparing online Agent quality with the component replay.
 
 The T09 capture and scoring commands above operate on the ten commerce cases. Missing Policy, execution-count or retrieval-hit evidence remains unmeasured. Capture requests may trigger simulated demo refund/cancel actions, so use an isolated fixture.
 
@@ -88,3 +90,7 @@ Docker 开发镜像包含测试依赖，生产镜像不包含 pytest：
     tool_use -> 工具执行 -> 最终文本
 
 验收同时检查最终回答、工具调用次数、tools_used 和完整 tool_traces。
+
+## 文件组织
+
+历史 T09 与 FAQ HTTP 证据分别在 `reports/t09/`、`reports/rag_http/`，内容原样保留。`prepare_online_eval` / `capture_online_eval` 默认使用根目录下 `data/evaluation/`，新运行不覆盖历史报告；`demo.prepare` 仍输出 `data/demo_business_fixture.json`。用 `--fixture` / `--cases` / `--output` 可显式选择其他位置。uv / pytest 缓存统一在本机 `cash/cache/`，见 [整理说明](../docs/project-organization.md)。

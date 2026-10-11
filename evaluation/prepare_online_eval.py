@@ -65,10 +65,12 @@ def prepare(now: datetime) -> tuple[dict, list[dict]]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Prepare isolated T09 demo fixture for real /chat")
-    parser.add_argument("--fixture", type=Path, default=ROOT / "t09_online_fixture.json")
-    parser.add_argument("--cases", type=Path, default=ROOT / "t09_online_cases.json")
+    parser.add_argument("--fixture", type=Path, default=ROOT / "data" / "evaluation" / "t09_online_fixture.json")
+    parser.add_argument("--cases", type=Path, default=ROOT / "data" / "evaluation" / "t09_online_cases.json")
     args = parser.parse_args()
     data, cases = prepare(datetime.now(timezone.utc))
+    args.fixture.parent.mkdir(parents=True, exist_ok=True)
+    args.cases.parent.mkdir(parents=True, exist_ok=True)
     args.fixture.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     args.cases.write_text(json.dumps(cases, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"fixture={args.fixture} cases={args.cases} scenario_count={len(cases)}")

@@ -78,11 +78,12 @@ def capture(base_url: str, cases: list[dict[str, Any]], output: Path, *, timeout
 def main() -> int:
     parser = argparse.ArgumentParser(description="Capture one real /chat run for T09 cases")
     parser.add_argument("--base-url", default="http://127.0.0.1:8003")
-    parser.add_argument("--cases", type=Path, default=ROOT / "t09_online_cases.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "t09_online_observations.json")
+    parser.add_argument("--cases", type=Path, default=ROOT / "data" / "evaluation" / "t09_online_cases.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "data" / "evaluation" / "t09_online_observations.json")
     parser.add_argument("--timeout", type=float, default=90)
     args = parser.parse_args()
     cases = json.loads(args.cases.read_text(encoding="utf-8"))
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     records = capture(args.base_url, cases, args.output, timeout=args.timeout)
     return 1 if any("error" in record for record in records) else 0
 

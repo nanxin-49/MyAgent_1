@@ -86,6 +86,8 @@ Before starting a non-trivial task, read:
 
 - `docs/CartCare-Codex-Workbench.html`
 - `docs/cartcare-workbench-progress.json` if it exists
+- `docs/hardening/README.md` and the **current** `docs/hardening/tasks/<Axx>.md` when working on post-T12 hardening (V3)
+- only the **relevant C/N entries** of `docs/engineering/project-audit-20261011.md` when the current hardening task cites the audit; do not read the full audit and all task files every round
 
 The workbench records:
 
@@ -220,6 +222,22 @@ If you discover technical debt outside the current task:
 
 Avoid replacing the whole Agent framework or introducing large dependencies unless the task explicitly requires it.
 
+## Post-T12 evidence-driven hardening (V3)
+
+T01–T12 are completed historical milestones. For Phase-2 tasks, follow `docs/hardening/README.md` and **only the current** `docs/hardening/tasks/<Axx>.md` when present. The older `docs/CartCare-Agent-Hardening-V2.md` is superseded by V3. The 2026-10-11 audit (`docs/engineering/project-audit-20261011.md`) describes evidence at its recorded HEAD and uncommitted workspace; it is not a substitute for checking current code. If the V3 files are missing, report that rather than silently running the V2 backlog.
+
+For A-series tasks:
+
+1. Work on **one `Axx/issue-id` at a time**. Confirm `HEAD`, dirty worktree, executable path, and existing tests. Preserve unrelated changes; stop after reporting results, without automatically starting the next task.
+2. The audit's **15 successful isolation probes show observed defects, not completed fixes**. Check relevant evidence, write a regression for **expected safe behavior** (red before repair, green after), and run related tests. If already fixed at current HEAD, prove it and record `verified_no_fix` rather than making unnecessary edits.
+3. Follow V3 task priority: in particular, audit-confirmed **N01 idempotency/identity reuse, N03 Provider error disclosure, and N02 authorization/Trace access** are not merely hypothetical. Do not incorrectly promote the separate A01 last-round Tool Use hypothesis to a confirmed defect without its own test. Detailed sequencing and acceptance criteria belong in task files, not here.
+4. Keep auth work minimal and deterministic: a local Demo `Principal/AuthContext` adapter is **not production authentication**; reviewer permissions and restricted operations/Trace endpoints matter. Protecting `/eval/run` with authorization does **not** address the separately observed evaluation shared-state risk. Do not claim public-deployment safety without a separate review.
+5. Reuse the current Single Support Agent, Provider, Policy/HITL, Tool Contract, RAG, Memory, Eval, and Demo/Trace implementations. For handoff, distinguish text suggesting assistance from a created record. For RAG, fix scoped correctness issues before controlled experiments. Conditional tasks may be deferred with `known_open` (including reproduced Memory N08/N09); do not redo T11 or add MCP/LangGraph by default.
+6. Preserve historical T09–T12 reports; record new evidence separately with commit, environment, test dataset, raw observations, metrics, and limitations. Distinguish Fake SDK/unit, live Redis/Chroma, and real-model HTTP E2E. Never present demonstration metrics as production results.
+7. Keep documentation proportionate and update **only the existing Workbench/progress JSON** for task state. Include one developer exercise that can be done without Codex; reserve week 6 for independent coding, debugging, and interview preparation.
+
+Track A-series **outcome** (`fixed`, `verified_no_fix`, `implemented`, `experiment_complete`, `partial`, `deferred/known_open`, or `skipped`) separately from Workbench status. Normally recommend `verify`; the user accepts work before `done`.
+
 ## Before modifying code
 
 For a non-trivial task:
@@ -292,7 +310,7 @@ Do not claim success from unexecuted tests.
 Record observable execution events such as:
 
 - request_id
-- routing result
+- routing result (only when the active topology actually routes; otherwise N/A)
 - selected tool
 - validated tool arguments
 - tool result
@@ -310,7 +328,7 @@ Prefer deterministic and task-specific metrics where possible.
 
 Important evaluation areas include:
 
-- routing accuracy
+- routing accuracy (only where routing exists; Single-Agent dispatch is N/A)
 - tool selection accuracy
 - tool argument correctness
 - tool execution success

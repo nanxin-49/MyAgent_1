@@ -1,0 +1,234 @@
+{
+  "date": "2026-10-11",
+  "head": "09efd3443d2e7b6e03fba7d13fe660c483b30583",
+  "moves": [
+    {
+      "source": "wiki/.DS_Store",
+      "destination": "cash/wiki/.DS_Store",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "d65165279105ca6773180500688df4bdc69a2c7b771752f0a46ef120b7fd8ec3"
+      }
+    },
+    {
+      "source": "wiki/assets",
+      "destination": "cash/wiki/assets",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        "architecture\\01-overall-architecture.svg": "03dc3f0afe2e454cea51274f81fb08b383eced6c8d013236148e9bce0bf45885",
+        "architecture\\02-chat-flow.svg": "0e0d622e44cf0e147f07479a72e06e72e8f1d8965fa39734164502698d5ec484",
+        "architecture\\03-agent-skills.svg": "9313626f58fa9ed18a52cd616939bf70e9505dfad170e2d18326ce7133f7fbea",
+        "architecture\\04-data-storage.svg": "b7db491493c4962bb142f67eb8c30126c1353cf79320240bb8be0f97691495bf",
+        "architecture\\05-monitor-eval.svg": "170f13402a40a4d6c2ef272406e4bc30964a9db511190554e17fc348eb868f63",
+        "architecture\\06-deployment.svg": "6aca9825a0768abfe11b72ab8993fe9c34daeed4adeb15343d3a12033783d7c9",
+        "posters\\cartcare-update-poster.svg": "29bea9937abb877e30f64d5027f4549df64449a7b334c25b5434cee1fb71543e"
+      }
+    },
+    {
+      "source": "wiki/CartCare学习文档.md",
+      "destination": "cash/wiki/CartCare学习文档.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "1c63e0241c22ebe7241568388cbdef9025572c43be88e773120a6c127c9c835a"
+      }
+    },
+    {
+      "source": "wiki/NexusOps企业智能运营协同中枢.md",
+      "destination": "cash/wiki/NexusOps企业智能运营协同中枢.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "df39b282a2493801c5765b97ac32162bcc69450ce439d267902690e13ba0e2cc"
+      }
+    },
+    {
+      "source": "wiki/业务流程说明.md",
+      "destination": "cash/wiki/业务流程说明.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "29b3173d2e4644af326c430e1e505cae8cb5ca57944500dc27facb63ee35eeec"
+      }
+    },
+    {
+      "source": "wiki/完整使用指南.md",
+      "destination": "cash/wiki/完整使用指南.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "adb42339cd91b13ec3bf8c6dc5667fff8b7c421e0acb66fae918c6db5cad8cab"
+      }
+    },
+    {
+      "source": "wiki/带数据指标的加强版简历模板.md",
+      "destination": "cash/wiki/带数据指标的加强版简历模板.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "6148b8b86a350d8e504b67b7d47b36bdc704b081880fe2ba49b9e86cbb02de2c"
+      }
+    },
+    {
+      "source": "wiki/技术亮点.md",
+      "destination": "cash/wiki/技术亮点.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "e646119299fccd9b4744a05adabaef52253bf7e64756fba341cdeb373283bf27"
+      }
+    },
+    {
+      "source": "wiki/文档中心.md",
+      "destination": "cash/wiki/文档中心.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "37d9e276d686ab258f491c81e0616be164c7fb3bf61267d8aee36c927efcf260"
+      }
+    },
+    {
+      "source": "wiki/架构图.md",
+      "destination": "cash/wiki/架构图.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "b98d08dbc21d3e314b8134098cff7dbfc8d7bb6f9524f3b2bc7dbeaeb1af76b8"
+      }
+    },
+    {
+      "source": "wiki/简历包装.md",
+      "destination": "cash/wiki/简历包装.md",
+      "reason": "旧架构、重复教程、旧简历及配图，不再作为当前事实源",
+      "sha256": {
+        ".": "40b1cb979dd4b0dc44503240789a7cdd65c45d61fd14466100e6f1d262f898cf"
+      }
+    },
+    {
+      "source": ".idea",
+      "destination": "cash/local/idea",
+      "reason": "本机 IDE 状态",
+      "sha256": {
+        ".gitignore": "ca032d82aa302ebed293f50f36a6b022de8e8b2e16f6400076f2a70236f9bc1b",
+        "claudeCodeTabState.xml": "dbbb75f456b76782628dd99096be88e3dce35cd88c77ec910f1e37f3c0e9dbb8",
+        "EchoMind.iml": "c5381b61d2fccef86ff2e3c574be9adfcc82195e3374e940f55d5a97ea40c5c5",
+        "misc.xml": "14293368f44e3593e276f729442971d7db18f485f4d19bcf51fc9dff278692c5",
+        "modules.xml": "cdd8bfe4d762872c49364ec586580b205c48f5b9d86e2a5daf9342c18732eebd",
+        "vcs.xml": "55768f1f84fb117f1d0fc383e180b5d0aa5e5e6584c8c4a2995c15b4237f0972",
+        "workspace.xml": "a97745aaee474181dcfa17e4bb94191149c1431e2da103b7ec89b8475a19dcce",
+        "inspectionProfiles\\profiles_settings.xml": "6172c5997eeb3cd19c9ca2b5b97d6e2983cdd1fa60b2460d7bbb74055edcaa46"
+      }
+    },
+    {
+      "source": ".DS_Store",
+      "destination": "cash/local/.DS_Store",
+      "reason": "OS 元数据",
+      "sha256": {
+        ".": "a81172f02b3e13dcc04afc87f8289c67e8fdd3ef4bd4cbc240ebce9325643a7d"
+      }
+    },
+    {
+      "source": ".pytest_cache",
+      "destination": "cash/cache/pytest",
+      "reason": "可再生成测试缓存",
+      "sha256": {
+        ".gitignore": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+        "CACHEDIR.TAG": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+        "README.md": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+        "v\\cache\\lastfailed": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "v\\cache\\nodeids": "02923db9641c6d32579caa45f5a9f2ca7484e84415436c8bed3bb0d6c3c45d68",
+        "v\\cache\\stepwise": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "source": ".uv-cache",
+      "destination": "cash/cache/uv",
+      "reason": "uv 主缓存统一目录",
+      "sha256": {}
+    },
+    {
+      "source": ".uv-cache-rag",
+      "destination": "cash/cache/uv-rag",
+      "reason": "旧 RAG 实验缓存",
+      "sha256": {}
+    },
+    {
+      "source": ".uv-cache-t09",
+      "destination": "cash/cache/uv-t09",
+      "reason": "旧 T09 实验缓存",
+      "sha256": {}
+    },
+    {
+      "source": "data/chroma",
+      "destination": "cash/legacy-data/chroma",
+      "reason": "旧嵌入式数据；当前 HttpClient 不读取，外部 named volume 未移动",
+      "sha256": {
+        "chroma.sqlite3": "2043029b2ed9b9def8a08177ae04f674c72e03361b3d47e751d0e3854990b755",
+        "1f7ec483-dfba-4ddc-8919-72c86652ac76\\data_level0.bin": "d3c9fd302f000d7790aa403c2d0d8fec363fe46f30b07d53020b6e33b22435a9",
+        "1f7ec483-dfba-4ddc-8919-72c86652ac76\\header.bin": "e87a1dc8bcae6f2c4bea6d5dd5005454d4dace8637dae29bff3c037ea771411e",
+        "1f7ec483-dfba-4ddc-8919-72c86652ac76\\length.bin": "4acd8079c708b098be96e875f84c52e0c3828df7fd93ef69ff036898471faa12",
+        "1f7ec483-dfba-4ddc-8919-72c86652ac76\\link_lists.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "563fc5ab-16c6-43e6-ae77-08bf025fb028\\data_level0.bin": "d3c9fd302f000d7790aa403c2d0d8fec363fe46f30b07d53020b6e33b22435a9",
+        "563fc5ab-16c6-43e6-ae77-08bf025fb028\\header.bin": "e87a1dc8bcae6f2c4bea6d5dd5005454d4dace8637dae29bff3c037ea771411e",
+        "563fc5ab-16c6-43e6-ae77-08bf025fb028\\length.bin": "17cf4e9be08bda41ee69dceb95792df92d539c1dc5668a39e7dfff204ecb5115",
+        "563fc5ab-16c6-43e6-ae77-08bf025fb028\\link_lists.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "source": "system_eval_report.json",
+      "destination": "evaluation/reports/t09/system_eval_report.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "a655bf3b76d9d3c02ebe8a97d561088c298d2a0d1a7426acee939b012f4bd531"
+      }
+    },
+    {
+      "source": "t09_online_cases.json",
+      "destination": "evaluation/reports/t09/t09_online_cases.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "2ca992e625467c3aa0663630c74e9eb58d7b6c490b4afb3fd1614b37c9fce5da"
+      }
+    },
+    {
+      "source": "t09_online_fixture.json",
+      "destination": "evaluation/reports/t09/t09_online_fixture.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "15c1b3c1bc827da084a59cfcea911d2543fcd94d82276a31ec836b2fb3304f50"
+      }
+    },
+    {
+      "source": "t09_online_observations_final.json",
+      "destination": "evaluation/reports/t09/t09_online_observations_final.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "40e48f2967e9626671d8e8de8ad498fd54a746843cfaee82317b703b6fff84c6"
+      }
+    },
+    {
+      "source": "t09_online_report.json",
+      "destination": "evaluation/reports/t09/t09_online_report.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "149119c087d0ed4e5ebc2541aa68ea02b8df030079ca53af385b7c7c4d6ece17"
+      }
+    },
+    {
+      "source": "rag_faq_case.json",
+      "destination": "evaluation/reports/rag_http/rag_faq_case.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "2d9dc32d181085efdaa18e1661e99fc3b35f8708dedd8972b2948e602f53ea70"
+      }
+    },
+    {
+      "source": "rag_faq_online_observation_final.json",
+      "destination": "evaluation/reports/rag_http/rag_faq_online_observation_final.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "bc97a0189471aa9c6656b2b50f0e0795db8fca677e8c4a61a10d2deb6c404e8a"
+      }
+    },
+    {
+      "source": "rag_faq_online_verification.json",
+      "destination": "evaluation/reports/rag_http/rag_faq_online_verification.json",
+      "reason": "历史验收证据原样迁移，继续版本化",
+      "sha256": {
+        ".": "3f83d75923e402cfcb0691186d0d533289f3900884dde22ab74322b858f26be9"
+      }
+    }
+  ]
+}

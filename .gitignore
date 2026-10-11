@@ -6,6 +6,10 @@ dist/
 build/
 .venv/
 .uv-cache/
+.uv-cache*/
+.pytest_cache/
+# Local archive and regenerable caches (including its local README)
+/cash/
 venv/
 
 # 环境变量（含敏感信息）
