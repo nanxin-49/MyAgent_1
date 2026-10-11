@@ -154,12 +154,22 @@ class ActionService:
         parsed_amount = self._parse_amount(amount)
         if amount is not None and parsed_amount is None:
             return self._simple_error("invalid_amount", "action 金额格式无效")
+        if idempotency_key is not None and not isinstance(idempotency_key, str):
+            return self._simple_error("invalid_action_input", "幂等键必须为字符串")
+        idempotency_key = idempotency_key.strip() if idempotency_key else None
 
         with self._lock:
+            existing = None
             if idempotency_key:
+                # A returned internal key is an identifier, never an access credential.
                 existing = self._store.find_by_idempotency(idempotency_key)
-                if existing is not None:
-                    return self._result(existing, reused=True)
+                if existing is None:
+                    scoped_key = self._idempotency_key(
+                        action_type, user_id, order_id, parsed_amount, idempotency_key
+                    )
+                    existing = self._store.find_by_idempotency(scoped_key)
+                if existing is not None and existing.user_id != user_id:
+                    return self._simple_error("unauthorized", "动作不属于当前客户")
 
             try:
                 order = self._order_provider.get_order(order_id, customer_id=user_id)
@@ -168,12 +178,15 @@ class ActionService:
                 key = self._idempotency_key(
                     action_type, user_id, order_id, parsed_amount, idempotency_key
                 )
-                existing = self._store.find_by_idempotency(key)
+                existing = existing or self._store.find_by_idempotency(key)
                 if existing is not None:
-                    return self._result(existing, reused=True)
+                    return self._reuse_action(existing, action_type, user_id, order_id, parsed_amount)
                 existing_refund = self._existing_refund(order_id, user_id) if action_type is ActionType.REFUND else None
                 policy = self._evaluate(action_type, order, user_id, parsed_amount, existing_refund)
             except ProviderError as exc:
+                # A rejected retry must not replace the original key binding.
+                if existing is not None:
+                    return self._simple_error(exc.code, str(exc))
                 key = self._idempotency_key(action_type, user_id, order_id, parsed_amount, idempotency_key)
                 return self._create_provider_failure(
                     action_type, order_id, user_id, request_id, parsed_amount, key, exc
@@ -196,6 +209,14 @@ class ActionService:
             action.status = ActionStatus.APPROVED
             self._store.save(action)
             return self._execute_locked(action, request_id=request_id)
+
+    def _reuse_action(self, action, action_type, user_id, order_id, amount) -> ActionResult:
+        if action.user_id != user_id:
+            return self._simple_error("unauthorized", "动作不属于当前客户")
+        # Decimal equality binds the effective amount, independent of its spelling.
+        if (action.action_type, action.order_id, action.amount) != (action_type, order_id, amount):
+            return self._simple_error("idempotency_conflict", "幂等键已绑定不同的动作参数")
+        return self._result(action, reused=True)
 
     def _execute_locked(self, action: PendingAction, *, request_id: str) -> ActionResult:
         try:
@@ -382,11 +403,20 @@ class ActionService:
                 "action": action_type.value,
                 "user_id": user_id,
                 "order_id": order_id,
-                "amount": str(amount) if amount is not None else None,
+                "amount": ActionService._canonical_amount(amount),
             },
             sort_keys=True,
         )
         return "auto_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
+
+    @staticmethod
+    def _canonical_amount(amount):
+        if amount is None:
+            return None
+        value = format(amount, "f")
+        if "." in value:
+            value = value.rstrip("0").rstrip(".")
+        return "0" if amount == 0 else value
 
 
 __all__ = ["ActionService"]

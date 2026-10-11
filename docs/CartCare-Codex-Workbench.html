@@ -112,6 +112,11 @@
 
     <section id="baseline">
       <h2>1. 当前事实基线（Codex 已核验）</h2>
+      <article class="task-card" data-task="A04">
+        <h3>A04 / N01 · 幂等复用与身份边界</h3>
+        <p>2026-10-11：N01=fixed，待验收 verify。内部 key 命中先检查主体与订单归属，同 key 的动作/订单/有效金额不同返回冲突；同进程8线程重复请求只执行一次。N05/N04仍未实施。</p>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="actions/service.py; tests/test_action_service.py; docs/hardening/A04-actions-idempotency.md"></div><div><label class="small">备注</label><textarea data-field="note">N01=fixed；红测7 failed/3 passed；最终专项31 passed，全量164 passed/2 skipped。保留原锁/Store/Policy/HITL；不保证跨进程或重启一致性，Demo身份非认证。未修复N02/N03/N04/N05，未调用真实支付/模型，未提交推送。独立练习及完整证据见技术笔记。</textarea></div></div>
+      </article>
       <article class="task-card" data-task="A00-lite">
         <h3>A00-lite / INTAKE · 审查结果接收</h3>
         <p>2026-10-11：HEAD 与审查及观察 JSON 一致（09efd344）；脚本和 JSON 均已找到，15 项记录为缺陷成立证据。仅接收基线，未重跑全面审查或复现，未修复 Axx。审查文件保持 verify，待用户确认。</p>

@@ -1,7 +1,15 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-11T19:49:38+08:00",
+  "updatedAt": "2026-10-11T19:55:55+08:00",
   "tasks": {
+    "A04": {
+      "status": "verify",
+      "outcome": "fixed",
+      "issue_id": "N01",
+      "issues": { "N01": "fixed", "N05": "known_open", "N04": "known_open" },
+      "evidence": "actions/service.py; tests/test_action_service.py; docs/hardening/A04-actions-idempotency.md",
+      "note": "2026-10-11 A04/N01=fixed，verify待用户验收，仅N01。起始HEAD=09efd3443d2e7b6e03fba7d13fe660c483b30583；执行期间外部提交整理内容，当前HEAD=e097ca871bcf07373b8bcf34dccd1e7b411c1657（19:51:18），本助手未提交。两个HEAD的业务代码/测试/uv.lock无变化，pyproject仅此前cache-dir配置；最终专项和完整回归在此提交后运行。既有改动保留，当前未提交仅本轮5文件。内部key命中先检查主体，Provider检查订单归属，_reuse_action比较action/user/order/有效Decimal amount；异参返回idempotency_conflict且不包含旧动作，跨用户不返回原结果；派生key规范化金额；拒绝重试不覆盖原绑定。原锁/ActionStore/Policy/HITL保持。修复前新增10例红测7 failed/3 passed/17 deselected；初修4 failed/23 passed是测试误用get_action，改为现有get；最终专项31 passed（新增14例），完整pytest164 passed/2 skipped/1既有AnyIO警告；uv lock --check 53 packages、git diff --check通过。8线程同一Service并发只执行1次；测试为内存fixture/模拟backend，live Redis/Chroma及真实模型E2E未跑。backend_executions=1不证明参数绑定或身份/数据安全。内存Store跨进程/重启、外部执行落库原子性仍不保证；Demo user_id非认证，N02/N03未改，N05/N04仍known_open。原审查脚本/JSON哈希不变；不更新历史T09–T12。README/核心Wiki无新架构漂移；只更新Workbench/progress并新增技术笔记。独立练习：批准600元待审批动作后同key/600.00重试断言原action_id、completed、reused及单次执行，再599冲突。未提交/推送，完成停止。"
+    },
     "A00-lite": {
       "status": "verify",
       "outcome": "implemented",

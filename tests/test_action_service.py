@@ -1,5 +1,7 @@
 import asyncio
 import json
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -180,6 +182,119 @@ def test_derived_idempotency_key_deduplicates_agent_retries():
 
     assert second.action_id == first.action_id
     assert second.reused is True
+    assert len(backend.calls) == 1
+
+
+@pytest.mark.parametrize("key_kind", ["external", "internal", "derived"])
+def test_n01_same_parameters_reuse_normalized_amount(key_kind):
+    service, backend = make_service()
+    key = None if key_kind == "derived" else "n01-same"
+    first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-first", amount="10.00", idempotency_key=key)
+    retry_key = first.action.idempotency_key if key_kind == "internal" else key
+    second = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-retry", amount="1E1", idempotency_key=retry_key)
+    assert first.status is second.status is ActionStatus.COMPLETED
+    assert second.action_id == first.action_id and second.reused
+    assert len(backend.calls) == 1
+
+
+@pytest.mark.parametrize("key_kind", ["external", "internal"])
+@pytest.mark.parametrize("changed", ["amount", "order"])
+def test_n01_changed_parameters_conflict_without_old_result(key_kind, changed):
+    service, backend = make_service()
+    other = dict(service._business_backend._data["orders"]["ORD-1001"])
+    other["order_id"] = "ORD-N01"
+    service._business_backend._data["orders"]["ORD-N01"] = other
+    first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-first", amount="10", idempotency_key="n01-conflict")
+    key = first.action.idempotency_key if key_kind == "internal" else "n01-conflict"
+    second = service.request_refund(
+        order_id="ORD-N01" if changed == "order" else "ORD-1001",
+        user_id="customer-1", request_id="n01-change",
+        amount="20" if changed == "amount" else "10", idempotency_key=key)
+    assert not second.success and second.error_code == "idempotency_conflict"
+    assert second.action is None and second.action_id is None and not second.reused
+    assert len(backend.calls) == 1
+    assert service.get(action_id=first.action_id, user_id="customer-1").action.amount == Decimal("10")
+
+
+@pytest.mark.parametrize("order_id", ["ORD-1001", "ORD-N01-OTHER"])
+def test_n01_cross_user_internal_key_does_not_disclose_action(order_id):
+    service, backend = make_service()
+    other = dict(service._business_backend._data["orders"]["ORD-1001"])
+    other.update(order_id="ORD-N01-OTHER", customer_id="customer-2")
+    service._business_backend._data["orders"]["ORD-N01-OTHER"] = other
+    first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-first", amount="10", idempotency_key="n01-private")
+    result = service.request_refund(order_id=order_id, user_id="customer-2",
+        request_id="n01-other", amount="10", idempotency_key=first.action.idempotency_key)
+    assert not result.success and result.error_code == "unauthorized"
+    payload = json.dumps(result.to_tool_result())
+    assert first.action_id not in payload and "customer-1" not in payload
+    assert first.action.idempotency_key not in payload
+    assert len(backend.calls) == 1
+
+
+def test_n01_concurrent_duplicates_execute_once():
+    service, backend = make_service()
+    start = Barrier(8)
+    def request(index):
+        start.wait(timeout=5)
+        return service.request_refund(order_id="ORD-1001", user_id="customer-1",
+            request_id=f"n01-thread-{index}", amount="10.00", idempotency_key="n01-parallel")
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(request, range(8)))
+    assert all(result.status is ActionStatus.COMPLETED for result in results)
+    assert len({result.action_id for result in results}) == 1
+    assert sum(not result.reused for result in results) == 1
+    assert len(backend.calls) == 1
+
+
+def test_n01_internal_key_cannot_reuse_another_action_type():
+    service, backend = make_service(status="pending")
+    first = service.request_cancel(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-cancel", idempotency_key="n01-kind")
+    result = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-refund", idempotency_key=first.action.idempotency_key)
+    assert result.error_code == "idempotency_conflict" and result.action is None
+    assert len(backend.calls) == 1
+
+
+def test_n01_pending_retry_does_not_bypass_approval():
+    service, backend = make_service(total="800.00")
+    first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-pending", amount="600", idempotency_key="n01-approval")
+    retry = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-pending-retry", amount="600.00", idempotency_key="n01-approval")
+    conflict = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-lower", amount="10", idempotency_key="n01-approval")
+    assert retry.status is ActionStatus.AWAITING_APPROVAL and retry.reused
+    assert retry.action_id == first.action_id
+    assert conflict.error_code == "idempotency_conflict" and conflict.action is None
+    assert backend.calls == []
+
+
+def test_n01_rejected_retry_preserves_original_key_binding():
+    service, backend = make_service()
+    first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-bound", amount="10", idempotency_key="n01-binding")
+    rejected = service.request_refund(order_id="ORD-MISSING", user_id="customer-1",
+        request_id="n01-missing", amount="10", idempotency_key="n01-binding")
+    assert rejected.error_code == "not_found" and rejected.action is None
+    retry = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-bound-retry", amount="10", idempotency_key="n01-binding")
+    assert retry.reused and retry.action_id == first.action_id
+    assert len(backend.calls) == 1
+
+
+def test_n01_omitted_amount_matches_effective_total():
+    service, backend = make_service(total="100.00")
+    first = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-total", idempotency_key="n01-total-key")
+    retry = service.request_refund(order_id="ORD-1001", user_id="customer-1",
+        request_id="n01-total-retry", amount="1E2", idempotency_key="n01-total-key")
+    assert retry.reused and retry.action_id == first.action_id
     assert len(backend.calls) == 1
 
 
