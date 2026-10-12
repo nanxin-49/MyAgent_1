@@ -383,6 +383,7 @@ class BaseAgent:
                         "latency_ms": round(tool_latency_ms, 1),
                         "cached": bool(result.get("cached")) if isinstance(result, dict) else False,
                         "reranked": bool(result.get("reranked")) if isinstance(result, dict) else False,
+                        "rerank_status": result.get("rerank_status") if isinstance(result, dict) else None,
                         "retrieval_status": result.get("retrieval_status") if isinstance(result, dict) else None,
                         "citations": result.get("citations", []) if isinstance(result, dict) else [],
                         "action_result": action_result,

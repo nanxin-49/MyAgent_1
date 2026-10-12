@@ -7,7 +7,7 @@ import pytest
 from agents.agent_orchestrator import GeneralAgent
 from agents.tools import build_action_tools, build_business_tools, build_shared_rag_tools, make_tool
 from core.tool_contract import RetryPolicy, RiskLevel, execute_tool, validate_tool_input
-from mcp.tool_manager import MCPToolManager, Tool
+from mcp.tool_manager import MCPToolManager, RerankResult, Tool
 from providers.mock_backend import InMemoryBusinessBackend
 
 
@@ -236,7 +236,7 @@ def test_agent_rag_adapter_preserves_search_with_rewrite_path():
         return [query]
 
     async def rerank(query, items, top_k):
-        return items[:top_k]
+        return RerankResult(items[:top_k], True, "ranked")
 
     manager.rewrite_query = rewrite
     manager._rerank = rerank

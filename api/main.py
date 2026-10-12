@@ -661,6 +661,7 @@ async def search(query: str, top_k: int = 5):
         raise HTTPException(422, "top_k 必须大于 0")
     result = await _tool_manager.search_with_rewrite("knowledge_search", query, top_k=top_k)
     return {"query": query, "results": result.data, "reranked": result.reranked,
+            "rerank_status": getattr(result, "rerank_status", "not_requested"),
             "retrieval_status": result.retrieval_status, "citations": result.citations,
             "success": result.success, "error_code": result.error_code}
 

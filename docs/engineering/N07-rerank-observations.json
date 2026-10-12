@@ -1,0 +1,392 @@
+{
+  "date": "2026-10-12",
+  "head": "1cc82bb182093b5fb5744b693af17bc034e382b9",
+  "python": "3.12.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "scope": "Fake SDK + Fake Chroma; real parser and finalizer; no paid/live-service calls",
+  "red": {
+    "command": "uv run python -m pytest -q -o cache_dir=.pytest-cache-n07 tests/test_rerank_result_contract.py",
+    "failed": 4,
+    "passed": 0,
+    "empty_rerank": {
+      "success": true,
+      "retrieval_status": "usable",
+      "reranked": true,
+      "hits": [],
+      "citations": []
+    },
+    "skipped_reranked": true,
+    "service_fallback_reranked": true,
+    "empty_recall_success": false
+  },
+  "verification": {
+    "n07_passed": 50,
+    "rag_tool_passed": 41,
+    "n06_passed": 39,
+    "prior_hardening_passed": 134,
+    "full_passed": 356,
+    "full_skipped": 3,
+    "lock_packages": 53,
+    "diff_check": "passed"
+  },
+  "observations": [
+    {
+      "sdk_output": "[]",
+      "candidate_count": 2,
+      "model_calls": 1,
+      "result": {
+        "success": true,
+        "data": [
+          {
+            "content": "policy content 0",
+            "score": 0.9,
+            "score_kind": "one_minus_chroma_distance",
+            "document_id": "policy-0",
+            "title": "模拟退款政策",
+            "source": "demo:policy/refund",
+            "doc_type": "policy",
+            "chunk_index": 0,
+            "total_chunks": 1,
+            "policy_version": "refund-cancel-v1",
+            "effective_at": "2026-09-01T00:00:00Z",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "citation": {
+              "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "document_id": "policy-0",
+              "chunk_index": 0,
+              "source": "demo:policy/refund",
+              "policy_version": "refund-cancel-v1"
+            },
+            "retrieval_status": "usable",
+            "reason_code": null
+          }
+        ],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": false,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "document_id": "policy-0",
+            "chunk_index": 0,
+            "source": "demo:policy/refund",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "rerank_status": "invalid_output_fallback"
+      }
+    },
+    {
+      "sdk_output": "[1,0]",
+      "candidate_count": 2,
+      "model_calls": 1,
+      "result": {
+        "success": true,
+        "data": [
+          {
+            "content": "policy content 1",
+            "score": 0.9,
+            "score_kind": "one_minus_chroma_distance",
+            "document_id": "policy-1",
+            "title": "模拟退款政策",
+            "source": "demo:policy/refund",
+            "doc_type": "policy",
+            "chunk_index": 0,
+            "total_chunks": 1,
+            "policy_version": "refund-cancel-v1",
+            "effective_at": "2026-09-01T00:00:00Z",
+            "content_hash": "b5d25bd1eab59c3fb2a96dc14778e2abdf575075daebd6aba77a3256b558aa5e",
+            "citation": {
+              "reference": "policy-1@refund-cancel-v1#chunk-0~b5d25bd1eab59c3fb2a96dc14778e2abdf575075daebd6aba77a3256b558aa5e",
+              "content_hash": "b5d25bd1eab59c3fb2a96dc14778e2abdf575075daebd6aba77a3256b558aa5e",
+              "document_id": "policy-1",
+              "chunk_index": 0,
+              "source": "demo:policy/refund",
+              "policy_version": "refund-cancel-v1"
+            },
+            "retrieval_status": "usable",
+            "reason_code": null
+          }
+        ],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": true,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "policy-1@refund-cancel-v1#chunk-0~b5d25bd1eab59c3fb2a96dc14778e2abdf575075daebd6aba77a3256b558aa5e",
+            "content_hash": "b5d25bd1eab59c3fb2a96dc14778e2abdf575075daebd6aba77a3256b558aa5e",
+            "document_id": "policy-1",
+            "chunk_index": 0,
+            "source": "demo:policy/refund",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "rerank_status": "ranked"
+      }
+    },
+    {
+      "sdk_output": "[0,0]",
+      "candidate_count": 2,
+      "model_calls": 1,
+      "result": {
+        "success": true,
+        "data": [
+          {
+            "content": "policy content 0",
+            "score": 0.9,
+            "score_kind": "one_minus_chroma_distance",
+            "document_id": "policy-0",
+            "title": "模拟退款政策",
+            "source": "demo:policy/refund",
+            "doc_type": "policy",
+            "chunk_index": 0,
+            "total_chunks": 1,
+            "policy_version": "refund-cancel-v1",
+            "effective_at": "2026-09-01T00:00:00Z",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "citation": {
+              "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "document_id": "policy-0",
+              "chunk_index": 0,
+              "source": "demo:policy/refund",
+              "policy_version": "refund-cancel-v1"
+            },
+            "retrieval_status": "usable",
+            "reason_code": null
+          }
+        ],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": false,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "document_id": "policy-0",
+            "chunk_index": 0,
+            "source": "demo:policy/refund",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "rerank_status": "invalid_output_fallback"
+      }
+    },
+    {
+      "sdk_output": "not JSON",
+      "candidate_count": 2,
+      "model_calls": 1,
+      "result": {
+        "success": true,
+        "data": [
+          {
+            "content": "policy content 0",
+            "score": 0.9,
+            "score_kind": "one_minus_chroma_distance",
+            "document_id": "policy-0",
+            "title": "模拟退款政策",
+            "source": "demo:policy/refund",
+            "doc_type": "policy",
+            "chunk_index": 0,
+            "total_chunks": 1,
+            "policy_version": "refund-cancel-v1",
+            "effective_at": "2026-09-01T00:00:00Z",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "citation": {
+              "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "document_id": "policy-0",
+              "chunk_index": 0,
+              "source": "demo:policy/refund",
+              "policy_version": "refund-cancel-v1"
+            },
+            "retrieval_status": "usable",
+            "reason_code": null
+          }
+        ],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": false,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "document_id": "policy-0",
+            "chunk_index": 0,
+            "source": "demo:policy/refund",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "rerank_status": "invalid_output_fallback"
+      }
+    },
+    {
+      "sdk_output": "[0]",
+      "candidate_count": 1,
+      "model_calls": 0,
+      "result": {
+        "success": true,
+        "data": [
+          {
+            "content": "policy content 0",
+            "score": 0.9,
+            "score_kind": "one_minus_chroma_distance",
+            "document_id": "policy-0",
+            "title": "模拟退款政策",
+            "source": "demo:policy/refund",
+            "doc_type": "policy",
+            "chunk_index": 0,
+            "total_chunks": 1,
+            "policy_version": "refund-cancel-v1",
+            "effective_at": "2026-09-01T00:00:00Z",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "citation": {
+              "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "document_id": "policy-0",
+              "chunk_index": 0,
+              "source": "demo:policy/refund",
+              "policy_version": "refund-cancel-v1"
+            },
+            "retrieval_status": "usable",
+            "reason_code": null
+          }
+        ],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": false,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "document_id": "policy-0",
+            "chunk_index": 0,
+            "source": "demo:policy/refund",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "rerank_status": "not_needed"
+      }
+    },
+    {
+      "sdk_output": "[]",
+      "candidate_count": 0,
+      "model_calls": 0,
+      "result": {
+        "success": true,
+        "data": [],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": false,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "no_answer",
+        "citations": [],
+        "rerank_status": "no_candidates"
+      }
+    },
+    {
+      "sdk_output": "synthetic SDK failure",
+      "candidate_count": 2,
+      "model_calls": 1,
+      "result": {
+        "success": true,
+        "data": [
+          {
+            "content": "policy content 0",
+            "score": 0.9,
+            "score_kind": "one_minus_chroma_distance",
+            "document_id": "policy-0",
+            "title": "模拟退款政策",
+            "source": "demo:policy/refund",
+            "doc_type": "policy",
+            "chunk_index": 0,
+            "total_chunks": 1,
+            "policy_version": "refund-cancel-v1",
+            "effective_at": "2026-09-01T00:00:00Z",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "citation": {
+              "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+              "document_id": "policy-0",
+              "chunk_index": 0,
+              "source": "demo:policy/refund",
+              "policy_version": "refund-cancel-v1"
+            },
+            "retrieval_status": "usable",
+            "reason_code": null
+          }
+        ],
+        "tool_name": "knowledge_search",
+        "error": null,
+        "cached": false,
+        "latency_ms": 0.0,
+        "reranked": false,
+        "error_code": null,
+        "error_type": null,
+        "retryable": false,
+        "validated_input": null,
+        "attempts": 0,
+        "retrieval_status": "usable",
+        "citations": [
+          {
+            "reference": "policy-0@refund-cancel-v1#chunk-0~66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "content_hash": "66fe8ed9b7269107f3fd9572ca097a7fd8f44225ab65e80be2f6999cfd135339",
+            "document_id": "policy-0",
+            "chunk_index": 0,
+            "source": "demo:policy/refund",
+            "policy_version": "refund-cancel-v1"
+          }
+        ],
+        "rerank_status": "service_error_fallback"
+      }
+    }
+  ]
+}

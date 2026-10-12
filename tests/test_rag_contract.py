@@ -168,11 +168,7 @@ def manager_for(kb, *, fallback=None):
     async def rewrite(query, n=3):
         return [query, f"{query} 解释"]
 
-    async def rerank(query, items, top_k):
-        return items[:top_k]
-
     manager.rewrite_query = rewrite
-    manager._rerank = rerank
     manager.register(Tool("knowledge_search", "search", kb.search_handler,
                           {"type": "object", "properties": {"query": {"type": "string", "minLength": 1},
                                                             "top_k": {"type": "integer"}},
@@ -187,7 +183,7 @@ def test_rewrite_deduplicates_citations_and_returns_usable_result():
     result = asyncio.run(manager_for(kb).search_with_rewrite("knowledge_search", "退款"))
     assert result.success is True
     assert result.retrieval_status == "usable"
-    assert result.reranked is True
+    assert result.reranked is False
     assert len(result.data) == len(result.citations) == 1
     assert result.citations[0]["policy_version"] == "refund-cancel-v1"
 
@@ -196,13 +192,13 @@ def test_low_confidence_no_answer_and_degraded_are_distinct():
     kb = knowledge_base()
     manager = manager_for(kb)
     empty = asyncio.run(manager.search_with_rewrite("knowledge_search", "未知问题"))
-    assert empty.success is False and empty.retrieval_status == "no_answer"
+    assert empty.success is True and empty.retrieval_status == "no_answer"
     assert empty.citations == []
 
     kb.add_documents([POLICY])
     kb._collection.distance = 0.9
     low = asyncio.run(manager.search_with_rewrite("knowledge_search", "低可信问题"))
-    assert low.success is False and low.retrieval_status == "low_confidence"
+    assert low.success is True and low.retrieval_status == "low_confidence"
     assert low.citations == []
 
     class BrokenKB:
@@ -261,7 +257,7 @@ def test_agent_low_confidence_cannot_claim_knowledge_used():
     kb._collection.distance = 0.9
     tool = build_shared_rag_tools(manager_for(kb))["search_knowledge_base"]
     payload = asyncio.run(tool.handler(Request(message="退款", user_id="u", conv_id="c"), {"query": "退款"}))
-    assert payload["success"] is False
+    assert payload["success"] is True
     assert payload["retrieval_status"] == "low_confidence"
     assert payload["results"] == [] and payload["citations"] == []
     assert "不要" in payload["answer_guidance"]

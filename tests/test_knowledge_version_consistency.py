@@ -44,6 +44,7 @@ def test_cached_knowledge_cannot_survive_replacement():
     assert [h['content'] for h in result.data] == ['30 days']
 
 from tests.test_rag_contract import FakeCollection
+from mcp.tool_manager import RerankResult
 from mcp.knowledge_base import KnowledgeBase
 from mcp.rag_contract import KnowledgeDocument, build_hit, RetrievalHit
 from api import main as api
@@ -245,10 +246,10 @@ def test_publication_during_rerank_cannot_return_stale_evidence():
     manager = manager_for(kb)
     async def rerank(query, items, top_k):
         kb.add_documents([{**POLICY, 'content': '30 days'}])
-        return items[:top_k]
+        return RerankResult(items[:top_k], True, "ranked")
     manager._rerank = rerank
     result = asyncio.run(manager.search_with_rewrite('knowledge_search', 'refund'))
-    assert result.success is False and result.retrieval_status == 'no_answer'
+    assert result.success is True and result.retrieval_status == 'no_answer'
     assert result.data == result.citations == []
 
 

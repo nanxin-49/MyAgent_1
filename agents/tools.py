@@ -219,15 +219,16 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
         status = getattr(result, "retrieval_status", None) or "degraded"
         if not getattr(result, "success", False) or status != "usable":
             return {
-                "success": False,
+                "success": bool(getattr(result, "success", False)),
                 "query": query,
-                "error": getattr(result, "error", None) or "没有可靠的知识库依据",
-                "error_code": getattr(result, "error_code", None) or status,
+                "error": getattr(result, "error", None),
+                "error_code": getattr(result, "error_code", None),
                 "retrieval_status": status,
                 "results": [],
                 "citations": [],
                 "answer_guidance": "不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。",
-                "reranked": False,
+                "reranked": bool(getattr(result, "reranked", False)),
+                "rerank_status": getattr(result, "rerank_status", "not_requested"),
             }
 
         return {
@@ -238,6 +239,7 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             "citations": getattr(result, "citations", []),
             "retrieval_status": "usable",
             "reranked": bool(getattr(result, "reranked", False)),
+            "rerank_status": getattr(result, "rerank_status", "not_requested"),
         }
 
     return {

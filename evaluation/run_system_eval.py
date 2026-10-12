@@ -215,8 +215,6 @@ async def _rag_result(scenario: str):
     manager = MCPToolManager(api_key="demo-eval-only")
     async def rewrite(query, n=3):
         return [query]
-    async def rerank(query, items, top_k):
-        return items[:top_k]
     async def handler(params, context):
         if scenario == "degraded":
             raise RuntimeError("demo Chroma dependency failure")
@@ -226,7 +224,6 @@ async def _rag_result(scenario: str):
         return [build_hit("Demo source text", POLICY_METADATA if scenario == "usable" else FAQ_METADATA,
                           distance, min_score=0.35, now=NOW).model_dump(mode="json")]
     manager.rewrite_query = rewrite
-    manager._rerank = rerank
     manager.register(Tool("knowledge_search", "demo search", handler, {
         "type": "object", "properties": {"query": {"type": "string", "minLength": 1},
                                           "top_k": {"type": "integer"}},

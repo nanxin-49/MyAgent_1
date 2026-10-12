@@ -47,7 +47,7 @@ class ToolResult:
     error:          Optional[str] = None
     cached:         bool = False
     latency_ms:     float = 0.0
-    reranked:       bool = False   # 是否经过重排
+    reranked:       bool = False   # True only for a validated model ordering
     error_code:     Optional[str] = None
     error_type:     Optional[str] = None
     retryable:      bool = False
@@ -55,6 +55,14 @@ class ToolResult:
     attempts:       int = 0
     retrieval_status: Optional[str] = None
     citations:      List[Dict[str, Any]] = field(default_factory=list)
+    rerank_status:  str = "not_requested"
+
+
+@dataclass(frozen=True)
+class RerankResult:
+    items: List[Any]
+    reranked: bool
+    status: str
 
 
 @dataclass
@@ -204,7 +212,7 @@ class MCPToolManager:
         if use_cache and tool.cache_ttl > 0:
             cached = self._get_cache(name, params, cache_rerank_top_k)
             if cached is not None:
-                cached_data, cached_reranked = cached
+                cached_data, cached_reranked, cached_status = cached
                 tool.stats.total += 1
                 tool.stats.success += 1
                 return ToolResult(
@@ -213,6 +221,7 @@ class MCPToolManager:
                     tool_name=name,
                     cached=True,
                     reranked=cached_reranked,
+                    rerank_status=cached_status,
                     validated_input=validated,
                 )
 
@@ -239,16 +248,25 @@ class MCPToolManager:
 
             # 重排（针对返回列表的检索工具）
             reranked = False
+            rerank_status = "not_requested"
             if rerank_top_k > 0 and tool.supports_rerank and isinstance(data, list):
                 query = params.get("query", "")
-                data, reranked = await self._rerank(query, data, rerank_top_k), True
+                candidates = data
+                outcome = await self._rerank(query, candidates, rerank_top_k)
+                data, reranked, rerank_status = outcome.items, outcome.reranked, outcome.status
+                if hasattr(owner, "validate_hits_async"):
+                    result = await self._finalize_rag(name, candidates, outcome, rerank_top_k)
+                    result.latency_ms = latency
+                    result.validated_input = validated
+                    result.attempts = execution.attempts
+                    return result
 
             # 写缓存：缓存最终返回结果，避免下次命中未重排的原始结果。
             if use_cache and tool.cache_ttl > 0:
-                self._set_cache(name, params, data, tool.cache_ttl, cache_rerank_top_k, reranked)
+                self._set_cache(name, params, data, tool.cache_ttl, cache_rerank_top_k, reranked, rerank_status)
 
             return ToolResult(success=True, data=data, tool_name=name,
-                              latency_ms=latency, reranked=reranked,
+                              latency_ms=latency, reranked=reranked, rerank_status=rerank_status,
                               validated_input=validated, attempts=execution.attempts)
 
         tool.stats.failed += 1
@@ -399,7 +417,8 @@ class MCPToolManager:
                 degraded = degraded or r.error_code not in {"no_results"}
                 continue
             if r.error_code is not None:
-                degraded = True  # fallback was used
+                degraded = True  # dependency fallback is never answer evidence
+                continue
             if not isinstance(r.data, list):
                 degraded = True
                 continue
@@ -424,67 +443,92 @@ class MCPToolManager:
         if not merged:
             status = (RetrievalStatus.DEGRADED if degraded else
                       RetrievalStatus.LOW_CONFIDENCE if low_confidence else RetrievalStatus.NO_ANSWER)
-            return ToolResult(success=False, data=low_confidence if status is RetrievalStatus.LOW_CONFIDENCE else [],
-                              tool_name=tool_name, error=f"RAG retrieval status: {status.value}",
-                              error_code=status.value, error_type="retrieval",
-                              retrieval_status=status.value)
+            return ToolResult(success=status is not RetrievalStatus.DEGRADED, data=[],
+                              tool_name=tool_name,
+                              error="RAG retrieval unavailable" if status is RetrievalStatus.DEGRADED else None,
+                              error_code="degraded" if status is RetrievalStatus.DEGRADED else None,
+                              error_type="retrieval" if status is RetrievalStatus.DEGRADED else None,
+                              retrieval_status=status.value, rerank_status="no_candidates")
 
-        # 4. 重排：用 LLM 对合并结果按相关性打分，取 Top-K
-        reranked = await self._rerank(query, merged, top_k)
-        owner = getattr(self._tools[tool_name].handler, "__self__", None)
-        if reranked and hasattr(owner, "validate_hits_async"):
-            try:
-                reranked = await owner.validate_hits_async(reranked)
-            except Exception:
-                return ToolResult(success=False, data=[], tool_name=tool_name,
-                                  error="knowledge revalidation failed", error_code="degraded",
-                                  error_type="retrieval", retrieval_status=RetrievalStatus.DEGRADED.value)
-            if not reranked:
-                return ToolResult(success=False, data=[], tool_name=tool_name,
-                                  error="knowledge changed during retrieval", error_code="no_answer",
-                                  error_type="retrieval", retrieval_status=RetrievalStatus.NO_ANSWER.value)
-        citations = list({item["citation"]["reference"]: item["citation"]
-                          for item in reranked if isinstance(item, dict) and item.get("citation")}.values())
-        return ToolResult(success=True, data=reranked, tool_name=tool_name, reranked=True,
-                          retrieval_status=RetrievalStatus.USABLE.value, citations=citations)
+        outcome = await self._rerank(query, merged, top_k)
+        return await self._finalize_rag(tool_name, merged, outcome, top_k)
 
-    # ── 结果重排（解决召回不好）──────────────────────────────────────────────
+    async def _finalize_rag(self, tool_name, candidates, outcome, top_k):
+        """Only validated subsets of original evidence can produce usable results."""
+        try:
+            original = {}
+            for item in candidates:
+                hit = RetrievalHit.model_validate(item)
+                if hit.retrieval_status is RetrievalStatus.USABLE and hit.citation is not None:
+                    original[hit.citation.reference] = hit.model_dump(mode="json")
+            def checked(items):
+                if not isinstance(items, list):
+                    raise ValueError("invalid final evidence")
+                hits, seen = [], set()
+                for item in items:
+                    hit = RetrievalHit.model_validate(item)
+                    normalized = hit.model_dump(mode="json")
+                    if (hit.retrieval_status is not RetrievalStatus.USABLE or hit.citation is None
+                            or not hit.content.strip() or original.get(hit.citation.reference) != normalized):
+                        raise ValueError("final evidence not in validated candidates")
+                    if hit.citation.reference not in seen:
+                        seen.add(hit.citation.reference)
+                        hits.append(normalized)
+                return hits
+            final = checked(outcome.items)
+            tool = self._tools.get(tool_name)
+            owner = getattr(tool.handler, "__self__", None) if tool else None
+            if final and hasattr(owner, "validate_hits_async"):
+                final = checked(await owner.validate_hits_async(final))
+            final = final[:top_k]
+        except Exception:
+            return ToolResult(success=False, data=[], tool_name=tool_name,
+                              error="RAG evidence validation failed", error_code="degraded",
+                              error_type="retrieval", retrieval_status=RetrievalStatus.DEGRADED.value,
+                              reranked=outcome.reranked, rerank_status=outcome.status)
+        citations = [item["citation"] for item in final]
+        return ToolResult(success=True, data=final, tool_name=tool_name,
+                          reranked=outcome.reranked, rerank_status=outcome.status,
+                          retrieval_status=(RetrievalStatus.USABLE if final else RetrievalStatus.NO_ANSWER).value,
+                          citations=citations)
 
-    async def _rerank(self, query: str, items: List[Any], top_k: int) -> List[Any]:
-        """
-        用 LLM 对召回结果重新打分排序。
+    # ── 结果重排 ──────────────────────────────────────────────────────────────
 
-        解决问题：向量检索的相似度分数不等于"对用户有用"，
-        LLM 能理解语义相关性，重排后 Top-K 质量显著提升。
-        """
+    async def _rerank(self, query: str, items: List[Any], top_k: int) -> RerankResult:
+        """A complete permutation, not a relevance filter. [] is invalid for candidates."""
         if len(items) <= top_k:
-            return items
-
-        # 将结果序列化为文本供 LLM 评分
+            return RerankResult(items[:top_k], False, "not_needed")
         items_text = "\n".join(f"{i}. {json.dumps(item, ensure_ascii=False)[:200]}"
                                for i, item in enumerate(items))
-        prompt = f"""根据用户查询，对以下检索结果按相关性打分（0-10），返回 JSON 数组。
+        prompt = f"""根据用户查询，将以下检索候选按相关性降序排列，返回 JSON 索引数组。
 用户查询: "{query}"
-检索结果:
+检索候选:
 {items_text}
-
-返回格式（按相关性降序排列的索引列表）: [最相关的索引, ..., 最不相关的索引]
+返回格式: [最相关的索引, ..., 最不相关的索引]。
+必须包含全部候选编号且各出现一次，不得省略、重复或使用未知编号。
+这是排序任务，不负责判定无答案；有候选时空数组不是有效排序。
 只返回 JSON 数组，不要其他文字。"""
         prompt = self._clean_text(prompt)
-
+        tool = self._tools.get("knowledge_search")
+        timeout_s = tool.timeout_s if tool else 30.0
         try:
-            resp = await self._client.messages.create(
+            resp = await asyncio.wait_for(self._client.messages.create(
                 model=self._model, max_tokens=256, temperature=0.0,
                 messages=[{"role": "user", "content": prompt}],
-            )
-            raw = extract_text_content(resp.content)
-            s, e = raw.find("["), raw.rfind("]") + 1
-            order: List[int] = json.loads(raw[s:e])
-            reranked = [items[i] for i in order if 0 <= i < len(items)]
-            return reranked[:top_k]
-        except Exception as ex:
-            logger.warning(f"重排失败，返回原始顺序: {ex}")
-            return items[:top_k]
+            ), timeout=timeout_s)
+        except TimeoutError:
+            return RerankResult(items[:top_k], False, "timeout_fallback")
+        except Exception:
+            return RerankResult(items[:top_k], False, "service_error_fallback")
+        try:
+            order = json.loads(extract_text_content(resp.content).strip())
+            if (not isinstance(order, list) or len(order) != len(items)
+                    or any(type(i) is not int for i in order)
+                    or set(order) != set(range(len(items)))):
+                raise ValueError("rerank requires a full permutation of candidate indices")
+        except Exception:
+            return RerankResult(items[:top_k], False, "invalid_output_fallback")
+        return RerankResult([items[i] for i in order][:top_k], True, "ranked")
 
     # ── 缓存 ──────────────────────────────────────────────────────────────────
 
@@ -492,12 +536,14 @@ class MCPToolManager:
         payload = {"params": params, "rerank_top_k": rerank_top_k}
         return f"{name}:{hashlib.md5(json.dumps(payload, sort_keys=True).encode()).hexdigest()}"
 
-    def _get_cache(self, name: str, params: Dict, rerank_top_k: int = 0) -> Optional[Tuple[Any, bool]]:
+    def _get_cache(self, name: str, params: Dict, rerank_top_k: int = 0) -> Optional[Tuple[Any, bool, str]]:
         key = self._cache_key(name, params, rerank_top_k)
         if key in self._cache:
-            data, expire_at, reranked = self._cache[key]
+            entry = self._cache[key]
+            data, expire_at, reranked = entry[:3]
+            status = entry[3] if len(entry) > 3 else ("ranked" if reranked else "not_requested")
             if time.monotonic() < expire_at:
-                return data, reranked
+                return data, reranked, status
             del self._cache[key]
         return None
 
@@ -509,12 +555,13 @@ class MCPToolManager:
         ttl: float,
         rerank_top_k: int = 0,
         reranked: bool = False,
+        rerank_status: str = "not_requested",
     ) -> None:
         if len(self._cache) >= 5000:
             # 清掉最旧的 1/4
             for k in list(self._cache)[:1250]:
                 del self._cache[k]
-        self._cache[self._cache_key(name, params, rerank_top_k)] = (data, time.monotonic() + ttl, reranked)
+        self._cache[self._cache_key(name, params, rerank_top_k)] = (data, time.monotonic() + ttl, reranked, rerank_status)
 
     # ── 参数校验 ──────────────────────────────────────────────────────────────
 
