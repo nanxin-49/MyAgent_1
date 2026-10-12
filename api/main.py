@@ -176,7 +176,7 @@ async def lifespan(app: FastAPI):
     with open(business_fixture, "r", encoding="utf-8") as handle:
         business_data = json.load(handle)
     business_backend = InMemoryBusinessBackend(business_data)
-    action_backend = InMemoryBusinessActionBackend(business_data)
+    action_backend = InMemoryBusinessActionBackend(business_backend.state)
     _action_service = ActionService(
         business_backend=business_backend,
         action_backend=action_backend,

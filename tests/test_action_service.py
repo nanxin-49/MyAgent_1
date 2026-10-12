@@ -39,7 +39,7 @@ def raw_data(*, refunds=True, status="shipped", total="129.90"):
 def make_service(*, refunds=False, status="shipped", total="129.90", fail_operations=(), backend=None, store=None):
     data = raw_data(refunds=refunds, status=status, total=total)
     read_backend = InMemoryBusinessBackend(data)
-    action_backend = backend or InMemoryBusinessActionBackend(data, fail_operations=fail_operations)
+    action_backend = backend or InMemoryBusinessActionBackend(read_backend.state, fail_operations=fail_operations)
     return ActionService(
         business_backend=read_backend,
         action_backend=action_backend,

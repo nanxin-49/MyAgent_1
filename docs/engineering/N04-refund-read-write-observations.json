@@ -1,0 +1,613 @@
+{
+  "date": "2026-10-12",
+  "head": "d02427a7bde8cac12353745c7480978ce855647b",
+  "python": "3.12.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "evidence_kind": "isolated_simulated_backend_and_tool",
+  "initial_red": {
+    "failed": 9,
+    "passed": 3
+  },
+  "old_terminal_red": {
+    "failed": 2,
+    "deselected": 16
+  },
+  "final_tests": {
+    "n04_passed": 18,
+    "full_passed": 253,
+    "full_skipped": 2
+  },
+  "startup_http_gate": "tests/test_refund_read_write_consistency.py::test_real_lifespan_refund_approval_and_http_query passed with production lifespan, Fake SDK/Memory/RAG/Monitor/Eval and fixed clock",
+  "observations": [
+    {
+      "case": "auto",
+      "action": {
+        "success": true,
+        "status": "completed",
+        "action_id": "act_63974d36c64b4704",
+        "action": {
+          "action_id": "act_63974d36c64b4704",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "10",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权、退款窗口和金额均符合退款条件",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "refund",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "status": "completed",
+            "refund_id": "REF-act_63974d36c64b4704",
+            "refund_status": "pending"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": false
+      },
+      "repeat": null,
+      "order_status": "refund_pending",
+      "refund_query": {
+        "success": true,
+        "tool_name": "get_refund_status",
+        "data": {
+          "refund_id": "REF-act_63974d36c64b4704",
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "10",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-12T05:29:14.098993Z",
+          "updated_at": "2026-10-12T05:29:14.098993Z"
+        },
+        "source": "business_provider"
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 1,
+      "backend_executions": 1
+    },
+    {
+      "case": "approved",
+      "action": {
+        "success": true,
+        "status": "completed",
+        "action_id": "act_86b1a7288c7a4790",
+        "action": {
+          "action_id": "act_86b1a7288c7a4790",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "600",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "require_approval",
+            "reason_code": "amount_requires_approval",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "退款金额超过自动处理阈值 500.00",
+            "order_id": "ORD-1001",
+            "amount": "600",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": true,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "refund",
+            "order_id": "ORD-1001",
+            "amount": "600",
+            "status": "completed",
+            "refund_id": "REF-act_86b1a7288c7a4790",
+            "refund_status": "pending"
+          },
+          "reviewed_by": "test-reviewer",
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": false
+      },
+      "repeat": null,
+      "order_status": "refund_pending",
+      "refund_query": {
+        "success": true,
+        "tool_name": "get_refund_status",
+        "data": {
+          "refund_id": "REF-act_86b1a7288c7a4790",
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "600",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-12T05:29:14.100034Z",
+          "updated_at": "2026-10-12T05:29:14.100034Z"
+        },
+        "source": "business_provider"
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 1,
+      "backend_executions": 1
+    },
+    {
+      "case": "awaiting_approval",
+      "action": {
+        "success": true,
+        "status": "awaiting_approval",
+        "action_id": "act_29d2602e8c2043e3",
+        "action": {
+          "action_id": "act_29d2602e8c2043e3",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "600",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "require_approval",
+            "reason_code": "amount_requires_approval",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "退款金额超过自动处理阈值 500.00",
+            "order_id": "ORD-1001",
+            "amount": "600",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": true,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "awaiting_approval",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": null,
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": false
+      },
+      "repeat": null,
+      "order_status": "shipped",
+      "refund_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 0,
+      "backend_executions": 0
+    },
+    {
+      "case": "rejected",
+      "action": {
+        "success": false,
+        "status": "rejected",
+        "action_id": "act_82d035646f404367",
+        "action": {
+          "action_id": "act_82d035646f404367",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "600",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "require_approval",
+            "reason_code": "amount_requires_approval",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "退款金额超过自动处理阈值 500.00",
+            "order_id": "ORD-1001",
+            "amount": "600",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": true,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "rejected",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": "approval_rejected",
+          "error_message": "客户拒绝了该敏感动作",
+          "execution_result": null,
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": "approval_rejected",
+        "message": "客户拒绝了该敏感动作",
+        "reused": false
+      },
+      "repeat": null,
+      "order_status": "shipped",
+      "refund_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 0,
+      "backend_executions": 0
+    },
+    {
+      "case": "backend_failure",
+      "action": {
+        "success": false,
+        "status": "failed",
+        "action_id": "act_222b31078beb473c",
+        "action": {
+          "action_id": "act_222b31078beb473c",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "10",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权、退款窗口和金额均符合退款条件",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "failed",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": "dependency_failure",
+          "error_message": "mock refund backend failure",
+          "execution_result": null,
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": "dependency_failure",
+        "message": "mock refund backend failure",
+        "reused": false
+      },
+      "repeat": null,
+      "order_status": "shipped",
+      "refund_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 0,
+      "backend_executions": 0
+    },
+    {
+      "case": "retry",
+      "action": {
+        "success": true,
+        "status": "completed",
+        "action_id": "act_8bc132356fe74d0b",
+        "action": {
+          "action_id": "act_8bc132356fe74d0b",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "10",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权、退款窗口和金额均符合退款条件",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "refund",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "status": "completed",
+            "refund_id": "REF-act_8bc132356fe74d0b",
+            "refund_status": "pending"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": false
+      },
+      "repeat": {
+        "success": true,
+        "status": "completed",
+        "action_id": "act_8bc132356fe74d0b",
+        "action": {
+          "action_id": "act_8bc132356fe74d0b",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "10",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权、退款窗口和金额均符合退款条件",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "refund",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "status": "completed",
+            "refund_id": "REF-act_8bc132356fe74d0b",
+            "refund_status": "pending"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": true
+      },
+      "order_status": "refund_pending",
+      "refund_query": {
+        "success": true,
+        "tool_name": "get_refund_status",
+        "data": {
+          "refund_id": "REF-act_8bc132356fe74d0b",
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "10",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-12T05:29:14.102937Z",
+          "updated_at": "2026-10-12T05:29:14.102937Z"
+        },
+        "source": "business_provider"
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 1,
+      "backend_executions": 1
+    },
+    {
+      "case": "old_failed",
+      "action": {
+        "success": true,
+        "status": "completed",
+        "action_id": "act_71371a7f6ab5410a",
+        "action": {
+          "action_id": "act_71371a7f6ab5410a",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-1001",
+          "amount": "10",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权、退款窗口和金额均符合退款条件",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "evaluated_at": "2026-09-25T10:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-09-25T10:00:00Z",
+          "updated_at": "2026-09-25T10:00:00Z",
+          "idempotency_key": "idem_dc6fd079f4a7a5e05007251230fcae1f",
+          "request_id": "n04-request",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "refund",
+            "order_id": "ORD-1001",
+            "amount": "10",
+            "status": "completed",
+            "refund_id": "REF-act_71371a7f6ab5410a",
+            "refund_status": "pending"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-subject:customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": false
+      },
+      "repeat": null,
+      "order_status": "refund_pending",
+      "refund_query": {
+        "success": true,
+        "tool_name": "get_refund_status",
+        "data": {
+          "refund_id": "REF-act_71371a7f6ab5410a",
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "10",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-12T05:29:14.103970Z",
+          "updated_at": "2026-10-12T05:29:14.103970Z"
+        },
+        "source": "business_provider"
+      },
+      "foreign_query": {
+        "success": false,
+        "tool_name": "get_refund_status",
+        "data": null,
+        "source": "business_provider",
+        "error": {
+          "code": "not_found",
+          "message": "未找到可访问的业务记录",
+          "resource_type": "refund",
+          "resource_id": "ORD-1001",
+          "details": {}
+        }
+      },
+      "refund_count": 2,
+      "backend_executions": 1
+    }
+  ],
+  "limitations": [
+    "No live payment, model or Redis/Chroma acceptance.",
+    "No cross-process or restart durability guarantee."
+  ]
+}

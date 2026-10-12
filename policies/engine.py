@@ -42,7 +42,7 @@ class PolicyEngine:
         {OrderStatus.PENDING, OrderStatus.PAID, OrderStatus.PROCESSING}
     )
     _ACTIVE_REFUND_STATUSES = frozenset(
-        {RefundStatus.REQUESTED, RefundStatus.APPROVED, RefundStatus.PROCESSING}
+        {RefundStatus.PENDING, RefundStatus.REQUESTED, RefundStatus.APPROVED, RefundStatus.PROCESSING}
     )
 
     def __init__(

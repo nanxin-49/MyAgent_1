@@ -62,6 +62,8 @@ Trace、Knowledge 添加/上传/统计、Skills 查询/reload、Eval、Monitor�
 
 `request_refund` / `request_cancel_order` → ActionService → PolicyEngine → deny / allow / require_approval → HITL（需要时）→ Executor。审批、恢复、执行时再次校验和幂等都在后端实现。UI 只消费 `/actions/{id}/approve`、`reject`、`resume` 和 GET `/actions/{id}`；现有 Approve API 可能直接完成执行，Resume 不能绕过审批。
 
+模拟退款执行完成后，Action 为 `completed`，订单为 `refund_pending`，退款查询返回新建的 `RefundRecord.status=pending`，表示等待后续处理，不能据此声称资金到账。执行回执追加 `refund_id` / `refund_status`，查询 Tool 沿用原字段并新增可返回状态 `pending`；按订单查询选择最新 updated_at 的记录，旧记录仍可按退款编号查询。startup 的读写 Backend 显式共享进程内状态和锁；不保证重启或多进程一致性。见 [N04 技术说明](docs/engineering/N04-refund-read-write-consistency.md)。
+
 ## RAG
 
 知识文档要求 source / document_id / doc_type；政策还要求 policy_version / effective_at。外部 Chroma Server 是唯一存储路径，连接失败不会切换到嵌入式数据库。字符 n-gram lexical embedding 是演示基线，`1 - Chroma distance` 的 0.35 阈值仍待更广泛校准。

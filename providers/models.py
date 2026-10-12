@@ -35,6 +35,7 @@ class ShipmentStatus(str, Enum):
 
 
 class RefundStatus(str, Enum):
+    PENDING = "pending"
     REQUESTED = "requested"
     APPROVED = "approved"
     PROCESSING = "processing"
