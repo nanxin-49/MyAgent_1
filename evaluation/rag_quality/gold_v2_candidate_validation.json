@@ -1,0 +1,256 @@
+{
+  "date_local": "2026-10-13",
+  "head": "98a590b343e0b244a77a0115168a8968fae940d9",
+  "status": "candidate_pending_final_acceptance",
+  "formal_experiment_status": "blocked",
+  "protected_sha256": {
+    "evaluation/rag_quality/corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "evaluation/rag_quality/dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028",
+    "evaluation/rag_quality/dev_dataset_v1.json": "b45de66c9e1cb23baaf47d870d5aa78569f0fe28f4db997e6654dac8d5c9dbc2",
+    "evaluation/rag_quality/freeze_v1.json": "4af4ba4e79ee4483189d8fdbc13b3c37d0fa55c4e15940c255507204b61c5a77",
+    "evaluation/rag_quality/gate_checks_v1.json": "59e5e8f46ee4a2be438930915e9201127b573b810a1e0c3392e91a4de1fb1508",
+    "evaluation/rag_quality/gate_validation_v1.json": "6241e26f719509ab44816da5dd05a6c269bebd8e30c0ed30683060f092797c7b",
+    "evaluation/rag_quality/gold_review_notes_v1.json": "a0343e68d75bc19b99b12e8c2b7bfd0be8e6d6fe901167b31befb44e896c9541",
+    "evaluation/rag_quality/gold_review_v1.md": "a80610723c94d9a08847971908266e0e20cc6a20afed019a737d92287f0c2cfe",
+    "evaluation/rag_quality/model_resources_v1.json": "736bae27d4239ed4b70d61ae5d4f785493130dcf35db30a107d478f01b0f55a3",
+    "evaluation/rag_quality/p2_experiment_protocol.md": "fb97ccaa891c29dfb9a8c7cf5c96c89160c9b57ef8671bf8983b12ae794d3556",
+    "evaluation/rag_quality/p2_gate_freeze_v1.json": "713450c40c2a03b9cb86233742de322a279ef16930f6574e969af71c4c6c4cf3",
+    "evaluation/rag_quality/prepare_gate.py": "0c7fe8976cd9260c8d1a50f0c4f748cf3d9f518fad51c57a8a95dfb217163fcb",
+    "evaluation/rag_quality/run_baseline.py": "005ea4d6f64c4369b9173e405b2027fb380b0f8e2644475edf45217063d0d76c",
+    "evaluation/reports/baseline_raw.json": "09d1a33e4ec48e5000ccbea242aba899dd35619bbfa0e6028fd2c8c6039ae847",
+    "evaluation/reports/baseline_report.md": "dd43c23dd27f1bd4173eda9ba3e47424f6b11dacdbfcb1bbe8daa12f49822892",
+    "evaluation/reports/t10_component_replay.json": "0a6104dfe9c72b559534dcbd02ac731264fab7682c8fe1fb8f4cac8de936ffc8",
+    "evaluation/reports/t10_topology_comparison.json": "03b28333b6b441a044580193e5eb180a5b217e4960f982a26265f958e8b5ded2",
+    "evaluation/reports/t10_topology_comparison.md": "6c68f03b8af1b7c05b14020ea101f25125e8ddedc3c479f18cf59f05af162435",
+    "evaluation/reports/t11_memory_acceptance.json": "b09b198a1705448a9798d706109325bf78aad51f5ad29ce8ec729ec31b0c68d0",
+    "evaluation/reports/t11_memory_acceptance.md": "d739b4ac460386908b75a6d3bac0af1ef0c9a5b53e8222954f3ac090eff17f37",
+    "evaluation/reports/rag_http/rag_faq_case.json": "2d9dc32d181085efdaa18e1661e99fc3b35f8708dedd8972b2948e602f53ea70",
+    "evaluation/reports/rag_http/rag_faq_online_observation_final.json": "bc97a0189471aa9c6656b2b50f0e0795db8fca677e8c4a61a10d2deb6c404e8a",
+    "evaluation/reports/rag_http/rag_faq_online_verification.json": "3f83d75923e402cfcb0691186d0d533289f3900884dde22ab74322b858f26be9",
+    "evaluation/reports/support_production/cases.json": "37b5fa94eb13da09c36d247126ff9ce9a806bd693ea1a4595d4cc34220f2a735",
+    "evaluation/reports/support_production/component_replay.json": "cfe126fe163b64c561c31ca0f4d726c6ef2937794dee9ca47e88f4fb9f1f30a6",
+    "evaluation/reports/support_production/fixture.json": "a8f6010026be109f8ca066be1185c201e41997c4766a80222cd0f3d74642985b",
+    "evaluation/reports/support_production/memory_acceptance.json": "c563e6398935785cfd9fb627a65f47db3def92d8d1410925fe9e5ed2b3988973",
+    "evaluation/reports/support_production/memory_acceptance.md": "3bb9d288edfc9b34b9e3992c43fae281bc44890dbc98016038eea00d7efcd0f2",
+    "evaluation/reports/support_production/observations.json": "28d4a5a57183a52e3b32787f9a490093c415b2344c9b76f453a531316484d891",
+    "evaluation/reports/support_production/regression.json": "9d97cf35d441bf54524afff3ff1d5d9b9394ae35e95872ade609be983437e8d2",
+    "evaluation/reports/support_production/regression.md": "39a8640223c611b7cd5549aa96c9baedb083604697268d22ef1a3b06d2338da7",
+    "evaluation/reports/t09/system_eval_report.json": "a655bf3b76d9d3c02ebe8a97d561088c298d2a0d1a7426acee939b012f4bd531",
+    "evaluation/reports/t09/t09_online_cases.json": "2ca992e625467c3aa0663630c74e9eb58d7b6c490b4afb3fd1614b37c9fce5da",
+    "evaluation/reports/t09/t09_online_fixture.json": "15c1b3c1bc827da084a59cfcea911d2543fcd94d82276a31ec836b2fb3304f50",
+    "evaluation/reports/t09/t09_online_observations_final.json": "40e48f2967e9626671d8e8de8ad498fd54a746843cfaee82317b703b6fff84c6",
+    "evaluation/reports/t09/t09_online_report.json": "149119c087d0ed4e5ebc2541aa68ea02b8df030079ca53af385b7c7c4d6ece17",
+    "evaluation/reports/t10/t10_frozen_cases.json": "37b5fa94eb13da09c36d247126ff9ce9a806bd693ea1a4595d4cc34220f2a735",
+    "evaluation/reports/t10/t10_frozen_fixture.json": "c8d93a1530b78a5d7bd480701b9c8b3a1edbf5973a6e8534cfbbc927bf6c16d7",
+    "evaluation/reports/t10/t10_manifest.json": "0b60d4918b31af364744ec66195a0e89cbb35a1e7f1eeeaada0323eb1f415c2b",
+    "evaluation/reports/t10/t10_topology_comparison.json": "222caf31915b7e79f7325181d10f06b64a97f4b0955f554e4dd7c127c15a0828",
+    "evaluation/reports/t10/t10_topology_comparison.md": "3e5deb1c2c91b3fc74e7caebd70b0597f1729a8bc25a79c233f6d38f2ba118ac",
+    "evaluation/reports/t10/t10_topology_observations.json": "92308347d0f2751fc2902813bef0144f83391ba0131a730d70e7e6b21e3a0cb0",
+    "evaluation/reports/t10_complete/t10_frozen_cases.json": "37b5fa94eb13da09c36d247126ff9ce9a806bd693ea1a4595d4cc34220f2a735",
+    "evaluation/reports/t10_complete/t10_frozen_fixture.json": "07d055d832f81994d566df528ad3178d660138e7a6162218ca7f45876ee4fbc2",
+    "evaluation/reports/t10_complete/t10_manifest.json": "d5598d370915d61e94bd01dabe035ca5d16c267fb7bf2a99c80380e29a5de741",
+    "evaluation/reports/t10_complete/t10_topology_comparison.json": "03b28333b6b441a044580193e5eb180a5b217e4960f982a26265f958e8b5ded2",
+    "evaluation/reports/t10_complete/t10_topology_comparison.md": "6c68f03b8af1b7c05b14020ea101f25125e8ddedc3c479f18cf59f05af162435",
+    "evaluation/reports/t10_complete/t10_topology_observations.json": "6ae97030984450c1a7bf2e0e90d383d6a12e6c686d1b76053860396b74fb5c03",
+    "evaluation/reports/rag_quality/20261012T073829Z-3b3ccf32/chunks.json": "a10d3bc9dfe3199cc0d0db622705d014b46be5354d2c6c5b333cb8bd666a8688",
+    "evaluation/reports/rag_quality/20261012T073829Z-3b3ccf32/corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "evaluation/reports/rag_quality/20261012T073829Z-3b3ccf32/dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028",
+    "evaluation/reports/rag_quality/20261012T073829Z-3b3ccf32/freeze_v1.json": "4af4ba4e79ee4483189d8fdbc13b3c37d0fa55c4e15940c255507204b61c5a77",
+    "evaluation/reports/rag_quality/20261012T073829Z-3b3ccf32/manifest.json": "32a65528877115ce1b1e258adb351b4322c865bad93b57fefc8216ed3bd2f082",
+    "evaluation/reports/rag_quality/20261012T073829Z-3b3ccf32/observations.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/chunks.json": "a10d3bc9dfe3199cc0d0db622705d014b46be5354d2c6c5b333cb8bd666a8688",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/freeze_v1.json": "4af4ba4e79ee4483189d8fdbc13b3c37d0fa55c4e15940c255507204b61c5a77",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/manifest.json": "43cf295988da7648837996e38ee4c90e08bcc334f1e7c65ddcbbef30905c817d",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/observations.json": "83c7b083a732e50575ced1e494804b42e4cfe22badaf81b9f4b6193b13f2986a",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/report.md": "af99ecbca7b0368de07100e2b6a1ec24e432800e04ad6ff8b919e7229417632e",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/summary.json": "df672647d0fb347294958e2360555cea64fb2cd3323077f3acc273328df5073c",
+    "evaluation/reports/rag_quality/20261012T073909Z-a7bd452b/validation.json": "a87574585ece1fe3811503486a80d6500297cf50961298abc2d15ee18a203ae3",
+    "docs/engineering/A05-rag-evaluation.md": "9fde585ca6554e594af925479fdf9da2408334881a85d98c05bd3fa6da2cf6d3"
+  },
+  "candidate_sha256": {
+    "dataset_v2.candidate.json": "716aa776041f947de704e5d338b8819a7e1f1fb582af2f2dd0f1a4b67a6fdb6e",
+    "dev_dataset_v2.candidate.json": "316a3737fee734db592e45676852b445d95e7e06ccb4d96430bf1dc6e3f7ad0a",
+    "gold_review_v2.md": "3007e3adc2a5ca41bdd2788262bdaa1f73823bcaca7106896fb09470f6e31308",
+    "gold_v1_to_v2_diff.md": "9fc7efb951bcc78b705a946cd4b49ddb2517cabe03f8e1b5aeaf5828add909f8"
+  },
+  "test_counts": {
+    "total": 30,
+    "answerable": 21,
+    "no_answer": 9
+  },
+  "dev_counts": {
+    "total": 16,
+    "answerable": 8,
+    "no_answer": 8
+  },
+  "leakage": {
+    "rules": {
+      "normalization": "lowercase + alnum",
+      "sequence_ratio_flag": 0.75,
+      "bigram_jaccard_flag": 0.6
+    },
+    "exact_duplicates": [],
+    "high_similarity_flags": [],
+    "nearest_test_query": [
+      {
+        "dev_id": "DEV-01",
+        "test_id": "A05-26",
+        "sequence_ratio": 0.15,
+        "bigram_jaccard": 0.027777777777777776
+      },
+      {
+        "dev_id": "DEV-02",
+        "test_id": "A05-04",
+        "sequence_ratio": 0.17391304347826086,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-03",
+        "test_id": "A05-03",
+        "sequence_ratio": 0.1702127659574468,
+        "bigram_jaccard": 0.046511627906976744
+      },
+      {
+        "dev_id": "DEV-04",
+        "test_id": "A05-23",
+        "sequence_ratio": 0.12903225806451613,
+        "bigram_jaccard": 0.03571428571428571
+      },
+      {
+        "dev_id": "DEV-05",
+        "test_id": "A05-13",
+        "sequence_ratio": 0.43243243243243246,
+        "bigram_jaccard": 0.19230769230769232
+      },
+      {
+        "dev_id": "DEV-06",
+        "test_id": "A05-22",
+        "sequence_ratio": 0.11764705882352941,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-07",
+        "test_id": "A05-04",
+        "sequence_ratio": 0.20689655172413793,
+        "bigram_jaccard": 0.038461538461538464
+      },
+      {
+        "dev_id": "DEV-08",
+        "test_id": "A05-18",
+        "sequence_ratio": 0.21052631578947367,
+        "bigram_jaccard": 0.058823529411764705
+      },
+      {
+        "dev_id": "DEV-09",
+        "test_id": "A05-04",
+        "sequence_ratio": 0.20689655172413793,
+        "bigram_jaccard": 0.038461538461538464
+      },
+      {
+        "dev_id": "DEV-10",
+        "test_id": "A05-24",
+        "sequence_ratio": 0.3333333333333333,
+        "bigram_jaccard": 0.1
+      },
+      {
+        "dev_id": "DEV-11",
+        "test_id": "A05-02",
+        "sequence_ratio": 0.15384615384615385,
+        "bigram_jaccard": 0.027777777777777776
+      },
+      {
+        "dev_id": "DEV-12",
+        "test_id": "A05-06",
+        "sequence_ratio": 0.21428571428571427,
+        "bigram_jaccard": 0.04
+      },
+      {
+        "dev_id": "DEV-13",
+        "test_id": "A05-27",
+        "sequence_ratio": 0.15789473684210525,
+        "bigram_jaccard": 0.02857142857142857
+      },
+      {
+        "dev_id": "DEV-14",
+        "test_id": "A05-12",
+        "sequence_ratio": 0.24390243902439024,
+        "bigram_jaccard": 0.08333333333333333
+      },
+      {
+        "dev_id": "DEV-15",
+        "test_id": "A05-13",
+        "sequence_ratio": 0.15789473684210525,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-16",
+        "test_id": "A05-26",
+        "sequence_ratio": 0.37209302325581395,
+        "bigram_jaccard": 0.17647058823529413
+      }
+    ],
+    "semantic_review": "Author checked requested attributes and ambiguity; independent human review pending",
+    "limitation": "No semantic model used; lexical checks cannot prove absence of semantic leakage. Shared corpus/themes limit generalization."
+  },
+  "changes": {
+    "test": {
+      "A05-03": [
+        "query",
+        "annotation_reason"
+      ],
+      "A05-05": [
+        "gold_evidence",
+        "annotation_reason"
+      ],
+      "A05-12": [
+        "annotation_reason"
+      ]
+    },
+    "dev": {
+      "DEV-04": [
+        "annotation_reason"
+      ],
+      "DEV-07": [
+        "query",
+        "annotation_reason"
+      ]
+    }
+  },
+  "tests": [
+    {
+      "command": "uv run python -m pytest -q -o cache_dir=.pytest-cache-a05-v2 tests/test_rag_gold_v2_candidate.py tests/test_rag_quality_baseline.py tests/test_rag_quality_gate.py tests/test_knowledge_version_consistency.py tests/test_rerank_result_contract.py",
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "stdout_summary": "134 passed in 4.39s"
+    },
+    {
+      "command": "uv run python -m pytest -q",
+      "passed": 427,
+      "failed": 0,
+      "skipped": 3,
+      "warnings": 1,
+      "stdout_summary": "427 passed, 3 skipped, 1 warning in 9.18s",
+      "skip_reasons": [
+        "live Redis/Chroma Memory opt-in",
+        "two real Chroma HTTP integration opt-ins"
+      ],
+      "warning": "existing Starlette/AnyIO BlockingPortal DeprecationWarning"
+    },
+    {
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "packages": 53
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "no_formal_retrieval_run": true,
+  "weights_downloaded": false,
+  "dependencies_installed": false,
+  "all_protected_hashes_unchanged": true
+}
