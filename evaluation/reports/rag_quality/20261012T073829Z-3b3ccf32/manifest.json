@@ -1,0 +1,61 @@
+{
+  "run_id": "20261012T073829Z-3b3ccf32",
+  "group": "B0",
+  "started_at_utc": "2026-10-12T07:38:29.199340+00:00",
+  "head": "34f4cce19a77b4b08987af47c0e65cddca3750cd",
+  "dirty_worktree": "?? evaluation/rag_quality/\n?? evaluation/reports/rag_quality/\n?? tests/test_rag_quality_baseline.py\n",
+  "python": "3.12.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "chromadb-client": "0.5.23",
+    "pydantic": "2.10.3",
+    "anthropic": "0.40.0",
+    "httpx": "0.28.1",
+    "pytest": "8.3.4"
+  },
+  "implementation_sha256": {
+    "mcp/knowledge_embeddings.py": "bca9827430c4d871cf9c7608b2d4a38b086d2c38876d2f4cb0bdd11bf1ec3033",
+    "mcp/knowledge_base.py": "4a0b8518ce3749a97a49a287044af3ce8cb9cd54ad3b96872773ae8e8aa7883d",
+    "mcp/rag_contract.py": "33c8dbddb9c8a173afbfaa886273c113f59b273b1e32689ce0191c74aa48e527",
+    "mcp/tool_manager.py": "af90e5a419503ece6d0b910f0134c3901343596624cb81390e61dc8101ad6844",
+    "evaluation/rag_quality/run_baseline.py": "005ea4d6f64c4369b9173e405b2027fb380b0f8e2644475edf45217063d0d76c",
+    "uv.lock": "392b74a8798b2a576cf33aeb13fa6ab73c5ecfe2a27eb669cae6a88e64b5687b"
+  },
+  "freeze": {
+    "version": "a05-freeze-v1",
+    "created_before_retrieval": true,
+    "files": {
+      "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+      "dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028"
+    }
+  },
+  "corpus_version": "a05-corpus-v1",
+  "dataset_version": "a05-dataset-v1",
+  "collection": "cartcare_a05_p1_899ed613551a41008e744ff7ad0b99b3",
+  "endpoint": "127.0.0.1:8001",
+  "backend": "real Chroma HTTP",
+  "embedding_version": "char-bigram-1024-v1",
+  "dimensions": 1024,
+  "title_feature_boost": 6,
+  "top_k": 5,
+  "min_score": 0.35,
+  "distance": "cosine; score=1-distance (not probability)",
+  "as_of": "2026-10-12T00:00:00Z",
+  "clock": "evaluation-process-only KnowledgeBase datetime patch",
+  "rewrite": false,
+  "rerank": false,
+  "cache": false,
+  "model": "none; fail-closed NoModel sentinel",
+  "repeats": 2,
+  "B_prod": {
+    "status": "not_executed",
+    "reason": "No paid model authorization"
+  },
+  "collection_deleted": false,
+  "outcome": "blocked",
+  "error": {
+    "type": "ValueError",
+    "message": ""
+  },
+  "finished_at_utc": "2026-10-12T07:38:30.365322+00:00"
+}

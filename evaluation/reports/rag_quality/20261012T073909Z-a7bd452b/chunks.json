@@ -1,0 +1,101 @@
+[
+  {
+    "chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+    "document_id": "doc_dd816769efe7659f114e",
+    "policy_version": "refund-cancel-v1",
+    "source": "demo:cartcare-default/refund-policy",
+    "chunk_index": 0,
+    "content": "CartCare 模拟客服政策说明，仅用于演示。订单创建后 7 天内、订单状态符合要求时可以请求退款。退款金额不能超过订单总额；超过 500 元需人工审批。退款请求是否可执行由实时订单事实和 PolicyEngine 决定。此文档不代表真实商城承诺或支付渠道处理时效。",
+    "content_hash": "a7c085e8feea32a6903616d128d81ba791f26b4797a903296ae4f4ad11396f90"
+  },
+  {
+    "chunk_id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+    "document_id": "doc_b18d553a21972fe4b3f5",
+    "policy_version": null,
+    "source": "demo:cartcare-default/order-guide",
+    "chunk_index": 0,
+    "content": "订单查询指南。用户可以通过订单号查询订单状态。订单状态包括：待支付、已支付、已发货、运输中、已签收、已完成。如果订单显示已发货但超过 7 天未收到，可以联系客服申请查件。物流信息通常在发货后 24 小时内更新。如果订单显示异常，请提供订单号联系客服处理。",
+    "content_hash": "faae5da225a4662a81554146ba9b335c8d6b80220025f8e320706a2bc39a4ca0"
+  },
+  {
+    "chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+    "document_id": "doc_1348d91e6f873b93a77a",
+    "policy_version": null,
+    "source": "demo:cartcare-default/account-guide",
+    "chunk_index": 0,
+    "content": "账户安全说明。建议用户定期修改密码，密码长度至少 8 位，包含字母和数字。如果忘记密码，可以通过绑定的手机号或邮箱重置。发现账户异常登录时，系统会自动锁定账户并发送通知。用户可以在安全设置中开启两步验证，提高账户安全性。不要将密码分享给他人，客服人员不会索要用户密码。",
+    "content_hash": "4cbdb2edc53ea45c3cbb7c7b9955b8806174dadfb41ea646b390804141b440de"
+  },
+  {
+    "chunk_id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+    "document_id": "doc_f4878e309f60ff328b5d",
+    "policy_version": null,
+    "source": "demo:cartcare-default/technical-guide",
+    "chunk_index": 0,
+    "content": "常见技术问题排查。应用崩溃：请尝试清除缓存后重启应用，如果问题持续请更新到最新版本。登录失败 401 错误：表示认证失败，请检查用户名密码是否正确，或尝试重置密码。页面加载慢：检查网络连接，尝试切换 WiFi 或移动数据。支付失败：确认银行卡余额充足，检查是否开启了网上支付功能。500 服务器错误：这是服务端问题，请稍后重试，如果持续出现请联系技术支持。",
+    "content_hash": "f60ada92831c5eb16025d315dc9d72a3df0680460d207b34993d521a1b78c938"
+  },
+  {
+    "chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+    "document_id": "doc_15eee479ec6749cbefce",
+    "policy_version": null,
+    "source": "demo:cartcare-default/membership-faq",
+    "chunk_index": 0,
+    "content": "会员积分规则。每消费 1 元累积 1 积分。积分可以在下次购物时抵扣，100 积分 = 1 元。会员等级分为：普通会员、银卡会员（累计消费 1000 元）、金卡会员（累计消费 5000 元）。银卡会员享受 95 折优惠，金卡会员享受 9 折优惠。积分有效期为 1 年，过期自动清零。生日当月消费可获得双倍积分。",
+    "content_hash": "ee10d33cc7b96cbec8b35b9c7a4c9f0f86a88c78cec26738c252da4abf0cb1e6"
+  },
+  {
+    "chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+    "document_id": "doc_2efff27478d4aa1b0a90",
+    "policy_version": null,
+    "source": "demo:cartcare-default/shipping-guide",
+    "chunk_index": 0,
+    "content": "配送服务说明。标准配送：3-5 个工作日送达，免运费（订单满 99 元）。加急配送：1-2 个工作日送达，运费 15 元。同城配送：当日达或次日达，运费 10 元。偏远地区可能需要额外 2-3 天。配送时间为每天 9:00-18:00，节假日可能延迟。如果需要修改收货地址，请在发货前联系客服。",
+    "content_hash": "9ddc4fc42b97b59d13710c770db288e77378dea2eb767311f6cc440ed2434678"
+  },
+  {
+    "chunk_id": "e63f7534951058290146662e7acf358002fe2600fa9d3469573772a9f7c612b0",
+    "document_id": "eval-exchange",
+    "policy_version": "demo-v1",
+    "source": "demo:a05-p1-isolated/exchange",
+    "chunk_index": 0,
+    "content": "隔离评测虚构换货政策，不是商城承诺。换货期限为14天。demo-v1寄回地址为青松路14号。",
+    "content_hash": "d7650852883728a24edede853196032c24a11a6a88e4aba2cb36eb6473fba530"
+  },
+  {
+    "chunk_id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+    "document_id": "eval-exchange",
+    "policy_version": "demo-v2",
+    "source": "demo:a05-p1-isolated/exchange",
+    "chunk_index": 0,
+    "content": "隔离评测虚构换货政策，不是商城承诺。换货期限为21天。换货商品必须保留完整包装。每笔订单最多换货一次。",
+    "content_hash": "0b1a2b2a84c96e92b515fb9a07229e6434d1be8520945b703bfdde4db586e868"
+  },
+  {
+    "chunk_id": "46e793a80d27465f89e2ea092bc00ffb563bb4ad68242da9ae56a3023053d549",
+    "document_id": "eval-exchange",
+    "policy_version": "demo-v3",
+    "source": "demo:a05-p1-isolated/exchange",
+    "chunk_index": 0,
+    "content": "隔离评测虚构未来換货政策，不是商城承诺。换货期限为45天。demo-v3指定承运人为雪鹿快递。",
+    "content_hash": "ba716ee0dfafe8e49f0de216fd4d5b8fcc41d3b23d4779be36733840ee39d8bb"
+  },
+  {
+    "chunk_id": "0f64495c1c7029731bdf2ab8552c2e5906f1c4616b0ef38d9e2a6c13f2370023",
+    "document_id": "eval-coupon",
+    "policy_version": "demo-expired",
+    "source": "demo:a05-p1-isolated/coupon",
+    "chunk_index": 0,
+    "content": "隔离评测虚构且过期的优惠券政策。活动口令为秋叶2026，优惠券可抵扣20元。",
+    "content_hash": "86bdd938cbbbfe51a99b2b3173d4465a710703ee552c2dc88b64574c21cdd3b9"
+  },
+  {
+    "chunk_id": "9db3c0cf7c21a23ee86a4159b32af95651cfa98f42e06b68e4256b0e0389948a",
+    "document_id": "eval-warranty",
+    "policy_version": "demo-revoked",
+    "source": "demo:a05-p1-isolated/warranty",
+    "chunk_index": 0,
+    "content": "隔离评测虚构且撤销的延保政策。延保赠品为蓝鲸收纳袋。",
+    "content_hash": "59ffc49583e72b196a8b05cd63ecaeedb8e0308c8206a4db5e57511f0782ea2a"
+  }
+]

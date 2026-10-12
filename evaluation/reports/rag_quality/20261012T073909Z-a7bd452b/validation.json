@@ -1,0 +1,80 @@
+{
+  "head": "34f4cce19a77b4b08987af47c0e65cddca3750cd",
+  "date_local": "2026-10-12",
+  "timezone": "Asia/Shanghai",
+  "scope": "A05-P1 only; Fake contract/unit tests separate from real HTTP B0 quality observations",
+  "checks": [
+    {
+      "command": "uv run python -m pytest -q -o cache_dir=.pytest-cache-a05 tests/test_rag_quality_baseline.py",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "final_stdout_summary": "20 passed in 1.06s"
+    },
+    {
+      "command": "uv run python -m pytest -q -o cache_dir=.pytest-cache-a05 tests/test_rag_quality_baseline.py tests/test_knowledge_version_consistency.py tests/test_rerank_result_contract.py tests/test_rag_contract.py tests/test_rag_http_integration.py tests/test_tool_contract.py tests/test_business_tools.py",
+      "passed": 157,
+      "failed": 0,
+      "skipped": 2,
+      "stdout_summary": "157 passed, 2 skipped in 3.34s",
+      "note": "Final report assertions subsequently strengthened;专项 and full suite rerun passed."
+    },
+    {
+      "command": "uv run python -m pytest -q",
+      "passed": 402,
+      "failed": 0,
+      "skipped": 3,
+      "warnings": 1,
+      "final_stdout_summary": "402 passed, 3 skipped, 1 warning in 8.98s",
+      "warning": "Existing Starlette/AnyIO BlockingPortal DeprecationWarning",
+      "skip_reasons": [
+        "tests/test_memory_live_services.py:13 requires live Redis/Chroma",
+        "tests/test_rag_http_integration.py:13 requires real Chroma HTTP opt-in",
+        "tests/test_rag_http_integration.py:41 requires real Chroma HTTP opt-in"
+      ]
+    },
+    {
+      "command": "uv run python -m pytest -q -o cache_dir=.pytest-cache-a05 tests/test_rag_http_integration.py",
+      "process_environment": {
+        "CARTCARE_RUN_CHROMA_HTTP_TEST": "1",
+        "CHROMA_HOST": "127.0.0.1",
+        "CHROMA_PORT": "8001"
+      },
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "stdout_summary": "2 passed in 1.99s",
+      "backend": "real HTTP; random collections deleted"
+    },
+    {
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "packages": 53
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "integrity_checks": {
+    "other_progress_tasks_equal_to_HEAD": true,
+    "tracked_production_code_unchanged": true,
+    "historical_reports_unchanged": true,
+    "new_evaluation_text_whitespace_checked": true,
+    "frozen_labels_unchanged_after_retrieval": true,
+    "repeat_publication_identical": true,
+    "repeat_retrieval_identical": true,
+    "isolated_baseline_collection_deleted": true
+  },
+  "execution_notes": [
+    "Initial sandbox run denied by Windows permissions creating reports/rag_quality; no run directory or collection created.",
+    "20261012T073829Z-3b3ccf32: execution environment returned 502 Bad Gateway on localhost /api/v2/auth/identity; blocked manifest and empty observations retained; no collection created.",
+    "Successful run set NO_PROXY=127.0.0.1,localhost only for the execution process; no system proxy configuration changed.",
+    "Chroma logged existing posthog capture() telemetry compatibility warnings; retrieval succeeded."
+  ],
+  "unexecuted": [
+    "B-prod / real model E2E / paid Embedding or Rerank",
+    "live Memory Redis/Chroma integration",
+    "A05-P2 / model downloads / deployment"
+  ]
+}

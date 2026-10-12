@@ -1,0 +1,8 @@
+{
+  "version": "a05-freeze-v1",
+  "created_before_retrieval": true,
+  "files": {
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028"
+  }
+}
