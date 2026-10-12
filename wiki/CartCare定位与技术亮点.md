@@ -12,6 +12,7 @@ POST /chat
     → RAG：静态 FAQ / 版本化政策
     → Providers：动态业务事实和 ownership
     → ActionService：Principal gate / Policy / PendingAction / reviewer HITL / idempotency
+    → HandoffService：策略 / Principal / 幂等 / 模拟交接记录
 → Memory 回写、异步 profile 更新
 → ChatResponse、Trace
 ```
@@ -27,6 +28,7 @@ Agent 负责理解、澄清、参数收集、选择工具和生成回复。生�
 - RAG 经外部 Chroma HTTP 存取；字符 n-gram embedding 是演示词面基线。usable 命中才有可用引用；来源、document_id、policy_version 与 chunk 信息保留。阈值仍为 0.35，fallback 不能作为可靠依据。
 - Memory 的工作层按用户/会话隔离并设置 24 小时 TTL；15 条触发确定性压缩，保留最近 5 条、订单号引用及待澄清字段。Chroma 只接收有来源和有效期的咨询主题与明确回复偏好，分别保留 30/180 天；订单、物流、库存和退款状态不进入长期事实。Monitor 继续观测工具和 Agent 成功率/延迟；Single 不再计算或反馈路由惩罚。
 - Trace 标记 topology=single、agent_type=support。模型调用统计覆盖 Support 与 RAG SDK 调用，不包含 Memory/profile 和 SDK 内部重试；不保存隐藏推理。
+- A02人工交接以 required/requested/created/failed 和可查询模拟记录为证据；明确人工请求由确定性门控兜底，复杂投诉由Agent请求后再校验。摘要不建单，越界合理拒绝不自动升级，created不代表真人已接单。具体路径与故障测试见 [A02说明](../docs/engineering/A02-handoff.md)。
 
 ## 为什么简化
 

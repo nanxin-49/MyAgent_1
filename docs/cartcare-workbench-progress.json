@@ -116,6 +116,16 @@
       "status": "done",
       "evidence": "agents/support_agent.py; api/main.py; tests/test_support_production.py; evaluation/reports/support_production/regression.md; evaluation/reports/support_production/memory_acceptance.md",
       "note": "用户已验收生产迁移 done。/chat=Single Support Agent，绕过 Intent/specialist/supporting/Composer；业务安全层、提示词及历史 T09/T10 不变。原迁移 HTTP 回归与 16 项真实 Memory 验收报告原样保留；后续 T11 独立改善长期 Memory 与 Redis 故障响应。"
+    },
+    "A02": {
+      "status": "verify",
+      "outcome": "fixed",
+      "issue_id": "C04",
+      "issues": {
+        "C04": "fixed"
+      },
+      "evidence": "core/handoff.py; agents/support_agent.py; agents/tools.py; api/main.py; tests/test_handoff.py; evaluation/handoff_cases.json; evaluation/handoff_eval.py; docs/engineering/A02-handoff.md; docs/engineering/A02-handoff-observations.json",
+      "note": "2026-10-12 A02/C04=fixed/verify，待用户验收。起始HEAD=c47eb8671898f336efc72ff79c25fd62d70cf499，工作区干净，仅A02。首轮红测6 failed；额外工具拒绝后模型虚假成功4 failed/17 passed。最终专项26 passed；Agent/Tool/Support45；已有安全业务134；RAG/Tool130/2 skipped；完整382 passed/3 skipped/既有AnyIO警告；JS12、lock53/diff通过。Fake SDK真实FastAPI/chat路由、owner查询与Trace/API一致性；独立a02-handoff-v1评测7/7，不以关键词判成功。Principal/策略/write Tool Contract/进程内Service，required/requested/created/failed分开，escalated=created；摘要不建单，unsupported可合理拒绝。客户端重试需conv_id+handoff_key，异参冲突、同key失败重放/新key恢复；不同身份独立，跨owner查询404。模型后续失败或拒绝不覆盖成功回执，Memory写失败保留N05式可信交接回执。记录仅固定安全摘要，UUID创建时生成，无真实客服/通知/SLA。锁仅同Service，多worker/重启不共享，无TTL/容量管理；保守语法和Agent升级选择未做真实模型召回验收。README/两份核心Wiki同步，T10历史0/3、既有N01/N02/N03/N04/N05/N06/N07/N10修复和其他任务不改。独立故障注入练习见技术说明。未运行收费模型/live服务/支付/部署，未提交推送，完成停止。"
     }
   },
   "decisions": {

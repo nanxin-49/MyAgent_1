@@ -93,7 +93,7 @@ def test_chat_uses_support_and_guarded_shared_tools(monkeypatch, case):
         assert len(backend.calls) == 1
 
 
-def test_production_prompt_and_registry_equal_accepted_single():
+def test_production_preserves_accepted_single_with_structured_handoff_extension():
     tools, _, _ = isolated_business(prepare(NOW)[0], NOW)
     runtime = SupportRuntime("test", "test", client=FakeClient("unused", {}))
     runtime.set_shared_tools(tools)
@@ -102,10 +102,11 @@ def test_production_prompt_and_registry_equal_accepted_single():
     experiment.set_shared_tools(tools)
     experiment.profile = replace(experiment.profile, tool_scope=tuple(experiment.get_tools()))
     request = Request("退款", "customer-1", "test", principal=customer('customer-1'))
-    assert production._build_system_prompt(request) == experiment._build_system_prompt(request)
+    assert production.system_prompt == experiment.system_prompt
+    assert "request_handoff" in production._build_system_prompt(request)
     assert production.profile.temperature == experiment.profile.temperature
     assert production.profile.max_tokens == experiment.profile.max_tokens
-    assert production.get_tools() == experiment.get_tools()
+    assert {k: v for k, v in production.get_tools().items() if k != "request_handoff"} == experiment.get_tools()
     assert production._build_role_packet(request) == ""
 
 

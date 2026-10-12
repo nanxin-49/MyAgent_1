@@ -9,6 +9,7 @@ CartCare 是面向 FAQ、商品、订单、物流、库存和售后的 **Single 
 - 回答政策 / FAQ，展示检索来源与版本；不足时保留 low_confidence / no_answer / degraded 状态。
 - 通过 Provider 查询订单、物流、商品、库存和退款状态；缺少必要参数时由 Agent 澄清。
 - 请求退款或取消订单，由 PolicyEngine 和 ActionService 控制资格、审批、二次校验与幂等。
+- 明确要求人工时创建结构化模拟交接记录；返回真实 handoff_id / created 或 failed，而非通过回复关键词判断成功。
 - 在 `/demo` 查看最终回答、工具参数与结果、引用、Policy、Pending approval、动作状态和请求耗时。
 
 ## Architecture
@@ -22,6 +23,7 @@ flowchart TD
     ToolRuntime --> RAG[FAQ / versioned policy · Chroma HTTP]
     ToolRuntime --> Providers[Authoritative business facts · demo backend]
     ToolRuntime --> ActionService
+    ToolRuntime --> HandoffService[Principal-scoped simulated handoff records]
     ActionService --> PolicyEngine
     ActionService --> HITL[Approve / Reject / Resume]
     ActionService --> Executor[Idempotent simulated executor]
@@ -48,7 +50,9 @@ flowchart TD
 | Order lookup | 查询我的订单 ORD-T09-ORDER | get_order → validated_input → Provider 结果；Memory 不替代最新查询 |
 | Refund approval | 为 ORD-T09-REFUND-APPROVAL 提交 600 元部分退款 | request_refund → require_approval → awaiting_approval；点击 Approve / Reject 查看 ActionResult |
 
-这些是演示输入与观察目标，模型输出和实际工具调用不预设成功。Trace 中没有 ActionService 结果时，UI 不从回答推定动作已完成。库存缺少 SKU 时应澄清；ownership violation 使用 customer-2 请求 customer-1 的订单；unsupported escalation 仍有已知缺陷。
+这些是演示输入与观察目标，模型输出和实际工具调用不预设成功。Trace 中没有 ActionService 结果时，UI 不从回答推定动作已完成。库存缺少 SKU 时应澄清；ownership violation 使用 customer-2 请求 customer-1 的订单；订票等越界请求可合理拒绝，不自动等于需要人工。
+
+结构化交接：`SingleSupportAgent → request_handoff → HandoffService → API/Trace handoff`。明确人工请求由保守确定性门控兜底；复杂电商投诉和已观察到的业务查询依赖故障可由 Agent 请求，服务再次校验策略。`handoff_required/requested/created/failed` 分别记录业务需求、真实创建调用、成功和失败；兼容 `escalated` 仅表示 created。`GET /handoffs/{id}` 只允许 owner 查询。客户端重复提交应复用 `conv_id + handoff_key`；新请求用新 key。没有 key 时只在同一后端请求内去重。创建成功后模型或 Memory 写入失败仍保留回执；摘要工具不建单。进程内模拟记录不等于真人接单，重启/多worker不共享。设计、故障证据与独立练习见 [A02说明](docs/engineering/A02-handoff.md)。
 
 ## Safety / business controls
 
@@ -76,11 +80,13 @@ Redis 工作记忆按用户 / 会话隔离，TTL 24 小时；15 条触发确定�
 
 Trace 展示读取计数、摘要是否存在、读写状态与耗时，不记录原始 Memory 内容。后台画像仅标记 `scheduled_unobserved`，不把调度成功视为落库成功。Redis 读取故障返回明确 503，Agent 不执行；该早期失败不会生成 Agent Trace。
 
-`/chat` 追加 `action_results`（既有 ActionResult 契约）、`memory_write_status` 和 `warning_codes`。危险工具回执须经带 Principal 的 ActionService 查询确认；至少一个动作已 `completed` 且有执行回执时，后续 Memory 写入失败返回 HTTP 200、`memory_write_status=failed`、`warning_codes=["memory_write_failed"]`，保留各动作真实状态和可查询编号。HTTP 200 不代表所有动作成功，更不代表退款到账；客户端以结构化动作状态判断业务结果。没有确认完成动作时，写入异常仍走原 HTTP 500；读取故障仍 fail-closed。失败写入不调度画像，Trace 记录失败角色、成功返回的写入调用数和耗时。见 [N05 技术说明](docs/engineering/N05-action-memory-consistency.md)。
+`/chat` 追加 `action_results`（既有 ActionResult 契约）、`memory_write_status` 和 `warning_codes`。危险工具回执须经带 Principal 的 ActionService 查询确认；至少一个动作已 `completed` 且有执行回执时，后续 Memory 写入失败返回 HTTP 200、`memory_write_status=failed`、`warning_codes=["memory_write_failed"]`，保留各动作真实状态和可查询编号。HTTP 200 不代表所有动作成功，更不代表退款到账；客户端以结构化动作状态判断业务结果。没有确认完成动作或已创建交接时，写入异常仍走原 HTTP 500；读取故障仍 fail-closed。失败写入不调度画像，Trace 记录失败角色、成功返回的写入调用数和耗时。见 [N05 技术说明](docs/engineering/N05-action-memory-consistency.md)。
 
 ## Evaluation
 
 [确定性专项 Eval](evaluation/README.md)评分工具参数、业务规则、HITL、RAG 和安全行为；LLM-as-Judge 只用于主观回复质量。历史报告保持原样，Single 的 nullable deprecated routing / intent 字段不用于伪造路由准确率。
+
+A02独立交接数据集：`uv run python -m evaluation.run_handoff_eval`，只运行 Fake SDK 与本地 FastAPI TestClient；以 API状态、Trace、owner可查询记录和后端回执评分，结果见 `docs/engineering/A02-handoff-observations.json`。不以回答中的“转人工”评分，不改 T10 历史 `0/3`。
 
 [T10 历史对比](evaluation/reports/t10_topology_comparison.md)：真实模型、演示业务后端，**controlled demo workload，3 × 10 cases / topology，not production benchmark**。
 

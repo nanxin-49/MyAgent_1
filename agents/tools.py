@@ -502,6 +502,21 @@ def billing_tools() -> Dict[str, AgentToolSpec]:
     }
 
 
+def build_handoff_tools(service) -> Dict[str, AgentToolSpec]:
+    def request_handoff(req, args):
+        result = service.request(req, args["reason_code"])
+        # A created receipt survives any later denied or failed attempt.
+        if not req.handoff or not req.handoff.handoff_created:
+            req.handoff = result
+        return {"success": result.handoff_created, **result.model_dump()}
+
+    return {"request_handoff": AgentToolSpec(
+        name="request_handoff", description="申请模拟人工交接。仅用户明确要求、复杂电商投诉或已观察到的业务查询依赖故障可用。摘要不等于建单。",
+        input_schema={"type": "object", "properties": {"reason_code": {"type": "string"}},
+                      "required": ["reason_code"], "additionalProperties": False},
+        handler=request_handoff, risk_level=RiskLevel.WRITE, timeout_s=None)}
+
+
 def escalation_tools() -> Dict[str, AgentToolSpec]:
     return {
         "create_handoff_summary": make_tool(

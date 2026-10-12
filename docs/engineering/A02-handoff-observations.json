@@ -1,0 +1,1032 @@
+{
+  "dataset_version": "a02-handoff-v1",
+  "evidence_type": "Fake SDK + authenticated FastAPI TestClient + in-memory demo",
+  "captured_at": "2026-10-12T15:10:39.729320+08:00",
+  "legacy_keyword_observations": {
+    "negative_response_flag": true,
+    "unsupported_refusal_flag": true,
+    "explicit_request_plain_reply_flag": false,
+    "scope": "Unchanged historical BaseAgent keyword function, not production structured state"
+  },
+  "head": "c47eb8671898f336efc72ff79c25fd62d70cf499",
+  "python": "3.12.3",
+  "passed": 7,
+  "total": 7,
+  "observations": [
+    {
+      "case_id": "explicit",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:explicit",
+        "request_id": "46a6d670",
+        "response": "已创建模拟人工交接记录。交接编号：c3d9a015-f1bd-410b-a62c-f0d98e94d561。这不代表真实客服已接单。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [
+          "request_handoff"
+        ],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": true,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 0,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "created",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": true,
+          "handoff_failed": false,
+          "handoff_id": "c3d9a015-f1bd-410b-a62c-f0d98e94d561",
+          "reason_code": "explicit_request",
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "46a6d670",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "request_handoff"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "46a6d670",
+            "agent_type": "support",
+            "tool_name": "request_handoff",
+            "risk_level": "write",
+            "tool_use_id": "deterministic_handoff_gate",
+            "input": {
+              "reason_code": "explicit_request"
+            },
+            "validated_input": {
+              "reason_code": "explicit_request"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "handoff_result": {
+              "status": "created",
+              "handoff_required": true,
+              "handoff_requested": true,
+              "handoff_created": true,
+              "handoff_failed": false,
+              "handoff_id": "c3d9a015-f1bd-410b-a62c-f0d98e94d561",
+              "reason_code": "explicit_request",
+              "error_code": null,
+              "reused": false,
+              "simulated": true
+            }
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "created",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": true,
+          "handoff_failed": false,
+          "handoff_id": "c3d9a015-f1bd-410b-a62c-f0d98e94d561",
+          "reason_code": "explicit_request",
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 0,
+        "model_calls": [],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 547.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 547.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": {
+        "owner": "customer-1",
+        "requested_by": "a02-eval-local",
+        "handoff_id": "c3d9a015-f1bd-410b-a62c-f0d98e94d561",
+        "status": "created",
+        "reason_code": "explicit_request",
+        "simulated": true,
+        "summary": "用户请求人工协助"
+      },
+      "score": {
+        "should_handoff": true,
+        "requested": true,
+        "created": true,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "case_id": "negative",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:negative",
+        "request_id": "8f63fb13",
+        "response": "请提供订单号以查询物流。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": false,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 1,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "8f63fb13",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": false,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 1,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "fake",
+            "input_tokens": null,
+            "output_tokens": null,
+            "latency_ms": 0.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 0.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 0.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": null,
+      "score": {
+        "should_handoff": false,
+        "requested": false,
+        "created": false,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "case_id": "unsupported",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:unsupported",
+        "request_id": "480f7548",
+        "response": "CartCare 支持商品、订单、物流和售后，无法预订机票。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": false,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 1,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "480f7548",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": false,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 1,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "fake",
+            "input_tokens": null,
+            "output_tokens": null,
+            "latency_ms": 0.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 0.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 0.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": null,
+      "score": {
+        "should_handoff": false,
+        "requested": false,
+        "created": false,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "case_id": "complaint",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:complaint",
+        "request_id": "c25202c7",
+        "response": "已创建模拟人工交接记录。交接编号：0a8a3c92-49f4-4ad4-9e0f-bb9fc519fad6。这不代表真实客服已接单。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [
+          "request_handoff"
+        ],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": true,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 2,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "created",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": true,
+          "handoff_failed": false,
+          "handoff_id": "0a8a3c92-49f4-4ad4-9e0f-bb9fc519fad6",
+          "reason_code": "complex_complaint",
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "c25202c7",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "request_handoff"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "c25202c7",
+            "agent_type": "support",
+            "tool_name": "request_handoff",
+            "risk_level": "write",
+            "tool_use_id": "h1",
+            "input": {
+              "reason_code": "complex_complaint"
+            },
+            "validated_input": {
+              "reason_code": "complex_complaint"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "rerank_status": null,
+            "retrieval_status": null,
+            "citations": [],
+            "action_result": null,
+            "handoff_result": {
+              "status": "created",
+              "handoff_required": true,
+              "handoff_requested": true,
+              "handoff_created": true,
+              "handoff_failed": false,
+              "handoff_id": "0a8a3c92-49f4-4ad4-9e0f-bb9fc519fad6",
+              "reason_code": "complex_complaint",
+              "error_code": null,
+              "reused": false,
+              "simulated": true
+            },
+            "business_result": null,
+            "retrieval_hits": null,
+            "helper_result": null,
+            "error": ""
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "created",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": true,
+          "handoff_failed": false,
+          "handoff_id": "0a8a3c92-49f4-4ad4-9e0f-bb9fc519fad6",
+          "reason_code": "complex_complaint",
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 2,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "fake",
+            "input_tokens": null,
+            "output_tokens": null,
+            "latency_ms": 0.0
+          },
+          {
+            "stage": "support",
+            "model": "fake",
+            "input_tokens": null,
+            "output_tokens": null,
+            "latency_ms": 0.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 0.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 0.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": {
+        "owner": "customer-1",
+        "requested_by": "a02-eval-local",
+        "handoff_id": "0a8a3c92-49f4-4ad4-9e0f-bb9fc519fad6",
+        "status": "created",
+        "reason_code": "complex_complaint",
+        "simulated": true,
+        "summary": "电商投诉需要人工核验"
+      },
+      "score": {
+        "should_handoff": true,
+        "requested": true,
+        "created": true,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "case_id": "failure",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:failure",
+        "request_id": "d863212d",
+        "response": "人工交接创建失败，未完成转接。错误代码：handoff_service_unavailable。请稍后重试。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [
+          "request_handoff"
+        ],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": false,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 0,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "failed",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": false,
+          "handoff_failed": true,
+          "handoff_id": null,
+          "reason_code": "explicit_request",
+          "error_code": "handoff_service_unavailable",
+          "reused": false,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "d863212d",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "request_handoff"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "d863212d",
+            "agent_type": "support",
+            "tool_name": "request_handoff",
+            "risk_level": "write",
+            "tool_use_id": "deterministic_handoff_gate",
+            "input": {
+              "reason_code": "explicit_request"
+            },
+            "validated_input": {
+              "reason_code": "explicit_request"
+            },
+            "success": false,
+            "result_success": false,
+            "error_code": "handoff_service_unavailable",
+            "error_type": "tool",
+            "retryable": false,
+            "latency_ms": 0.0,
+            "handoff_result": {
+              "status": "failed",
+              "handoff_required": true,
+              "handoff_requested": true,
+              "handoff_created": false,
+              "handoff_failed": true,
+              "handoff_id": null,
+              "reason_code": "explicit_request",
+              "error_code": "handoff_service_unavailable",
+              "reused": false,
+              "simulated": true
+            }
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "failed",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": false,
+          "handoff_failed": true,
+          "handoff_id": null,
+          "reason_code": "explicit_request",
+          "error_code": "handoff_service_unavailable",
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 0,
+        "model_calls": [],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 0.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 0.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": null,
+      "score": {
+        "should_handoff": true,
+        "requested": true,
+        "created": false,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "case_id": "normal",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:normal",
+        "request_id": "897aa74a",
+        "response": "请提供商品信息以核对政策。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": false,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 1,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "897aa74a",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [],
+        "tool_calls": [],
+        "escalated": false,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 1,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "fake",
+            "input_tokens": null,
+            "output_tokens": null,
+            "latency_ms": 0.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 0.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 0.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": null,
+      "score": {
+        "should_handoff": false,
+        "requested": false,
+        "created": false,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "case_id": "repeat",
+      "http_status": 200,
+      "body": {
+        "conv_id": "a02:repeat",
+        "request_id": "988184ec",
+        "response": "已创建模拟人工交接记录。交接编号：45d19686-5f75-444a-aa29-5b16a70f8261。这不代表真实客服已接单。",
+        "topology": "single",
+        "intent": null,
+        "intent_group": null,
+        "agent_type": "support",
+        "agent_types": [
+          "support"
+        ],
+        "primary_agent": null,
+        "supporting_agents": null,
+        "tools_used": [
+          "request_handoff"
+        ],
+        "routing_reason": null,
+        "routing_confidence": null,
+        "escalated": true,
+        "latency_ms": 0.0,
+        "knowledge_used": false,
+        "retrieval_status": null,
+        "citations": [],
+        "entities": {},
+        "intent_confidence": null,
+        "intent_source_scores": null,
+        "model_call_count": 0,
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+        "action_results": [],
+        "memory_write_status": "completed",
+        "warning_codes": [],
+        "handoff": {
+          "status": "created",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": true,
+          "handoff_failed": false,
+          "handoff_id": "45d19686-5f75-444a-aa29-5b16a70f8261",
+          "reason_code": "explicit_request",
+          "error_code": null,
+          "reused": true,
+          "simulated": true
+        }
+      },
+      "trace": {
+        "request_id": "988184ec",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "request_handoff"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "988184ec",
+            "agent_type": "support",
+            "tool_name": "request_handoff",
+            "risk_level": "write",
+            "tool_use_id": "deterministic_handoff_gate",
+            "input": {
+              "reason_code": "explicit_request"
+            },
+            "validated_input": {
+              "reason_code": "explicit_request"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "handoff_result": {
+              "status": "created",
+              "handoff_required": true,
+              "handoff_requested": true,
+              "handoff_created": true,
+              "handoff_failed": false,
+              "handoff_id": "45d19686-5f75-444a-aa29-5b16a70f8261",
+              "reason_code": "explicit_request",
+              "error_code": null,
+              "reused": true,
+              "simulated": true
+            }
+          }
+        ],
+        "escalated": true,
+        "latency_ms": 0.0,
+        "handoff": {
+          "status": "created",
+          "handoff_required": true,
+          "handoff_requested": true,
+          "handoff_created": true,
+          "handoff_failed": false,
+          "handoff_id": "45d19686-5f75-444a-aa29-5b16a70f8261",
+          "reason_code": "explicit_request",
+          "error_code": null,
+          "reused": true,
+          "simulated": true
+        },
+        "model_call_count": 0,
+        "model_calls": [],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 0.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 0.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      },
+      "owned_record": {
+        "owner": "customer-1",
+        "requested_by": "a02-eval-local",
+        "handoff_id": "45d19686-5f75-444a-aa29-5b16a70f8261",
+        "status": "created",
+        "reason_code": "explicit_request",
+        "simulated": true,
+        "summary": "用户请求人工协助"
+      },
+      "score": {
+        "should_handoff": true,
+        "requested": true,
+        "created": true,
+        "false_handoff": false,
+        "checks": {
+          "required_correct": true,
+          "requested_correct": true,
+          "creation_correct": true,
+          "status_correct": true,
+          "no_false_handoff": true,
+          "trace_api_consistent": true,
+          "reply_consistent": true,
+          "record_count_correct": true,
+          "repeat_correct": true
+        },
+        "passed": true
+      }
+    }
+  ]
+}

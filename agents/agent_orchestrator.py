@@ -137,6 +137,9 @@ class Request:
     intent_confidence: float = 1.0
     request_id:  str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     principal: Principal | None = None
+    handoff_key: str | None = None
+    handoff: Any = None
+    handoff_evidence: list = field(default_factory=list)
 
 
 @dataclass
@@ -387,6 +390,8 @@ class BaseAgent:
                         "retrieval_status": result.get("retrieval_status") if isinstance(result, dict) else None,
                         "citations": result.get("citations", []) if isinstance(result, dict) else [],
                         "action_result": action_result,
+                        "handoff_result": {k: v for k, v in result.items() if k != "success"}
+                            if name == "request_handoff" and isinstance(result, dict) else None,
                         "business_result": business_result,
                         "retrieval_hits": retrieval_hits,
                         "helper_result": helper_result,
@@ -397,6 +402,7 @@ class BaseAgent:
                 # exposes the tool attempt in the error response and trace API.
                 self._last_tools_used = list(tools_used)
                 self._last_tool_traces = list(tool_traces)
+                req.handoff_evidence = list(tool_traces)
                 tool_results.append({
                     "type": "tool_result",
                     "tool_use_id": tool_use_id,

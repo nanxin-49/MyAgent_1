@@ -112,6 +112,11 @@
 
     <section id="baseline">
       <h2>1. 当前事实基线（Codex 已核验）</h2>
+      <article class="task-card" data-task="A02">
+        <h3>A02 / C04 · Structured Handoff</h3>
+        <p>2026-10-12：fixed / verify，待用户验收。明确人工请求经确定性门控，Agent可按受限策略请求；request_handoff经Principal/策略/幂等创建模拟记录。API与Trace区分required/requested/created/failed，escalated仅表示created；摘要和越界拒绝不等于建单。无真人分配或通知。</p>
+        <div class="work-grid"><div><label class="small">状态</label><select data-field="status"><option>todo</option><option>doing</option><option>blocked</option><option selected>verify</option><option>done</option></select></div><div><label class="small">证据</label><input data-field="evidence" value="core/handoff.py; agents/support_agent.py; agents/tools.py; api/main.py; tests/test_handoff.py; evaluation/handoff_cases.json; evaluation/handoff_eval.py; docs/engineering/A02-handoff.md; docs/engineering/A02-handoff-observations.json"></div><div><label class="small">备注</label><textarea data-field="note">HEAD=c47eb867，起始干净，仅A02。红测6 failed；额外拒绝工具后虚假成功4 failed/17 passed。最终专项26 passed；Agent/Tool/Support45；已有安全业务134；RAG/Tool130/2 skipped；完整382/3 skipped、AnyIO既有警告；JS12、lock53/diff通过。Fake SDK经真实FastAPI/chat路由和owner查询，独立结构化评测7/7；没有收费模型/live服务/部署。成功后模型/Memory写失败保留可信回执；客户端重试需复用conv_id+handoff_key，异参冲突、失败重放、新key恢复、跨owner404。进程内无持久化/TTL，多worker不共享；保守语言门控未证明真实模型召回率。T10历史0/3不改，README/核心Wiki已同步。独立练习：故障注入，同key失败重放/新key恢复，后续模型失败仍保留created。未提交推送，停止待验收。</textarea></div></div>
+      </article>
       <article class="task-card" data-task="A05">
         <h3>A05 / N06、N07 · 知识版本与重排契约</h3>
         <p>2026-10-12：N06=fixed，verify待验收。显式发布状态与supersedes/时间区间控制候选；同版本精确替换、失败禁用旧依据、citation绑定内容hash。旧无发布记录资料保留并要求审核重发布；Chroma非事务/单发布者边界见技术说明。N07=fixed/verify：空或异常排序不伪usable，fallback须通过证据及N06复核；真实reranked与rerank_status可观察。完整A05实验未执行。</p>

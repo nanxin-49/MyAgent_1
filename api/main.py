@@ -30,6 +30,7 @@ from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from actions import ActionResult
+from core.handoff import HandoffResult
 
 load_dotenv()
 
@@ -262,6 +263,7 @@ class ChatRequest(BaseModel):
     message:     str
     user_id:     Optional[str] = None
     conv_id:     Optional[str] = None
+    handoff_key: Optional[str] = Field(default=None, min_length=1, max_length=128)
 
 
 class ChatResponse(BaseModel):
@@ -291,6 +293,7 @@ class ChatResponse(BaseModel):
     action_results: List[ActionResult] = Field(default_factory=list)
     memory_write_status: str = "completed"
     warning_codes: List[str] = Field(default_factory=list)
+    handoff: HandoffResult = Field(default_factory=HandoffResult)
 
 
 def _observed_action_results(tool_traces: List[Dict[str, Any]], user_id: str,
@@ -415,6 +418,7 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
         conv_id=conv_id,
         context=full_context,
         history=history,
+        handoff_key=req.handoff_key,
     )
 
     # 3. 执行
@@ -424,6 +428,7 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
         receipt.success and receipt.status.value == "completed" and receipt.action.execution_result
         for receipt in action_results
     )
+    confirmed_completed = confirmed_completed or result.handoff.handoff_created
     warning_codes = []
 
     # Extend the existing bounded trace with counts, never raw memory or prompts.
@@ -489,7 +494,19 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
         action_results=action_results,
         memory_write_status=memory_observation["write_status"],
         warning_codes=warning_codes,
+        handoff=result.handoff,
     )
+
+
+@app.get("/handoffs/{handoff_id}", tags=["Handoff"])
+async def get_handoff(handoff_id: str, principal: Principal = Depends(get_principal)):
+    customer_identity(principal)
+    if _orchestrator is None:
+        raise HTTPException(503, "服务未就绪")
+    record = _orchestrator.handoff_service.get(handoff_id, principal)
+    if record is None:
+        raise HTTPException(404, "交接记录不存在")
+    return record
 
 
 @app.post("/actions/{action_id}/approve", response_model=ActionResult, tags=["Actions"])

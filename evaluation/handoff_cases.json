@@ -1,0 +1,13 @@
+{
+  "version": "a02-handoff-v1",
+  "evidence_type": "Fake SDK + authenticated FastAPI TestClient + in-memory demo",
+  "cases": [
+    {"id": "explicit", "message": "我想转人工客服。", "required": true, "status": "created"},
+    {"id": "negative", "message": "我不需要人工客服，请直接查询物流。", "required": false, "status": "not_required", "reply": "请提供订单号以查询物流。"},
+    {"id": "unsupported", "message": "帮我预订机票", "required": false, "status": "not_required", "reply": "CartCare 支持商品、订单、物流和售后，无法预订机票。"},
+    {"id": "complaint", "message": "我要投诉订单退款争议，多次没有解决。", "required": true, "status": "created", "tool": "complex_complaint"},
+    {"id": "failure", "message": "我想转人工客服。", "required": true, "status": "failed", "service_failure": true},
+    {"id": "normal", "message": "退货政策是什么？", "required": false, "status": "not_required", "reply": "请提供商品信息以核对政策。"},
+    {"id": "repeat", "message": "我想转人工客服。", "required": true, "status": "created", "repeat": true}
+  ]
+}

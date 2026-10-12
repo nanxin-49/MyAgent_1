@@ -1,13 +1,18 @@
-"""Production Single Support Agent. Role text matches accepted T10 Single."""
-from dataclasses import dataclass, replace
+"""Production Single Support Agent, with backend-owned A02 handoff receipts."""
+from dataclasses import dataclass, replace, field
 from collections import deque
 import os
+import re
 import time
 
 from anthropic import AsyncAnthropic
 from agents.agent_orchestrator import AgentProfile, AgentType, BaseAgent, GeneralAgent
 from agents.tools import general_tools, technical_tools, billing_tools, escalation_tools
 from core.model_observation import ObservedClient, model_events
+from core.handoff import HandoffService, HandoffResult, explicit_handoff, handoff_reply
+from core.tool_contract import execute_tool
+from agents.tools import build_handoff_tools
+from agents.agent_orchestrator import AgentResponse
 
 
 def support_helpers():
@@ -40,6 +45,49 @@ class SingleSupportAgent(BaseAgent):
     def _build_role_packet(self, req):
         return ""
 
+    async def handle(self, req):
+        req.handoff = HandoffResult()
+        if explicit_handoff(req.message):
+            spec = self.get_tools()["request_handoff"]
+            args = {"reason_code": "explicit_request"}
+            execution = await execute_tool(spec, args, lambda: spec.handler(req, args))
+            payload = execution.agent_payload()
+            trace = {"request_id": req.request_id, "agent_type": "support", "tool_name": spec.name,
+                     "risk_level": "write", "tool_use_id": "deterministic_handoff_gate",
+                     "input": args, "validated_input": execution.validated_input,
+                     "success": execution.success, "result_success": payload.get("success"),
+                     "error_code": execution.error_code, "error_type": execution.error_type,
+                     "retryable": False, "latency_ms": execution.latency_ms,
+                     "handoff_result": req.handoff.model_dump()}
+            response = AgentResponse(self.agent_type, "", execution.success,
+                                     tools_used=[spec.name], tool_traces=[trace])
+        else:
+            response = await super().handle(req)
+        response.escalate = req.handoff.handoff_created
+        if req.handoff.handoff_requested or req.handoff.handoff_failed or any(
+            t.get("tool_name") == "request_handoff" for t in response.tool_traces
+        ):
+            action_receipt = self._last_action_receipt()
+            response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
+            response.success = req.handoff.handoff_created or bool(action_receipt)
+        else:
+            # Wording guard only: generated handoff language cannot certify an
+            # absent record. It never changes any business state or escalated.
+            sentences = re.split(r"(?<=[。！？.!?\n])", response.content)
+            if any(re.search(r"人工|真人|转接|handoff|escalat|human|specialist", s, re.I) for s in sentences):
+                response.content = "".join(s for s in sentences if not re.search(
+                    r"人工|真人|转接|handoff|escalat|human|specialist", s, re.I)) + handoff_reply(req.handoff)
+        return response
+
+    def _needs_escalation(self, content):
+        return False
+
+    def _build_system_prompt(self, req):
+        return super()._build_system_prompt(req) + (
+            "\n人工交接只能通过 request_handoff 创建模拟记录。理由码仅 explicit_request、complex_complaint、"
+            "business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。"
+            "订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。")
+
 
 @dataclass
 class SupportResult:
@@ -50,6 +98,7 @@ class SupportResult:
     tools_used: list
     tool_traces: list
     model_calls: list
+    handoff: HandoffResult = field(default_factory=HandoffResult)
     agent_type: AgentType = AgentType.SUPPORT
     intent: None = None
 
@@ -66,11 +115,12 @@ class SupportRuntime:
         self._client = ObservedClient(self._raw_client, "support")
         self._model, self._skills = model, skill_manager
         self._tools = {}
+        self.handoff_service = HandoffService()
         self._traces = deque(maxlen=int(os.getenv("ECHOMIND_TOOL_TRACE_MAX", "200")))
         self._total, self._success, self._total_ms = 0, 0, 0.0
 
     def set_shared_tools(self, tools):
-        self._tools = dict(tools or {})
+        self._tools = {**dict(tools or {}), **build_handoff_tools(self.handoff_service)}
 
     def set_skill_manager(self, manager):
         self._skills = manager
@@ -78,7 +128,7 @@ class SupportRuntime:
     def make_agent(self):
         agent = SingleSupportAgent(self._client, self._model,
             AllRoleSkills(self._skills) if self._skills else None)
-        agent.set_shared_tools(self._tools)
+        agent.set_shared_tools({**self._tools, **build_handoff_tools(self.handoff_service)})
         agent.profile = replace(agent.profile, tool_scope=tuple(agent.get_tools()))
         return agent
 
@@ -97,13 +147,14 @@ class SupportRuntime:
         self._success += int(response.success)
         self._total_ms += elapsed
         result = SupportResult(req.request_id, response.content, response.escalate, elapsed,
-                               response.tools_used, response.tool_traces, events)
+                               response.tools_used, response.tool_traces, events, handoff=req.handoff)
         self._traces.append({"request_id": req.request_id, "topology": "single", "agent_type": "support",
             "intent": None, "primary_agent": None, "supporting_agents": None,
             "routing_reason": None, "routing_confidence": None,
             "deprecated_fields": ["primary_agent", "supporting_agents", "routing_reason", "routing_confidence"],
             "tools_used": list(result.tools_used), "tool_calls": list(result.tool_traces),
             "escalated": result.escalated, "latency_ms": round(elapsed, 1),
+            "handoff": result.handoff.model_dump(),
             "model_call_count": len(events), "model_calls": list(events),
             "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"})
         return result
