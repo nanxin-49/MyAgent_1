@@ -56,7 +56,7 @@ HTTP 先由可替换 AuthAdapter 验证 Principal（subject_id/customer_id/roles
 
 需要人工审核的动作仅可由独立 reviewer 批准，且 owner 必须在其服务端 `review_customers` 范围；同 customer_id 或同请求主体禁止自审。动作保留 owner、requested_by 和 reviewed_by，重复审批仍单次执行。客户可拒绝自己的待审批请求，不能批准；admin 不自动获得 reviewer 权限。
 
-Trace、Knowledge 添加/上传/统计、Skills 查询/reload、Eval、Monitor、Metrics 和诊断 Search 要求 admin。`/eval/run` 授权不等于评测业务状态隔离，A07/N10仍未处理。静态 Demo 与 health 仍公开；没有生产认证验证器时不会自动降级为Demo/anonymous。
+Trace、Knowledge 添加/上传/统计、Skills 查询/reload、Eval、Monitor、Metrics 和诊断 Search 要求 admin。`/eval/run` 每轮通过独立模拟 Runtime/BusinessState/ActionStore 执行，内部使用固定 customer-1 测试 Principal，保留 Policy/HITL；不接入聊天 Memory。见 [N10 隔离说明](docs/engineering/N10-evaluation-runtime-isolation.md)。静态 Demo 与 health 仍公开；没有生产认证验证器时不会自动降级为Demo/anonymous。
 
 受控本地 Demo Auth 需同时配置 `CARTCARE_AUTH_MODE=demo`、`APP_ENV=development`、`API_HOST=127.0.0.1`（或 ::1）、回环客户端/Host及 `CARTCARE_DEMO_CREDENTIALS` 服务端JSON映射。凭据键为自行生成、至少32字符的Bearer token；值为 `{"subject_id":"...","customer_id":"customer-1","roles":["customer"]}`，reviewer另设roles及review_customers列表，admin另设roles。没有默认凭据。Demo页面分开输入customer/reviewer/admin token，不保存至浏览器存储；user_id仍须与客户凭据一致。CLI 使用 `CARTCARE_CLI_TOKEN`。不要把Demo暴露到公网或公共反向代理；它不替代生产认证、凭据生命周期与部署安全审查。真实验证器通过 `app.state.auth_adapter` 或 FastAPI `get_auth_adapter` 依赖安装。设计与限制见 [ADR](docs/engineering/ADR-auth-and-provider-safety.md)。
 

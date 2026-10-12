@@ -2,6 +2,16 @@
   "version": 2,
   "updatedAt": "2026-10-12",
   "tasks": {
+    "A07": {
+      "status": "verify",
+      "outcome": "fixed",
+      "issue_id": "N10",
+      "issues": {
+        "N10": "fixed"
+      },
+      "evidence": "evaluation/runtime.py; evaluation/evaluator.py; api/main.py; tests/test_evaluation_runtime_isolation.py; docs/engineering/N10-evaluation-runtime-isolation.md",
+      "note": "2026-10-12 A07/N10=fixed/verify，待用户验收。HEAD=dcab02aa6382130826f37839e3c8d83640ccdac1，起始干净，保留N01/N02/N03/N04/N05。红测5 failed/3 passed：已认证测试Principal经startup evaluator绑定Runtime取消订单，正常paid变cancelled；原HTTP eval无Principal被N02拒绝，不表示隔离。API改用每轮Factory，从startup不可变JSON fixture快照构造新state、ActionService/Store、SupportRuntime/Trace、RAG cache/工具统计/SDK、Skills；同轮读写共享state保留N04。固定模拟customer身份，不给reviewer/admin；其他身份422，HTTP admin要求不变。异常和构造失败关闭本轮SDK，无聊天fallback；Memory不接入，知识只共享只读search。专项14 passed；既有Eval22/N04 18/安全102=142 passed；完整267 passed/2 skipped/既有AnyIO警告，lock53 packages/diff通过；pytest缓存override data/test-cache/n10；额外canonical原样复跑267/2，增加既有cash缓存权限警告。Fake SDK/lifespan/HTTP，连续、重叠、写后异常和构造异常均隔离；无模型/支付/live服务。baseline自动覆盖/数据集版本/并发报告仍后续待办，进程内状态无跨进程持久恢复，外部知识语料/查询负载未物理隔离。README/重点代码同步，历史T09-T12及审查证据不改。独立练习见技术说明：嵌套items隔离断言与浅拷贝红绿对照。仅N10；A07/EVIDENCE及其他任务未执行。未提交推送。"
+    },
     "A03-lite": {
       "status": "verify",
       "outcome": "fixed",

@@ -230,6 +230,8 @@ class EndToEndEvaluator:
         base_url: Optional[str] = None,
         model:    str = "claude-3-5-sonnet-20241022",
         baseline_path: Optional[str] = None,
+        runtime_factory=None,
+        evaluation_principal=None,
     ):
         kwargs: Dict[str, Any] = {"api_key": api_key}
         if base_url:
@@ -237,6 +239,8 @@ class EndToEndEvaluator:
         client = AsyncAnthropic(**kwargs)
 
         self._orchestrator     = orchestrator
+        self._runtime_factory = runtime_factory
+        self._evaluation_principal = evaluation_principal
         self._judge            = LLMJudge(client, model)
         self._intent_evaluator = IntentEvaluator(recognizer)
         self._history:         List[EvalReport] = []
@@ -256,6 +260,12 @@ class EndToEndEvaluator:
           - 单轮: [{"question": "..."}]
           - 多轮: [{"turns": ["第一轮", "第二轮", ...]}]
         """
+        if self._runtime_factory is not None:
+            async with self._runtime_factory() as runtime:
+                return await self._run(runtime, intent_cases, dialog_cases)
+        return await self._run(self._orchestrator, intent_cases, dialog_cases)
+
+    async def _run(self, runtime, intent_cases, dialog_cases) -> EvalReport:
         results: List[EvalResult] = []
         all_scores: Dict[str, List[float]] = {
             "relevance": [], "clarity": [], "completeness": [], "helpfulness": []
@@ -281,7 +291,7 @@ class EndToEndEvaluator:
         # 2. 对话质量评测（调用 orchestrator 产出回复，再用 LLM Judge 评分）
         if dialog_cases:
             for i, case in enumerate(dialog_cases):
-                case_results = await self._evaluate_dialog_case(case, i)
+                case_results = await self._evaluate_dialog_case(case, i, orchestrator=runtime)
                 results.extend(case_results)
                 for r in case_results:
                     for k in all_scores:
@@ -318,7 +328,7 @@ class EndToEndEvaluator:
         self._save_baseline(report)
         return report
 
-    async def _evaluate_dialog_case(self, case: Dict[str, Any], case_idx: int) -> List[EvalResult]:
+    async def _evaluate_dialog_case(self, case: Dict[str, Any], case_idx: int, *, orchestrator=None) -> List[EvalResult]:
         """评测单轮或多轮对话用例。"""
         from agents.agent_orchestrator import Request as OrcReq
 
@@ -328,6 +338,11 @@ class EndToEndEvaluator:
 
         conv_id = str(case.get("conv_id") or f"eval_{case_idx}")
         user_id = str(case.get("user_id") or "eval_user")
+        principal = getattr(self, "_evaluation_principal", None)
+        if principal is not None:
+            if case.get("user_id") and case["user_id"] != principal.customer_id:
+                raise ValueError("evaluation requires the configured simulated fixture identity")
+            user_id = principal.customer_id
         history: List[Dict[str, str]] = []
         results: List[EvalResult] = []
 
@@ -339,8 +354,9 @@ class EndToEndEvaluator:
                 conv_id=conv_id,
                 context=context,
                 history=history[-6:] if history else None,
+                principal=principal,
             )
-            orch_result = await self._orchestrator.run(orch_req)
+            orch_result = await (orchestrator if orchestrator is not None else self._orchestrator).run(orch_req)
             actual_answer = orch_result.response
 
             scores = await self._judge.judge(question, actual_answer, context=context or None)

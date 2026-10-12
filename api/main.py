@@ -80,6 +80,7 @@ async def lifespan(app: FastAPI):
     from actions import ActionService, InMemoryBusinessActionBackend
     from core.intent_recognizer import IntentRecognizer
     from evaluation.evaluator import EndToEndEvaluator
+    from evaluation.runtime import EvaluationRuntimeFactory, EVALUATION_PRINCIPAL
     from mcp.knowledge_base import KnowledgeBase
     from mcp.tool_manager import MCPToolManager, Tool
     from core.tool_contract import RetryPolicy
@@ -148,7 +149,7 @@ async def lifespan(app: FastAPI):
             "error": error,
         }]
 
-    _tool_manager.register(Tool(
+    knowledge_tool = Tool(
         name="knowledge_search",
         description="搜索知识库（基于 ChromaDB 向量检索）",
         handler=kb.search_handler,
@@ -165,7 +166,8 @@ async def lifespan(app: FastAPI):
         supports_rerank=True,
         fallback=knowledge_fallback,
         retry_policy=RetryPolicy(max_attempts=2),
-    ))
+    )
+    _tool_manager.register(knowledge_tool)
     from core.model_observation import ObservedClient
     _tool_manager._client = ObservedClient(_tool_manager._client, "rag_rewrite_or_rerank")
 
@@ -206,12 +208,18 @@ async def lifespan(app: FastAPI):
 
     # 评测器
     _evaluator = EndToEndEvaluator(
-        orchestrator=_orchestrator,
+        orchestrator=None,
         recognizer=recognizer,
         api_key=cfg["api_key"],
         base_url=cfg.get("base_url"),
         model=cfg["model"],
         baseline_path=os.getenv("EVAL_BASELINE_PATH", "/app/data/eval/baseline.json"),
+        runtime_factory=EvaluationRuntimeFactory(
+            fixture_data=business_data, cfg=cfg, knowledge_tool=knowledge_tool,
+            skills_dir=skills_dir,
+            max_prompt_chars=int(os.getenv("ECHOMIND_SKILLS_MAX_PROMPT_CHARS", "5000")),
+        ),
+        evaluation_principal=EVALUATION_PRINCIPAL,
     )
 
     logger.info("CartCare 已就绪")
@@ -818,6 +826,11 @@ async def run_eval(body: Optional[EvalRunInput] = None):
         ]
     else:
         dialog_cases = DEFAULT_DIALOG_CASES
+
+    from evaluation.runtime import EVALUATION_PRINCIPAL
+    if any(case.get("user_id") not in (None, "", EVALUATION_PRINCIPAL.customer_id)
+           for case in dialog_cases):
+        raise HTTPException(422, "评测只允许配置的模拟 fixture 身份 customer-1")
 
     report = await _evaluator.run(
         intent_cases=intent_cases,
