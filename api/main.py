@@ -280,6 +280,32 @@ class ChatResponse(BaseModel):
     intent_source_scores: Optional[Dict[str, float]] = None
     model_call_count: int = 0
     model_observation_scope: str = "support + RAG SDK calls; excludes Memory/profile"
+    action_results: List[ActionResult] = Field(default_factory=list)
+    memory_write_status: str = "completed"
+    warning_codes: List[str] = Field(default_factory=list)
+
+
+def _observed_action_results(tool_traces: List[Dict[str, Any]], user_id: str,
+                             principal: Principal) -> List[ActionResult]:
+    """Reconfirm request-local tool receipts through the existing owned read gate."""
+    if _action_service is None:
+        return []
+    receipts = {}
+    for call in tool_traces:
+        observed = call.get("action_result") or {}
+        action_id = observed.get("action_id")
+        if call.get("risk_level") != "dangerous" or not action_id:
+            continue
+        if observed.get("status") == "completed" and not (
+            call.get("success") and call.get("result_success")
+        ):
+            continue
+        receipt = _action_service.get(action_id, user_id=user_id, principal=principal)
+        if receipt.action is None or receipt.status.value != observed.get("status"):
+            continue
+        receipts[action_id] = receipt.model_copy(deep=True,
+            update={"reused": bool(observed.get("reused"))})
+    return list(receipts.values())
 
 
 def collect_rag_evidence(tool_traces: List[Dict[str, Any]]) -> tuple[Optional[str], List[Dict[str, Any]]]:
@@ -385,6 +411,12 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
 
     # 3. 执行
     result = await _orchestrator.run(orch_req)
+    action_results = _observed_action_results(result.tool_traces, user_id, principal)
+    confirmed_completed = any(
+        receipt.success and receipt.status.value == "completed" and receipt.action.execution_result
+        for receipt in action_results
+    )
+    warning_codes = []
 
     # Extend the existing bounded trace with counts, never raw memory or prompts.
     trace = _orchestrator.get_tool_trace(result.request_id)
@@ -395,28 +427,41 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
         "profile_field_count": len(getattr(mem_ctx, "user_profile", {})),
         "summary_present": bool(getattr(mem_ctx, "summary", "")),
         "write_status": "started", "profile_update_status": "not_scheduled",
+        "messages_written": 0,
     }
     if trace is not None:
         trace["memory"] = memory_observation
 
     # 4. 写入记忆
     write_start = time.monotonic()
+    write_role = "user"
     try:
         await _memory.add_message(user_id, conv_id, MsgRole.USER, req.message)
+        memory_observation["messages_written"] = 1
+        write_role = "assistant"
         await _memory.add_message(user_id, conv_id, MsgRole.ASSISTANT, result.response)
+        memory_observation["messages_written"] = 2
         memory_observation["write_status"] = "completed"
     except Exception:
         memory_observation["write_status"] = "failed"
-        raise
+        memory_observation["write_failed_role"] = write_role
+        memory_observation["error_code"] = "memory_write_failed"
+        # Do not log exception text/traceback, prompts, or business payloads.
+        logger.warning("memory_write_failed request_id=%s role=%s confirmed_completed=%s",
+                       result.request_id, write_role, bool(confirmed_completed))
+        if not confirmed_completed:
+            raise
+        warning_codes.append("memory_write_failed")
     finally:
         memory_observation["write_latency_ms"] = round((time.monotonic() - write_start) * 1000, 1)
+        if trace is not None:
+            trace["request_latency_ms"] = round((time.monotonic() - request_start) * 1000, 1)
+            trace["latency_scope"] = "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
 
     # 5. 异步更新用户画像（不阻塞响应）
-    asyncio.create_task(_memory.update_profile(user_id, conv_id))
-    memory_observation["profile_update_status"] = "scheduled_unobserved"
-    if trace is not None:
-        trace["request_latency_ms"] = round((time.monotonic() - request_start) * 1000, 1)
-        trace["latency_scope"] = "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    if memory_observation["write_status"] == "completed":
+        asyncio.create_task(_memory.update_profile(user_id, conv_id))
+        memory_observation["profile_update_status"] = "scheduled_unobserved"
 
     retrieval_status, citations = collect_rag_evidence(result.tool_traces)
     return ChatResponse(
@@ -433,6 +478,9 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
         knowledge_used=bool(citations),
         retrieval_status=retrieval_status,
         citations=citations,
+        action_results=action_results,
+        memory_write_status=memory_observation["write_status"],
+        warning_codes=warning_codes,
     )
 
 

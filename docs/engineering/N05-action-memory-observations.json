@@ -1,0 +1,1569 @@
+{
+  "date": "2026-10-12",
+  "head": "001919c15a34923c239db52ab25b6ca1aaba9523",
+  "python": "3.12.3",
+  "evidence_kind": "isolated_fake_sdk_simulated_backend",
+  "red_run": {
+    "failed": 7,
+    "passed": 10,
+    "observed_defect": {
+      "http_status": 500,
+      "action_status": "completed",
+      "backend_executions": 1
+    },
+    "qualification": "Four memory fault cases and two retry cases failed on HTTP 500; one failed on missing new action_results field."
+  },
+  "green_run": {
+    "passed": 22
+  },
+  "observations": [
+    {
+      "case": "normal",
+      "http_statuses": [
+        200
+      ],
+      "responses": [
+        {
+          "conv_id": "n05-session",
+          "request_id": "c997956b",
+          "response": "已处理",
+          "topology": "single",
+          "intent": null,
+          "intent_group": null,
+          "agent_type": "support",
+          "agent_types": [
+            "support"
+          ],
+          "primary_agent": null,
+          "supporting_agents": null,
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "routing_reason": null,
+          "routing_confidence": null,
+          "escalated": false,
+          "latency_ms": 0.0,
+          "knowledge_used": false,
+          "retrieval_status": null,
+          "citations": [],
+          "entities": {},
+          "intent_confidence": null,
+          "intent_source_scores": null,
+          "model_call_count": 2,
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+          "action_results": [
+            {
+              "success": true,
+              "status": "completed",
+              "action_id": "act_b92c97b002964d78",
+              "action": {
+                "action_id": "act_b92c97b002964d78",
+                "action_type": "cancel_order",
+                "user_id": "customer-1",
+                "order_id": "ORD-T09-CANCEL",
+                "amount": "129.90",
+                "policy_decision": {
+                  "action": "cancel",
+                  "decision": "allow",
+                  "reason_code": "cancel_eligible",
+                  "policy_version": "refund-cancel-v1",
+                  "explanation": "订单状态、所有权和金额均符合取消条件",
+                  "order_id": "ORD-T09-CANCEL",
+                  "amount": "129.90",
+                  "evaluated_at": "2026-10-02T00:00:00Z",
+                  "requires_approval": false,
+                  "metadata": {}
+                },
+                "policy_version": "refund-cancel-v1",
+                "status": "completed",
+                "created_at": "2026-10-02T00:00:00Z",
+                "updated_at": "2026-10-02T00:00:00Z",
+                "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+                "request_id": "c997956b",
+                "error_code": null,
+                "error_message": null,
+                "execution_result": {
+                  "simulated": true,
+                  "operation": "cancel",
+                  "order_id": "ORD-T09-CANCEL",
+                  "status": "completed"
+                },
+                "reviewed_by": null,
+                "requested_by": "test-customer"
+              },
+              "error_code": null,
+              "message": null,
+              "reused": false
+            }
+          ],
+          "memory_write_status": "completed",
+          "warning_codes": []
+        }
+      ],
+      "backend_executions": 1,
+      "stored_actions": [
+        {
+          "action_id": "act_b92c97b002964d78",
+          "action_type": "cancel_order",
+          "user_id": "customer-1",
+          "order_id": "ORD-T09-CANCEL",
+          "amount": "129.90",
+          "policy_decision": {
+            "action": "cancel",
+            "decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权和金额均符合取消条件",
+            "order_id": "ORD-T09-CANCEL",
+            "amount": "129.90",
+            "evaluated_at": "2026-10-02T00:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-10-02T00:00:00Z",
+          "updated_at": "2026-10-02T00:00:00Z",
+          "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+          "request_id": "c997956b",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "cancel",
+            "order_id": "ORD-T09-CANCEL",
+            "status": "completed"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-customer"
+        }
+      ],
+      "memory_write_attempts": [
+        "user",
+        "assistant"
+      ],
+      "traces": [
+        {
+          "request_id": "c997956b",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "c997956b",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_b92c97b002964d78",
+                "status": "completed",
+                "error_code": null,
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": true,
+                "reused": false
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "completed",
+            "profile_update_status": "scheduled_unobserved",
+            "messages_written": 2,
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    },
+    {
+      "case": "completed_user_write_failure",
+      "http_statuses": [
+        200
+      ],
+      "responses": [
+        {
+          "conv_id": "n05-session",
+          "request_id": "32119a47",
+          "response": "已处理",
+          "topology": "single",
+          "intent": null,
+          "intent_group": null,
+          "agent_type": "support",
+          "agent_types": [
+            "support"
+          ],
+          "primary_agent": null,
+          "supporting_agents": null,
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "routing_reason": null,
+          "routing_confidence": null,
+          "escalated": false,
+          "latency_ms": 0.0,
+          "knowledge_used": false,
+          "retrieval_status": null,
+          "citations": [],
+          "entities": {},
+          "intent_confidence": null,
+          "intent_source_scores": null,
+          "model_call_count": 2,
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+          "action_results": [
+            {
+              "success": true,
+              "status": "completed",
+              "action_id": "act_7eff49dec2c240fb",
+              "action": {
+                "action_id": "act_7eff49dec2c240fb",
+                "action_type": "cancel_order",
+                "user_id": "customer-1",
+                "order_id": "ORD-T09-CANCEL",
+                "amount": "129.90",
+                "policy_decision": {
+                  "action": "cancel",
+                  "decision": "allow",
+                  "reason_code": "cancel_eligible",
+                  "policy_version": "refund-cancel-v1",
+                  "explanation": "订单状态、所有权和金额均符合取消条件",
+                  "order_id": "ORD-T09-CANCEL",
+                  "amount": "129.90",
+                  "evaluated_at": "2026-10-02T00:00:00Z",
+                  "requires_approval": false,
+                  "metadata": {}
+                },
+                "policy_version": "refund-cancel-v1",
+                "status": "completed",
+                "created_at": "2026-10-02T00:00:00Z",
+                "updated_at": "2026-10-02T00:00:00Z",
+                "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+                "request_id": "32119a47",
+                "error_code": null,
+                "error_message": null,
+                "execution_result": {
+                  "simulated": true,
+                  "operation": "cancel",
+                  "order_id": "ORD-T09-CANCEL",
+                  "status": "completed"
+                },
+                "reviewed_by": null,
+                "requested_by": "test-customer"
+              },
+              "error_code": null,
+              "message": null,
+              "reused": false
+            }
+          ],
+          "memory_write_status": "failed",
+          "warning_codes": [
+            "memory_write_failed"
+          ]
+        }
+      ],
+      "backend_executions": 1,
+      "stored_actions": [
+        {
+          "action_id": "act_7eff49dec2c240fb",
+          "action_type": "cancel_order",
+          "user_id": "customer-1",
+          "order_id": "ORD-T09-CANCEL",
+          "amount": "129.90",
+          "policy_decision": {
+            "action": "cancel",
+            "decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权和金额均符合取消条件",
+            "order_id": "ORD-T09-CANCEL",
+            "amount": "129.90",
+            "evaluated_at": "2026-10-02T00:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-10-02T00:00:00Z",
+          "updated_at": "2026-10-02T00:00:00Z",
+          "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+          "request_id": "32119a47",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "cancel",
+            "order_id": "ORD-T09-CANCEL",
+            "status": "completed"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-customer"
+        }
+      ],
+      "memory_write_attempts": [
+        "user"
+      ],
+      "traces": [
+        {
+          "request_id": "32119a47",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "32119a47",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_7eff49dec2c240fb",
+                "status": "completed",
+                "error_code": null,
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": true,
+                "reused": false
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "failed",
+            "profile_update_status": "not_scheduled",
+            "messages_written": 0,
+            "write_failed_role": "user",
+            "error_code": "memory_write_failed",
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    },
+    {
+      "case": "completed_assistant_write_failure",
+      "http_statuses": [
+        200
+      ],
+      "responses": [
+        {
+          "conv_id": "n05-session",
+          "request_id": "bf273104",
+          "response": "已处理",
+          "topology": "single",
+          "intent": null,
+          "intent_group": null,
+          "agent_type": "support",
+          "agent_types": [
+            "support"
+          ],
+          "primary_agent": null,
+          "supporting_agents": null,
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "routing_reason": null,
+          "routing_confidence": null,
+          "escalated": false,
+          "latency_ms": 0.0,
+          "knowledge_used": false,
+          "retrieval_status": null,
+          "citations": [],
+          "entities": {},
+          "intent_confidence": null,
+          "intent_source_scores": null,
+          "model_call_count": 2,
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+          "action_results": [
+            {
+              "success": true,
+              "status": "completed",
+              "action_id": "act_9b1f7ae831074e1f",
+              "action": {
+                "action_id": "act_9b1f7ae831074e1f",
+                "action_type": "cancel_order",
+                "user_id": "customer-1",
+                "order_id": "ORD-T09-CANCEL",
+                "amount": "129.90",
+                "policy_decision": {
+                  "action": "cancel",
+                  "decision": "allow",
+                  "reason_code": "cancel_eligible",
+                  "policy_version": "refund-cancel-v1",
+                  "explanation": "订单状态、所有权和金额均符合取消条件",
+                  "order_id": "ORD-T09-CANCEL",
+                  "amount": "129.90",
+                  "evaluated_at": "2026-10-02T00:00:00Z",
+                  "requires_approval": false,
+                  "metadata": {}
+                },
+                "policy_version": "refund-cancel-v1",
+                "status": "completed",
+                "created_at": "2026-10-02T00:00:00Z",
+                "updated_at": "2026-10-02T00:00:00Z",
+                "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+                "request_id": "bf273104",
+                "error_code": null,
+                "error_message": null,
+                "execution_result": {
+                  "simulated": true,
+                  "operation": "cancel",
+                  "order_id": "ORD-T09-CANCEL",
+                  "status": "completed"
+                },
+                "reviewed_by": null,
+                "requested_by": "test-customer"
+              },
+              "error_code": null,
+              "message": null,
+              "reused": false
+            }
+          ],
+          "memory_write_status": "failed",
+          "warning_codes": [
+            "memory_write_failed"
+          ]
+        }
+      ],
+      "backend_executions": 1,
+      "stored_actions": [
+        {
+          "action_id": "act_9b1f7ae831074e1f",
+          "action_type": "cancel_order",
+          "user_id": "customer-1",
+          "order_id": "ORD-T09-CANCEL",
+          "amount": "129.90",
+          "policy_decision": {
+            "action": "cancel",
+            "decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权和金额均符合取消条件",
+            "order_id": "ORD-T09-CANCEL",
+            "amount": "129.90",
+            "evaluated_at": "2026-10-02T00:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-10-02T00:00:00Z",
+          "updated_at": "2026-10-02T00:00:00Z",
+          "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+          "request_id": "bf273104",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "cancel",
+            "order_id": "ORD-T09-CANCEL",
+            "status": "completed"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-customer"
+        }
+      ],
+      "memory_write_attempts": [
+        "user",
+        "assistant"
+      ],
+      "traces": [
+        {
+          "request_id": "bf273104",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "bf273104",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_9b1f7ae831074e1f",
+                "status": "completed",
+                "error_code": null,
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": true,
+                "reused": false
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "failed",
+            "profile_update_status": "not_scheduled",
+            "messages_written": 1,
+            "write_failed_role": "assistant",
+            "error_code": "memory_write_failed",
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    },
+    {
+      "case": "backend_failure",
+      "http_statuses": [
+        200
+      ],
+      "responses": [
+        {
+          "conv_id": "n05-session",
+          "request_id": "c6b28742",
+          "response": "已处理",
+          "topology": "single",
+          "intent": null,
+          "intent_group": null,
+          "agent_type": "support",
+          "agent_types": [
+            "support"
+          ],
+          "primary_agent": null,
+          "supporting_agents": null,
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "routing_reason": null,
+          "routing_confidence": null,
+          "escalated": false,
+          "latency_ms": 0.0,
+          "knowledge_used": false,
+          "retrieval_status": null,
+          "citations": [],
+          "entities": {},
+          "intent_confidence": null,
+          "intent_source_scores": null,
+          "model_call_count": 2,
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+          "action_results": [
+            {
+              "success": false,
+              "status": "failed",
+              "action_id": "act_5d595a3b91814819",
+              "action": {
+                "action_id": "act_5d595a3b91814819",
+                "action_type": "cancel_order",
+                "user_id": "customer-1",
+                "order_id": "ORD-T09-CANCEL",
+                "amount": "129.90",
+                "policy_decision": {
+                  "action": "cancel",
+                  "decision": "allow",
+                  "reason_code": "cancel_eligible",
+                  "policy_version": "refund-cancel-v1",
+                  "explanation": "订单状态、所有权和金额均符合取消条件",
+                  "order_id": "ORD-T09-CANCEL",
+                  "amount": "129.90",
+                  "evaluated_at": "2026-10-02T00:00:00Z",
+                  "requires_approval": false,
+                  "metadata": {}
+                },
+                "policy_version": "refund-cancel-v1",
+                "status": "failed",
+                "created_at": "2026-10-02T00:00:00Z",
+                "updated_at": "2026-10-02T00:00:00Z",
+                "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+                "request_id": "c6b28742",
+                "error_code": "synthetic_execution_failure",
+                "error_message": "模拟业务执行失败",
+                "execution_result": null,
+                "reviewed_by": null,
+                "requested_by": "test-customer"
+              },
+              "error_code": "synthetic_execution_failure",
+              "message": "模拟业务执行失败",
+              "reused": false
+            }
+          ],
+          "memory_write_status": "completed",
+          "warning_codes": []
+        }
+      ],
+      "backend_executions": 0,
+      "stored_actions": [
+        {
+          "action_id": "act_5d595a3b91814819",
+          "action_type": "cancel_order",
+          "user_id": "customer-1",
+          "order_id": "ORD-T09-CANCEL",
+          "amount": "129.90",
+          "policy_decision": {
+            "action": "cancel",
+            "decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权和金额均符合取消条件",
+            "order_id": "ORD-T09-CANCEL",
+            "amount": "129.90",
+            "evaluated_at": "2026-10-02T00:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "failed",
+          "created_at": "2026-10-02T00:00:00Z",
+          "updated_at": "2026-10-02T00:00:00Z",
+          "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+          "request_id": "c6b28742",
+          "error_code": "synthetic_execution_failure",
+          "error_message": "模拟业务执行失败",
+          "execution_result": null,
+          "reviewed_by": null,
+          "requested_by": "test-customer"
+        }
+      ],
+      "memory_write_attempts": [
+        "user",
+        "assistant"
+      ],
+      "traces": [
+        {
+          "request_id": "c6b28742",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "c6b28742",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": false,
+              "result_success": false,
+              "error_code": "synthetic_execution_failure",
+              "error_type": "action",
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_5d595a3b91814819",
+                "status": "failed",
+                "error_code": "synthetic_execution_failure",
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": null,
+                "reused": false
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": "模拟业务执行失败"
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "completed",
+            "profile_update_status": "scheduled_unobserved",
+            "messages_written": 2,
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    },
+    {
+      "case": "backend_failure_and_memory_failure",
+      "http_statuses": [
+        500
+      ],
+      "responses": [
+        {
+          "body": "Internal Server Error"
+        }
+      ],
+      "backend_executions": 0,
+      "stored_actions": [
+        {
+          "action_id": "act_ce0505908587466f",
+          "action_type": "cancel_order",
+          "user_id": "customer-1",
+          "order_id": "ORD-T09-CANCEL",
+          "amount": "129.90",
+          "policy_decision": {
+            "action": "cancel",
+            "decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权和金额均符合取消条件",
+            "order_id": "ORD-T09-CANCEL",
+            "amount": "129.90",
+            "evaluated_at": "2026-10-02T00:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "failed",
+          "created_at": "2026-10-02T00:00:00Z",
+          "updated_at": "2026-10-02T00:00:00Z",
+          "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+          "request_id": "e57620b8",
+          "error_code": "synthetic_execution_failure",
+          "error_message": "模拟业务执行失败",
+          "execution_result": null,
+          "reviewed_by": null,
+          "requested_by": "test-customer"
+        }
+      ],
+      "memory_write_attempts": [
+        "user"
+      ],
+      "traces": [
+        {
+          "request_id": "e57620b8",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "e57620b8",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": false,
+              "result_success": false,
+              "error_code": "synthetic_execution_failure",
+              "error_type": "action",
+              "retryable": false,
+              "latency_ms": 16.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_ce0505908587466f",
+                "status": "failed",
+                "error_code": "synthetic_execution_failure",
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": null,
+                "reused": false
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": "模拟业务执行失败"
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 16.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "failed",
+            "profile_update_status": "not_scheduled",
+            "messages_written": 0,
+            "write_failed_role": "user",
+            "error_code": "memory_write_failed",
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 16.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    },
+    {
+      "case": "read_failure",
+      "http_statuses": [
+        503
+      ],
+      "responses": [
+        {
+          "detail": {
+            "error_code": "memory_unavailable",
+            "message": "会话记忆暂不可用"
+          }
+        }
+      ],
+      "backend_executions": 0,
+      "stored_actions": [],
+      "memory_write_attempts": [],
+      "traces": []
+    },
+    {
+      "case": "readonly_write_failure",
+      "http_statuses": [
+        500
+      ],
+      "responses": [
+        {
+          "body": "Internal Server Error"
+        }
+      ],
+      "backend_executions": 0,
+      "stored_actions": [],
+      "memory_write_attempts": [
+        "user"
+      ],
+      "traces": [
+        {
+          "request_id": "dd2bfd22",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "get_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "dd2bfd22",
+              "agent_type": "support",
+              "tool_name": "get_order",
+              "risk_level": "read",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-ORDER"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-ORDER"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": null,
+              "business_result": {
+                "order_id": "ORD-T09-ORDER",
+                "status": "shipped",
+                "total_amount": "129.90"
+              },
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "failed",
+            "profile_update_status": "not_scheduled",
+            "messages_written": 0,
+            "write_failed_role": "user",
+            "error_code": "memory_write_failed",
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    },
+    {
+      "case": "retry",
+      "http_statuses": [
+        200,
+        200
+      ],
+      "responses": [
+        {
+          "conv_id": "n05-session",
+          "request_id": "c5c643b4",
+          "response": "已处理",
+          "topology": "single",
+          "intent": null,
+          "intent_group": null,
+          "agent_type": "support",
+          "agent_types": [
+            "support"
+          ],
+          "primary_agent": null,
+          "supporting_agents": null,
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "routing_reason": null,
+          "routing_confidence": null,
+          "escalated": false,
+          "latency_ms": 0.0,
+          "knowledge_used": false,
+          "retrieval_status": null,
+          "citations": [],
+          "entities": {},
+          "intent_confidence": null,
+          "intent_source_scores": null,
+          "model_call_count": 2,
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+          "action_results": [
+            {
+              "success": true,
+              "status": "completed",
+              "action_id": "act_7905244a4c1d4b6f",
+              "action": {
+                "action_id": "act_7905244a4c1d4b6f",
+                "action_type": "cancel_order",
+                "user_id": "customer-1",
+                "order_id": "ORD-T09-CANCEL",
+                "amount": "129.90",
+                "policy_decision": {
+                  "action": "cancel",
+                  "decision": "allow",
+                  "reason_code": "cancel_eligible",
+                  "policy_version": "refund-cancel-v1",
+                  "explanation": "订单状态、所有权和金额均符合取消条件",
+                  "order_id": "ORD-T09-CANCEL",
+                  "amount": "129.90",
+                  "evaluated_at": "2026-10-02T00:00:00Z",
+                  "requires_approval": false,
+                  "metadata": {}
+                },
+                "policy_version": "refund-cancel-v1",
+                "status": "completed",
+                "created_at": "2026-10-02T00:00:00Z",
+                "updated_at": "2026-10-02T00:00:00Z",
+                "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+                "request_id": "c5c643b4",
+                "error_code": null,
+                "error_message": null,
+                "execution_result": {
+                  "simulated": true,
+                  "operation": "cancel",
+                  "order_id": "ORD-T09-CANCEL",
+                  "status": "completed"
+                },
+                "reviewed_by": null,
+                "requested_by": "test-customer"
+              },
+              "error_code": null,
+              "message": null,
+              "reused": false
+            }
+          ],
+          "memory_write_status": "failed",
+          "warning_codes": [
+            "memory_write_failed"
+          ]
+        },
+        {
+          "conv_id": "n05-session",
+          "request_id": "4510095d",
+          "response": "已处理",
+          "topology": "single",
+          "intent": null,
+          "intent_group": null,
+          "agent_type": "support",
+          "agent_types": [
+            "support"
+          ],
+          "primary_agent": null,
+          "supporting_agents": null,
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "routing_reason": null,
+          "routing_confidence": null,
+          "escalated": false,
+          "latency_ms": 0.0,
+          "knowledge_used": false,
+          "retrieval_status": null,
+          "citations": [],
+          "entities": {},
+          "intent_confidence": null,
+          "intent_source_scores": null,
+          "model_call_count": 2,
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+          "action_results": [
+            {
+              "success": true,
+              "status": "completed",
+              "action_id": "act_7905244a4c1d4b6f",
+              "action": {
+                "action_id": "act_7905244a4c1d4b6f",
+                "action_type": "cancel_order",
+                "user_id": "customer-1",
+                "order_id": "ORD-T09-CANCEL",
+                "amount": "129.90",
+                "policy_decision": {
+                  "action": "cancel",
+                  "decision": "allow",
+                  "reason_code": "cancel_eligible",
+                  "policy_version": "refund-cancel-v1",
+                  "explanation": "订单状态、所有权和金额均符合取消条件",
+                  "order_id": "ORD-T09-CANCEL",
+                  "amount": "129.90",
+                  "evaluated_at": "2026-10-02T00:00:00Z",
+                  "requires_approval": false,
+                  "metadata": {}
+                },
+                "policy_version": "refund-cancel-v1",
+                "status": "completed",
+                "created_at": "2026-10-02T00:00:00Z",
+                "updated_at": "2026-10-02T00:00:00Z",
+                "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+                "request_id": "c5c643b4",
+                "error_code": null,
+                "error_message": null,
+                "execution_result": {
+                  "simulated": true,
+                  "operation": "cancel",
+                  "order_id": "ORD-T09-CANCEL",
+                  "status": "completed"
+                },
+                "reviewed_by": null,
+                "requested_by": "test-customer"
+              },
+              "error_code": null,
+              "message": null,
+              "reused": true
+            }
+          ],
+          "memory_write_status": "failed",
+          "warning_codes": [
+            "memory_write_failed"
+          ]
+        }
+      ],
+      "backend_executions": 1,
+      "stored_actions": [
+        {
+          "action_id": "act_7905244a4c1d4b6f",
+          "action_type": "cancel_order",
+          "user_id": "customer-1",
+          "order_id": "ORD-T09-CANCEL",
+          "amount": "129.90",
+          "policy_decision": {
+            "action": "cancel",
+            "decision": "allow",
+            "reason_code": "cancel_eligible",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "订单状态、所有权和金额均符合取消条件",
+            "order_id": "ORD-T09-CANCEL",
+            "amount": "129.90",
+            "evaluated_at": "2026-10-02T00:00:00Z",
+            "requires_approval": false,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "completed",
+          "created_at": "2026-10-02T00:00:00Z",
+          "updated_at": "2026-10-02T00:00:00Z",
+          "idempotency_key": "auto_e6dab441e2e69db76f0422a05e5680e5",
+          "request_id": "c5c643b4",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": {
+            "simulated": true,
+            "operation": "cancel",
+            "order_id": "ORD-T09-CANCEL",
+            "status": "completed"
+          },
+          "reviewed_by": null,
+          "requested_by": "test-customer"
+        }
+      ],
+      "memory_write_attempts": [
+        "user",
+        "assistant",
+        "user",
+        "assistant"
+      ],
+      "traces": [
+        {
+          "request_id": "4510095d",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "4510095d",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_7905244a4c1d4b6f",
+                "status": "completed",
+                "error_code": null,
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": true,
+                "reused": true
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "failed",
+            "profile_update_status": "not_scheduled",
+            "messages_written": 1,
+            "write_failed_role": "assistant",
+            "error_code": "memory_write_failed",
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        },
+        {
+          "request_id": "c5c643b4",
+          "topology": "single",
+          "agent_type": "support",
+          "intent": null,
+          "primary_agent": null,
+          "supporting_agents": null,
+          "routing_reason": null,
+          "routing_confidence": null,
+          "deprecated_fields": [
+            "primary_agent",
+            "supporting_agents",
+            "routing_reason",
+            "routing_confidence"
+          ],
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "tool_calls": [
+            {
+              "request_id": "c5c643b4",
+              "agent_type": "support",
+              "tool_name": "request_cancel_order",
+              "risk_level": "dangerous",
+              "tool_use_id": "t1",
+              "input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "validated_input": {
+                "order_id": "ORD-T09-CANCEL"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0.0,
+              "cached": false,
+              "reranked": false,
+              "retrieval_status": null,
+              "citations": [],
+              "action_result": {
+                "action_id": "act_7905244a4c1d4b6f",
+                "status": "completed",
+                "error_code": null,
+                "policy_decision": "allow",
+                "reason_code": "cancel_eligible",
+                "policy_version": "refund-cancel-v1",
+                "execution_simulated": true,
+                "reused": false
+              },
+              "business_result": null,
+              "retrieval_hits": null,
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "escalated": false,
+          "latency_ms": 0.0,
+          "model_call_count": 2,
+          "model_calls": [
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            },
+            {
+              "stage": "support",
+              "model": "test",
+              "input_tokens": null,
+              "output_tokens": null,
+              "latency_ms": 0.0
+            }
+          ],
+          "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+          "memory": {
+            "read_status": "completed",
+            "read_latency_ms": 0.0,
+            "recent_message_count": 0,
+            "relevant_history_count": 0,
+            "profile_field_count": 0,
+            "summary_present": false,
+            "write_status": "failed",
+            "profile_update_status": "not_scheduled",
+            "messages_written": 1,
+            "write_failed_role": "assistant",
+            "error_code": "memory_write_failed",
+            "write_latency_ms": 0.0
+          },
+          "request_latency_ms": 0.0,
+          "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No live Redis/Chroma acceptance or real model HTTP E2E.",
+    "In-memory ActionStore and bounded Trace; no process restart or multi-worker recovery guarantee."
+  ]
+}

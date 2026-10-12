@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-11T20:36:22+08:00",
+  "updatedAt": "2026-10-12",
   "tasks": {
     "A03-lite": {
       "status": "verify",
@@ -14,10 +14,14 @@
     "A04": {
       "status": "verify",
       "outcome": "fixed",
-      "issue_id": "N01",
-      "issues": { "N01": "fixed", "N05": "known_open", "N04": "known_open" },
-      "evidence": "actions/service.py; tests/test_action_service.py; docs/hardening/A04-actions-idempotency.md",
-      "note": "2026-10-11 A04/N01=fixed，verify待用户验收，仅N01。起始HEAD=09efd3443d2e7b6e03fba7d13fe660c483b30583；执行期间外部提交整理内容，当前HEAD=e097ca871bcf07373b8bcf34dccd1e7b411c1657（19:51:18），本助手未提交。两个HEAD的业务代码/测试/uv.lock无变化，pyproject仅此前cache-dir配置；最终专项和完整回归在此提交后运行。既有改动保留，当前未提交仅本轮5文件。内部key命中先检查主体，Provider检查订单归属，_reuse_action比较action/user/order/有效Decimal amount；异参返回idempotency_conflict且不包含旧动作，跨用户不返回原结果；派生key规范化金额；拒绝重试不覆盖原绑定。原锁/ActionStore/Policy/HITL保持。修复前新增10例红测7 failed/3 passed/17 deselected；初修4 failed/23 passed是测试误用get_action，改为现有get；最终专项31 passed（新增14例），完整pytest164 passed/2 skipped/1既有AnyIO警告；uv lock --check 53 packages、git diff --check通过。8线程同一Service并发只执行1次；测试为内存fixture/模拟backend，live Redis/Chroma及真实模型E2E未跑。backend_executions=1不证明参数绑定或身份/数据安全。内存Store跨进程/重启、外部执行落库原子性仍不保证；Demo user_id非认证，N02/N03未改，N05/N04仍known_open。原审查脚本/JSON哈希不变；不更新历史T09–T12。README/核心Wiki无新架构漂移；只更新Workbench/progress并新增技术笔记。独立练习：批准600元待审批动作后同key/600.00重试断言原action_id、completed、reused及单次执行，再599冲突。未提交/推送，完成停止。"
+      "issue_id": "N05",
+      "issues": {
+        "N01": "fixed",
+        "N05": "fixed",
+        "N04": "known_open"
+      },
+      "evidence": "actions/service.py; tests/test_action_service.py; docs/hardening/A04-actions-idempotency.md; api/main.py; agents/agent_orchestrator.py; tests/test_action_memory_consistency.py; docs/engineering/N05-action-memory-consistency.md; docs/engineering/N05-action-memory-observations.json",
+      "note": "2026-10-11 A04/N01=fixed，verify待用户验收，仅N01。起始HEAD=09efd3443d2e7b6e03fba7d13fe660c483b30583；执行期间外部提交整理内容，当前HEAD=e097ca871bcf07373b8bcf34dccd1e7b411c1657（19:51:18），本助手未提交。两个HEAD的业务代码/测试/uv.lock无变化，pyproject仅此前cache-dir配置；最终专项和完整回归在此提交后运行。既有改动保留，当前未提交仅本轮5文件。内部key命中先检查主体，Provider检查订单归属，_reuse_action比较action/user/order/有效Decimal amount；异参返回idempotency_conflict且不包含旧动作，跨用户不返回原结果；派生key规范化金额；拒绝重试不覆盖原绑定。原锁/ActionStore/Policy/HITL保持。修复前新增10例红测7 failed/3 passed/17 deselected；初修4 failed/23 passed是测试误用get_action，改为现有get；最终专项31 passed（新增14例），完整pytest164 passed/2 skipped/1既有AnyIO警告；uv lock --check 53 packages、git diff --check通过。8线程同一Service并发只执行1次；测试为内存fixture/模拟backend，live Redis/Chroma及真实模型E2E未跑。backend_executions=1不证明参数绑定或身份/数据安全。内存Store跨进程/重启、外部执行落库原子性仍不保证；Demo user_id非认证，N02/N03未改，N05/N04仍known_open。原审查脚本/JSON哈希不变；不更新历史T09–T12。README/核心Wiki无新架构漂移；只更新Workbench/progress并新增技术笔记。独立练习：批准600元待审批动作后同key/600.00重试断言原action_id、completed、reused及单次执行，再599冲突。未提交/推送，完成停止。\n2026-10-12 A04/N05=fixed，verify待用户验收。本轮仅N05；起始HEAD=001919c15a34923c239db52ab25b6ca1aaba9523，工作区干净，保留N01/N02/N03。复用审查ACTION_SUCCESS_MEMORY_FAILURE，旧脚本/JSON只读；红测7 failed/10 passed，其中6项HTTP500及1项新字段缺失。API经本请求危险工具Trace和Principal/owner ActionService.get确认动作，completed+执行回执才允许后续Memory写入失败返回200及action_results/memory_write_status/warning_codes；未确认、失败、待审批及只读写入故障仍500，读取Redis故障仍503且不执行。Trace记录固定错误码/失败角色/成功返回调用数，写失败不调度画像；深复制回执并保留reused。专项22 passed；Action31；Memory7 passed/1 skipped；N01/N02/N03安全80；完整235 passed/2 skipped/既有AnyIO警告；uv lock --check 53 packages及diff通过。Windows/Python3.12.3/uv0.12.19，Fake SDK+隔离模拟backend；8组新原始观察保存工程JSON，未跑真实模型/支付/live服务验收。API契约README/核心重点代码已同步，历史T01–T12不变。内存Store/Trace仍不保证跨进程、重启或外部执行状态不确定窗口恢复；不自动重执行/补写，不引入Outbox/队列。N04/N06/N10未执行，N04保留known_open。独立练习：写入完成后再抛RedisError，验证HTTP200/真实回执/单次执行，并解释写入计数非原子持久化保证。最终复跑仍235 passed/2 skipped，额外出现沙箱pytest stepwise缓存Permission denied警告，不影响断言结果；未提交推送，完成停止。"
     },
     "A00-lite": {
       "status": "verify",

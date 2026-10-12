@@ -338,6 +338,7 @@ class BaseAgent:
                         "reason_code": policy.get("reason_code"),
                         "policy_version": action.get("policy_version"),
                         "execution_simulated": execution_result.get("simulated"),
+                        "reused": bool(result.get("reused")),
                     }
                 business_result = None
                 if isinstance(result, dict) and result.get("source") == "business_provider" and isinstance(result.get("data"), dict):
