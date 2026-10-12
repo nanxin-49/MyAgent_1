@@ -1,0 +1,33 @@
+{
+  "version": "a05-p2-gate-freeze-v1",
+  "created_at_utc": "2026-10-12T08:22:54.193688+00:00",
+  "head": "aba22b2514cf4dd7668c12ed620972ebc708e253",
+  "human_review_status": "pending",
+  "formal_experiment_status": "blocked",
+  "preserved_original_sha256": {
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028",
+    "freeze_v1.json": "4af4ba4e79ee4483189d8fdbc13b3c37d0fa55c4e15940c255507204b61c5a77",
+    "run_baseline.py": "005ea4d6f64c4369b9173e405b2027fb380b0f8e2644475edf45217063d0d76c"
+  },
+  "p1_report_sha256": {
+    "chunks.json": "a10d3bc9dfe3199cc0d0db622705d014b46be5354d2c6c5b333cb8bd666a8688",
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028",
+    "freeze_v1.json": "4af4ba4e79ee4483189d8fdbc13b3c37d0fa55c4e15940c255507204b61c5a77",
+    "manifest.json": "43cf295988da7648837996e38ee4c90e08bcc334f1e7c65ddcbbef30905c817d",
+    "observations.json": "83c7b083a732e50575ced1e494804b42e4cfe22badaf81b9f4b6193b13f2986a",
+    "report.md": "af99ecbca7b0368de07100e2b6a1ec24e432800e04ad6ff8b919e7229417632e",
+    "summary.json": "df672647d0fb347294958e2360555cea64fb2cd3323077f3acc273328df5073c",
+    "validation.json": "a87574585ece1fe3811503486a80d6500297cf50961298abc2d15ee18a203ae3"
+  },
+  "gate_inputs_sha256": {
+    "dev_dataset_v1.json": "b45de66c9e1cb23baaf47d870d5aa78569f0fe28f4db997e6654dac8d5c9dbc2",
+    "gold_review_notes_v1.json": "a0343e68d75bc19b99b12e8c2b7bfd0be8e6d6fe901167b31befb44e896c9541",
+    "gold_review_v1.md": "a80610723c94d9a08847971908266e0e20cc6a20afed019a737d92287f0c2cfe",
+    "model_resources_v1.json": "736bae27d4239ed4b70d61ae5d4f785493130dcf35db30a107d478f01b0f55a3",
+    "p2_experiment_protocol.md": "fb97ccaa891c29dfb9a8c7cf5c96c89160c9b57ef8671bf8983b12ae794d3556",
+    "prepare_gate.py": "0c7fe8976cd9260c8d1a50f0c4f748cf3d9f518fad51c57a8a95dfb217163fcb",
+    "gate_checks_v1.json": "59e5e8f46ee4a2be438930915e9201127b573b810a1e0c3392e91a4de1fb1508"
+  }
+}

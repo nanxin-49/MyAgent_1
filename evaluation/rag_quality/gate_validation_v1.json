@@ -1,0 +1,66 @@
+{
+  "date_utc": "2026-10-12T08:25:54.909293+00:00",
+  "head": "aba22b2514cf4dd7668c12ed620972ebc708e253",
+  "scope": "A05-P2-GATE only; no embedding/model execution, no Chroma calls, no dependency installation or weight downloads",
+  "checks": [
+    {
+      "command": "uv run python -m evaluation.rag_quality.prepare_gate",
+      "status": "passed",
+      "review_counts": {
+        "reasonable": 19,
+        "human_judgment_needed": 10,
+        "suspected_error": 1
+      },
+      "dev_answerable": 8,
+      "dev_no_answer": 8,
+      "dev_test_pairs": 256,
+      "exact_duplicates": 0,
+      "high_lexical_similarity_flags": 0,
+      "human_review_status": "pending"
+    },
+    {
+      "command": "uv run python -m pytest -q -o cache_dir=.pytest-cache-a05-gate tests/test_rag_quality_gate.py tests/test_rag_quality_baseline.py",
+      "passed": 39,
+      "failed": 0,
+      "skipped": 0,
+      "stdout_summary": "39 passed in 1.18s"
+    },
+    {
+      "command": "uv run python -m pytest -q",
+      "passed": 421,
+      "failed": 0,
+      "skipped": 3,
+      "warnings": 2,
+      "stdout_summary": "421 passed, 3 skipped, 2 warnings in 6.98s",
+      "skip_reasons": [
+        "live Memory Redis/Chroma opt-in",
+        "two Chroma HTTP integration opt-ins"
+      ],
+      "warning_reasons": [
+        "existing AnyIO BlockingPortal alias deprecated",
+        "local cash/cache/pytest stepwise Permission denied; assertions passed"
+      ]
+    },
+    {
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "packages": 53
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "original_freeze_and_p1_reports_unchanged": true,
+  "gate_inputs_match_lock": true,
+  "official_metadata_queries_only": true,
+  "source_and_dependency_version_snapshots": "model_resources_v1.json",
+  "formal_experiment_status": "blocked",
+  "blockers": [
+    "Gold/dev human acceptance pending",
+    "download/install/compute authorization pending",
+    "isolated dependency resolution and model smoke not done",
+    "available RAM below provisional engineering budget; peak RSS unmeasured"
+  ],
+  "commit_or_push": false
+}

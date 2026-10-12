@@ -1,0 +1,264 @@
+{
+  "scope": "Offline gate preparation only; no model or retrieval calls",
+  "frozen_hashes": {
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v1.json": "e9442c1d8dc6b67784296c94f4ba49619991d7aeb6c0216ff51cd1253413c028"
+  },
+  "freeze_file_sha256": "4af4ba4e79ee4483189d8fdbc13b3c37d0fa55c4e15940c255507204b61c5a77",
+  "p1_observations_sha256": "83c7b083a732e50575ced1e494804b42e4cfe22badaf81b9f4b6193b13f2986a",
+  "review_counts": {
+    "需人工判断": 10,
+    "合理": 19,
+    "疑似错误": 1
+  },
+  "human_review_status": "pending",
+  "dev_counts": {
+    "answerable": 8,
+    "no_answer": 8
+  },
+  "leakage": {
+    "rules": {
+      "normalization": "lowercase + alnum",
+      "sequence_ratio_flag": 0.75,
+      "bigram_jaccard_flag": 0.6
+    },
+    "exact_duplicates": [],
+    "high_similarity_flags": [],
+    "nearest_test_query": [
+      {
+        "dev_id": "DEV-01",
+        "test_id": "A05-26",
+        "sequence_ratio": 0.15,
+        "bigram_jaccard": 0.027777777777777776
+      },
+      {
+        "dev_id": "DEV-02",
+        "test_id": "A05-04",
+        "sequence_ratio": 0.17391304347826086,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-03",
+        "test_id": "A05-03",
+        "sequence_ratio": 0.18181818181818182,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-04",
+        "test_id": "A05-23",
+        "sequence_ratio": 0.12903225806451613,
+        "bigram_jaccard": 0.03571428571428571
+      },
+      {
+        "dev_id": "DEV-05",
+        "test_id": "A05-13",
+        "sequence_ratio": 0.43243243243243246,
+        "bigram_jaccard": 0.19230769230769232
+      },
+      {
+        "dev_id": "DEV-06",
+        "test_id": "A05-22",
+        "sequence_ratio": 0.11764705882352941,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-07",
+        "test_id": "A05-04",
+        "sequence_ratio": 0.15789473684210525,
+        "bigram_jaccard": 0.029411764705882353
+      },
+      {
+        "dev_id": "DEV-08",
+        "test_id": "A05-18",
+        "sequence_ratio": 0.21052631578947367,
+        "bigram_jaccard": 0.058823529411764705
+      },
+      {
+        "dev_id": "DEV-09",
+        "test_id": "A05-04",
+        "sequence_ratio": 0.20689655172413793,
+        "bigram_jaccard": 0.038461538461538464
+      },
+      {
+        "dev_id": "DEV-10",
+        "test_id": "A05-24",
+        "sequence_ratio": 0.3333333333333333,
+        "bigram_jaccard": 0.1
+      },
+      {
+        "dev_id": "DEV-11",
+        "test_id": "A05-02",
+        "sequence_ratio": 0.15384615384615385,
+        "bigram_jaccard": 0.027777777777777776
+      },
+      {
+        "dev_id": "DEV-12",
+        "test_id": "A05-06",
+        "sequence_ratio": 0.21428571428571427,
+        "bigram_jaccard": 0.04
+      },
+      {
+        "dev_id": "DEV-13",
+        "test_id": "A05-27",
+        "sequence_ratio": 0.15789473684210525,
+        "bigram_jaccard": 0.02857142857142857
+      },
+      {
+        "dev_id": "DEV-14",
+        "test_id": "A05-12",
+        "sequence_ratio": 0.24390243902439024,
+        "bigram_jaccard": 0.08333333333333333
+      },
+      {
+        "dev_id": "DEV-15",
+        "test_id": "A05-13",
+        "sequence_ratio": 0.15789473684210525,
+        "bigram_jaccard": 0.0
+      },
+      {
+        "dev_id": "DEV-16",
+        "test_id": "A05-26",
+        "sequence_ratio": 0.37209302325581395,
+        "bigram_jaccard": 0.17647058823529413
+      }
+    ],
+    "semantic_review": "Author checked requested attributes and ambiguity; independent human review pending",
+    "limitation": "No semantic model used; lexical checks cannot prove absence of semantic leakage. Shared corpus/themes limit generalization."
+  },
+  "p1_verification": {
+    "1": {
+      "raw_gold_cases": [
+        "A05-02",
+        "A05-03",
+        "A05-04",
+        "A05-07",
+        "A05-08",
+        "A05-09",
+        "A05-10",
+        "A05-11",
+        "A05-12",
+        "A05-13",
+        "A05-14",
+        "A05-15",
+        "A05-16",
+        "A05-17",
+        "A05-18",
+        "A05-24",
+        "A05-25",
+        "A05-26"
+      ],
+      "final_gold_cases": [
+        "A05-11",
+        "A05-16",
+        "A05-18",
+        "A05-24",
+        "A05-25",
+        "A05-26"
+      ],
+      "not_recalled": [
+        "A05-01",
+        "A05-05",
+        "A05-06"
+      ],
+      "below_threshold": [
+        "A05-02",
+        "A05-03",
+        "A05-04",
+        "A05-07",
+        "A05-08",
+        "A05-09",
+        "A05-10",
+        "A05-12",
+        "A05-13",
+        "A05-14",
+        "A05-15",
+        "A05-17"
+      ],
+      "theme_without_requested_fact": [
+        "A05-19",
+        "A05-20",
+        "A05-21",
+        "A05-23"
+      ],
+      "counts": [
+        18,
+        6,
+        3,
+        12,
+        4
+      ],
+      "denominators": {
+        "answerable": 21,
+        "no_answer": 9
+      }
+    },
+    "2": {
+      "raw_gold_cases": [
+        "A05-02",
+        "A05-03",
+        "A05-04",
+        "A05-07",
+        "A05-08",
+        "A05-09",
+        "A05-10",
+        "A05-11",
+        "A05-12",
+        "A05-13",
+        "A05-14",
+        "A05-15",
+        "A05-16",
+        "A05-17",
+        "A05-18",
+        "A05-24",
+        "A05-25",
+        "A05-26"
+      ],
+      "final_gold_cases": [
+        "A05-11",
+        "A05-16",
+        "A05-18",
+        "A05-24",
+        "A05-25",
+        "A05-26"
+      ],
+      "not_recalled": [
+        "A05-01",
+        "A05-05",
+        "A05-06"
+      ],
+      "below_threshold": [
+        "A05-02",
+        "A05-03",
+        "A05-04",
+        "A05-07",
+        "A05-08",
+        "A05-09",
+        "A05-10",
+        "A05-12",
+        "A05-13",
+        "A05-14",
+        "A05-15",
+        "A05-17"
+      ],
+      "theme_without_requested_fact": [
+        "A05-19",
+        "A05-20",
+        "A05-21",
+        "A05-23"
+      ],
+      "counts": [
+        18,
+        6,
+        3,
+        12,
+        4
+      ],
+      "denominators": {
+        "answerable": 21,
+        "no_answer": 9
+      }
+    }
+  },
+  "dev_sha256": "b45de66c9e1cb23baaf47d870d5aa78569f0fe28f4db997e6654dac8d5c9dbc2",
+  "notes_sha256": "a0343e68d75bc19b99b12e8c2b7bfd0be8e6d6fe901167b31befb44e896c9541"
+}

@@ -1,0 +1,320 @@
+{
+  "version": "a05-gold-review-assistance-v1",
+  "dataset_version": "a05-dataset-v1",
+  "human_review_status": "pending",
+  "reviewer_type": "author-assisted semantic review, not independent human validation",
+  "recommendation": "Propose v2 after user resolves A05-05 ambiguity and A05-02 alternative-source scope; do not modify v1. A05-19/20 and 27-30 require scope decisions.",
+  "cases": [
+    {
+      "case_id": "A05-01",
+      "recommendation": "需人工判断",
+      "reasoning": "“买完”可能指付款，而正文期限从订单创建起算；若接受口语映射则7天证据足够，不能把起算点改成付款。",
+      "proposed_revision": "建议v2明确订单创建后申请退款的期限；或用户接受当前口语映射。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-02",
+      "recommendation": "需人工判断",
+      "reasoning": "账户指南提供手机/邮箱重置；技术指南也建议认证失败时尝试重置密码。宽泛“找回账户”可能允许后者作为部分有效来源，现有单Gold可能过窄。",
+      "proposed_revision": "建议v2明确要问绑定手机/邮箱的找回方式，或改为多Gold并重新定义Recall。",
+      "alternative_document_indices": [
+        3
+      ],
+      "additional_evidence": [
+        {
+          "document_index": 3,
+          "quote": "或尝试重置密码"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-03",
+      "recommendation": "需人工判断",
+      "reasoning": "“收到货的进展”表达不自然，可能指配送进度，也可能是签收后流程。订单状态指南只能支持按订单号查状态。",
+      "proposed_revision": "建议v2明确“配送/订单状态在哪里查”，不要默认解释签收后流程。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-04",
+      "recommendation": "合理",
+      "reasoning": "普通送货可合理对应标准配送，正文明确3-5个工作日；不能把工作日转换为自然日。",
+      "proposed_revision": "保留；审核时确认普通=标准配送的演示语义。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-05",
+      "recommendation": "疑似错误",
+      "reasoning": "“急着拿到”“快送”未明确加急或同城，两者均满足快速需求且价格分别15元/10元。单独指定加急15元的Gold事实可能过窄；同一Gold chunk含两种方案不等于问题没有歧义。",
+      "proposed_revision": "建议v2明确“加急配送收费”，或把答案定义成需澄清/比较两种方案并补齐证据。",
+      "alternative_document_indices": [],
+      "additional_evidence": [
+        {
+          "document_index": 5,
+          "quote": "同城配送：当日达或次日达，运费 10 元"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-06",
+      "recommendation": "合理",
+      "reasoning": "积分折成钱由100积分=1元直接支持，且正文说明下次购物抵扣；不是现金提现。",
+      "proposed_revision": "保留，并禁止把抵扣说成提现。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-07",
+      "recommendation": "合理",
+      "reasoning": "“闪退”与应用崩溃的处理对应，清缓存重启是第一步；如果持续还需要更新。",
+      "proposed_revision": "保留，完整chunk还提供持续故障处理。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-08",
+      "recommendation": "合理",
+      "reasoning": "二次确认可对应两步验证，账户正文明确可开启；未涉及关闭或客服权限。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-09",
+      "recommendation": "合理",
+      "reasoning": "生日当月消费双倍积分与问题直接对应，不需要动态订单数据。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-10",
+      "recommendation": "合理",
+      "reasoning": "退款数额大时谁同意由超过500元需人工审批直接支持；“大”在回答中需明确阈值。",
+      "proposed_revision": "保留；不能泛化为所有退款都审批。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-11",
+      "recommendation": "合理",
+      "reasoning": "密码最低长度8位直接给出；其他字母数字条件在同chunk，可附带但非本题必要。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-12",
+      "recommendation": "需人工判断",
+      "reasoning": "同一chunk确实含401认证失败与500服务端问题；原Gold连续长引文混入页面/支付无关事实，但两项目标事实均存在。不是缺失Gold，需确认“原因”仅要求文档解释而非具体根因。",
+      "proposed_revision": "可接受v1；若v2，改为两个准确短证据跨度，或将问题写为两种错误各表示什么。",
+      "alternative_document_indices": [],
+      "additional_evidence": [
+        {
+          "document_index": 3,
+          "quote": "登录失败 401 错误：表示认证失败"
+        },
+        {
+          "document_index": 3,
+          "quote": "500 服务器错误：这是服务端问题"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-13",
+      "recommendation": "合理",
+      "reasoning": "银卡1000元、金卡5000元累计消费同时在原Gold，引文支持两个门槛。",
+      "proposed_revision": "保留；这是累计消费而非会费。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-14",
+      "recommendation": "合理",
+      "reasoning": "明确问免运费且否定退款金额，配送99元足够；退款500元只是干扰事实，不能作为替代答案。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-15",
+      "recommendation": "合理",
+      "reasoning": "24小时是发货后物流信息更新，不是送达时长；指南精确区分。",
+      "proposed_revision": "保留，回答保留“通常/发货后”限定。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-16",
+      "recommendation": "合理",
+      "reasoning": "这是要求否定“无事实保证成功”的问题；正文明确是否可执行由实时订单事实与PolicyEngine决定，直接支持否定回答。answerable=true合理，和缺具体到账数字的19题不同。",
+      "proposed_revision": "保留；证据只能说明规则边界，不证明任何实际订单已退款。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-17",
+      "recommendation": "合理",
+      "reasoning": "积分有效期1年直接支持；退款7天是另一主题，不能成为积分有效期的替代Gold。",
+      "proposed_revision": "保留，正文也写过期清零。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-18",
+      "recommendation": "合理",
+      "reasoning": "已发货超过7天未收到时申请查件在指南直接出现，不代表承诺赔偿或退款。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-19",
+      "recommendation": "需人工判断",
+      "reasoning": "正文明确不代表支付渠道处理时效，无法给出所问工作日数；若answerable要求具体事实，则false合理。若允许“文档未规定”作为答案，应另设可回答拒绝/说明类型，不能悄改二元分母。",
+      "proposed_revision": "用户确认answerable的操作定义；建议保持“所问事实是否存在”的口径。",
+      "alternative_document_indices": [],
+      "additional_evidence": [
+        {
+          "document_index": 0,
+          "quote": "此文档不代表真实商城承诺或支付渠道处理时效"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-20",
+      "recommendation": "需人工判断",
+      "reasoning": "正文只说明开启两步验证，无客服关闭权限。不能推断客服能或不能关闭；以所问权限事实是否存在为标准则无答案。",
+      "proposed_revision": "用户确认未知权限与明确禁止的区别；不要把未知写成禁止。",
+      "alternative_document_indices": [],
+      "additional_evidence": [
+        {
+          "document_index": 2,
+          "quote": "用户可以在安全设置中开启两步验证，提高账户安全性"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-21",
+      "recommendation": "合理",
+      "reasoning": "具体订单位置属于动态事实；指南只有按订单号查询的方法，没有ORD-999记录，不能用静态指南回答今天的位置。",
+      "proposed_revision": "保留。Agent未来可能调用Provider，但本检索实验无答案。",
+      "alternative_document_indices": [],
+      "additional_evidence": [
+        {
+          "document_index": 1,
+          "quote": "用户可以通过订单号查询订单状态"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-22",
+      "recommendation": "合理",
+      "reasoning": "所有冻结有效文档均无苹果电池官方保修政策，撤销的虚构延保也不属于该产品。",
+      "proposed_revision": "保留；不从通用常识补Gold。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-23",
+      "recommendation": "合理",
+      "reasoning": "会员资料只有累计消费门槛/折扣/积分，没有金卡年费；门槛不等于会费。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [
+        {
+          "document_index": 4,
+          "quote": "金卡会员（累计消费 5000 元）"
+        }
+      ],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-24",
+      "recommendation": "合理",
+      "reasoning": "demo-v2当前有效且ready，21天直接支持。v1已被替代，v3尚未生效，不能混入14/45天。",
+      "proposed_revision": "保留隔离演示标记，不当作真实退款规则。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-25",
+      "recommendation": "合理",
+      "reasoning": "有效demo-v2明确必须完整包装，旧/未来文档不提供另一有效答案。",
+      "proposed_revision": "保留。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-26",
+      "recommendation": "合理",
+      "reasoning": "有效demo-v2每笔订单最多一次，直接支持次数问题。",
+      "proposed_revision": "保留；没有业务执行成功含义。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-27",
+      "recommendation": "需人工判断",
+      "reasoning": "demo-v1的地址确实在冻结物理语料，但v2生效后v1被supersedes退役。当前有效证据范围内无答案；若用户期望查询历史版本，其false标签将不合理。",
+      "proposed_revision": "用户确认本测试只允许现行证据；v2可在题目显式写“仅用当前有效知识”，或另建历史查询测试。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-28",
+      "recommendation": "需人工判断",
+      "reasoning": "demo-v3承运人事实存在，但11月1日才生效。10月12日当前有效证据范围不允许引用；未来版本说明与现行答复是不同任务。",
+      "proposed_revision": "确认当前有效范围；v2可显式强调当前时点，而非用未来计划解释为已生效。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-29",
+      "recommendation": "需人工判断",
+      "reasoning": "优惠券口令确实在物理语料，9月1日已过期。无答案来自当前有效范围，不是正文没有该事实。",
+      "proposed_revision": "确认过期资料不可用作本实验答案；如要历史说明需新实验口径。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    },
+    {
+      "case_id": "A05-30",
+      "recommendation": "需人工判断",
+      "reasoning": "延保赠品确实在物理语料，但publication_status=revoked。无答案标签依赖当前有效证据范围。",
+      "proposed_revision": "确认撤销内容只用于负向过滤验证，不允许历史证据答复。",
+      "alternative_document_indices": [],
+      "additional_evidence": [],
+      "human_decision": "pending"
+    }
+  ]
+}
