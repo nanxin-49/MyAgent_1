@@ -66,9 +66,9 @@ Trace、Knowledge 添加/上传/统计、Skills 查询/reload、Eval、Monitor�
 
 ## RAG
 
-知识文档要求 source / document_id / doc_type；政策还要求 policy_version / effective_at。外部 Chroma Server 是唯一存储路径，连接失败不会切换到嵌入式数据库。字符 n-gram lexical embedding 是演示基线，`1 - Chroma distance` 的 0.35 阈值仍待更广泛校准。
+知识文档要求 source / document_id / doc_type；政策还要求 policy_version / effective_at。同 document_id/version 修订会完整替换旧片段；跨版本替代必须显式声明 `supersedes`（同文档前驱版本），并受 `effective_at` / 可选 `expires_at` / `publication_status=active|revoked` 约束。新 citation 增加 content_hash，reference 附实际 chunk hash。发布失败返回固定 503，不把部分写入作为成功；Chroma 非事务、逐文档发布。旧无发布记录数据不作为当前依据，需从可信源审核重发布，不能自动按版本字符串迁移。详细接口、恢复及旧数据限制见 [N06 技术说明](docs/engineering/N06-knowledge-version-consistency.md)。外部 Chroma Server 是唯一存储路径，连接失败不会切换到嵌入式数据库。字符 n-gram lexical embedding 是演示基线，`1 - Chroma distance` 的 0.35 阈值仍待更广泛校准。
 
-只有 `usable` 命中可展示可靠 citation；`low_confidence`、`no_answer`、`degraded` 和未检索分别显示。引用证明检索来源，不等于逐句事实核验。文档标题通过 Trace 的 retrieval_hits 关联 citation，未观测时明确标示。缓存、改写、重排、熔断和 fallback 留在现有 RAG 层。
+只有 `usable` 命中可展示可靠 citation；`low_confidence`、`no_answer`、`degraded` 和未检索分别显示。引用证明检索来源，不等于逐句事实核验。文档标题通过 Trace 的 retrieval_hits 关联 citation，未观测时明确标示。改写、重排、熔断和 fallback 留在现有 RAG 层；KnowledgeBase 命中禁用结果缓存并在重排后复核当前版本，普通工具缓存保留。
 
 ## Memory
 

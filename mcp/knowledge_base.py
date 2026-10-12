@@ -16,11 +16,14 @@ import hashlib
 import logging
 import os
 import math
+import json
+import threading
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import chromadb
 from .knowledge_embeddings import EMBEDDING_VERSION, embed_document, embed_query
-from .rag_contract import KnowledgeDocument, build_hit
+from .rag_contract import KnowledgeDocument, ChunkMetadata, build_hit
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +35,8 @@ class KnowledgeBase:
     HTTP thin client 不提供默认 embedding function。演示知识库使用明确的
     字符 n-gram 向量基线，导入与查询使用同一版本；Chroma 只负责向量存取。
     """
+
+    _publication_lock = threading.RLock()  # Single-process serialization; not a distributed lock.
 
     COLLECTION_NAME = "cartcare_demo_knowledge_chargram_v1"
     DEFAULT_MIN_SCORE = 0.35  # Heuristic for 1 - Chroma distance; not a calibrated probability.
@@ -84,48 +89,167 @@ class KnowledgeBase:
 
     # ── 文档管理 ──────────────────────────────────────────────────────────────
 
-    def add_documents(self, documents: List[Dict[str, Any]]) -> int:
-        """
-        批量导入文档到知识库。
+    @staticmethod
+    def _key(doc):
+        return "publication_" + hashlib.sha256(
+            f"{doc.document_id}\0{doc.policy_version or ''}".encode()).hexdigest()
 
-        documents require title, content and source; policy documents also
-        require policy_version and timezone-aware effective_at.
-        长文档会自动切片（每片 500 字）。
+    def _snapshot(self):
+        result = self._collection.get(include=["documents", "metadatas"])
+        return dict(zip(result["ids"], zip(result["documents"], result["metadatas"])))
+
+    def _publications(self, rows):
+        publications = {}
+        for key, (text, meta) in rows.items():
+            if meta.get("record_type") != "publication":
+                continue
+            payload = json.loads(text)
+            doc = KnowledgeDocument.model_validate(payload["document"])
+            if key != self._key(doc) or payload["state"] not in {"publishing", "ready"}:
+                raise RuntimeError("invalid knowledge publication record")
+            if payload["revision"] != hashlib.sha256(doc.model_dump_json().encode()).hexdigest():
+                raise RuntimeError("invalid knowledge publication revision")
+            publications[key] = (doc, payload)
+        return publications
+
+    def add_documents(self, documents: List[Dict[str, Any]]) -> int:
+        """Replace an exact document/version. A failed publication stays unavailable.
+
+        Batch members commit individually; Chroma does not provide a transaction.
+        Retry the identical request to recover a publishing record.
         """
         validated = [KnowledgeDocument.model_validate(doc) for doc in documents]
-        ids, docs, metas = [], [], []
+        if len({self._key(doc) for doc in validated}) != len(validated):
+            raise ValueError("duplicate document/version in batch")
+        with self._publication_lock:
+            count = 0
+            for doc in validated:
+                count += self._publish(doc)
+            return count
 
-        for doc in validated:
-            chunks = self._chunk_text(doc.content, chunk_size=500)
-
-            for i, chunk in enumerate(chunks):
-                chunk_id = hashlib.sha256(
-                    f"{doc.document_id}\0{doc.policy_version}\0{i}\0{chunk}".encode("utf-8")
-                ).hexdigest()
-                ids.append(chunk_id)
-                docs.append(chunk)
-                meta = {
-                    "document_id": doc.document_id,
-                    "title": doc.title,
-                    "source": doc.source,
-                    "doc_type": doc.doc_type.value,
-                    "chunk_index": i,
-                    "total_chunks": len(chunks),
-                }
-                if doc.policy_version is not None:
-                    meta["policy_version"] = doc.policy_version
-                if doc.effective_at is not None:
-                    meta["effective_at"] = doc.effective_at.isoformat()
-                metas.append(meta)
-
-        if ids:
-            embeddings = [embed_document(meta["title"], content)
-                          for meta, content in zip(metas, docs)]
-            self._collection.upsert(ids=ids, documents=docs, metadatas=metas,
-                                    embeddings=embeddings)
-            logger.info(f"知识库导入 {len(ids)} 个文档片段")
-
+    def _publish(self, doc):
+        rows = self._snapshot()
+        publications = self._publications(rows)
+        if any(meta.get("document_id") == doc.document_id
+               and (meta.get("source") != doc.source or meta.get("doc_type") != doc.doc_type.value)
+               for _, meta in rows.values() if meta.get("record_type") != "publication"):
+            raise ValueError("document_id is already bound to a different source/type")
+        key = self._key(doc)
+        previous = publications.get(key)
+        if previous:
+            old, _ = previous
+            # Retirement edges and their activation date must survive retries/edits.
+            if (old.source != doc.source or old.doc_type != doc.doc_type
+                    or old.supersedes != doc.supersedes or old.effective_at != doc.effective_at
+                    or (old.expires_at is not None and (doc.expires_at is None or doc.expires_at > old.expires_at))
+                    or (old.publication_status == "revoked" and doc.publication_status != "revoked")):
+                raise ValueError("publication identity/lifecycle is immutable; use a new version")
+        for version in doc.supersedes:
+            predecessor = next((d for d, _ in publications.values()
+                                if d.document_id == doc.document_id and d.policy_version == version), None)
+            if predecessor is None or predecessor.source != doc.source or predecessor.doc_type != doc.doc_type:
+                raise ValueError("supersedes must name an existing policy in the same document/source")
+            if predecessor.effective_at > doc.effective_at:
+                raise ValueError("successor cannot become effective before predecessor")
+            stack, seen = [predecessor], set()
+            while stack:
+                current = stack.pop()
+                if current.policy_version == doc.policy_version:
+                    raise ValueError("cyclic supersedes relation")
+                if current.policy_version in seen:
+                    continue
+                seen.add(current.policy_version)
+                stack.extend(d for d, _ in publications.values()
+                             if d.document_id == doc.document_id and d.policy_version in current.supersedes)
+        chunks = self._chunk_text(doc.content, chunk_size=500)
+        revision = hashlib.sha256(doc.model_dump_json().encode()).hexdigest()
+        ids = [hashlib.sha256(f"{key}\0{revision}\0{i}".encode()).hexdigest()
+               for i in range(len(chunks))]
+        metas = []
+        for i, chunk in enumerate(chunks):
+            meta = {"record_type": "chunk", "publication_id": key, "revision": revision,
+                    "chunk_id": ids[i], "content_hash": hashlib.sha256(chunk.encode()).hexdigest(),
+                    "document_id": doc.document_id, "title": doc.title, "source": doc.source,
+                    "doc_type": doc.doc_type.value, "chunk_index": i, "total_chunks": len(chunks),
+                    "publication_status": doc.publication_status}
+            for field in ("policy_version", "effective_at", "expires_at"):
+                value = getattr(doc, field)
+                if value is not None:
+                    meta[field] = value.isoformat() if isinstance(value, datetime) else value
+            metas.append(meta)
+        payload = {"document": doc.model_dump(mode="json"), "revision": revision,
+                   "chunk_ids": ids, "state": "publishing"}
+        def write_manifest():
+            self._collection.upsert(ids=[key], documents=[json.dumps(payload, sort_keys=True)],
+                                    metadatas=[{"record_type": "publication", "source": doc.source}],
+                                    embeddings=[embed_document("publication", key)])
+        # Disable old content BEFORE any chunk mutation. If this fails, no chunk is touched.
+        write_manifest()
+        if self._snapshot().get(key, (None,))[0] != json.dumps(payload, sort_keys=True):
+            raise RuntimeError("knowledge publication begin unconfirmed")
+        self._collection.upsert(ids=ids, documents=chunks, metadatas=metas,
+                                embeddings=[embed_document(doc.title, c) for c in chunks])
+        stale = [row_id for row_id, (_, meta) in rows.items()
+                 if meta.get("record_type") != "publication"
+                 and meta.get("document_id") == doc.document_id
+                 and meta.get("policy_version") == doc.policy_version
+                 and row_id not in ids]
+        if stale:
+            self._collection.delete(ids=stale)
+        stored = self._snapshot()
+        if any(stored.get(row_id) != (chunk, meta)
+               for row_id, chunk, meta in zip(ids, chunks, metas)) or any(i in stored for i in stale):
+            raise RuntimeError("knowledge publication incomplete; retry required")
+        if stored.get(key, (None,))[0] != json.dumps(payload, sort_keys=True):
+            raise RuntimeError("concurrent knowledge publication detected")
+        payload["state"] = "ready"
+        write_manifest()
+        if self._snapshot().get(key, (None,))[0] != json.dumps(payload, sort_keys=True):
+            raise RuntimeError("knowledge publication commit unconfirmed")
         return len(ids)
+
+    def _eligible(self, rows, now):
+        publications = self._publications(rows)
+        retired = set()
+        # Retirement persists even if successor expires, is revoked, or fails to finish.
+        for doc, payload in publications.values():
+            if doc.effective_at is not None and doc.effective_at <= now:
+                retired.update((doc.document_id, v) for v in doc.supersedes)
+        eligible = {}
+        for key, (doc, payload) in publications.items():
+            if (payload["state"] != "ready" or doc.publication_status != "active"
+                    or (doc.document_id, doc.policy_version) in retired
+                    or (doc.effective_at is not None and doc.effective_at > now)
+                    or (doc.expires_at is not None and doc.expires_at <= now)):
+                continue
+            ids = payload["chunk_ids"]
+            expected_chunks = self._chunk_text(doc.content, chunk_size=500)
+            expected_ids = [hashlib.sha256(f"{key}\0{payload['revision']}\0{i}".encode()).hexdigest()
+                            for i in range(len(expected_chunks))]
+            if ids != expected_ids:
+                continue
+            group = [rows.get(i) for i in ids]
+            if not ids or any(row is None for row in group):
+                continue
+            valid = True
+            for i, (content, meta) in enumerate(group):
+                try:
+                    chunk = ChunkMetadata.model_validate(meta)
+                except ValueError:
+                    valid = False
+                    break
+                if (content != expected_chunks[i] or meta.get("chunk_id") != ids[i]
+                        or meta.get("publication_id") != key or meta.get("revision") != payload["revision"]
+                        or chunk.document_id != doc.document_id or chunk.policy_version != doc.policy_version
+                        or chunk.source != doc.source or chunk.title != doc.title or chunk.doc_type != doc.doc_type
+                        or chunk.effective_at != doc.effective_at or chunk.expires_at != doc.expires_at
+                        or chunk.publication_status != doc.publication_status
+                        or chunk.chunk_index != i or chunk.total_chunks != len(ids)
+                        or chunk.content_hash != hashlib.sha256(content.encode()).hexdigest()):
+                    valid = False
+            if valid:
+                eligible[key] = set(ids)
+        return eligible
 
     async def add_documents_async(self, documents: List[Dict[str, Any]]) -> int:
         """异步导入文档；ChromaDB 客户端为同步实现，因此放入线程池执行。"""
@@ -139,22 +263,51 @@ class KnowledgeBase:
         """
         if not query.strip() or top_k < 1:
             raise ValueError("query 不能为空且 top_k 必须大于 0")
-        results = self._collection.query(
-            query_embeddings=[embed_query(query)],
-            n_results=top_k,
-            include=["documents", "metadatas", "distances"],
-        )
+        with self._publication_lock:
+            rows = self._snapshot()
+            eligible = self._eligible(rows, datetime.now(timezone.utc))
+            if not eligible:
+                if any(meta.get("record_type") not in {"chunk", "publication"}
+                       for _, meta in rows.values()):
+                    raise RuntimeError("legacy knowledge requires reviewed republication")
+                return []
+            results = self._collection.query(
+                query_embeddings=[embed_query(query)], n_results=top_k,
+                where={"chunk_id": {"$in": [i for ids in eligible.values() for i in ids]}},
+                include=["documents", "metadatas", "distances"],
+            )
+            # Detect a publisher changing the snapshot during the HTTP query.
+            after = self._snapshot()
+            if rows != after:
+                raise RuntimeError("knowledge changed during retrieval; retry required")
+            retrieval_time = datetime.now(timezone.utc)
+            current = self._eligible(after, retrieval_time)
+            items = []
+            for row_id, content, meta, distance in zip(
+                    results["ids"][0], results["documents"][0],
+                    results["metadatas"][0], results["distances"][0]):
+                if row_id not in current.get(meta.get("publication_id"), set()):
+                    continue
+                if after.get(row_id) != (content, meta):
+                    raise RuntimeError("knowledge query provenance mismatch")
+                items.append(build_hit(content, meta, distance, min_score=self.min_score, now=retrieval_time).model_dump(mode="json"))
+            return items
 
-        items = []
-        if results["documents"] and results["documents"][0]:
-            for doc, meta, dist in zip(
-                results["documents"][0],
-                results["metadatas"][0],
-                results["distances"][0],
-            ):
-                items.append(build_hit(doc, meta, dist, min_score=self.min_score).model_dump(mode="json"))
-
-        return items
+    async def validate_hits_async(self, hits):
+        """Revalidate after rewrite/rerank awaits, where publications may change."""
+        def validate():
+            with self._publication_lock:
+                rows = self._snapshot()
+                eligible = self._eligible(rows, datetime.now(timezone.utc))
+                allowed = {i for ids in eligible.values() for i in ids}
+                evidence = {(content, meta["document_id"], meta.get("policy_version"),
+                             meta["source"], meta["chunk_index"], meta["content_hash"], meta["title"], meta["total_chunks"])
+                            for i, (content, meta) in rows.items() if i in allowed}
+                return [hit for hit in hits if
+                        (hit.get("content"), hit.get("document_id"), hit.get("policy_version"),
+                         hit.get("source"), hit.get("chunk_index"), hit.get("content_hash"),
+                         hit.get("title"), hit.get("total_chunks")) in evidence]
+        return await asyncio.to_thread(validate)
 
     async def search_async(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """异步检索；ChromaDB 客户端为同步实现，因此放入线程池执行。"""
@@ -162,7 +315,7 @@ class KnowledgeBase:
 
     @property
     def doc_count(self) -> int:
-        return self._collection.count()
+        return sum(meta.get("record_type") != "publication" for _, meta in self._snapshot().values())
 
     def rebuild_demo_collection(self) -> int:
         """Explicitly replace only the versioned demo seed; refuse unknown sources."""
@@ -182,7 +335,7 @@ class KnowledgeBase:
 
     async def doc_count_async(self) -> int:
         """异步获取文档片段数量。"""
-        return await asyncio.to_thread(self._collection.count)
+        return await asyncio.to_thread(lambda: self.doc_count)
 
     # ── MCP 工具 handler ─────────────────────────────────────────────────────
 

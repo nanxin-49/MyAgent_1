@@ -33,12 +33,19 @@ class FakeCollection:
         return len(self.rows)
 
     def get(self, *, include):
-        return {"metadatas": [metadata for _, metadata in self.rows.values()]}
+        return {"ids": list(self.rows), "documents": [r[0] for r in self.rows.values()],
+                "metadatas": [r[1] for r in self.rows.values()]}
 
-    def query(self, *, query_embeddings, n_results, include):
+    def delete(self, *, ids):
+        for key in ids:
+            self.rows.pop(key, None)
+
+    def query(self, *, query_embeddings, n_results, include, where=None):
         assert len(query_embeddings) == 1 and len(query_embeddings[0]) == 1024
-        rows = list(self.rows.values())[:n_results]
-        return {"documents": [[row[0] for row in rows]],
+        keys = [key for key, (_, meta) in self.rows.items()
+                if where is None or meta.get("chunk_id") in where["chunk_id"]["$in"]][:n_results]
+        rows = [self.rows[k] for k in keys]
+        return {"ids": [keys], "documents": [[row[0] for row in rows]],
                 "metadatas": [[row[1] for row in rows]],
                 "distances": [[self.distance for _ in rows]]}
 
@@ -64,7 +71,7 @@ POLICY = {
 def test_metadata_ingestion_round_trip_and_policy_citation():
     kb = knowledge_base()
     assert kb.add_documents([POLICY]) == 1
-    stored = next(iter(kb._collection.rows.values()))[1]
+    stored = next(meta for _, meta in kb._collection.rows.values() if meta.get("record_type") == "chunk")
     assert stored["document_id"] == "refund-policy-2026"
     assert stored["source"] == "demo:policy/refund"
     assert stored["doc_type"] == "policy"
@@ -77,7 +84,8 @@ def test_metadata_ingestion_round_trip_and_policy_citation():
     assert hit["retrieval_status"] == "usable"
     assert hit["score_kind"] == "one_minus_chroma_distance"
     assert hit["citation"] == {
-        "reference": "refund-policy-2026@refund-cancel-v1#chunk-0", "document_id": "refund-policy-2026",
+        "reference": "refund-policy-2026@refund-cancel-v1#chunk-0~" + stored["content_hash"],
+        "content_hash": stored["content_hash"], "document_id": "refund-policy-2026",
         "chunk_index": 0, "source": "demo:policy/refund", "policy_version": "refund-cancel-v1",
     }
     assert hit["policy_version"] == "refund-cancel-v1"
@@ -87,8 +95,8 @@ def test_metadata_ingestion_round_trip_and_policy_citation():
 def test_default_demo_documents_import_with_explicit_provenance():
     kb = knowledge_base()
     kb._load_default_docs()
-    assert len(kb._collection.rows) >= 6
-    policy_rows = [meta for _, meta in kb._collection.rows.values() if meta["doc_type"] == "policy"]
+    assert kb.doc_count >= 6
+    policy_rows = [meta for _, meta in kb._collection.rows.values() if meta.get("doc_type") == "policy"]
     assert policy_rows
     assert all(meta["source"].startswith("demo:") for meta in policy_rows)
     assert all(meta["policy_version"] == "refund-cancel-v1" for meta in policy_rows)
@@ -113,7 +121,7 @@ def test_non_policy_document_has_stable_generated_id_without_policy_fields():
     assert doc.document_id == same.document_id
     kb = knowledge_base()
     kb.add_documents([doc.model_dump(mode="json", exclude_none=True)])
-    stored = next(iter(kb._collection.rows.values()))[1]
+    stored = next(meta for _, meta in kb._collection.rows.values() if meta.get("record_type") == "chunk")
     assert "policy_version" not in stored
     assert "effective_at" not in stored
 
@@ -127,9 +135,9 @@ def test_low_score_and_future_policy_are_not_citable():
     assert low["reason_code"] == "low_score"
     assert low["citation"] is None
 
-    future_meta = next(iter(kb._collection.rows.values()))[1].copy()
+    future_meta = next(meta for _, meta in kb._collection.rows.values() if meta.get("record_type") == "chunk").copy()
     future_meta["effective_at"] = "2099-01-01T00:00:00+00:00"
-    future = build_hit("future policy", future_meta, 0.1, min_score=0.35,
+    future = build_hit(POLICY["content"], future_meta, 0.1, min_score=0.35,
                        now=datetime(2026, 9, 30, tzinfo=timezone.utc))
     assert future.retrieval_status is RetrievalStatus.LOW_CONFIDENCE
     assert future.reason_code == "not_yet_effective"
@@ -239,7 +247,7 @@ def test_agent_rag_tool_round_trip_exposes_only_usable_citations():
     assert response.success is True
     trace = response.tool_traces[0]
     assert trace["retrieval_status"] == "usable"
-    assert trace["citations"][0]["reference"] == "refund-policy-2026@refund-cancel-v1#chunk-0"
+    assert trace["citations"][0]["reference"].startswith("refund-policy-2026@refund-cancel-v1#chunk-0~")
     status, citations = collect_rag_evidence(response.tool_traces)
     assert status == "usable" and len(citations) == 1
     payload = json.loads(client.calls[1]["messages"][-1]["content"][0]["content"])
@@ -293,7 +301,7 @@ def test_api_ingestion_preserves_policy_metadata_and_invalidates_cache(monkeypat
     response = asyncio.run(api_main.add_knowledge(body))
     assert response["added_chunks"] == 1
     assert manager._cache == {}
-    assert next(iter(kb._collection.rows.values()))[1]["policy_version"] == "refund-cancel-v1"
+    assert next(meta for _, meta in kb._collection.rows.values() if meta.get("record_type") == "chunk")["policy_version"] == "refund-cancel-v1"
 
     invalid = api_main.BatchDocInput(documents=[api_main.DocInput(
         title="bad policy", content="body", doc_type="policy")])
@@ -315,4 +323,4 @@ def test_json_upload_assigns_explicit_upload_source(monkeypatch):
 
     response = asyncio.run(api_main.upload_knowledge(Upload()))
     assert response["added_chunks"] == 1
-    assert next(iter(kb._collection.rows.values()))[1]["source"] == "upload:faq.json"
+    assert next(meta for _, meta in kb._collection.rows.values() if meta.get("record_type") == "chunk")["source"] == "upload:faq.json"

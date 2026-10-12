@@ -40,6 +40,10 @@ class KnowledgeDocument(BaseModel):
     doc_type: DocumentType = DocumentType.GUIDE
     policy_version: str | None = None
     effective_at: datetime | None = None
+    expires_at: datetime | None = None
+    publication_status: str = "active"
+
+    supersedes: list[str] = Field(default_factory=list)
 
     @field_validator("document_id", "title", "content", "source", "policy_version")
     @classmethod
@@ -53,11 +57,22 @@ class KnowledgeDocument(BaseModel):
         if self.doc_type is DocumentType.POLICY:
             if not self.policy_version or self.effective_at is None:
                 raise ValueError("policy documents require policy_version and effective_at")
-        if self.effective_at is not None and self.effective_at.tzinfo is None:
-            raise ValueError("effective_at must include a timezone")
+        for value in (self.effective_at, self.expires_at):
+            if value is not None and value.tzinfo is None:
+                raise ValueError("knowledge dates must include a timezone")
+        if self.expires_at and self.effective_at and self.expires_at <= self.effective_at:
+            raise ValueError("expires_at must be after effective_at")
+        if self.publication_status not in {"active", "revoked"}:
+            raise ValueError("publication_status must be active or revoked")
+        if any(not v.strip() or v == self.policy_version for v in self.supersedes):
+            raise ValueError("supersedes requires distinct nonblank predecessor versions")
+        if len(set(self.supersedes)) != len(self.supersedes):
+            raise ValueError("duplicate supersedes version")
+        if self.supersedes and (self.document_id is None or self.doc_type is not DocumentType.POLICY):
+            raise ValueError("supersedes requires an explicit policy document_id")
         if self.document_id is None:
             digest = hashlib.sha256(
-                f"{self.source}\0{self.title}\0{self.content}".encode("utf-8")
+                f"{self.source}\0{self.title}".encode("utf-8")
             ).hexdigest()[:20]
             self.document_id = f"doc_{digest}"
         return self
@@ -74,6 +89,10 @@ class ChunkMetadata(BaseModel):
     total_chunks: int = Field(gt=0)
     policy_version: str | None = None
     effective_at: datetime | None = None
+    expires_at: datetime | None = None
+    publication_status: str = "active"
+
+    content_hash: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
 
     @model_validator(mode="after")
     def check_chunk(self) -> "ChunkMetadata":
@@ -81,8 +100,13 @@ class ChunkMetadata(BaseModel):
             raise ValueError("chunk_index must be below total_chunks")
         if self.doc_type is DocumentType.POLICY and (not self.policy_version or self.effective_at is None):
             raise ValueError("policy chunk lacks version or effective_at")
-        if self.effective_at is not None and self.effective_at.tzinfo is None:
-            raise ValueError("effective_at must include a timezone")
+        for value in (self.effective_at, self.expires_at):
+            if value is not None and value.tzinfo is None:
+                raise ValueError("knowledge dates must include a timezone")
+        if self.expires_at and self.effective_at and self.expires_at <= self.effective_at:
+            raise ValueError("expires_at must be after effective_at")
+        if self.publication_status not in {"active", "revoked"}:
+            raise ValueError("publication_status must be active or revoked")
         return self
 
 
@@ -90,6 +114,7 @@ class Citation(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     reference: str
+    content_hash: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     document_id: str
     chunk_index: int
     source: str
@@ -110,6 +135,7 @@ class RetrievalHit(BaseModel):
     total_chunks: int
     policy_version: str | None = None
     effective_at: datetime | None = None
+    content_hash: str | None = None
     citation: Citation | None = None
     retrieval_status: RetrievalStatus
     reason_code: str | None = None
@@ -129,14 +155,18 @@ class RetrievalHit(BaseModel):
             if self.effective_at.tzinfo is None:
                 raise ValueError("policy effective_at must include a timezone")
         if self.retrieval_status is RetrievalStatus.USABLE:
+            if self.content_hash is not None and self.content_hash != hashlib.sha256(self.content.encode()).hexdigest():
+                raise ValueError("citation content hash does not match content")
             if self.citation is None:
                 raise ValueError("usable hits require a citation")
             if (self.citation.document_id != self.document_id
                     or self.citation.chunk_index != self.chunk_index
                     or self.citation.source != self.source
                     or self.citation.policy_version != self.policy_version
+                    or self.citation.content_hash != self.content_hash
                     or self.citation.reference != (
                         f"{self.document_id}{'@' + self.policy_version if self.policy_version else ''}#chunk-{self.chunk_index}"
+                        + (f"~{self.content_hash}" if self.content_hash else "")
                     )):
                 raise ValueError("citation does not match hit provenance")
         elif self.citation is not None:
@@ -177,11 +207,17 @@ def build_hit(
         and effective is not None
         and effective > (now or datetime.now(timezone.utc))
     )
-    usable = score >= min_score and not future_policy and bool(content.strip())
+    current_time = now or datetime.now(timezone.utc)
+    expired = chunk.expires_at is not None and chunk.expires_at <= current_time
+    retired = chunk.publication_status != "active"
+    hash_mismatch = chunk.content_hash is not None and chunk.content_hash != hashlib.sha256(content.encode("utf-8")).hexdigest()
+    usable = score >= min_score and not (future_policy or expired or retired or hash_mismatch) and bool(content.strip())
     citation = None
     if usable:
         citation = Citation(
-            reference=f"{chunk.document_id}{'@' + chunk.policy_version if chunk.policy_version else ''}#chunk-{chunk.chunk_index}",
+            reference=f"{chunk.document_id}{'@' + chunk.policy_version if chunk.policy_version else ''}#chunk-{chunk.chunk_index}"
+                      + (f"~{chunk.content_hash}" if chunk.content_hash else ""),
+            content_hash=chunk.content_hash,
             document_id=chunk.document_id,
             chunk_index=chunk.chunk_index,
             source=chunk.source,
@@ -192,7 +228,7 @@ def build_hit(
         title=chunk.title, source=chunk.source, doc_type=chunk.doc_type.value,
         chunk_index=chunk.chunk_index, total_chunks=chunk.total_chunks,
         policy_version=chunk.policy_version, effective_at=effective,
-        citation=citation,
+        content_hash=chunk.content_hash, citation=citation,
         retrieval_status=RetrievalStatus.USABLE if usable else RetrievalStatus.LOW_CONFIDENCE,
-        reason_code="not_yet_effective" if future_policy else "low_score" if score < min_score else None,
+        reason_code="content_hash_mismatch" if hash_mismatch else "revoked" if retired else "expired" if expired else "not_yet_effective" if future_policy else "low_score" if score < min_score else None,
     )

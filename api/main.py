@@ -28,7 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from actions import ActionResult
 
 load_dotenv()
@@ -667,6 +667,7 @@ async def search(query: str, top_k: int = 5):
 
 class DocInput(BaseModel):
     """单篇文档输入。"""
+    model_config = ConfigDict(extra="forbid")
     document_id: Optional[str] = None
     title: str
     content: str
@@ -674,6 +675,9 @@ class DocInput(BaseModel):
     doc_type: str = "guide"
     policy_version: Optional[str] = None
     effective_at: Optional[str] = None
+    expires_at: Optional[str] = None
+    publication_status: str = "active"
+    supersedes: List[str] = Field(default_factory=list)
 
 
 class BatchDocInput(BaseModel):
@@ -729,6 +733,9 @@ async def add_knowledge(body: BatchDocInput):
     except (ValidationError, ValueError) as exc:
         detail = exc.errors(include_input=False, include_context=False) if isinstance(exc, ValidationError) else str(exc)
         raise HTTPException(422, {"error": "文档 metadata 无效", "details": detail}) from exc
+    except Exception as exc:
+        _tool_manager._cache.clear()
+        raise HTTPException(503, {"error": "knowledge_publication_failed", "retry_required": True}) from exc
     _tool_manager._cache.clear()
     total = await kb.doc_count_async()
     return {"message": f"成功导入 {count} 个文档片段", "added_chunks": count, "total_chunks": total}
@@ -781,6 +788,9 @@ async def upload_knowledge(file: UploadFile = File(...)):
     except (ValidationError, ValueError) as exc:
         detail = exc.errors(include_input=False, include_context=False) if isinstance(exc, ValidationError) else str(exc)
         raise HTTPException(422, {"error": "文档 metadata 无效", "details": detail}) from exc
+    except Exception as exc:
+        _tool_manager._cache.clear()
+        raise HTTPException(503, {"error": "knowledge_publication_failed", "retry_required": True}) from exc
     _tool_manager._cache.clear()
     total = await kb.doc_count_async()
     return {

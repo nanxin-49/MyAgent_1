@@ -194,7 +194,9 @@ class MCPToolManager:
             return ToolResult(success=False, data=None, tool_name=name, error=str(exc),
                               error_code=exc.code, error_type="validation")
 
-        use_cache = use_cache and tool.risk_level is RiskLevel.READ
+        owner = getattr(tool.handler, "__self__", None)
+        use_cache = (use_cache and tool.risk_level is RiskLevel.READ
+                     and not hasattr(owner, "validate_hits_async"))
 
         cache_rerank_top_k = rerank_top_k if rerank_top_k > 0 and tool.supports_rerank else 0
 
@@ -429,6 +431,18 @@ class MCPToolManager:
 
         # 4. 重排：用 LLM 对合并结果按相关性打分，取 Top-K
         reranked = await self._rerank(query, merged, top_k)
+        owner = getattr(self._tools[tool_name].handler, "__self__", None)
+        if reranked and hasattr(owner, "validate_hits_async"):
+            try:
+                reranked = await owner.validate_hits_async(reranked)
+            except Exception:
+                return ToolResult(success=False, data=[], tool_name=tool_name,
+                                  error="knowledge revalidation failed", error_code="degraded",
+                                  error_type="retrieval", retrieval_status=RetrievalStatus.DEGRADED.value)
+            if not reranked:
+                return ToolResult(success=False, data=[], tool_name=tool_name,
+                                  error="knowledge changed during retrieval", error_code="no_answer",
+                                  error_type="retrieval", retrieval_status=RetrievalStatus.NO_ANSWER.value)
         citations = list({item["citation"]["reference"]: item["citation"]
                           for item in reranked if isinstance(item, dict) and item.get("citation")}.values())
         return ToolResult(success=True, data=reranked, tool_name=tool_name, reranked=True,
