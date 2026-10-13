@@ -1,0 +1,468 @@
+.FFFFFFFFFFFF..                                                          [100%]
+================================== FAILURES ===================================
+________________ test_usable_never_certifies_fact_sufficiency _________________
+
+    def test_usable_never_certifies_fact_sufficiency():
+        kb = make_kb()
+        # Force a high-scoring relevant hit without granting it missing facts.
+        original = kb._collection.query
+        def high_score(**kwargs):
+            result = original(**kwargs)
+            result['distances'] = [[.1]*len(result['ids'][0])]
+            return result
+        kb._collection.query = high_score
+        tool = build_shared_rag_tools(manager_for(kb))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('退款多久到账？'),{'query':'退款政策'}))
+        assert payload['success'] and payload['retrieval_status']=='usable'
+        assert payload['results'] and payload['citations']
+>       assert '事实充分' in payload.get('answer_guidance','')
+E       AssertionError: assert '事实充分' in ''
+E        +  where '' = <built-in method get of dict object at 0x000001E20727D5C0>('answer_guidance', '')
+E        +    where <built-in method get of dict object at 0x000001E20727D5C0> = {'citations': [{'chunk_index': 0, 'content_hash': '8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37', ...468580a43ee0bd', 'policy_version': None, ...}], 'query': '退款政策', 'rerank_status': 'not_needed', 'reranked': False, ...}.get
+
+tests\test_answerability_boundary.py:36: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:53,221 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:53,226 [INFO] mcp.tool_manager: 查询改写: '退款政策' → ['退款政策']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策' → ['退款政策']
+_ test_normal_absence_and_failure_guidance_stay_distinct[expired-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3] _
+
+scenario = 'expired', expected = 'no_answer', success = True
+explanation = '正常知识不足'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'正常知识不足'),
+        ('future','no_answer',True,'正常知识不足'),
+        ('publishing','no_answer',True,'正常知识不足'),
+        ('chroma_failure','degraded',False,'依赖故障'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('退款政策'),{'query':'退款政策'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '正常知识不足' in '不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:53,749 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:53,752 [INFO] mcp.tool_manager: 查询改写: '退款政策' → ['退款政策']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策' → ['退款政策']
+_ test_normal_absence_and_failure_guidance_stay_distinct[future-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3] _
+
+scenario = 'future', expected = 'no_answer', success = True
+explanation = '正常知识不足'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'正常知识不足'),
+        ('future','no_answer',True,'正常知识不足'),
+        ('publishing','no_answer',True,'正常知识不足'),
+        ('chroma_failure','degraded',False,'依赖故障'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('退款政策'),{'query':'退款政策'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '正常知识不足' in '不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:53,804 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:53,806 [INFO] mcp.tool_manager: 查询改写: '退款政策' → ['退款政策']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策' → ['退款政策']
+_ test_normal_absence_and_failure_guidance_stay_distinct[publishing-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3] _
+
+scenario = 'publishing', expected = 'no_answer', success = True
+explanation = '正常知识不足'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'正常知识不足'),
+        ('future','no_answer',True,'正常知识不足'),
+        ('publishing','no_answer',True,'正常知识不足'),
+        ('chroma_failure','degraded',False,'依赖故障'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('退款政策'),{'query':'退款政策'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '正常知识不足' in '不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:53,863 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:53,865 [INFO] mcp.tool_manager: 查询改写: '退款政策' → ['退款政策']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策' → ['退款政策']
+_ test_normal_absence_and_failure_guidance_stay_distinct[chroma_failure-degraded-False-\u4f9d\u8d56\u6545\u969c] _
+
+scenario = 'chroma_failure', expected = 'degraded', success = False
+explanation = '依赖故障'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'正常知识不足'),
+        ('future','no_answer',True,'正常知识不足'),
+        ('publishing','no_answer',True,'正常知识不足'),
+        ('chroma_failure','degraded',False,'依赖故障'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('退款政策'),{'query':'退款政策'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '依赖故障' in '不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:53,933 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:53,935 [INFO] mcp.tool_manager: 查询改写: '退款政策' → ['退款政策']
+2026-10-13 21:15:53,937 [ERROR] mcp.tool_manager: 工具异常: knowledge_search — injected Chroma dependency failure
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策' → ['退款政策']
+ERROR    mcp.tool_manager:tool_manager.py:276 工具异常: knowledge_search — injected Chroma dependency failure
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-03] _
+
+id = 'ANS-03'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:53,998 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:15:54,035 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:54,036 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：500元和500.01元审批有什么区别，谁能审核？'
+2026-10-13 21:15:54,038 [INFO] mcp.tool_manager: 查询改写: '退款政策：500元和500.01元审批有什么区别，谁能审核？' → ['退款政策：500元和500.01元审批有什么区别，谁能审核？']
+2026-10-13 21:15:54,041 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：500元和500.01元审批有什么区别，谁能审核？'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：500元和500.01元审批有什么区别，谁能审核？'
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策：500元和500.01元审批有什么区别，谁能审核？' → ['退款政策：500元和500.01元审批有什么区别，谁能审核？']
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：500元和500.01元审批有什么区别，谁能审核？'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-08] _
+
+id = 'ANS-08'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:54,086 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:15:54,121 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:54,121 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：退款超过500元谁审核，多久到账？'
+2026-10-13 21:15:54,122 [INFO] mcp.tool_manager: 查询改写: '退款政策：退款超过500元谁审核，多久到账？' → ['退款政策：退款超过500元谁审核，多久到账？']
+2026-10-13 21:15:54,128 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：退款超过500元谁审核，多久到账？'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：退款超过500元谁审核，多久到账？'
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '退款政策：退款超过500元谁审核，多久到账？' → ['退款政策：退款超过500元谁审核，多久到账？']
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 技术支持处理规范(keywords=500) message='退款政策：退款超过500元谁审核，多久到账？'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-09] _
+
+id = 'ANS-09'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:54,174 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:15:54,208 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:54,209 [INFO] core.skill_loader: Skills 已注入: agent=all matched=通用客服接待规范(keywords=会员) message='会员与积分：每消费一元积多少积分？'
+2026-10-13 21:15:54,210 [INFO] mcp.tool_manager: 查询改写: '会员与积分：每消费一元积多少积分？' → ['会员与积分：每消费一元积多少积分？']
+2026-10-13 21:15:54,214 [INFO] core.skill_loader: Skills 已注入: agent=all matched=通用客服接待规范(keywords=会员) message='会员与积分：每消费一元积多少积分？'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=通用客服接待规范(keywords=会员) message='会员与积分：每消费一元积多少积分？'
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '会员与积分：每消费一元积多少积分？' → ['会员与积分：每消费一元积多少积分？']
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=通用客服接待规范(keywords=会员) message='会员与积分：每消费一元积多少积分？'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-12] _
+
+id = 'ANS-12'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:54,261 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:15:54,292 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:54,293 [INFO] core.skill_loader: Skills 已注入: agent=all matched=通用客服接待规范(keywords=订单) message='订单查询：ORD-1001现在的订单状态是什么？'
+2026-10-13 21:15:54,294 [INFO] mcp.tool_manager: 查询改写: '订单查询：ORD-1001现在的订单状态是什么？' → ['订单查询：ORD-1001现在的订单状态是什么？']
+2026-10-13 21:15:54,300 [INFO] core.skill_loader: Skills 已注入: agent=all matched=通用客服接待规范(keywords=订单) message='订单查询：ORD-1001现在的订单状态是什么？'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=通用客服接待规范(keywords=订单) message='订单查询：ORD-1001现在的订单状态是什么？'
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '订单查询：ORD-1001现在的订单状态是什么？' → ['订单查询：ORD-1001现在的订单状态是什么？']
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=通用客服接待规范(keywords=订单) message='订单查询：ORD-1001现在的订单状态是什么？'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-25] _
+
+id = 'ANS-25'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:54,346 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:15:54,377 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:54,377 [INFO] core.skill_loader: Skills 已注入: agent=all matched=技术支持处理规范(keywords=错误, 500) message='技术故障排查：500错误是否证明Chroma已经宕机？'
+2026-10-13 21:15:54,378 [INFO] mcp.tool_manager: 查询改写: '技术故障排查：500错误是否证明Chroma已经宕机？' → ['技术故障排查：500错误是否证明Chroma已经宕机？']
+2026-10-13 21:15:54,382 [INFO] core.skill_loader: Skills 已注入: agent=all matched=技术支持处理规范(keywords=错误, 500) message='技术故障排查：500错误是否证明Chroma已经宕机？'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=技术支持处理规范(keywords=错误, 500) message='技术故障排查：500错误是否证明Chroma已经宕机？'
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '技术故障排查：500错误是否证明Chroma已经宕机？' → ['技术故障排查：500错误是否证明Chroma已经宕机？']
+INFO     core.skill_loader:skill_loader.py:161 Skills 已注入: agent=all matched=技术支持处理规范(keywords=错误, 500) message='技术故障排查：500错误是否证明Chroma已经宕机？'
+_________________ test_unmatched_question_gets_same_base_rule _________________
+
+    def test_unmatched_question_gets_same_base_rule():
+        from agents.support_agent import SingleSupportAgent
+        from evaluation.answerability.harness import AdversarialSDK
+        case = load_dataset()['cases'][0]
+        agent = SingleSupportAgent(AdversarialSDK(case),'fake')
+        prompt = agent._build_system_prompt(request('xyzq'))
+>       assert '主题相关不等于事实充分' in prompt
+E       AssertionError: assert '主题相关不等于事实充分' in '你是 CartCare 电商客服助手。友好、简洁地回答用户问题。如果问题超出你的能力范围，明确说明并建议转接专业客服。\n\n[角色契约]\n角色：电商客服\n职责：处理商品、订单、物流和售后问题，明确证据与人工处理边界。\n处理流程...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+
+tests\test_answerability_boundary.py:70: AssertionError
+_______ test_capability_denial_remains_usable_when_explicitly_supported _______
+
+    def test_capability_denial_remains_usable_when_explicitly_supported():
+        kb = make_kb()
+        # Natural exact title query above existing .35; no threshold changes.
+        tool = build_shared_rag_tools(manager_for(kb))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('会员与积分'),{'query':'会员与积分'}))
+        assert payload['retrieval_status']=='usable'
+        assert any('未实现会员账户' in h['content'] for h in payload['results'])
+>       assert '不支持该功能' in payload.get('answer_guidance','')
+E       AssertionError: assert '不支持该功能' in ''
+E        +  where '' = <built-in method get of dict object at 0x000001E22721EC40>('answer_guidance', '')
+E        +    where <built-in method get of dict object at 0x000001E22721EC40> = {'citations': [{'chunk_index': 0, 'content_hash': '4e044b244b4a03f4f45d0cc996e89eff99707f81e76a38480d35bf320e007ca8', ...5c6f9e8cfe749', 'policy_version': None, ...}], 'query': '会员与积分', 'rerank_status': 'not_needed', 'reranked': False, ...}.get
+
+tests\test_answerability_boundary.py:80: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:15:54,457 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-13 21:15:54,460 [INFO] mcp.tool_manager: 查询改写: '会员与积分' → ['会员与积分']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 注册工具: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 查询改写: '会员与积分' → ['会员与积分']
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\config\__init__.py:1277
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\_pytest\config\__init__.py:1277: PytestAssertRewriteWarning: Module already imported so cannot be rewritten: anyio
+    self._mark_plugins_for_rewrite(hook)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_answerability_boundary.py::test_usable_never_certifies_fact_sufficiency
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[expired-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3]
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[future-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3]
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[publishing-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3]
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[chroma_failure-degraded-False-\u4f9d\u8d56\u6545\u969c]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-03]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-08]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-09]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-12]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-25]
+FAILED tests/test_answerability_boundary.py::test_unmatched_question_gets_same_base_rule
+FAILED tests/test_answerability_boundary.py::test_capability_denial_remains_usable_when_explicitly_supported
+12 failed, 3 passed, 1 warning in 2.70s

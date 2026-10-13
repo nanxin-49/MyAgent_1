@@ -1,0 +1,14 @@
+{
+  "review_status": "pending",
+  "original_frozen_sha256": "bc86eb7bde56071fae87d426e6667a771ac8f5778b57a5a80e2c940f72f961e4",
+  "review_candidate_sha256": "89f987aa623a9ba23ea8cf7bcf0234dc7d6c86e46f42028507d11f7c866dee4f",
+  "correction_phase": "after baseline measurement; source-contract correction only, no query/label/score tuning",
+  "change": {
+    "id": "ANS-18",
+    "field": "allowed_boundary",
+    "before": "隔离fixture未ready，不作证据；publishing被现有契约视为依赖不可用。",
+    "after": "只在隔离fixture设置publishing；不可引用未ready版本；合法publishing无有效chunk为no_answer，不自动判依赖故障。"
+  },
+  "source": "mcp/knowledge_base.py:_eligible/search; mcp/tool_manager.py:search_with_rewrite",
+  "unchanged": "queries, necessary facts, evidence, gold_behavior, scenarios and all other case fields"
+}

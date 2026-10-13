@@ -1,0 +1,26 @@
+{
+  "cases": 26,
+  "scope": "deterministic actual Python path, Fake Chroma cosine + Fake SDK only",
+  "before_boundary_delivered": 0,
+  "after_boundary_delivered": 26,
+  "retrieval_statuses": {
+    "usable": 10,
+    "low_confidence": 12,
+    "no_answer": 3,
+    "degraded": 1
+  },
+  "raw_results_rag_fields_provider_results_scripted_prose_unchanged": true,
+  "expected_evidence_cases": 24,
+  "gold_not_recalled_active": 0,
+  "gold_threshold_filtered": 11,
+  "model_obedience_measured": false,
+  "real_chat_e2e": false,
+  "real_model_calls": 0,
+  "added_model_calls": 0,
+  "incremental_prompt_token_cost": "not_measured; longer existing prompts/payloads increase tokens",
+  "adversarial_fake_unsafe_phrase_persisted": 25,
+  "adversarial_fake_denominator": 26,
+  "not_a_model_performance_rate": true,
+  "ANS-18_gold_erratum": "legal publishing is no_answer not automatically degraded; frozen original kept",
+  "gold_human_review": "pending"
+}

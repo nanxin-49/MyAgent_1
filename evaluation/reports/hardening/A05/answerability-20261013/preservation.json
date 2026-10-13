@@ -1,0 +1,11 @@
+{
+  "tracked_checked": 522,
+  "changed": [
+    "agents/support_agent.py",
+    "agents/tools.py",
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "unexpected_changes": [],
+  "protected_unchanged": 518
+}

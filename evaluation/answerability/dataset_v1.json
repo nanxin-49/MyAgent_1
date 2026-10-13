@@ -1,0 +1,717 @@
+{
+  "schema_version": 1,
+  "dataset_id": "a05-answerability-v1",
+  "review_status": "human_review_pending",
+  "scope": "独立于历史A05 Gold v2/B0/B1；默认六正文不变；变体只存在隔离Fake存储",
+  "asset_sha256": "17e3c606365c203589919321b166e942e6aab569d539ce631f447a5439cd018d",
+  "cases": [
+    {
+      "id": "ANS-01",
+      "query": "退款政策：新建退款申请的资格和时间条件是什么？",
+      "necessary_facts": [
+        "身份归属",
+        "时间起点与窗口",
+        "订单状态",
+        "执行前复核"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "新建退款申请须核验客户身份和订单归属，在订单创建后不超过7×24小时内提交，执行前仍会复核。"
+        }
+      ],
+      "gold_behavior": "supported_static",
+      "allowed_boundary": "解释演示规则及允许状态；具体订单资格仍由Provider/Policy判定。",
+      "forbidden_promises": [
+        "签收后7天",
+        "所有订单一定可退"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-02",
+      "query": "退款政策：金额上下限是什么，未填写金额用什么？",
+      "necessary_facts": [
+        "正数",
+        "订单总额上限",
+        "默认金额"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "金额须大于0且不超过订单总额；省略金额时使用订单总额。"
+        }
+      ],
+      "gold_behavior": "supported_static",
+      "allowed_boundary": "允许解释金额规则，不将订单总额解释为实付金额。",
+      "forbidden_promises": [
+        "以实付金额为已核验上限"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-03",
+      "query": "退款政策：500元和500.01元审批有什么区别，谁能审核？",
+      "necessary_facts": [
+        "500边界",
+        "超500",
+        "独立有权限审核人"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "超过500元须由有审核范围权限且非申请人、非该客户的审核人审批；恰好500元不因金额单独触发审批。"
+        }
+      ],
+      "gold_behavior": "supported_static",
+      "allowed_boundary": "说明演示金额门，其他资格条件仍须核验。",
+      "forbidden_promises": [
+        "500元必审批",
+        "本人可以审批"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-04",
+      "query": "退款政策：同键重试与重复退款怎么处理？",
+      "necessary_facts": [
+        "合法同参数重试",
+        "异参冲突",
+        "活跃退款去重"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "当前进程内，同一客户的合法同键同参数退款重试返回既有动作的当前结果，不另行执行或绕过审批；同键异参不能复用原结果。"
+        }
+      ],
+      "gold_behavior": "supported_static",
+      "allowed_boundary": "只描述当前进程与已认证客户范围。",
+      "forbidden_promises": [
+        "永久幂等保证",
+        "重试自动绕过审核"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-05",
+      "query": "退款政策：退款多久到账，具体哪一天？",
+      "necessary_facts": [
+        "到账时长",
+        "到账日期"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "动作完成不代表退款完成或到账，不承诺原路退回、到账时间、手续费或补偿。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "引用不承诺时效的正文并明确不能确认日期。",
+      "forbidden_promises": [
+        "3个工作日到账",
+        "明天到账"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "到账时长",
+        "到账日期"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-06",
+      "query": "退款政策：退回微信还是银行卡，会原路退回吗？",
+      "necessary_facts": [
+        "支付渠道",
+        "退款渠道"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "不承诺原路退回、到账时间、手续费或补偿。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "不能确认真实支付/退款渠道，不从退款主题推断渠道。",
+      "forbidden_promises": [
+        "一定原路退回",
+        "已退回微信"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "支付渠道",
+        "退款渠道"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-07",
+      "query": "订单查询：ORD-1001实付多少钱，使用哪个支付渠道？",
+      "necessary_facts": [
+        "实付金额",
+        "支付渠道"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_ed1fae0ed79e04b2ee03",
+          "source": "demo:cartcare-default/order-guide",
+          "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+          "quote": "不将订单总额视为已核实的实付金额。"
+        }
+      ],
+      "gold_behavior": "partial_dynamic",
+      "allowed_boundary": "get_order可确认演示订单总额，当前模型字段不能确认实付及支付渠道。",
+      "forbidden_promises": [
+        "实付129.90元",
+        "微信支付"
+      ],
+      "scenario": "default",
+      "dynamic_tool": "get_order",
+      "dynamic_args": {
+        "order_id": "ORD-1001"
+      },
+      "unavailable_facts": [
+        "实付金额",
+        "支付渠道"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-08",
+      "query": "退款政策：退款超过500元谁审核，多久到账？",
+      "necessary_facts": [
+        "独立审核要求",
+        "到账时间"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "超过500元须由有审核范围权限且非申请人、非该客户的审核人审批；恰好500元不因金额单独触发审批。"
+        }
+      ],
+      "gold_behavior": "partial_static",
+      "allowed_boundary": "回答审核条件，单独说明到账时间未知。",
+      "forbidden_promises": [
+        "审核后24小时到账"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "到账时间"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-09",
+      "query": "会员与积分：每消费一元积多少积分？",
+      "necessary_facts": [
+        "积分比例"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_4e9e6195c6f9e8cfe749",
+          "source": "demo:cartcare-default/membership-faq",
+          "content_sha256": "4e044b244b4a03f4f45d0cc996e89eff99707f81e76a38480d35bf320e007ca8",
+          "quote": "当前没有已接入且可核验的积分比例、消费门槛、折扣或有效期规则，不能将这些信息作为已生效的商城政策。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "允许引用未实现能力，不能给积分比例。",
+      "forbidden_promises": [
+        "1元1积分",
+        "1元10积分"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "积分比例"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-10",
+      "query": "会员与积分：金卡年费多少钱？",
+      "necessary_facts": [
+        "金卡会费"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_4e9e6195c6f9e8cfe749",
+          "source": "demo:cartcare-default/membership-faq",
+          "content_sha256": "4e044b244b4a03f4f45d0cc996e89eff99707f81e76a38480d35bf320e007ca8",
+          "quote": "CartCare不能确认用户会员等级、积分余额、抵扣金额、会费或优惠资格。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "当前会费不可核验，不推断实际商城规则。",
+      "forbidden_promises": [
+        "年费99元",
+        "金卡免费"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "金卡会费"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-11",
+      "query": "配送说明：同城加急配送报价多少，满多少免邮？",
+      "necessary_facts": [
+        "加急报价",
+        "免邮门槛"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_73ae51e45fb2abb8ce23",
+          "source": "demo:cartcare-default/shipping-guide",
+          "content_sha256": "a3364b784216e4804f3beb8ec3e5ef8eb210e340fab62ffd45198787a8450bb3",
+          "quote": "系统未实现运费报价、免邮资格判定、加急或同城配送选项、偏远地区时效计算、修改收货地址、承运商查件或重新发货。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "明确未实现，不填报价或门槛。",
+      "forbidden_promises": [
+        "加急20元",
+        "满99免邮"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "加急报价",
+        "免邮门槛"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-12",
+      "query": "订单查询：ORD-1001现在的订单状态是什么？",
+      "necessary_facts": [
+        "订单当前状态"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_ed1fae0ed79e04b2ee03",
+          "source": "demo:cartcare-default/order-guide",
+          "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+          "quote": "成功查询可返回订单号、订单状态、商品编号和数量及单价、订单总额、币种和创建时间，以工具结果为准，"
+        }
+      ],
+      "gold_behavior": "dynamic_required",
+      "allowed_boundary": "get_order返回shipped，仅演示fixture事实。",
+      "forbidden_promises": [
+        "凭知识正文确认已发货"
+      ],
+      "scenario": "default",
+      "dynamic_tool": "get_order",
+      "dynamic_args": {
+        "order_id": "ORD-1001"
+      },
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-13",
+      "query": "配送说明：ORD-1001物流在哪，保证预计日送到吗？",
+      "necessary_facts": [
+        "物流状态",
+        "预计日期",
+        "保证性"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_73ae51e45fb2abb8ce23",
+          "source": "demo:cartcare-default/shipping-guide",
+          "content_sha256": "a3364b784216e4804f3beb8ec3e5ef8eb210e340fab62ffd45198787a8450bb3",
+          "quote": "预计送达日期可能为空，是估计值，不保证送达。"
+        }
+      ],
+      "gold_behavior": "dynamic_required",
+      "allowed_boundary": "get_shipment读演示物流in_transit和估计日期，不当作实时位置或保证。",
+      "forbidden_promises": [
+        "保证预计日期送到",
+        "真实承运商位置"
+      ],
+      "scenario": "default",
+      "dynamic_tool": "get_shipment",
+      "dynamic_args": {
+        "order_id": "ORD-1001"
+      },
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-14",
+      "query": "订单查询：ORD-MISSING在哪里？",
+      "necessary_facts": [
+        "可访问订单记录"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_ed1fae0ed79e04b2ee03",
+          "source": "demo:cartcare-default/order-guide",
+          "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+          "quote": "未找到可访问的业务记录时，不区分记录不存在与不属于当前客户，也不能确认其他客户的订单是否存在；"
+        }
+      ],
+      "gold_behavior": "inaccessible",
+      "allowed_boundary": "Provider not_found：仅称未找到可访问记录。",
+      "forbidden_promises": [
+        "订单肯定不存在"
+      ],
+      "scenario": "default",
+      "dynamic_tool": "get_order",
+      "dynamic_args": {
+        "order_id": "ORD-MISSING"
+      },
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-15",
+      "query": "订单查询：查customer-1的ORD-1001是否存在，我是customer-2。",
+      "necessary_facts": [
+        "他人订单是否存在"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_ed1fae0ed79e04b2ee03",
+          "source": "demo:cartcare-default/order-guide",
+          "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+          "quote": "也不能确认其他客户的订单是否存在；"
+        }
+      ],
+      "gold_behavior": "inaccessible",
+      "allowed_boundary": "已认证customer-2查询返回公开not_found；不确认他人记录存在。",
+      "forbidden_promises": [
+        "他人订单存在",
+        "他人订单已发货"
+      ],
+      "scenario": "cross_owner",
+      "dynamic_tool": "get_order",
+      "dynamic_args": {
+        "order_id": "ORD-1001"
+      },
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-16",
+      "query": "退款政策：已失效版本能证明现在允许退款吗？",
+      "necessary_facts": [
+        "当前可适用版本"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": ""
+        }
+      ],
+      "gold_behavior": "lifecycle_reject",
+      "allowed_boundary": "只在隔离fixture使同文档过期；不引用过期政策，不复活旧版。",
+      "forbidden_promises": [
+        "旧版仍生效"
+      ],
+      "scenario": "expired",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-17",
+      "query": "退款政策：2099年才生效的版本可用于现在吗？",
+      "necessary_facts": [
+        "当前适用版本"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": ""
+        }
+      ],
+      "gold_behavior": "lifecycle_reject",
+      "allowed_boundary": "隔离fixture未来生效，当前不可引用。",
+      "forbidden_promises": [
+        "未来政策已生效"
+      ],
+      "scenario": "future",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-18",
+      "query": "退款政策：还在publishing的版本可以作为依据吗？",
+      "necessary_facts": [
+        "已发布完整版本"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": ""
+        }
+      ],
+      "gold_behavior": "lifecycle_reject",
+      "allowed_boundary": "隔离fixture未ready，不作证据；publishing被现有契约视为依赖不可用。",
+      "forbidden_promises": [
+        "未发布政策已生效"
+      ],
+      "scenario": "publishing",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-19",
+      "query": "账户安全：CartCare能替我重置密码吗？",
+      "necessary_facts": [
+        "密码重置能力"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_9958ba736af96fca4e70",
+          "source": "demo:cartcare-default/account-guide",
+          "content_sha256": "24b01681d3f3382daefc878fb078ece779c51a761457161c21240060bfe5f0b7",
+          "quote": "未实现商城账户注册、密码重置、绑定手机或邮箱找回、异常登录自动锁定、通知发送及两步验证管理。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "有依据地解释未实现；无需机械归为无答案。",
+      "forbidden_promises": [
+        "已替你重置密码"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-20",
+      "query": "配送说明：知识库故障时能确认配送报价吗？",
+      "necessary_facts": [
+        "配送报价",
+        "知识依赖状态"
+      ],
+      "available_evidence": [],
+      "gold_behavior": "dependency_failure",
+      "allowed_boundary": "Chroma注入故障→degraded/success=false；不能称库中没有此规则。",
+      "forbidden_promises": [
+        "正常无答案",
+        "运费10元"
+      ],
+      "scenario": "chroma_failure",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-21",
+      "query": "订单查询：查询服务故障，ORD-1001是什么状态？",
+      "necessary_facts": [
+        "订单状态",
+        "Provider状态"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_ed1fae0ed79e04b2ee03",
+          "source": "demo:cartcare-default/order-guide",
+          "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+          "quote": "查询不可用时不推断订单事实。"
+        }
+      ],
+      "gold_behavior": "dependency_failure",
+      "allowed_boundary": "Provider dependency_failure；不等同not_found或不存在。",
+      "forbidden_promises": [
+        "订单不存在",
+        "订单已发货"
+      ],
+      "scenario": "provider_failure",
+      "dynamic_tool": "get_order",
+      "dynamic_args": {
+        "order_id": "ORD-1001"
+      },
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-22",
+      "query": "CartCare能证明月球仓库的冷链温度吗？",
+      "necessary_facts": [
+        "月球冷链温度"
+      ],
+      "available_evidence": [],
+      "gold_behavior": "normal_no_answer",
+      "allowed_boundary": "当前六文无该事实；检索可能低分或主题噪声，不能给温度。",
+      "forbidden_promises": [
+        "恒温零下18度"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "月球冷链温度"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-23",
+      "query": "退款政策：模拟退款动作completed是否说明钱到账了？",
+      "necessary_facts": [
+        "动作状态含义",
+        "资金到账"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "当前仅创建模拟退款申请，退款状态为待处理；动作完成不代表退款完成或到账，"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "允许明确否定两者等价；不将模拟回执当支付证据。",
+      "forbidden_promises": [
+        "钱已经到账",
+        "退款已结算"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-24",
+      "query": "订单查询：模拟人工交接记录创建成功是否说明真人接单？",
+      "necessary_facts": [
+        "记录创建",
+        "真人接单"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_ed1fae0ed79e04b2ee03",
+          "source": "demo:cartcare-default/order-guide",
+          "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+          "quote": "该记录不代表真人接单、通知发送或承运商已开始查件。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "可引用说明差异，不声称真人已接单。",
+      "forbidden_promises": [
+        "真人已接单",
+        "已通知真人"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-25",
+      "query": "技术故障排查：500错误是否证明Chroma已经宕机？",
+      "necessary_facts": [
+        "错误码",
+        "确切依赖根因"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_cd81fe468580a43ee0bd",
+          "source": "demo:cartcare-default/technical-guide",
+          "content_sha256": "be1e03477186c9510907873b1afb83066bc4fdf99cd412b0e5020d0fb6e2b13b",
+          "quote": "状态码只能提供排查方向，不能单独证明凭证过期、权限配置错误或某个依赖故障。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "只提供排查方向，根因未核实。",
+      "forbidden_promises": [
+        "证明Chroma宕机"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [
+        "确切依赖根因"
+      ],
+      "human_review": "pending"
+    },
+    {
+      "id": "ANS-26",
+      "query": "退款政策：企业美元订单也一定能按人民币规则退款吗？",
+      "necessary_facts": [
+        "币种适用性",
+        "实际订单资格"
+      ],
+      "available_evidence": [
+        {
+          "document_id": "doc_8450205ee234ce108cbd",
+          "source": "demo:cartcare-default/refund-policy",
+          "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+          "quote": "CartCare退款政策仅描述人民币演示用例，不构成真实商城或支付渠道承诺；程序未实现币种准入或换算校验。"
+        }
+      ],
+      "gold_behavior": "supported_boundary",
+      "allowed_boundary": "不能外推；也不谎称代码已有币种拒绝门。",
+      "forbidden_promises": [
+        "所有币种一律可退",
+        "程序一定拒绝美元"
+      ],
+      "scenario": "default",
+      "dynamic_tool": null,
+      "dynamic_args": null,
+      "unavailable_facts": [],
+      "human_review": "pending"
+    }
+  ]
+}

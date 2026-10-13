@@ -209,7 +209,8 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
                     "retrieval_status": "no_answer", "results": [], "citations": []}
         if tool_manager is None:
             return {"success": False, "error_code": "dependency_failure", "error": "RAG 工具未初始化",
-                    "retrieval_status": "degraded", "results": [], "citations": []}
+                    "retrieval_status": "degraded", "results": [], "citations": [],
+                    "answer_guidance": "检索依赖故障，不能判定事实充分或知识是否存在；说明查询不可用，不推断答案。"}
 
         result = await tool_manager.search_with_rewrite(
             "knowledge_search",
@@ -218,6 +219,17 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
         )
         status = getattr(result, "retrieval_status", None) or "degraded"
         if not getattr(result, "success", False) or status != "usable":
+            if not getattr(result, "success", False) or status == "degraded":
+                guidance = (
+                    "检索依赖故障或调用失败，不能判定知识是否存在，不能把故障说成正常知识不足。"
+                    "不要将检索候选或降级内容当作已核实的知识；说明查询不可用，可稍后重试或按条件人工核验。"
+                )
+            else:
+                guidance = (
+                    "本次没有可引用证据，是正常知识不足或低置信检索，不代表依赖故障，也不证明该事实不存在。"
+                    "不要将检索候选或降级内容当作已核实的知识；只说明无法确认所问事实，必要时澄清或查询动态工具。"
+                )
+            guidance += "检索状态没有判定事实充分；应按用户原始问题逐项核对事实依据。"
             return {
                 "success": bool(getattr(result, "success", False)),
                 "query": query,
@@ -226,7 +238,7 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
                 "retrieval_status": status,
                 "results": [],
                 "citations": [],
-                "answer_guidance": "不要将检索候选或降级内容当作已核实的知识；请澄清问题或建议人工核验。",
+                "answer_guidance": guidance,
                 "reranked": bool(getattr(result, "reranked", False)),
                 "rerank_status": getattr(result, "rerank_status", "not_requested"),
             }
@@ -238,6 +250,13 @@ def build_shared_rag_tools(tool_manager: Any) -> Dict[str, AgentToolSpec]:
             "results": result.data,
             "citations": getattr(result, "citations", []),
             "retrieval_status": "usable",
+            "answer_guidance": (
+                "usable仅表示检索片段通过相关性分数、来源、引用和生命周期校验，不表示事实充分或回答已核实。"
+                "请按用户原始问题逐项核对必要事实和片段中的直接依据，不按改写查询或主题相似度补全事实。"
+                "只回答有依据的部分并引用对应片段；缺失部分明确无法确认，不能把一个事实的引用用于其他事实。"
+                "正文明确不支持该功能时，可以有引用地说明能力边界。动态业务事实须查询当前客户有权限的Provider；"
+                "静态知识不证明具体订单、支付、物流、实付或到账状态。"
+            ),
             "reranked": bool(getattr(result, "reranked", False)),
             "rerank_status": getattr(result, "rerank_status", "not_requested"),
         }

@@ -1,0 +1,19 @@
+{
+  "at_utc": "2026-10-13T13:25:16.635104+00:00",
+  "python": "3.12.3 | packaged by conda-forge | (main, Apr 15 2024, 18:20:11) [MSC v.1938 64 bit (AMD64)]",
+  "executable": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\.venv\\Scripts\\python.exe",
+  "head": "20ad905875d5ffc539752982faa16f3775fee1ea",
+  "api_port_8000": "not_connectable",
+  "api_probe_error_type": "TimeoutError",
+  "docker_inspect": {
+    "exit": 1,
+    "stdout": "\n",
+    "stderr": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+  },
+  "chroma_heartbeat": {
+    "error_type": "ConnectTimeout",
+    "message": "timed out"
+  },
+  "service_start_attempts": 0,
+  "real_model_calls": 0
+}

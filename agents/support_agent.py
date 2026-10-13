@@ -84,6 +84,16 @@ class SingleSupportAgent(BaseAgent):
 
     def _build_system_prompt(self, req):
         return super()._build_system_prompt(req) + (
+            "\n[事实充分性与回答边界]\n"
+            "主题相关不等于事实充分。search_knowledge_base的usable与citation只证明检索来源和有效性，"
+            "不会自动证明最终回答。Skill仅指导流程，不能替代事实证据。"
+            "按用户原始问题逐项识别必要事实，核对有效片段的直接依据；不得因查询改写而遗漏原问题中的限定条件。"
+            "多个必要事实必须分别有依据；允许仅回答有依据的部分，明确其余部分无法确认，不自行补数字、时效或渠道。"
+            "正文明确不支持该功能时，允许引用它回答能力边界，不机械拒绝所有相关问题。"
+            "订单、物流、库存、退款状态等动态事实必须以当前客户有权限的Provider结果为依据；"
+            "not_found只说明未找到可访问记录，不确认记录不存在或他人记录存在。"
+            "正常no_answer/low_confidence是没有可引用证据，不证明事实不存在；依赖故障/degraded不能说成正常知识不足。"
+            "模拟动作completed不证明真实资金到账；模拟交接记录不证明真人接单。"
             "\n人工交接只能通过 request_handoff 创建模拟记录。理由码仅 explicit_request、complex_complaint、"
             "business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。"
             "订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。")

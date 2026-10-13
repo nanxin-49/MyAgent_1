@@ -1,0 +1,463 @@
+.FFFFFFFFFFFF..                                                          [100%]
+================================== FAILURES ===================================
+________________ test_usable_never_certifies_fact_sufficiency _________________
+
+    def test_usable_never_certifies_fact_sufficiency():
+        kb = make_kb()
+        # Force a high-scoring relevant hit without granting it missing facts.
+        original = kb._collection.query
+        def high_score(**kwargs):
+            result = original(**kwargs)
+            result['distances'] = [[.1]*len(result['ids'][0])]
+            return result
+        kb._collection.query = high_score
+        tool = build_shared_rag_tools(manager_for(kb))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('�˿��õ��ˣ�'),{'query':'�˿�����'}))
+        assert payload['success'] and payload['retrieval_status']=='usable'
+        assert payload['results'] and payload['citations']
+>       assert '��ʵ���' in payload.get('answer_guidance','')
+E       AssertionError: assert '��ʵ���' in ''
+E        +  where '' = <built-in method get of dict object at 0x0000025DFF30E000>('answer_guidance', '')
+E        +    where <built-in method get of dict object at 0x0000025DFF30E000> = {'citations': [{'chunk_index': 0, 'content_hash': '8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37', ...468580a43ee0bd', 'policy_version': None, ...}], 'query': '�˿�����', 'rerank_status': 'not_needed', 'reranked': False, ...}.get
+
+tests\test_answerability_boundary.py:36: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:44,926 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:44,928 [INFO] mcp.tool_manager: ��ѯ��д: '�˿�����' �� ['�˿�����']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿�����' �� ['�˿�����']
+_ test_normal_absence_and_failure_guidance_stay_distinct[expired-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3] _
+
+scenario = 'expired', expected = 'no_answer', success = True
+explanation = '����֪ʶ����'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'����֪ʶ����'),
+        ('future','no_answer',True,'����֪ʶ����'),
+        ('publishing','degraded',False,'��������'),
+        ('chroma_failure','degraded',False,'��������'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('�˿�����'),{'query':'�˿�����'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '����֪ʶ����' in '��Ҫ��������ѡ�򽵼����ݵ����Ѻ�ʵ��֪ʶ���������������˹����顣'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,395 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,397 [INFO] mcp.tool_manager: ��ѯ��д: '�˿�����' �� ['�˿�����']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿�����' �� ['�˿�����']
+_ test_normal_absence_and_failure_guidance_stay_distinct[future-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3] _
+
+scenario = 'future', expected = 'no_answer', success = True
+explanation = '����֪ʶ����'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'����֪ʶ����'),
+        ('future','no_answer',True,'����֪ʶ����'),
+        ('publishing','degraded',False,'��������'),
+        ('chroma_failure','degraded',False,'��������'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('�˿�����'),{'query':'�˿�����'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '����֪ʶ����' in '��Ҫ��������ѡ�򽵼����ݵ����Ѻ�ʵ��֪ʶ���������������˹����顣'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,431 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,433 [INFO] mcp.tool_manager: ��ѯ��д: '�˿�����' �� ['�˿�����']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿�����' �� ['�˿�����']
+_ test_normal_absence_and_failure_guidance_stay_distinct[publishing-degraded-False-\u4f9d\u8d56\u6545\u969c] _
+
+scenario = 'publishing', expected = 'degraded', success = False
+explanation = '��������'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'����֪ʶ����'),
+        ('future','no_answer',True,'����֪ʶ����'),
+        ('publishing','degraded',False,'��������'),
+        ('chroma_failure','degraded',False,'��������'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('�˿�����'),{'query':'�˿�����'}))
+>       assert payload['retrieval_status']==expected and payload['success'] is success
+E       AssertionError: assert ('no_answer' == 'degraded'
+E         
+E         - degraded
+E         + no_answer)
+
+tests\test_answerability_boundary.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,466 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,469 [INFO] mcp.tool_manager: ��ѯ��д: '�˿�����' �� ['�˿�����']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿�����' �� ['�˿�����']
+_ test_normal_absence_and_failure_guidance_stay_distinct[chroma_failure-degraded-False-\u4f9d\u8d56\u6545\u969c] _
+
+scenario = 'chroma_failure', expected = 'degraded', success = False
+explanation = '��������'
+
+    @pytest.mark.parametrize('scenario,expected,success,explanation', [
+        ('expired','no_answer',True,'����֪ʶ����'),
+        ('future','no_answer',True,'����֪ʶ����'),
+        ('publishing','degraded',False,'��������'),
+        ('chroma_failure','degraded',False,'��������'),
+    ])
+    def test_normal_absence_and_failure_guidance_stay_distinct(scenario,expected,success,explanation):
+        tool = build_shared_rag_tools(manager_for(make_kb(scenario)))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('�˿�����'),{'query':'�˿�����'}))
+        assert payload['retrieval_status']==expected and payload['success'] is success
+        assert payload['results']==[] and payload['citations']==[]
+>       assert explanation in payload['answer_guidance']
+E       AssertionError: assert '��������' in '��Ҫ��������ѡ�򽵼����ݵ����Ѻ�ʵ��֪ʶ���������������˹����顣'
+
+tests\test_answerability_boundary.py:52: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,515 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,516 [INFO] mcp.tool_manager: ��ѯ��д: '�˿�����' �� ['�˿�����']
+2026-10-13 21:11:45,518 [ERROR] mcp.tool_manager: �����쳣: knowledge_search �� injected Chroma dependency failure
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿�����' �� ['�˿�����']
+ERROR    mcp.tool_manager:tool_manager.py:276 �����쳣: knowledge_search �� injected Chroma dependency failure
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-03] _
+
+id = 'ANS-03'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,546 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:11:45,570 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,572 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�'
+2026-10-13 21:11:45,572 [INFO] mcp.tool_manager: ��ѯ��д: '�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�' �� ['�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�']
+2026-10-13 21:11:45,574 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�'
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�' �� ['�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�']
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ�500Ԫ��500.01Ԫ������ʲô����˭����ˣ�'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-08] _
+
+id = 'ANS-08'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,601 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:11:45,625 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,626 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�'
+2026-10-13 21:11:45,626 [INFO] mcp.tool_manager: ��ѯ��д: '�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�' �� ['�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�']
+2026-10-13 21:11:45,630 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�'
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�' �� ['�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�']
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=�˵��˿���淶(keywords=�˿�); ����֧�ִ����淶(keywords=500) message='�˿����ߣ��˿��500Ԫ˭��ˣ���õ��ˣ�'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-09] _
+
+id = 'ANS-09'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,657 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:11:45,679 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,680 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=��Ա) message='��Ա����֣�ÿ����һԪ�����ٻ��֣�'
+2026-10-13 21:11:45,680 [INFO] mcp.tool_manager: ��ѯ��д: '��Ա����֣�ÿ����һԪ�����ٻ��֣�' �� ['��Ա����֣�ÿ����һԪ�����ٻ��֣�']
+2026-10-13 21:11:45,684 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=��Ա) message='��Ա����֣�ÿ����һԪ�����ٻ��֣�'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=��Ա) message='��Ա����֣�ÿ����һԪ�����ٻ��֣�'
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '��Ա����֣�ÿ����һԪ�����ٻ��֣�' �� ['��Ա����֣�ÿ����һԪ�����ٻ��֣�']
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=��Ա) message='��Ա����֣�ÿ����һԪ�����ٻ��֣�'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-12] _
+
+id = 'ANS-12'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,710 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:11:45,735 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,735 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=����) message='������ѯ��ORD-1001���ڵĶ���״̬��ʲô��'
+2026-10-13 21:11:45,736 [INFO] mcp.tool_manager: ��ѯ��д: '������ѯ��ORD-1001���ڵĶ���״̬��ʲô��' �� ['������ѯ��ORD-1001���ڵĶ���״̬��ʲô��']
+2026-10-13 21:11:45,740 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=����) message='������ѯ��ORD-1001���ڵĶ���״̬��ʲô��'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=����) message='������ѯ��ORD-1001���ڵĶ���״̬��ʲô��'
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '������ѯ��ORD-1001���ڵĶ���״̬��ʲô��' �� ['������ѯ��ORD-1001���ڵĶ���״̬��ʲô��']
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=ͨ�ÿͷ��Ӵ��淶(keywords=����) message='������ѯ��ORD-1001���ڵĶ���״̬��ʲô��'
+_ test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-25] _
+
+id = 'ANS-25'
+
+    @pytest.mark.parametrize('id', ['ANS-03','ANS-08','ANS-09','ANS-12','ANS-25'])
+    def test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills(id):
+        case = next(c for c in load_dataset()['cases'] if c['id']==id)
+        row = asyncio.run(observe(case))
+>       assert row['boundary_delivered']
+E       assert False
+
+tests\test_answerability_boundary.py:59: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,766 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-13 21:11:45,788 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,788 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=����֧�ִ����淶(keywords=����, 500) message='���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���'
+2026-10-13 21:11:45,789 [INFO] mcp.tool_manager: ��ѯ��д: '���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���' �� ['���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���']
+2026-10-13 21:11:45,791 [INFO] core.skill_loader: Skills ��ע��: agent=all matched=����֧�ִ����淶(keywords=����, 500) message='���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���'
+------------------------------ Captured log call ------------------------------
+INFO     core.skill_loader:skill_loader.py:212 
+================ CartCare Skills Loaded ================
+Ŀ¼: E:\AAA_NEED\Echomind_new\EchoMind\skills
+����: 3
+1. �˵��˿���淶
+   agents: billing
+   keywords: �˿�, �˷�, �ۿ�, �ظ��ۿ�, ֧��, �˵�, ��Ʊ, ����, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. ͨ�ÿͷ��Ӵ��淶
+   agents: general
+   keywords: ���, ����, ��ѯ, ����, �ͷ�, ����, �ۺ�, �, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. ����֧�ִ����淶
+   agents: technical
+   keywords: ����, ����, �쳣, ����, ����, �޷���¼, ��¼ʧ��, �ӿ�, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=����֧�ִ����淶(keywords=����, 500) message='���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���'
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���' �� ['���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���']
+INFO     core.skill_loader:skill_loader.py:161 Skills ��ע��: agent=all matched=����֧�ִ����淶(keywords=����, 500) message='���������Ų飺500�����Ƿ�֤��Chroma�Ѿ�崻���'
+_________________ test_unmatched_question_gets_same_base_rule _________________
+
+    def test_unmatched_question_gets_same_base_rule():
+        from agents.support_agent import SingleSupportAgent
+        from evaluation.answerability.harness import AdversarialSDK
+        case = load_dataset()['cases'][0]
+        agent = SingleSupportAgent(AdversarialSDK(case),'fake')
+        prompt = agent._build_system_prompt(request('xyzq'))
+>       assert '������ز�������ʵ���' in prompt
+E       AssertionError: assert '������ز�������ʵ���' in '���� CartCare ���̿ͷ����֡��Ѻá����ػش��û����⡣������ⳬ�����������Χ����ȷ˵��������ת��רҵ�ͷ���\n\n[��ɫ��Լ]\n��ɫ�����̿ͷ�\nְ�𣺴�����Ʒ���������������ۺ����⣬��ȷ֤�����˹������߽硣\n��������...xplicit_request��complex_complaint��business_dependency_failure����Ҫ��ժҪ��Խ��ܾ���ȱ�������ɽ��ӡ���Ʊ�ȷǵ��������ɺ����ܾ������������������ѽӵ��򹤾�δ�����Ľ����ѳɹ���'
+
+tests\test_answerability_boundary.py:70: AssertionError
+_______ test_capability_denial_remains_usable_when_explicitly_supported _______
+
+    def test_capability_denial_remains_usable_when_explicitly_supported():
+        kb = make_kb()
+        # Natural exact title query above existing .35; no threshold changes.
+        tool = build_shared_rag_tools(manager_for(kb))['search_knowledge_base']
+        payload = asyncio.run(tool.handler(request('��Ա�����'),{'query':'��Ա�����'}))
+        assert payload['retrieval_status']=='usable'
+        assert any('δʵ�ֻ�Ա�˻�' in h['content'] for h in payload['results'])
+>       assert '��֧�ָù���' in payload.get('answer_guidance','')
+E       AssertionError: assert '��֧�ָù���' in ''
+E        +  where '' = <built-in method get of dict object at 0x0000025DFF8B5F80>('answer_guidance', '')
+E        +    where <built-in method get of dict object at 0x0000025DFF8B5F80> = {'citations': [{'chunk_index': 0, 'content_hash': '4e044b244b4a03f4f45d0cc996e89eff99707f81e76a38480d35bf320e007ca8', ...5c6f9e8cfe749', 'policy_version': None, ...}], 'query': '��Ա�����', 'rerank_status': 'not_needed', 'reranked': False, ...}.get
+
+tests\test_answerability_boundary.py:80: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-13 21:11:45,838 [INFO] mcp.tool_manager: ע�Ṥ��: knowledge_search
+2026-10-13 21:11:45,839 [INFO] mcp.tool_manager: ��ѯ��д: '��Ա�����' �� ['��Ա�����']
+------------------------------ Captured log call ------------------------------
+INFO     mcp.tool_manager:tool_manager.py:174 ע�Ṥ��: knowledge_search
+INFO     mcp.tool_manager:tool_manager.py:399 ��ѯ��д: '��Ա�����' �� ['��Ա�����']
+=========================== short test summary info ===========================
+FAILED tests/test_answerability_boundary.py::test_usable_never_certifies_fact_sufficiency
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[expired-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3]
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[future-no_answer-True-\u6b63\u5e38\u77e5\u8bc6\u4e0d\u8db3]
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[publishing-degraded-False-\u4f9d\u8d56\u6545\u969c]
+FAILED tests/test_answerability_boundary.py::test_normal_absence_and_failure_guidance_stay_distinct[chroma_failure-degraded-False-\u4f9d\u8d56\u6545\u969c]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-03]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-08]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-09]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-12]
+FAILED tests/test_answerability_boundary.py::test_base_boundary_reaches_real_support_sdk_with_or_without_matching_skills[ANS-25]
+FAILED tests/test_answerability_boundary.py::test_unmatched_question_gets_same_base_rule
+FAILED tests/test_answerability_boundary.py::test_capability_denial_remains_usable_when_explicitly_supported
+12 failed, 3 passed in 2.06s
