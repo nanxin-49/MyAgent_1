@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "baseline_head": "483a2743f8aae4d5286a1202669ba6201af88823",
+  "changed_tracked": [
+    "README.md",
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json",
+    "skills/README.md",
+    "skills/billing_support/SKILL.md",
+    "skills/general_customer_service/SKILL.md",
+    "skills/technical_support/SKILL.md"
+  ],
+  "all_other_tracked_sha256_unchanged": true,
+  "protected_count": 497,
+  "approved_asset_sha256": "17e3c606365c203589919321b166e942e6aab569d539ce631f447a5439cd018d",
+  "database_calls": 0,
+  "real_model_calls": 0,
+  "api_started": false
+}

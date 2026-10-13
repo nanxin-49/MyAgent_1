@@ -1,0 +1,8 @@
+{
+  "captured_at_utc": "2026-10-13T09:13:41.4805177Z",
+  "available_memory_GiB": 1.5553970336914062,
+  "app_state": "exited",
+  "app_running": "false",
+  "api_listeners": [],
+  "resource_scope": "lightweight Fake/unit pytest only; not a B1 resource retry"
+}

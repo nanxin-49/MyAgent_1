@@ -144,7 +144,7 @@ $env:CARTCARE_BUSINESS_FIXTURE = (Resolve-Path data/demo_business_fixture.json).
 uv run python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
 ```
 
-已有 `.env` 时保留原配置。知识库首次为空时从 `mcp/knowledge_assets/default_business_v1.json` 加载获批演示资料；先用 `uv run python -m mcp.seed_demo_knowledge --check-assets` 离线核验审批 hash 和 publication revision。普通 seed 与 `--reset` 使用同一资产；非空集合须停写、完整备份，再通过 `--backup-file` 核对未变化快照，优先原位发布。本地演示默认库已完成受控内部维护发布及机械核验；业务、Skills、Answerability和真实/chat仍待独立验证，API保持停止。执行证据见 `evaluation/reports/hardening/A05/default-kb-internal-publication-20261013T081119Z/REPORT.md`；发布/恢复命令和边界见 `evaluation/reports/hardening/A05/default-kb-publication-20261013/REPORT.md`。保持外部 Chroma 可连接，不使用 PersistentClient fallback。全容器运行仍可用 `docker compose up -d --build`，Compose 的应用服务名 `echomind` 和 `ECHOMIND_*` 兼容标识暂时保留；十场景 fixture 环境变量需传入应用容器，以上本地路径更便于演示。
+已有 `.env` 时保留原配置。知识库首次为空时从 `mcp/knowledge_assets/default_business_v1.json` 加载获批演示资料；先用 `uv run python -m mcp.seed_demo_knowledge --check-assets` 离线核验审批 hash 和 publication revision。普通 seed 与 `--reset` 使用同一资产；非空集合须停写、完整备份，再通过 `--backup-file` 核对未变化快照，优先原位发布。本地演示默认库已完成受控内部维护发布及机械核验；Skills口径修订已通过静态/Fake验证、等待人工验收，业务Answerability和真实/chat仍待独立验证，API保持停止；见 `evaluation/reports/hardening/A05/skills-consistency-20261013/REPORT.md`。执行证据见 `evaluation/reports/hardening/A05/default-kb-internal-publication-20261013T081119Z/REPORT.md`；发布/恢复命令和边界见 `evaluation/reports/hardening/A05/default-kb-publication-20261013/REPORT.md`。保持外部 Chroma 可连接，不使用 PersistentClient fallback。全容器运行仍可用 `docker compose up -d --build`，Compose 的应用服务名 `echomind` 和 `ECHOMIND_*` 兼容标识暂时保留；十场景 fixture 环境变量需传入应用容器，以上本地路径更便于演示。
 
 ## Tests
 

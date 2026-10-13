@@ -1,0 +1,128 @@
+.FFFFFFFF.FFFFFF.                                                        [100%]
+================================== FAILURES ===================================
+_ test_conflicting_billing_instruction_never_reaches_sdk[\u9000\u6b3e\u91d1\u989d\u4ee5\u5b9e\u9645\u652f\u4ed8\u91d1\u989d\u548c\u5e73\u53f0\u89c4\u5219\u4e3a\u51c6] _
+tests\test_runtime_skills_consistency.py:67: in test_conflicting_billing_instruction_never_reaches_sdk
+    assert old_instruction not in dynamic('退款发票订阅')
+E   AssertionError: assert '退款金额以实际支付金额和平台规则为准' not in '以下是当前请求可用的 ...工具未创建的交接已成功。'
+E     
+E     '退款金额以实际支付金额和平台规则为准' is contained here:
+E       其他约定方式。
+E       - 退款金额以实际支付金额和平台规则为准，不要把订单原价当作退款金额。
+E       
+E       ### 退款到账
+E       ...
+E     
+E     ...Full output truncated (58 lines hidden), use '-vv' to show
+_ test_conflicting_billing_instruction_never_reaches_sdk[\u5982\u679c\u6d89\u53ca\u5df2\u4f7f\u7528\u670d\u52a1\u3001\u865a\u62df\u5546\u54c1\u3001\u6d3b\u52a8\u4ef7\u3001\u4f01\u4e1a\u5408\u540c\u3001\u90e8\u5206\u9000\u6b3e\uff0c\u5fc5\u987b\u8bf4\u660e\u9700\u8981\u4eba\u5de5\u5ba1\u6838] _
+tests\test_runtime_skills_consistency.py:67: in test_conflicting_billing_instruction_never_reaches_sdk
+    assert old_instruction not in dynamic('退款发票订阅')
+E   AssertionError: assert '如果涉及已使用服务、虚...款，必须说明需要人工审核' not in '以下是当前请求可用的 ...工具未创建的交接已成功。'
+E     
+E     '如果涉及已使用服务、虚拟商品、活动价、企业合同、部分退款，必须说明需要人工审核' is contained here:
+E       验时直接承诺。
+E       - 如果涉及已使用服务、虚拟商品、活动价、企业合同、部分退款，必须说明需要人工审核。
+E       - 说明退款路径：提交申请、核验订单、审核结果、原路退回或其他约定方式。
+E       - 退款金额以实际支付金额和平台规则为准，不要把订单原价当作退款金额。
+E       ...
+E     
+E     ...Full output truncated (60 lines hidden), use '-vv' to show
+_ test_conflicting_billing_instruction_never_reaches_sdk[\u8bf4\u660e\u9000\u6b3e\u901a\u8fc7\u540e\u901a\u5e38\u539f\u8def\u9000\u56de] _
+tests\test_runtime_skills_consistency.py:67: in test_conflicting_billing_instruction_never_reaches_sdk
+    assert old_instruction not in dynamic('退款发票订阅')
+E   AssertionError: assert '说明退款通过后通常原路退回' not in '以下是当前请求可用的 ...工具未创建的交接已成功。'
+E     
+E     '说明退款通过后通常原路退回' is contained here:
+E       # 退款到账
+E       
+E       - 说明退款通过后通常原路退回，但不同支付渠道处理时间不同。
+E       - 如果用户说“显示退款成功但没到账”，建议检查原支付账户、银行卡入账记录、支付渠道通知。
+E       - 超过常规时间仍未到账时，建议转人工核实退款流水号。...
+E     
+E     ...Full output truncated (55 lines hidden), use '-vv' to show
+_ test_conflicting_billing_instruction_never_reaches_sdk[\u53d6\u6d88\u8ba2\u9605\u901a\u5e38\u53ea\u5f71\u54cd\u540e\u7eed\u7eed\u8d39] _
+tests\test_runtime_skills_consistency.py:67: in test_conflicting_billing_instruction_never_reaches_sdk
+    assert old_instruction not in dynamic('退款发票订阅')
+E   AssertionError: assert '取消订阅通常只影响后续续费' not in '以下是当前请求可用的 ...工具未创建的交接已成功。'
+E     
+E     '取消订阅通常只影响后续续费' is contained here:
+E       自动扣款协议。
+E       - 取消订阅通常只影响后续续费，不代表当前已支付订单自动退款。
+E       
+E       ### 优惠券和抵扣
+E       ...
+E     
+E     ...Full output truncated (33 lines hidden), use '-vv' to show
+_____________ test_refund_money_and_approval_context_reaches_sdk ______________
+tests\test_runtime_skills_consistency.py:75: in test_refund_money_and_approval_context_reaches_sdk
+    assert text in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+____ test_general_single_static_live_action_and_owner_boundaries_reach_sdk ____
+tests\test_runtime_skills_consistency.py:81: in test_general_single_static_live_action_and_owner_boundaries_reach_sdk
+    assert '识别是否需要专属 Agent' not in prompt
+E   AssertionError: assert '识别是否需要专属 Agent' not in '以下是当前请求可用的 ...工具未创建的交接已成功。'
+E     
+E     '识别是否需要专属 Agent' is contained here:
+E       还是转人工。
+E       2. 识别是否需要专属 Agent：技术故障转技术支持，账单/退款/发票转账单支持，复杂投诉或权限操作转人工。
+E     ?    ++++++++++++++
+E       3. 信息澄清：只索取解决问题必要的信息，例如订单号、手机号后四位、报错截图、支付时间、设备类型等。
+E       4. 给出下一步：告诉用户应该怎么做、客服会怎么处理、预计需要等待什么结果。...
+E     
+E     ...Full output truncated (38 lines hidden), use '-vv' to show
+___ test_technical_does_not_offer_unimplemented_password_or_real_escalation ___
+tests\test_runtime_skills_consistency.py:89: in test_technical_does_not_offer_unimplemented_password_or_real_escalation
+    assert '可以建议重置密码或重新授权' not in prompt
+E   AssertionError: assert '可以建议重置密码或重新授权' not in '以下是当前请求可用的 ...工具未创建的交接已成功。'
+E     
+E     '可以建议重置密码或重新授权' is contained here:
+E       户提供密码或验证码；可以建议重置密码或重新授权。
+E       
+E       ### 接口 500
+E       
+E       - 说明 500 表示服务端处理异常，但不能直接断定是用户或平台单方原因。...
+E     
+E     ...Full output truncated (48 lines hidden), use '-vv' to show
+___ test_all_three_skills_critical_boundaries_survive_actual_default_budget ___
+tests\test_runtime_skills_consistency.py:100: in test_all_three_skills_critical_boundaries_survive_actual_default_budget
+    assert text in system
+E   AssertionError: assert 'order.total_amount' in '你是 CartCare 电商客服助手。友好、简洁地回答用户问题。如果问题超出你的能力范围，明确说明并建议转接专业客服。\n\n[角色契约]\n角色：电商客服\n职责：处理商品、订单、物流和售后问题，明确证据与人工处理边界。\n处理流程...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+_ test_skill_explained_amount_boundary_uses_real_unchanged_policy[None-require_approval] _
+tests\test_runtime_skills_consistency.py:121: in test_skill_explained_amount_boundary_uses_real_unchanged_policy
+    assert 'order.total_amount' in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+_ test_skill_explained_amount_boundary_uses_real_unchanged_policy[100-allow] __
+tests\test_runtime_skills_consistency.py:121: in test_skill_explained_amount_boundary_uses_real_unchanged_policy
+    assert 'order.total_amount' in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+_ test_skill_explained_amount_boundary_uses_real_unchanged_policy[500-allow] __
+tests\test_runtime_skills_consistency.py:121: in test_skill_explained_amount_boundary_uses_real_unchanged_policy
+    assert 'order.total_amount' in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+_ test_skill_explained_amount_boundary_uses_real_unchanged_policy[500.01-require_approval] _
+tests\test_runtime_skills_consistency.py:121: in test_skill_explained_amount_boundary_uses_real_unchanged_policy
+    assert 'order.total_amount' in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+__ test_skill_explained_amount_boundary_uses_real_unchanged_policy[801-deny] __
+tests\test_runtime_skills_consistency.py:121: in test_skill_explained_amount_boundary_uses_real_unchanged_policy
+    assert 'order.total_amount' in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+___ test_skill_explained_amount_boundary_uses_real_unchanged_policy[0-deny] ___
+tests\test_runtime_skills_consistency.py:121: in test_skill_explained_amount_boundary_uses_real_unchanged_policy
+    assert 'order.total_amount' in prompt
+E   AssertionError: assert 'order.total_amount' in '以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 账单退款处理规范\n说明: 适用于 CartCare BillingAgent 的账单查询、扣...xplicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。'
+=========================== short test summary info ===========================
+FAILED tests/test_runtime_skills_consistency.py::test_conflicting_billing_instruction_never_reaches_sdk[\u9000\u6b3e\u91d1\u989d\u4ee5\u5b9e\u9645\u652f\u4ed8\u91d1\u989d\u548c\u5e73\u53f0\u89c4\u5219\u4e3a\u51c6]
+FAILED tests/test_runtime_skills_consistency.py::test_conflicting_billing_instruction_never_reaches_sdk[\u5982\u679c\u6d89\u53ca\u5df2\u4f7f\u7528\u670d\u52a1\u3001\u865a\u62df\u5546\u54c1\u3001\u6d3b\u52a8\u4ef7\u3001\u4f01\u4e1a\u5408\u540c\u3001\u90e8\u5206\u9000\u6b3e\uff0c\u5fc5\u987b\u8bf4\u660e\u9700\u8981\u4eba\u5de5\u5ba1\u6838]
+FAILED tests/test_runtime_skills_consistency.py::test_conflicting_billing_instruction_never_reaches_sdk[\u8bf4\u660e\u9000\u6b3e\u901a\u8fc7\u540e\u901a\u5e38\u539f\u8def\u9000\u56de]
+FAILED tests/test_runtime_skills_consistency.py::test_conflicting_billing_instruction_never_reaches_sdk[\u53d6\u6d88\u8ba2\u9605\u901a\u5e38\u53ea\u5f71\u54cd\u540e\u7eed\u7eed\u8d39]
+FAILED tests/test_runtime_skills_consistency.py::test_refund_money_and_approval_context_reaches_sdk
+FAILED tests/test_runtime_skills_consistency.py::test_general_single_static_live_action_and_owner_boundaries_reach_sdk
+FAILED tests/test_runtime_skills_consistency.py::test_technical_does_not_offer_unimplemented_password_or_real_escalation
+FAILED tests/test_runtime_skills_consistency.py::test_all_three_skills_critical_boundaries_survive_actual_default_budget
+FAILED tests/test_runtime_skills_consistency.py::test_skill_explained_amount_boundary_uses_real_unchanged_policy[None-require_approval]
+FAILED tests/test_runtime_skills_consistency.py::test_skill_explained_amount_boundary_uses_real_unchanged_policy[100-allow]
+FAILED tests/test_runtime_skills_consistency.py::test_skill_explained_amount_boundary_uses_real_unchanged_policy[500-allow]
+FAILED tests/test_runtime_skills_consistency.py::test_skill_explained_amount_boundary_uses_real_unchanged_policy[500.01-require_approval]
+FAILED tests/test_runtime_skills_consistency.py::test_skill_explained_amount_boundary_uses_real_unchanged_policy[801-deny]
+FAILED tests/test_runtime_skills_consistency.py::test_skill_explained_amount_boundary_uses_real_unchanged_policy[0-deny]
+14 failed, 3 passed in 0.80s
