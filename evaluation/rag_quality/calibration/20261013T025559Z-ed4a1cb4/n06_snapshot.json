@@ -1,0 +1,279 @@
+{
+  "publication_82f5a1b614dac0d8d6811ae66fbe179c121a5d5ebf418f3a93e184a65363c1bf": [
+    "{\"chunk_ids\": [\"7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864\"], \"document\": {\"content\": \"CartCare \\u6a21\\u62df\\u5ba2\\u670d\\u653f\\u7b56\\u8bf4\\u660e\\uff0c\\u4ec5\\u7528\\u4e8e\\u6f14\\u793a\\u3002\\u8ba2\\u5355\\u521b\\u5efa\\u540e 7 \\u5929\\u5185\\u3001\\u8ba2\\u5355\\u72b6\\u6001\\u7b26\\u5408\\u8981\\u6c42\\u65f6\\u53ef\\u4ee5\\u8bf7\\u6c42\\u9000\\u6b3e\\u3002\\u9000\\u6b3e\\u91d1\\u989d\\u4e0d\\u80fd\\u8d85\\u8fc7\\u8ba2\\u5355\\u603b\\u989d\\uff1b\\u8d85\\u8fc7 500 \\u5143\\u9700\\u4eba\\u5de5\\u5ba1\\u6279\\u3002\\u9000\\u6b3e\\u8bf7\\u6c42\\u662f\\u5426\\u53ef\\u6267\\u884c\\u7531\\u5b9e\\u65f6\\u8ba2\\u5355\\u4e8b\\u5b9e\\u548c PolicyEngine \\u51b3\\u5b9a\\u3002\\u6b64\\u6587\\u6863\\u4e0d\\u4ee3\\u8868\\u771f\\u5b9e\\u5546\\u57ce\\u627f\\u8bfa\\u6216\\u652f\\u4ed8\\u6e20\\u9053\\u5904\\u7406\\u65f6\\u6548\\u3002\", \"doc_type\": \"policy\", \"document_id\": \"doc_dd816769efe7659f114e\", \"effective_at\": \"2026-09-30T00:00:00Z\", \"expires_at\": null, \"policy_version\": \"refund-cancel-v1\", \"publication_status\": \"active\", \"source\": \"demo:cartcare-default/refund-policy\", \"supersedes\": [], \"title\": \"\\u9000\\u6b3e\\u653f\\u7b56\"}, \"revision\": \"a3be2b6ee4fcbab41e9cf4ac047e61745a681a61172a06139fa5add78ac615b6\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:cartcare-default/refund-policy"
+    }
+  ],
+  "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864": [
+    "CartCare 模拟客服政策说明，仅用于演示。订单创建后 7 天内、订单状态符合要求时可以请求退款。退款金额不能超过订单总额；超过 500 元需人工审批。退款请求是否可执行由实时订单事实和 PolicyEngine 决定。此文档不代表真实商城承诺或支付渠道处理时效。",
+    {
+      "chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+      "chunk_index": 0,
+      "content_hash": "a7c085e8feea32a6903616d128d81ba791f26b4797a903296ae4f4ad11396f90",
+      "doc_type": "policy",
+      "document_id": "doc_dd816769efe7659f114e",
+      "effective_at": "2026-09-30T00:00:00+00:00",
+      "policy_version": "refund-cancel-v1",
+      "publication_id": "publication_82f5a1b614dac0d8d6811ae66fbe179c121a5d5ebf418f3a93e184a65363c1bf",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "a3be2b6ee4fcbab41e9cf4ac047e61745a681a61172a06139fa5add78ac615b6",
+      "source": "demo:cartcare-default/refund-policy",
+      "title": "退款政策",
+      "total_chunks": 1
+    }
+  ],
+  "publication_00ccd86904bf0e7eb3a723daf541b6ce62e241b3cf39684c8ef2a83656cadc47": [
+    "{\"chunk_ids\": [\"4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3\"], \"document\": {\"content\": \"\\u8ba2\\u5355\\u67e5\\u8be2\\u6307\\u5357\\u3002\\u7528\\u6237\\u53ef\\u4ee5\\u901a\\u8fc7\\u8ba2\\u5355\\u53f7\\u67e5\\u8be2\\u8ba2\\u5355\\u72b6\\u6001\\u3002\\u8ba2\\u5355\\u72b6\\u6001\\u5305\\u62ec\\uff1a\\u5f85\\u652f\\u4ed8\\u3001\\u5df2\\u652f\\u4ed8\\u3001\\u5df2\\u53d1\\u8d27\\u3001\\u8fd0\\u8f93\\u4e2d\\u3001\\u5df2\\u7b7e\\u6536\\u3001\\u5df2\\u5b8c\\u6210\\u3002\\u5982\\u679c\\u8ba2\\u5355\\u663e\\u793a\\u5df2\\u53d1\\u8d27\\u4f46\\u8d85\\u8fc7 7 \\u5929\\u672a\\u6536\\u5230\\uff0c\\u53ef\\u4ee5\\u8054\\u7cfb\\u5ba2\\u670d\\u7533\\u8bf7\\u67e5\\u4ef6\\u3002\\u7269\\u6d41\\u4fe1\\u606f\\u901a\\u5e38\\u5728\\u53d1\\u8d27\\u540e 24 \\u5c0f\\u65f6\\u5185\\u66f4\\u65b0\\u3002\\u5982\\u679c\\u8ba2\\u5355\\u663e\\u793a\\u5f02\\u5e38\\uff0c\\u8bf7\\u63d0\\u4f9b\\u8ba2\\u5355\\u53f7\\u8054\\u7cfb\\u5ba2\\u670d\\u5904\\u7406\\u3002\", \"doc_type\": \"guide\", \"document_id\": \"doc_b18d553a21972fe4b3f5\", \"effective_at\": null, \"expires_at\": null, \"policy_version\": null, \"publication_status\": \"active\", \"source\": \"demo:cartcare-default/order-guide\", \"supersedes\": [], \"title\": \"\\u8ba2\\u5355\\u67e5\\u8be2\"}, \"revision\": \"118d81261c1a7b0f8eeaf4a66b4512a163209b533710b8f2a2ac8414bf16c65f\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:cartcare-default/order-guide"
+    }
+  ],
+  "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3": [
+    "订单查询指南。用户可以通过订单号查询订单状态。订单状态包括：待支付、已支付、已发货、运输中、已签收、已完成。如果订单显示已发货但超过 7 天未收到，可以联系客服申请查件。物流信息通常在发货后 24 小时内更新。如果订单显示异常，请提供订单号联系客服处理。",
+    {
+      "chunk_id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+      "chunk_index": 0,
+      "content_hash": "faae5da225a4662a81554146ba9b335c8d6b80220025f8e320706a2bc39a4ca0",
+      "doc_type": "guide",
+      "document_id": "doc_b18d553a21972fe4b3f5",
+      "publication_id": "publication_00ccd86904bf0e7eb3a723daf541b6ce62e241b3cf39684c8ef2a83656cadc47",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "118d81261c1a7b0f8eeaf4a66b4512a163209b533710b8f2a2ac8414bf16c65f",
+      "source": "demo:cartcare-default/order-guide",
+      "title": "订单查询",
+      "total_chunks": 1
+    }
+  ],
+  "publication_c2e229e05739ab0a7ed491099265d67e598158a24a4956360ce7775aba13e503": [
+    "{\"chunk_ids\": [\"4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d\"], \"document\": {\"content\": \"\\u8d26\\u6237\\u5b89\\u5168\\u8bf4\\u660e\\u3002\\u5efa\\u8bae\\u7528\\u6237\\u5b9a\\u671f\\u4fee\\u6539\\u5bc6\\u7801\\uff0c\\u5bc6\\u7801\\u957f\\u5ea6\\u81f3\\u5c11 8 \\u4f4d\\uff0c\\u5305\\u542b\\u5b57\\u6bcd\\u548c\\u6570\\u5b57\\u3002\\u5982\\u679c\\u5fd8\\u8bb0\\u5bc6\\u7801\\uff0c\\u53ef\\u4ee5\\u901a\\u8fc7\\u7ed1\\u5b9a\\u7684\\u624b\\u673a\\u53f7\\u6216\\u90ae\\u7bb1\\u91cd\\u7f6e\\u3002\\u53d1\\u73b0\\u8d26\\u6237\\u5f02\\u5e38\\u767b\\u5f55\\u65f6\\uff0c\\u7cfb\\u7edf\\u4f1a\\u81ea\\u52a8\\u9501\\u5b9a\\u8d26\\u6237\\u5e76\\u53d1\\u9001\\u901a\\u77e5\\u3002\\u7528\\u6237\\u53ef\\u4ee5\\u5728\\u5b89\\u5168\\u8bbe\\u7f6e\\u4e2d\\u5f00\\u542f\\u4e24\\u6b65\\u9a8c\\u8bc1\\uff0c\\u63d0\\u9ad8\\u8d26\\u6237\\u5b89\\u5168\\u6027\\u3002\\u4e0d\\u8981\\u5c06\\u5bc6\\u7801\\u5206\\u4eab\\u7ed9\\u4ed6\\u4eba\\uff0c\\u5ba2\\u670d\\u4eba\\u5458\\u4e0d\\u4f1a\\u7d22\\u8981\\u7528\\u6237\\u5bc6\\u7801\\u3002\", \"doc_type\": \"guide\", \"document_id\": \"doc_1348d91e6f873b93a77a\", \"effective_at\": null, \"expires_at\": null, \"policy_version\": null, \"publication_status\": \"active\", \"source\": \"demo:cartcare-default/account-guide\", \"supersedes\": [], \"title\": \"\\u8d26\\u6237\\u5b89\\u5168\"}, \"revision\": \"9fb2c196868e16ac7c68decd29f386b0ec1af502fbae891326a4967392592c6a\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:cartcare-default/account-guide"
+    }
+  ],
+  "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d": [
+    "账户安全说明。建议用户定期修改密码，密码长度至少 8 位，包含字母和数字。如果忘记密码，可以通过绑定的手机号或邮箱重置。发现账户异常登录时，系统会自动锁定账户并发送通知。用户可以在安全设置中开启两步验证，提高账户安全性。不要将密码分享给他人，客服人员不会索要用户密码。",
+    {
+      "chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+      "chunk_index": 0,
+      "content_hash": "4cbdb2edc53ea45c3cbb7c7b9955b8806174dadfb41ea646b390804141b440de",
+      "doc_type": "guide",
+      "document_id": "doc_1348d91e6f873b93a77a",
+      "publication_id": "publication_c2e229e05739ab0a7ed491099265d67e598158a24a4956360ce7775aba13e503",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "9fb2c196868e16ac7c68decd29f386b0ec1af502fbae891326a4967392592c6a",
+      "source": "demo:cartcare-default/account-guide",
+      "title": "账户安全",
+      "total_chunks": 1
+    }
+  ],
+  "publication_90f72dcb00923e2639ade65055e079ae8dccf9173edee9c59ba6e729394c5440": [
+    "{\"chunk_ids\": [\"830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3\"], \"document\": {\"content\": \"\\u5e38\\u89c1\\u6280\\u672f\\u95ee\\u9898\\u6392\\u67e5\\u3002\\u5e94\\u7528\\u5d29\\u6e83\\uff1a\\u8bf7\\u5c1d\\u8bd5\\u6e05\\u9664\\u7f13\\u5b58\\u540e\\u91cd\\u542f\\u5e94\\u7528\\uff0c\\u5982\\u679c\\u95ee\\u9898\\u6301\\u7eed\\u8bf7\\u66f4\\u65b0\\u5230\\u6700\\u65b0\\u7248\\u672c\\u3002\\u767b\\u5f55\\u5931\\u8d25 401 \\u9519\\u8bef\\uff1a\\u8868\\u793a\\u8ba4\\u8bc1\\u5931\\u8d25\\uff0c\\u8bf7\\u68c0\\u67e5\\u7528\\u6237\\u540d\\u5bc6\\u7801\\u662f\\u5426\\u6b63\\u786e\\uff0c\\u6216\\u5c1d\\u8bd5\\u91cd\\u7f6e\\u5bc6\\u7801\\u3002\\u9875\\u9762\\u52a0\\u8f7d\\u6162\\uff1a\\u68c0\\u67e5\\u7f51\\u7edc\\u8fde\\u63a5\\uff0c\\u5c1d\\u8bd5\\u5207\\u6362 WiFi \\u6216\\u79fb\\u52a8\\u6570\\u636e\\u3002\\u652f\\u4ed8\\u5931\\u8d25\\uff1a\\u786e\\u8ba4\\u94f6\\u884c\\u5361\\u4f59\\u989d\\u5145\\u8db3\\uff0c\\u68c0\\u67e5\\u662f\\u5426\\u5f00\\u542f\\u4e86\\u7f51\\u4e0a\\u652f\\u4ed8\\u529f\\u80fd\\u3002500 \\u670d\\u52a1\\u5668\\u9519\\u8bef\\uff1a\\u8fd9\\u662f\\u670d\\u52a1\\u7aef\\u95ee\\u9898\\uff0c\\u8bf7\\u7a0d\\u540e\\u91cd\\u8bd5\\uff0c\\u5982\\u679c\\u6301\\u7eed\\u51fa\\u73b0\\u8bf7\\u8054\\u7cfb\\u6280\\u672f\\u652f\\u6301\\u3002\", \"doc_type\": \"guide\", \"document_id\": \"doc_f4878e309f60ff328b5d\", \"effective_at\": null, \"expires_at\": null, \"policy_version\": null, \"publication_status\": \"active\", \"source\": \"demo:cartcare-default/technical-guide\", \"supersedes\": [], \"title\": \"\\u6280\\u672f\\u6545\\u969c\\u6392\\u67e5\"}, \"revision\": \"73827434173fd44d6d16b4391d42028d4f6dd3a5253877d06ec5508a41661a76\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:cartcare-default/technical-guide"
+    }
+  ],
+  "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3": [
+    "常见技术问题排查。应用崩溃：请尝试清除缓存后重启应用，如果问题持续请更新到最新版本。登录失败 401 错误：表示认证失败，请检查用户名密码是否正确，或尝试重置密码。页面加载慢：检查网络连接，尝试切换 WiFi 或移动数据。支付失败：确认银行卡余额充足，检查是否开启了网上支付功能。500 服务器错误：这是服务端问题，请稍后重试，如果持续出现请联系技术支持。",
+    {
+      "chunk_id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+      "chunk_index": 0,
+      "content_hash": "f60ada92831c5eb16025d315dc9d72a3df0680460d207b34993d521a1b78c938",
+      "doc_type": "guide",
+      "document_id": "doc_f4878e309f60ff328b5d",
+      "publication_id": "publication_90f72dcb00923e2639ade65055e079ae8dccf9173edee9c59ba6e729394c5440",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "73827434173fd44d6d16b4391d42028d4f6dd3a5253877d06ec5508a41661a76",
+      "source": "demo:cartcare-default/technical-guide",
+      "title": "技术故障排查",
+      "total_chunks": 1
+    }
+  ],
+  "publication_e1e0a7b519ecf5e457b60449e4ca5d4c86a7f717799db9858810a359286efef5": [
+    "{\"chunk_ids\": [\"9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419\"], \"document\": {\"content\": \"\\u4f1a\\u5458\\u79ef\\u5206\\u89c4\\u5219\\u3002\\u6bcf\\u6d88\\u8d39 1 \\u5143\\u7d2f\\u79ef 1 \\u79ef\\u5206\\u3002\\u79ef\\u5206\\u53ef\\u4ee5\\u5728\\u4e0b\\u6b21\\u8d2d\\u7269\\u65f6\\u62b5\\u6263\\uff0c100 \\u79ef\\u5206 = 1 \\u5143\\u3002\\u4f1a\\u5458\\u7b49\\u7ea7\\u5206\\u4e3a\\uff1a\\u666e\\u901a\\u4f1a\\u5458\\u3001\\u94f6\\u5361\\u4f1a\\u5458\\uff08\\u7d2f\\u8ba1\\u6d88\\u8d39 1000 \\u5143\\uff09\\u3001\\u91d1\\u5361\\u4f1a\\u5458\\uff08\\u7d2f\\u8ba1\\u6d88\\u8d39 5000 \\u5143\\uff09\\u3002\\u94f6\\u5361\\u4f1a\\u5458\\u4eab\\u53d7 95 \\u6298\\u4f18\\u60e0\\uff0c\\u91d1\\u5361\\u4f1a\\u5458\\u4eab\\u53d7 9 \\u6298\\u4f18\\u60e0\\u3002\\u79ef\\u5206\\u6709\\u6548\\u671f\\u4e3a 1 \\u5e74\\uff0c\\u8fc7\\u671f\\u81ea\\u52a8\\u6e05\\u96f6\\u3002\\u751f\\u65e5\\u5f53\\u6708\\u6d88\\u8d39\\u53ef\\u83b7\\u5f97\\u53cc\\u500d\\u79ef\\u5206\\u3002\", \"doc_type\": \"faq\", \"document_id\": \"doc_15eee479ec6749cbefce\", \"effective_at\": null, \"expires_at\": null, \"policy_version\": null, \"publication_status\": \"active\", \"source\": \"demo:cartcare-default/membership-faq\", \"supersedes\": [], \"title\": \"\\u4f1a\\u5458\\u4e0e\\u79ef\\u5206\"}, \"revision\": \"a5f2efd867898d646e76a322de0336912a2baa399fa740e61565b10ed68212c0\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:cartcare-default/membership-faq"
+    }
+  ],
+  "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419": [
+    "会员积分规则。每消费 1 元累积 1 积分。积分可以在下次购物时抵扣，100 积分 = 1 元。会员等级分为：普通会员、银卡会员（累计消费 1000 元）、金卡会员（累计消费 5000 元）。银卡会员享受 95 折优惠，金卡会员享受 9 折优惠。积分有效期为 1 年，过期自动清零。生日当月消费可获得双倍积分。",
+    {
+      "chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+      "chunk_index": 0,
+      "content_hash": "ee10d33cc7b96cbec8b35b9c7a4c9f0f86a88c78cec26738c252da4abf0cb1e6",
+      "doc_type": "faq",
+      "document_id": "doc_15eee479ec6749cbefce",
+      "publication_id": "publication_e1e0a7b519ecf5e457b60449e4ca5d4c86a7f717799db9858810a359286efef5",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "a5f2efd867898d646e76a322de0336912a2baa399fa740e61565b10ed68212c0",
+      "source": "demo:cartcare-default/membership-faq",
+      "title": "会员与积分",
+      "total_chunks": 1
+    }
+  ],
+  "publication_8cc1b9d3c4e7f1af7685edbd817b4a639f7e12356720f4f0ee41d7bb9a12aa8e": [
+    "{\"chunk_ids\": [\"df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2\"], \"document\": {\"content\": \"\\u914d\\u9001\\u670d\\u52a1\\u8bf4\\u660e\\u3002\\u6807\\u51c6\\u914d\\u9001\\uff1a3-5 \\u4e2a\\u5de5\\u4f5c\\u65e5\\u9001\\u8fbe\\uff0c\\u514d\\u8fd0\\u8d39\\uff08\\u8ba2\\u5355\\u6ee1 99 \\u5143\\uff09\\u3002\\u52a0\\u6025\\u914d\\u9001\\uff1a1-2 \\u4e2a\\u5de5\\u4f5c\\u65e5\\u9001\\u8fbe\\uff0c\\u8fd0\\u8d39 15 \\u5143\\u3002\\u540c\\u57ce\\u914d\\u9001\\uff1a\\u5f53\\u65e5\\u8fbe\\u6216\\u6b21\\u65e5\\u8fbe\\uff0c\\u8fd0\\u8d39 10 \\u5143\\u3002\\u504f\\u8fdc\\u5730\\u533a\\u53ef\\u80fd\\u9700\\u8981\\u989d\\u5916 2-3 \\u5929\\u3002\\u914d\\u9001\\u65f6\\u95f4\\u4e3a\\u6bcf\\u5929 9:00-18:00\\uff0c\\u8282\\u5047\\u65e5\\u53ef\\u80fd\\u5ef6\\u8fdf\\u3002\\u5982\\u679c\\u9700\\u8981\\u4fee\\u6539\\u6536\\u8d27\\u5730\\u5740\\uff0c\\u8bf7\\u5728\\u53d1\\u8d27\\u524d\\u8054\\u7cfb\\u5ba2\\u670d\\u3002\", \"doc_type\": \"guide\", \"document_id\": \"doc_2efff27478d4aa1b0a90\", \"effective_at\": null, \"expires_at\": null, \"policy_version\": null, \"publication_status\": \"active\", \"source\": \"demo:cartcare-default/shipping-guide\", \"supersedes\": [], \"title\": \"\\u914d\\u9001\\u8bf4\\u660e\"}, \"revision\": \"e917416dc6f882130ae935eed66eb10fb10d948a094200babdde7c01a96cf3f6\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:cartcare-default/shipping-guide"
+    }
+  ],
+  "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2": [
+    "配送服务说明。标准配送：3-5 个工作日送达，免运费（订单满 99 元）。加急配送：1-2 个工作日送达，运费 15 元。同城配送：当日达或次日达，运费 10 元。偏远地区可能需要额外 2-3 天。配送时间为每天 9:00-18:00，节假日可能延迟。如果需要修改收货地址，请在发货前联系客服。",
+    {
+      "chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+      "chunk_index": 0,
+      "content_hash": "9ddc4fc42b97b59d13710c770db288e77378dea2eb767311f6cc440ed2434678",
+      "doc_type": "guide",
+      "document_id": "doc_2efff27478d4aa1b0a90",
+      "publication_id": "publication_8cc1b9d3c4e7f1af7685edbd817b4a639f7e12356720f4f0ee41d7bb9a12aa8e",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "e917416dc6f882130ae935eed66eb10fb10d948a094200babdde7c01a96cf3f6",
+      "source": "demo:cartcare-default/shipping-guide",
+      "title": "配送说明",
+      "total_chunks": 1
+    }
+  ],
+  "publication_672793a44e95fc915f664016e57429b8148560cddb1777a22a3c5815b9d5d2f7": [
+    "{\"chunk_ids\": [\"e63f7534951058290146662e7acf358002fe2600fa9d3469573772a9f7c612b0\"], \"document\": {\"content\": \"\\u9694\\u79bb\\u8bc4\\u6d4b\\u865a\\u6784\\u6362\\u8d27\\u653f\\u7b56\\uff0c\\u4e0d\\u662f\\u5546\\u57ce\\u627f\\u8bfa\\u3002\\u6362\\u8d27\\u671f\\u9650\\u4e3a14\\u5929\\u3002demo-v1\\u5bc4\\u56de\\u5730\\u5740\\u4e3a\\u9752\\u677e\\u8def14\\u53f7\\u3002\", \"doc_type\": \"policy\", \"document_id\": \"eval-exchange\", \"effective_at\": \"2026-01-01T00:00:00Z\", \"expires_at\": null, \"policy_version\": \"demo-v1\", \"publication_status\": \"active\", \"source\": \"demo:a05-p1-isolated/exchange\", \"supersedes\": [], \"title\": \"\\u9694\\u79bb\\u6f14\\u793a\\u6362\\u8d27\\u653f\\u7b56\"}, \"revision\": \"328eefdc2604c3ed68034e32385d2c145aa28e6f1016f11be6ea425ec56032f8\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:a05-p1-isolated/exchange"
+    }
+  ],
+  "e63f7534951058290146662e7acf358002fe2600fa9d3469573772a9f7c612b0": [
+    "隔离评测虚构换货政策，不是商城承诺。换货期限为14天。demo-v1寄回地址为青松路14号。",
+    {
+      "chunk_id": "e63f7534951058290146662e7acf358002fe2600fa9d3469573772a9f7c612b0",
+      "chunk_index": 0,
+      "content_hash": "d7650852883728a24edede853196032c24a11a6a88e4aba2cb36eb6473fba530",
+      "doc_type": "policy",
+      "document_id": "eval-exchange",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "policy_version": "demo-v1",
+      "publication_id": "publication_672793a44e95fc915f664016e57429b8148560cddb1777a22a3c5815b9d5d2f7",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "328eefdc2604c3ed68034e32385d2c145aa28e6f1016f11be6ea425ec56032f8",
+      "source": "demo:a05-p1-isolated/exchange",
+      "title": "隔离演示换货政策",
+      "total_chunks": 1
+    }
+  ],
+  "publication_45ab5cc270107da4a099bcf51d3ebba1fc458d9f067487e704bc89b91e14e65f": [
+    "{\"chunk_ids\": [\"e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525\"], \"document\": {\"content\": \"\\u9694\\u79bb\\u8bc4\\u6d4b\\u865a\\u6784\\u6362\\u8d27\\u653f\\u7b56\\uff0c\\u4e0d\\u662f\\u5546\\u57ce\\u627f\\u8bfa\\u3002\\u6362\\u8d27\\u671f\\u9650\\u4e3a21\\u5929\\u3002\\u6362\\u8d27\\u5546\\u54c1\\u5fc5\\u987b\\u4fdd\\u7559\\u5b8c\\u6574\\u5305\\u88c5\\u3002\\u6bcf\\u7b14\\u8ba2\\u5355\\u6700\\u591a\\u6362\\u8d27\\u4e00\\u6b21\\u3002\", \"doc_type\": \"policy\", \"document_id\": \"eval-exchange\", \"effective_at\": \"2026-10-01T00:00:00Z\", \"expires_at\": null, \"policy_version\": \"demo-v2\", \"publication_status\": \"active\", \"source\": \"demo:a05-p1-isolated/exchange\", \"supersedes\": [\"demo-v1\"], \"title\": \"\\u9694\\u79bb\\u6f14\\u793a\\u6362\\u8d27\\u653f\\u7b56\"}, \"revision\": \"fb10393a388d35be517e7c548e51013b2b594e75242bfa5e0aec9c4af8c99c4c\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:a05-p1-isolated/exchange"
+    }
+  ],
+  "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525": [
+    "隔离评测虚构换货政策，不是商城承诺。换货期限为21天。换货商品必须保留完整包装。每笔订单最多换货一次。",
+    {
+      "chunk_id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+      "chunk_index": 0,
+      "content_hash": "0b1a2b2a84c96e92b515fb9a07229e6434d1be8520945b703bfdde4db586e868",
+      "doc_type": "policy",
+      "document_id": "eval-exchange",
+      "effective_at": "2026-10-01T00:00:00+00:00",
+      "policy_version": "demo-v2",
+      "publication_id": "publication_45ab5cc270107da4a099bcf51d3ebba1fc458d9f067487e704bc89b91e14e65f",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "fb10393a388d35be517e7c548e51013b2b594e75242bfa5e0aec9c4af8c99c4c",
+      "source": "demo:a05-p1-isolated/exchange",
+      "title": "隔离演示换货政策",
+      "total_chunks": 1
+    }
+  ],
+  "publication_c29b471a481b8a840f3c0fb7aed58bf77feadc202bdf899e886e3fb99622a31c": [
+    "{\"chunk_ids\": [\"46e793a80d27465f89e2ea092bc00ffb563bb4ad68242da9ae56a3023053d549\"], \"document\": {\"content\": \"\\u9694\\u79bb\\u8bc4\\u6d4b\\u865a\\u6784\\u672a\\u6765\\u63db\\u8d27\\u653f\\u7b56\\uff0c\\u4e0d\\u662f\\u5546\\u57ce\\u627f\\u8bfa\\u3002\\u6362\\u8d27\\u671f\\u9650\\u4e3a45\\u5929\\u3002demo-v3\\u6307\\u5b9a\\u627f\\u8fd0\\u4eba\\u4e3a\\u96ea\\u9e7f\\u5feb\\u9012\\u3002\", \"doc_type\": \"policy\", \"document_id\": \"eval-exchange\", \"effective_at\": \"2026-11-01T00:00:00Z\", \"expires_at\": null, \"policy_version\": \"demo-v3\", \"publication_status\": \"active\", \"source\": \"demo:a05-p1-isolated/exchange\", \"supersedes\": [\"demo-v2\"], \"title\": \"\\u9694\\u79bb\\u6f14\\u793a\\u6362\\u8d27\\u653f\\u7b56\"}, \"revision\": \"0a631d54d62348efce903b0e257e7260d92337ba42a775fc7f4a14f6cdafee06\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:a05-p1-isolated/exchange"
+    }
+  ],
+  "46e793a80d27465f89e2ea092bc00ffb563bb4ad68242da9ae56a3023053d549": [
+    "隔离评测虚构未来換货政策，不是商城承诺。换货期限为45天。demo-v3指定承运人为雪鹿快递。",
+    {
+      "chunk_id": "46e793a80d27465f89e2ea092bc00ffb563bb4ad68242da9ae56a3023053d549",
+      "chunk_index": 0,
+      "content_hash": "ba716ee0dfafe8e49f0de216fd4d5b8fcc41d3b23d4779be36733840ee39d8bb",
+      "doc_type": "policy",
+      "document_id": "eval-exchange",
+      "effective_at": "2026-11-01T00:00:00+00:00",
+      "policy_version": "demo-v3",
+      "publication_id": "publication_c29b471a481b8a840f3c0fb7aed58bf77feadc202bdf899e886e3fb99622a31c",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "0a631d54d62348efce903b0e257e7260d92337ba42a775fc7f4a14f6cdafee06",
+      "source": "demo:a05-p1-isolated/exchange",
+      "title": "隔离演示换货政策",
+      "total_chunks": 1
+    }
+  ],
+  "publication_9570cff2da0664e22824fab2d093fd5a35a7596c925246a5b96c5acc2b70d716": [
+    "{\"chunk_ids\": [\"0f64495c1c7029731bdf2ab8552c2e5906f1c4616b0ef38d9e2a6c13f2370023\"], \"document\": {\"content\": \"\\u9694\\u79bb\\u8bc4\\u6d4b\\u865a\\u6784\\u4e14\\u8fc7\\u671f\\u7684\\u4f18\\u60e0\\u5238\\u653f\\u7b56\\u3002\\u6d3b\\u52a8\\u53e3\\u4ee4\\u4e3a\\u79cb\\u53f62026\\uff0c\\u4f18\\u60e0\\u5238\\u53ef\\u62b5\\u626320\\u5143\\u3002\", \"doc_type\": \"policy\", \"document_id\": \"eval-coupon\", \"effective_at\": \"2026-01-01T00:00:00Z\", \"expires_at\": \"2026-09-01T00:00:00Z\", \"policy_version\": \"demo-expired\", \"publication_status\": \"active\", \"source\": \"demo:a05-p1-isolated/coupon\", \"supersedes\": [], \"title\": \"\\u9694\\u79bb\\u6f14\\u793a\\u4f18\\u60e0\\u5238\\u653f\\u7b56\"}, \"revision\": \"ad67956fe52bbb411cb462c90c7633e1d98370cbd4754034c7066ce6f0d32a99\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:a05-p1-isolated/coupon"
+    }
+  ],
+  "0f64495c1c7029731bdf2ab8552c2e5906f1c4616b0ef38d9e2a6c13f2370023": [
+    "隔离评测虚构且过期的优惠券政策。活动口令为秋叶2026，优惠券可抵扣20元。",
+    {
+      "chunk_id": "0f64495c1c7029731bdf2ab8552c2e5906f1c4616b0ef38d9e2a6c13f2370023",
+      "chunk_index": 0,
+      "content_hash": "86bdd938cbbbfe51a99b2b3173d4465a710703ee552c2dc88b64574c21cdd3b9",
+      "doc_type": "policy",
+      "document_id": "eval-coupon",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": "2026-09-01T00:00:00+00:00",
+      "policy_version": "demo-expired",
+      "publication_id": "publication_9570cff2da0664e22824fab2d093fd5a35a7596c925246a5b96c5acc2b70d716",
+      "publication_status": "active",
+      "record_type": "chunk",
+      "revision": "ad67956fe52bbb411cb462c90c7633e1d98370cbd4754034c7066ce6f0d32a99",
+      "source": "demo:a05-p1-isolated/coupon",
+      "title": "隔离演示优惠券政策",
+      "total_chunks": 1
+    }
+  ],
+  "publication_a0e7a687ddecd00c369b01e24df1f51ccb8b8e9a4628fb2efeeae150c59f837a": [
+    "{\"chunk_ids\": [\"9db3c0cf7c21a23ee86a4159b32af95651cfa98f42e06b68e4256b0e0389948a\"], \"document\": {\"content\": \"\\u9694\\u79bb\\u8bc4\\u6d4b\\u865a\\u6784\\u4e14\\u64a4\\u9500\\u7684\\u5ef6\\u4fdd\\u653f\\u7b56\\u3002\\u5ef6\\u4fdd\\u8d60\\u54c1\\u4e3a\\u84dd\\u9cb8\\u6536\\u7eb3\\u888b\\u3002\", \"doc_type\": \"policy\", \"document_id\": \"eval-warranty\", \"effective_at\": \"2026-01-01T00:00:00Z\", \"expires_at\": null, \"policy_version\": \"demo-revoked\", \"publication_status\": \"revoked\", \"source\": \"demo:a05-p1-isolated/warranty\", \"supersedes\": [], \"title\": \"\\u9694\\u79bb\\u6f14\\u793a\\u5ef6\\u4fdd\\u653f\\u7b56\"}, \"revision\": \"ee30186594d3acbd0e6d0d6605a5ddb19803714a2f52a7b12bcb2cb52039f421\", \"state\": \"ready\"}",
+    {
+      "record_type": "publication",
+      "source": "demo:a05-p1-isolated/warranty"
+    }
+  ],
+  "9db3c0cf7c21a23ee86a4159b32af95651cfa98f42e06b68e4256b0e0389948a": [
+    "隔离评测虚构且撤销的延保政策。延保赠品为蓝鲸收纳袋。",
+    {
+      "chunk_id": "9db3c0cf7c21a23ee86a4159b32af95651cfa98f42e06b68e4256b0e0389948a",
+      "chunk_index": 0,
+      "content_hash": "59ffc49583e72b196a8b05cd63ecaeedb8e0308c8206a4db5e57511f0782ea2a",
+      "doc_type": "policy",
+      "document_id": "eval-warranty",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "policy_version": "demo-revoked",
+      "publication_id": "publication_a0e7a687ddecd00c369b01e24df1f51ccb8b8e9a4628fb2efeeae150c59f837a",
+      "publication_status": "revoked",
+      "record_type": "chunk",
+      "revision": "ee30186594d3acbd0e6d0d6605a5ddb19803714a2f52a7b12bcb2cb52039f421",
+      "source": "demo:a05-p1-isolated/warranty",
+      "title": "隔离演示延保政策",
+      "total_chunks": 1
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "1": {
+    "Recall@1": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": null,
+      "numerator": 0,
+      "denominator": 0
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 26.171350007643923,
+      "p95": 34.57660001004115,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "low_confidence": 16
+    },
+    "failure_counts": {
+      "gold_below_threshold": 8,
+      "none": 8
+    },
+    "retrieval_calls": 16,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  },
+  "2": {
+    "Recall@1": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": null,
+      "numerator": 0,
+      "denominator": 0
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 27.649950032355264,
+      "p95": 31.66417498141527,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "low_confidence": 16
+    },
+    "failure_counts": {
+      "gold_below_threshold": 8,
+      "none": 8
+    },
+    "retrieval_calls": 16,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  }
+}

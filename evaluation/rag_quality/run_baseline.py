@@ -172,13 +172,15 @@ class CountingCollection:
     def __init__(self, collection):
         self.collection = collection
         self.queries = 0
+        self.last_query_result = None
 
     def __getattr__(self, name):
         return getattr(self.collection, name)
 
     def query(self, **kwargs):
         self.queries += 1
-        return self.collection.query(**kwargs)
+        self.last_query_result = self.collection.query(**kwargs)
+        return self.last_query_result
 
 
 def make_manager(kb):
@@ -299,19 +301,32 @@ def write_json(path, value):
 
 
 async def run(args):
-    corpus, dataset, lock = load_frozen(args.dataset_version)
-    chunks = validate_dataset(corpus, dataset)
+    split = getattr(args, 'split', 'test')
+    if split == 'dev':
+        from evaluation.rag_quality.dev_calibration import load_dev_frozen
+        corpus, dataset, lock = load_dev_frozen(args.dataset_version, HERE)
+        chunks = {c['chunk_id']: c for c in chunk_catalog(corpus)}
+    elif split == 'test':
+        corpus, dataset, lock = load_frozen(args.dataset_version)
+        chunks = validate_dataset(corpus, dataset)
+    else:
+        raise ValueError('unsupported dataset split')
+    dataset_name = ('dev_dataset_v2.json' if split == 'dev' else f'dataset_{args.dataset_version}.json')
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + uuid.uuid4().hex[:8]
     report_root = ROOT / 'evaluation/reports/rag_quality'
-    output = (report_root / 'v2' if args.dataset_version == 'v2' else report_root) / run_id
+    output = ((HERE / 'calibration' / run_id) if split == 'dev' else
+              (report_root / 'v2' if args.dataset_version == 'v2' else report_root) / run_id)
     output.mkdir(parents=True, exist_ok=False)
     for name in lock['files']:
+        if split == 'dev' and name not in {'corpus_v1.json', 'dev_dataset_v2.json'}:
+            continue  # Test data is hashed only, never parsed/copied into the dev run.
         (output / name).write_bytes((HERE / name).read_bytes())
     freeze_name = f'freeze_{args.dataset_version}.json'
     (output / freeze_name).write_bytes((HERE / freeze_name).read_bytes())
     write_json(output / 'chunks.json', list(chunks.values()))
     collection = 'cartcare_a05_p1_' + uuid.uuid4().hex
-    manifest = dict(run_id=run_id, group='B0-original', started_at_utc=datetime.now(timezone.utc).isoformat(),
+    manifest = dict(run_id=run_id, group='B0-dev-calibration' if split == 'dev' else 'B0-original',
+                    split=split, started_at_utc=datetime.now(timezone.utc).isoformat(),
                     head=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                     dirty_worktree=subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True),
                     python=platform.python_version(), platform=platform.platform(),
@@ -320,8 +335,8 @@ async def run(args):
                         ('mcp/knowledge_embeddings.py', 'mcp/knowledge_base.py', 'mcp/rag_contract.py',
                          'mcp/tool_manager.py', 'evaluation/rag_quality/run_baseline.py', 'uv.lock')},
                     freeze=lock, corpus_version=corpus['version'], dataset_version=dataset['version'],
-                    dataset_path=str(HERE / f'dataset_{args.dataset_version}.json'),
-                    dataset_sha256=digest(HERE / f'dataset_{args.dataset_version}.json'),
+                    dataset_path=str(HERE / dataset_name),
+                    dataset_sha256=digest(HERE / dataset_name),
                     freeze_path=str(HERE / freeze_name), freeze_sha256=digest(HERE / freeze_name),
                     input_sha256=dict(lock['files']), review=lock.get('review'),
                     collection=collection, endpoint=f'{args.host}:{args.port}', backend='real Chroma HTTP',
@@ -374,8 +389,26 @@ async def run(args):
                     start = time.perf_counter()
                     raw, final = await retrieve_b0(manager, case['query'])
                     elapsed = (time.perf_counter() - start) * 1000
-                    observations.append(observe(case, raw, final, chunks, elapsed, repeat,
-                                                kb._collection.queries - previous_queries))
+                    row = observe({**case, 'category': case.get('category', 'development')},
+                                  raw, final, chunks, elapsed, repeat,
+                                  kb._collection.queries - previous_queries)
+                    if split == 'dev':
+                        query_result = kb._collection.last_query_result
+                        if not raw.success or not query_result or row['vector_queries'] != 1:
+                            raise RuntimeError('dev capture requires complete real HTTP candidates')
+                        distances = dict(zip(query_result['ids'][0], query_result['distances'][0]))
+                        for rank, hit in enumerate(row['candidates'], 1):
+                            chunk_id = hit['frozen_chunk_id']
+                            distance = distances[chunk_id]
+                            if hit['score'] != 1.0 - distance:
+                                raise RuntimeError('HTTP distance/score mismatch')
+                            hit.update(rank=rank, chunk_id=chunk_id, raw_distance=distance,
+                                       metadata=first[chunk_id][1], valid_at_as_of=chunk_id in eligible_ids,
+                                       gold_match=bool(case['answerable'] and chunk_id == case['gold_chunk_id']))
+                    observations.append(row)
+            if split == 'dev':
+                from evaluation.rag_quality.dev_calibration import calibrate
+                await calibrate(output, observations, dataset, kb, first, fixed_time, manifest)
         if manager._client.calls:
             raise RuntimeError('unexpected model invocation')
         if kb._snapshot() != first:
@@ -389,12 +422,14 @@ async def run(args):
         manifest['outcome'] = 'measured' if all(r['success'] for r in observations) else 'partial_dependency_failure'
         write_json(output / 'summary.json', summaries)
         primary = observations[:len(dataset['cases'])]
-        report = [f'# {dataset["version"]} B0-original lexical retrieval baseline', '',
+        report = [f'# {dataset["version"]} lexical retrieval baseline ({split})', '',
                   'Real Chroma HTTP; no model calls. Labels frozen before retrieval; '
                   + ('user-approved v2 after human discussion/candidate verification.' if args.dataset_version == 'v2'
                      else 'v1 author labels, original human-review status retained.'),
                   'Production call paths/configuration unchanged. B-prod not executed (no paid-model authorization).',
-                  '21 answerable / 9 no-answer. One gold chunk per answerable query. Final usable hits determine metrics.', '',
+                  f'{sum(c["answerable"] for c in dataset["cases"])} answerable / '
+                  f'{sum(not c["answerable"] for c in dataset["cases"])} no-answer. '
+                  'One gold chunk per answerable query. Final usable hits determine metrics.', '',
                   '```json', json.dumps(summaries, ensure_ascii=False, indent=2), '```', '',
                   '| Case | Query | Gold rank | Candidate rank (diagnostic) | Status | Failure reason |',
                   '| --- | --- | --- | --- | --- | --- |']
@@ -432,6 +467,8 @@ def main():
     parser.add_argument('--repeats', type=int, default=2)
     parser.add_argument('--dataset-version', choices=('v1', 'v2'), default='v1',
                         help='Select version explicitly; v2 requires the approved freeze_v2.json')
+    parser.add_argument('--split', choices=('test', 'dev'), default='test',
+                        help='dev requires v2; calibrates exclusively on the frozen 16-case development set')
     args = parser.parse_args()
     if args.repeats < 1:
         parser.error('repeats must be >=1')
