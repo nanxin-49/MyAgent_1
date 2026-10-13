@@ -1,0 +1,55 @@
+{
+  "task": "A05-B1-PREP",
+  "head": "eb55ae85532100829f7f8dd92d6a8c4813f6572c",
+  "status": "blocked",
+  "outcome": "partial",
+  "A05_status": "doing",
+  "A05_outcome": "partial",
+  "B1_status": "blocked",
+  "authoritative_blocker": "available physical RAM below user-required 4 GiB at the first stage gate",
+  "performed": [
+    "Windows available-memory and E-disk read-only measurement",
+    "evidence JSON parsing and Python AST syntax checks",
+    "all original tracked SHA256 protection checks except two authorized state documents",
+    "A05-only state update and unchanged B0-calibrated acceptance state",
+    "git diff --check"
+  ],
+  "changed_original_files": [
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "all_other_original_tracked_hashes_unchanged": true,
+  "full_regression": {
+    "status": "not_run",
+    "reason": "resource gate blocked before any implementation/install/model smoke",
+    "passed": null,
+    "failed": null,
+    "skipped": null
+  },
+  "environment_lock": "not_created",
+  "local_weight_hash": "not_verified",
+  "smoke": "not_run",
+  "new_network_download_bytes": 0,
+  "model_CPU_time_seconds": null,
+  "embedding_process_peak_memory_bytes": null,
+  "Chroma_calls": 0,
+  "collections_created": 0,
+  "dev_calibration_executed": false,
+  "formal_test_executed": false,
+  "installed_or_loaded": false,
+  "terminated_other_processes": false,
+  "committed_or_pushed": false,
+  "production_request_path_changed": false,
+  "readme_core_wiki_update_needed": false,
+  "dependency_download_budget": "not_resolved; not a pass",
+  "minimum_resolution": "User-managed release of application memory or a different execution time until available RAM is at least 4 GiB; rerun the resource gate before installation and model loading. Do not terminate user or system processes automatically. Existing PREP authorization remains conditional; B1 calibration/test still need separate authorization.",
+  "directory_permission_note": "normal sandbox report directory creation denied; authorized elevated report-only write succeeded",
+  "artifacts_sha256": {
+    "check_resource_gate.py": "0d140bcb2b8f75efa708bed2dafe14c4f2c9268b23a4bd7246b4fc5b26d22091",
+    "progress_before.json": "2d091c9db98c35062de4f088f2a19bb5ce2e89962475013a3a660166edc5d00a",
+    "protected_inputs.json": "c0a019abf722a388de35d0d2bf9b7d5f397f60caf93933b3b049e5f94997ff09",
+    "record_blocker.py": "edcc8e89ef89521073252b2d3b8ed067c0456a95e88e622ebd528102eca6a5ce",
+    "report.md": "cc5a36a09974b11f99e0728c56c33ebfdbf506344ebe4993abadcb6ad7c173c5",
+    "resource_gate.json": "196af324708a8d5f88bf78dba6424dbd267dfb6d194527dac71a5bc23929a4a9"
+  }
+}
