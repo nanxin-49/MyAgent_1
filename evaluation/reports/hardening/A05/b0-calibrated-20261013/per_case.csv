@@ -1,0 +1,31 @@
+﻿case_id,query,answerable,old_gold_rank,new_gold_rank,old_status,new_status,raw_gold_rank,gold_score,failure_category,explanation,gold_issue,old_false_positive,new_false_positive
+A05-01,买完东西想把钱退回来，多久之内可以申请？,True,,,low_confidence,low_confidence,,,原始候选未召回,冻结有效Gold未进入Top5；不能归因为阈值过滤。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-02,忘掉登录口令了怎样找回账户？,True,,,low_confidence,low_confidence,1,0.14907120470975777,正确候选被分数过滤,Gold在raw rank=1，score=0.14907120470975777<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-03,我想看看买的东西发货了没有、现在是什么状态，应该怎么查？,True,,,low_confidence,low_confidence,5,0.010936966398805259,正确候选被分数过滤,Gold在raw rank=5，score=0.010936966398805259<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-04,普通送货大概几天能到？,True,,,low_confidence,low_confidence,4,0.0,正确候选被分数过滤,Gold在raw rank=4，score=0.0<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-05,急着拿到包裹，快送收费多少？,True,,,low_confidence,low_confidence,,,原始候选未召回,冻结有效Gold未进入Top5；不能归因为阈值过滤。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-06,购物攒的分怎么折成钱用？,True,,,low_confidence,low_confidence,,,原始候选未召回,冻结有效Gold未进入Top5；不能归因为阈值过滤。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-07,软件一打开就闪退该怎么办？,True,,,low_confidence,low_confidence,3,0.015113398518462828,正确候选被分数过滤,Gold在raw rank=3，score=0.015113398518462828<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-08,保护账号可以启用什么二次确认？,True,,,low_confidence,low_confidence,3,0.014322297262892025,正确候选被分数过滤,Gold在raw rank=3，score=0.014322297262892025<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-09,生日那个月买东西积分享受什么待遇？,True,,,low_confidence,low_confidence,1,0.1440164648759914,正确候选被分数过滤,Gold在raw rank=1，score=0.1440164648759914<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-10,退款数额很大时还要谁同意？,True,,,low_confidence,low_confidence,1,0.15666989177144985,正确候选被分数过滤,Gold在raw rank=1，score=0.15666989177144985<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-11,账户安全的密码长度至少是多少？,True,1,1,usable,usable,1,0.5012804124668988,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-12,登录失败401和500服务器错误分别是什么原因？,True,,,low_confidence,low_confidence,1,0.16030179701521774,正确候选被分数过滤,Gold在raw rank=1，score=0.16030179701521774<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-13,会员等级中银卡和金卡的消费门槛分别是多少？,True,,1,low_confidence,usable,1,0.22850355248072407,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-14,配送说明中免运费的门槛是多少，不是退款审批金额？,True,,1,low_confidence,usable,1,0.3294345673889266,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-15,订单查询中物流信息多久更新，而不是多久送达？,True,,1,low_confidence,usable,1,0.34154835536126926,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-16,退款政策是否意味着不用查实时订单就保证退款成功？,True,1,1,usable,usable,1,0.4677476696899203,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-17,积分有效期是一年还是订单退款的七天？,True,,,low_confidence,low_confidence,2,0.14940357414893368,正确候选被分数过滤,Gold在raw rank=2，score=0.14940357414893368<0.20；有效性校验通过。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-18,已经发货超过七天没收到，订单查询指南建议做什么？,True,1,1,usable,usable,1,0.41626205575938746,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-19,退款政策规定退款到账需要几个工作日？,False,,,usable,usable,,,无答案问题错误判为usable；片段事实不足,退款正文明确不承诺支付渠道处理时效；无到账天数。,未发现新标签冲突；沿用已批准冻结口径,True,True
+A05-20,账户安全说明中客服可以替我关闭两步验证吗？,False,,,usable,usable,,,无答案问题错误判为usable；片段事实不足,仅说明开启两步验证，无客服关闭权限或流程。,未发现新标签冲突；沿用已批准冻结口径,True,True
+A05-21,订单查询：订单ORD-999今天到哪了？,False,,,usable,usable,,,无答案问题错误判为usable；片段事实不足,具体订单实时位置必须走Provider；演示指南只有查询方法。,未发现新标签冲突；沿用已批准冻结口径,True,True
+A05-22,苹果手机电池的官方保修期是多少？,False,,,low_confidence,low_confidence,,,通过,最终无证据；正确拒答。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-23,会员与积分：金卡会费每年多少钱？,False,,,usable,usable,,,无答案问题错误判为usable；片段事实不足,语料说明金卡消费门槛和折扣，没有会费。,未发现新标签冲突；沿用已批准冻结口径,True,True
+A05-24,隔离演示换货政策目前的换货期限是多少？,True,1,1,usable,usable,1,0.7077252216167482,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-25,现行隔离演示换货政策要求商品包装满足什么条件？,True,1,1,usable,usable,1,0.5628234135020641,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-26,现行隔离演示换货政策每笔订单能换货几次？,True,1,1,usable,usable,1,0.7390384934799793,通过,冻结Gold在最终rank1。,未发现新标签冲突；沿用已批准冻结口径,False,False
+A05-27,请仅根据demo-v1换货政策告诉我寄回地址。,False,,,low_confidence,usable,,,无答案问题错误判为usable；片段事实不足,在固定时点有效且ready的语料中无所请求事实；禁止用相似主题或失效版本作为答案。 返回的是现行demo-v2换货片段，无该题所问事实；不是被排除版本泄漏。,未发现新标签冲突；沿用已批准冻结口径,False,True
+A05-28,请仅根据demo-v3换货政策告诉我指定承运人。,False,,,low_confidence,usable,,,无答案问题错误判为usable；片段事实不足,在固定时点有效且ready的语料中无所请求事实；禁止用相似主题或失效版本作为答案。 返回的是现行demo-v2换货片段，无该题所问事实；不是被排除版本泄漏。,未发现新标签冲突；沿用已批准冻结口径,False,True
+A05-29,过期的隔离演示优惠券政策活动口令是什么？,False,,,low_confidence,usable,,,无答案问题错误判为usable；片段事实不足,在固定时点有效且ready的语料中无所请求事实；禁止用相似主题或失效版本作为答案。 返回的是现行demo-v2换货片段，无该题所问事实；不是被排除版本泄漏。,未发现新标签冲突；沿用已批准冻结口径,False,True
+A05-30,撤销的隔离演示延保政策赠品是什么？,False,,,low_confidence,usable,,,无答案问题错误判为usable；片段事实不足,在固定时点有效且ready的语料中无所请求事实；禁止用相似主题或失效版本作为答案。 返回的是现行demo-v2换货片段，无该题所问事实；不是被排除版本泄漏。,未发现新标签冲突；沿用已批准冻结口径,False,True

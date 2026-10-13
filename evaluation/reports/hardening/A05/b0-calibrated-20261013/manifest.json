@@ -1,0 +1,409 @@
+{
+  "phase": "formal",
+  "started_at_utc": "2026-10-13T03:24:35.556059+00:00",
+  "head": "8cefc6c3e24230177c1db6dbb54f2e45f1c86f23",
+  "dirty_worktree": "?? evaluation/reports/hardening/\n",
+  "script_sha256": "810337631f39f477f8ade3ba3da6c7069de8ad049a7adf8f09a35e2346edf719",
+  "python": "3.12.3",
+  "outcome": "measured",
+  "formal_test_started": true,
+  "collection_deleted": true,
+  "default_collection": "cartcare_demo_knowledge_chargram_v1",
+  "endpoint": "127.0.0.1:8001",
+  "review": {
+    "status": "user_approved_v2",
+    "approved_date": "2026-10-13",
+    "timezone": "Asia/Shanghai",
+    "source": "Direct user instruction A05-P2-FREEZE-B0 in this chat, following human discussion and final candidate/diff verification",
+    "authorization_excerpt": "我已核对 A05 Gold v2 候选版及逐项差异，批准按当前候选内容正式冻结 v2。",
+    "independent_double_annotation": false,
+    "fully_blind_review": false,
+    "approved_candidate_sha256": {
+      "dataset_v2.candidate.json": "716aa776041f947de704e5d338b8819a7e1f1fb582af2f2dd0f1a4b67a6fdb6e",
+      "dev_dataset_v2.candidate.json": "316a3737fee734db592e45676852b445d95e7e06ccb4d96430bf1dc6e3f7ad0a"
+    }
+  },
+  "input_sha256": {
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v2.json": "c5eefac673cd34529793d83bb860fbb07ef5393507c99652dfe4eef2e76a0818",
+    "dev_dataset_v2.json": "e49037acd561248f93b5e72ce23ab1d20b3fed1b9d7910b2ba8448f64d9fb002",
+    "gold_review_v2.md": "3007e3adc2a5ca41bdd2788262bdaa1f73823bcaca7106896fb09470f6e31308",
+    "gold_v1_to_v2_diff.md": "9fc7efb951bcc78b705a946cd4b49ddb2517cabe03f8e1b5aeaf5828add909f8",
+    "freeze_v2.json": "7ea0b1c40d430de13fead53ed1f21af082410efc7c0cdf6bb967c22030524f79"
+  },
+  "packages": {
+    "chromadb-client": "0.5.23",
+    "pydantic": "2.10.3",
+    "anthropic": "0.40.0",
+    "httpx": "0.28.1",
+    "pytest": "8.3.4"
+  },
+  "code_sha256": {
+    "mcp/knowledge_embeddings.py": "bca9827430c4d871cf9c7608b2d4a38b086d2c38876d2f4cb0bdd11bf1ec3033",
+    "mcp/knowledge_base.py": "4a0b8518ce3749a97a49a287044af3ce8cb9cd54ad3b96872773ae8e8aa7883d",
+    "mcp/rag_contract.py": "33c8dbddb9c8a173afbfaa886273c113f59b273b1e32689ce0191c74aa48e527",
+    "mcp/tool_manager.py": "af90e5a419503ece6d0b910f0134c3901343596624cb81390e61dc8101ad6844",
+    "evaluation/rag_quality/run_baseline.py": "60e933a70291ada708b029ee87e7bb917bbc052c480dee36ceb26bec65035c29",
+    "uv.lock": "392b74a8798b2a576cf33aeb13fa6ab73c5ecfe2a27eb669cae6a88e64b5687b",
+    "evaluation/rag_quality/dev_calibration.py": "acf191f4e73265bafb3e14ca022c35e3fcce34fc4a3f9a540b7ca432d58707b0"
+  },
+  "calibration_sha256": "c65630d00d33e51d345b2fb94982b24331e7385d05195ec2c34eaf213fc84ad2",
+  "baseline_comparability": {
+    "shared_production_sources_identical": true,
+    "original_runner_archive_verified": true,
+    "identical_function_AST": [
+      "chunk_catalog",
+      "active_identities",
+      "validate_dataset",
+      "load_frozen",
+      "make_manager",
+      "retrieve_b0",
+      "identify_hit",
+      "observe",
+      "percentile",
+      "aggregate"
+    ]
+  },
+  "chroma_server_version": "0.5.23",
+  "existing_collections": [
+    "cartcare_memory_profile_chargram_v1",
+    "knowledge_base",
+    "cartcare_memory_topics_chargram_v1",
+    "cartcare_demo_knowledge_chargram_v1",
+    "user_profile",
+    "episodic"
+  ],
+  "default_knowledge": {
+    "rows": 6,
+    "publications": [],
+    "physical_chunks": 6,
+    "eligible_chunk_ids": [],
+    "chunks": [
+      {
+        "id": "8658722cb22185ea5a1f465da5a5686e6f9c311c40141592f4c0c817a075029c",
+        "stored_hash": null,
+        "actual_hash": "a7c085e8feea32a6903616d128d81ba791f26b4797a903296ae4f4ad11396f90",
+        "hash_matches": false,
+        "record_type": null
+      },
+      {
+        "id": "8509d226eb8c75e65bccd7a42538580d90ba376c873af16cef7af8d2896b3362",
+        "stored_hash": null,
+        "actual_hash": "faae5da225a4662a81554146ba9b335c8d6b80220025f8e320706a2bc39a4ca0",
+        "hash_matches": false,
+        "record_type": null
+      },
+      {
+        "id": "8bbdb48ecd6341fc174b14a51746a838dfe53b676821d01789f75e94a2059fe3",
+        "stored_hash": null,
+        "actual_hash": "4cbdb2edc53ea45c3cbb7c7b9955b8806174dadfb41ea646b390804141b440de",
+        "hash_matches": false,
+        "record_type": null
+      },
+      {
+        "id": "27afcb8c0404ed59d77faf8105d4fe794749dceb00b0a50179c6dac557276f8e",
+        "stored_hash": null,
+        "actual_hash": "f60ada92831c5eb16025d315dc9d72a3df0680460d207b34993d521a1b78c938",
+        "hash_matches": false,
+        "record_type": null
+      },
+      {
+        "id": "5443d7a6598f33f1b37d1a21b42269cea9b23d419bbc2d0954d4c23eede8e7d8",
+        "stored_hash": null,
+        "actual_hash": "ee10d33cc7b96cbec8b35b9c7a4c9f0f86a88c78cec26738c252da4abf0cb1e6",
+        "hash_matches": false,
+        "record_type": null
+      },
+      {
+        "id": "d49143f8580e2c0872a4f798e50dffc0ffc7f2f1ace620d85be69fbe7215fd3d",
+        "stored_hash": null,
+        "actual_hash": "9ddc4fc42b97b59d13710c770db288e77378dea2eb767311f6cc440ed2434678",
+        "hash_matches": false,
+        "record_type": null
+      }
+    ]
+  },
+  "default_probe_error": "legacy knowledge requires reviewed republication",
+  "collection": "cartcare_a05_calibrated_65857ea0ac73404981c49d0cd7088059",
+  "evaluation_knowledge": {
+    "rows": 22,
+    "publications": [
+      {
+        "id": "publication_82f5a1b614dac0d8d6811ae66fbe179c121a5d5ebf418f3a93e184a65363c1bf",
+        "state": "ready",
+        "document_id": "doc_dd816769efe7659f114e",
+        "policy_version": "refund-cancel-v1",
+        "publication_status": "active",
+        "chunk_ids": [
+          "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864"
+        ],
+        "eligible_chunk_ids": [
+          "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864"
+        ]
+      },
+      {
+        "id": "publication_00ccd86904bf0e7eb3a723daf541b6ce62e241b3cf39684c8ef2a83656cadc47",
+        "state": "ready",
+        "document_id": "doc_b18d553a21972fe4b3f5",
+        "policy_version": null,
+        "publication_status": "active",
+        "chunk_ids": [
+          "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3"
+        ],
+        "eligible_chunk_ids": [
+          "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3"
+        ]
+      },
+      {
+        "id": "publication_c2e229e05739ab0a7ed491099265d67e598158a24a4956360ce7775aba13e503",
+        "state": "ready",
+        "document_id": "doc_1348d91e6f873b93a77a",
+        "policy_version": null,
+        "publication_status": "active",
+        "chunk_ids": [
+          "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d"
+        ],
+        "eligible_chunk_ids": [
+          "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d"
+        ]
+      },
+      {
+        "id": "publication_90f72dcb00923e2639ade65055e079ae8dccf9173edee9c59ba6e729394c5440",
+        "state": "ready",
+        "document_id": "doc_f4878e309f60ff328b5d",
+        "policy_version": null,
+        "publication_status": "active",
+        "chunk_ids": [
+          "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3"
+        ],
+        "eligible_chunk_ids": [
+          "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3"
+        ]
+      },
+      {
+        "id": "publication_e1e0a7b519ecf5e457b60449e4ca5d4c86a7f717799db9858810a359286efef5",
+        "state": "ready",
+        "document_id": "doc_15eee479ec6749cbefce",
+        "policy_version": null,
+        "publication_status": "active",
+        "chunk_ids": [
+          "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419"
+        ],
+        "eligible_chunk_ids": [
+          "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419"
+        ]
+      },
+      {
+        "id": "publication_8cc1b9d3c4e7f1af7685edbd817b4a639f7e12356720f4f0ee41d7bb9a12aa8e",
+        "state": "ready",
+        "document_id": "doc_2efff27478d4aa1b0a90",
+        "policy_version": null,
+        "publication_status": "active",
+        "chunk_ids": [
+          "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2"
+        ],
+        "eligible_chunk_ids": [
+          "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2"
+        ]
+      },
+      {
+        "id": "publication_672793a44e95fc915f664016e57429b8148560cddb1777a22a3c5815b9d5d2f7",
+        "state": "ready",
+        "document_id": "eval-exchange",
+        "policy_version": "demo-v1",
+        "publication_status": "active",
+        "chunk_ids": [
+          "e63f7534951058290146662e7acf358002fe2600fa9d3469573772a9f7c612b0"
+        ],
+        "eligible_chunk_ids": []
+      },
+      {
+        "id": "publication_45ab5cc270107da4a099bcf51d3ebba1fc458d9f067487e704bc89b91e14e65f",
+        "state": "ready",
+        "document_id": "eval-exchange",
+        "policy_version": "demo-v2",
+        "publication_status": "active",
+        "chunk_ids": [
+          "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525"
+        ],
+        "eligible_chunk_ids": [
+          "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525"
+        ]
+      },
+      {
+        "id": "publication_c29b471a481b8a840f3c0fb7aed58bf77feadc202bdf899e886e3fb99622a31c",
+        "state": "ready",
+        "document_id": "eval-exchange",
+        "policy_version": "demo-v3",
+        "publication_status": "active",
+        "chunk_ids": [
+          "46e793a80d27465f89e2ea092bc00ffb563bb4ad68242da9ae56a3023053d549"
+        ],
+        "eligible_chunk_ids": []
+      },
+      {
+        "id": "publication_9570cff2da0664e22824fab2d093fd5a35a7596c925246a5b96c5acc2b70d716",
+        "state": "ready",
+        "document_id": "eval-coupon",
+        "policy_version": "demo-expired",
+        "publication_status": "active",
+        "chunk_ids": [
+          "0f64495c1c7029731bdf2ab8552c2e5906f1c4616b0ef38d9e2a6c13f2370023"
+        ],
+        "eligible_chunk_ids": []
+      },
+      {
+        "id": "publication_a0e7a687ddecd00c369b01e24df1f51ccb8b8e9a4628fb2efeeae150c59f837a",
+        "state": "ready",
+        "document_id": "eval-warranty",
+        "policy_version": "demo-revoked",
+        "publication_status": "revoked",
+        "chunk_ids": [
+          "9db3c0cf7c21a23ee86a4159b32af95651cfa98f42e06b68e4256b0e0389948a"
+        ],
+        "eligible_chunk_ids": []
+      }
+    ],
+    "physical_chunks": 11,
+    "eligible_chunk_ids": [
+      "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+      "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+      "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+      "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+      "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+      "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+      "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525"
+    ],
+    "chunks": [
+      {
+        "id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+        "stored_hash": "a7c085e8feea32a6903616d128d81ba791f26b4797a903296ae4f4ad11396f90",
+        "actual_hash": "a7c085e8feea32a6903616d128d81ba791f26b4797a903296ae4f4ad11396f90",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+        "stored_hash": "faae5da225a4662a81554146ba9b335c8d6b80220025f8e320706a2bc39a4ca0",
+        "actual_hash": "faae5da225a4662a81554146ba9b335c8d6b80220025f8e320706a2bc39a4ca0",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+        "stored_hash": "4cbdb2edc53ea45c3cbb7c7b9955b8806174dadfb41ea646b390804141b440de",
+        "actual_hash": "4cbdb2edc53ea45c3cbb7c7b9955b8806174dadfb41ea646b390804141b440de",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+        "stored_hash": "f60ada92831c5eb16025d315dc9d72a3df0680460d207b34993d521a1b78c938",
+        "actual_hash": "f60ada92831c5eb16025d315dc9d72a3df0680460d207b34993d521a1b78c938",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "stored_hash": "ee10d33cc7b96cbec8b35b9c7a4c9f0f86a88c78cec26738c252da4abf0cb1e6",
+        "actual_hash": "ee10d33cc7b96cbec8b35b9c7a4c9f0f86a88c78cec26738c252da4abf0cb1e6",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "stored_hash": "9ddc4fc42b97b59d13710c770db288e77378dea2eb767311f6cc440ed2434678",
+        "actual_hash": "9ddc4fc42b97b59d13710c770db288e77378dea2eb767311f6cc440ed2434678",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "e63f7534951058290146662e7acf358002fe2600fa9d3469573772a9f7c612b0",
+        "stored_hash": "d7650852883728a24edede853196032c24a11a6a88e4aba2cb36eb6473fba530",
+        "actual_hash": "d7650852883728a24edede853196032c24a11a6a88e4aba2cb36eb6473fba530",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+        "stored_hash": "0b1a2b2a84c96e92b515fb9a07229e6434d1be8520945b703bfdde4db586e868",
+        "actual_hash": "0b1a2b2a84c96e92b515fb9a07229e6434d1be8520945b703bfdde4db586e868",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "46e793a80d27465f89e2ea092bc00ffb563bb4ad68242da9ae56a3023053d549",
+        "stored_hash": "ba716ee0dfafe8e49f0de216fd4d5b8fcc41d3b23d4779be36733840ee39d8bb",
+        "actual_hash": "ba716ee0dfafe8e49f0de216fd4d5b8fcc41d3b23d4779be36733840ee39d8bb",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "0f64495c1c7029731bdf2ab8552c2e5906f1c4616b0ef38d9e2a6c13f2370023",
+        "stored_hash": "86bdd938cbbbfe51a99b2b3173d4465a710703ee552c2dc88b64574c21cdd3b9",
+        "actual_hash": "86bdd938cbbbfe51a99b2b3173d4465a710703ee552c2dc88b64574c21cdd3b9",
+        "hash_matches": true,
+        "record_type": "chunk"
+      },
+      {
+        "id": "9db3c0cf7c21a23ee86a4159b32af95651cfa98f42e06b68e4256b0e0389948a",
+        "stored_hash": "59ffc49583e72b196a8b05cd63ecaeedb8e0308c8206a4db5e57511f0782ea2a",
+        "actual_hash": "59ffc49583e72b196a8b05cd63ecaeedb8e0308c8206a4db5e57511f0782ea2a",
+        "hash_matches": true,
+        "record_type": "chunk"
+      }
+    ]
+  },
+  "retrievability_probes": [
+    {
+      "chunk_id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+      "rank": 1,
+      "distance": 1.5564834976444786e-08
+    },
+    {
+      "chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+      "rank": 1,
+      "distance": -4.939002340442755e-08
+    },
+    {
+      "chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+      "rank": 1,
+      "distance": 1.7948231567643802e-08
+    },
+    {
+      "chunk_id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+      "rank": 1,
+      "distance": -1.010043737537103e-08
+    },
+    {
+      "chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+      "rank": 1,
+      "distance": -2.9804132273270056e-08
+    },
+    {
+      "chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+      "rank": 1,
+      "distance": -1.5422218835325907e-08
+    },
+    {
+      "chunk_id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+      "rank": 1,
+      "distance": 5.854778883929157e-10
+    }
+  ],
+  "gates_passed": true,
+  "top_k": 5,
+  "min_score": 0.2,
+  "embedding_version": "char-bigram-1024-v1",
+  "dimensions": 1024,
+  "as_of": "2026-10-12T00:00:00Z",
+  "rewrite": false,
+  "rerank": false,
+  "cache": false,
+  "model_calls": 0,
+  "formal_queries": 30,
+  "repeats": 1,
+  "default_snapshot_unchanged": true,
+  "all_tracked_files_unchanged": true,
+  "finished_at_utc": "2026-10-13T03:24:38.995078+00:00"
+}

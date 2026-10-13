@@ -1,0 +1,121 @@
+{
+  "head": "8cefc6c3e24230177c1db6dbb54f2e45f1c86f23",
+  "stage": "A05-P2-B0-CAL",
+  "stage_status": "verify",
+  "A05_status": "doing",
+  "A05_outcome": "partial",
+  "measurement": "real Chroma HTTP; not Fake or real-model E2E",
+  "formal_queries": 30,
+  "model_calls": 0,
+  "default_snapshot_unchanged": true,
+  "source_call_path": "independent gate → original publisher → retrieve_b0 → N06/N07 → observe/aggregate",
+  "original_production_call_paths_changed": false,
+  "all_other_tracked_hashes_unchanged": true,
+  "changed_tracked_files": [
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "B1_executed": false,
+  "commit_push": false,
+  "commands": [
+    {
+      "command": "uv lock --check",
+      "result": "passed: 53 packages"
+    },
+    {
+      "command": "uv run python -m pytest -q tests/test_rag_dev_calibration.py tests/test_rag_frozen_v2.py tests/test_rag_quality_baseline.py tests/test_rag_quality_gate.py tests/test_rag_gold_v2_candidate.py tests/test_knowledge_version_consistency.py tests/test_rerank_result_contract.py tests/test_rag_contract.py",
+      "result": "193 passed"
+    },
+    {
+      "command": "uv run python -m pytest -q",
+      "result": "466 passed, 3 skipped, 1 existing AnyIO deprecation warning"
+    },
+    {
+      "command": "CARTCARE_RUN_CHROMA_HTTP_TEST=1 CHROMA_HOST=127.0.0.1 CHROMA_PORT=8001 NO_PROXY=127.0.0.1,localhost; uv run python -m pytest -q tests/test_rag_http_integration.py",
+      "result": "2 passed; pytest cache permission warning"
+    },
+    {
+      "command": "NO_PROXY=127.0.0.1,localhost; uv run python -m evaluation.reports.hardening.A05.b0-calibrated-20261013.run_verified",
+      "result": "preflight_passed; no test queries; collection deleted"
+    },
+    {
+      "command": "NO_PROXY=127.0.0.1,localhost; uv run python -m evaluation.reports.hardening.A05.b0-calibrated-20261013.run_verified --formal",
+      "result": "measured; exactly one 30-case pass; collection deleted"
+    },
+    {
+      "command": "uv run python -m evaluation.reports.hardening.A05.b0-calibrated-20261013.analyze",
+      "result": "offline comparison verified both old repeats; no retrieval"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "skipped": [
+    "live Memory integration not run",
+    "2 HTTP opt-in skipped by default; separately run above"
+  ],
+  "environment_attempts": [
+    {
+      "phase": "directory creation",
+      "error": "Windows Access denied under sandbox",
+      "resolution": "auto-reviewed elevated creation approved"
+    },
+    {
+      "phase": "preflight before any HTTP or formal test",
+      "error": "PermissionError [Errno 13] writing protected_inputs.json",
+      "resolution": "auto-reviewed elevated evidence writes approved; subsequent preflight passed"
+    },
+    {
+      "phase": "Chroma telemetry only",
+      "error": "capture() takes 1 positional argument but 3 were given",
+      "result": "Chroma heartbeat/get/query and all measurement gates succeeded"
+    }
+  ],
+  "acceptance": {
+    "isolation_publication_hash_retrievability": "passed",
+    "frozen_30_gold_snapshot": "passed",
+    "human_Gold_review": "prior whole-candidate user approval preserved; no new independent annotation",
+    "reproducibility": "passed; lock/code/AST/packages/input hashes and script archived",
+    "formal_metrics_and_per_case": "completed",
+    "comparison": "same candidates both repeats; threshold-only quality change",
+    "stage_human_acceptance": "pending"
+  },
+  "artifact_sha256": {
+    "analyze.py": "0225a87a6fb0ab36db39e6c1924b56243db0b34084480b55574b5fae55979267",
+    "b0_lexical_calibration_v2.json": "c65630d00d33e51d345b2fb94982b24331e7385d05195ec2c34eaf213fc84ad2",
+    "chunks.json": "a10d3bc9dfe3199cc0d0db622705d014b46be5354d2c6c5b333cb8bd666a8688",
+    "comparison.json": "9ba52ef00bbb53c25e33602aedb19c77775d62d55a04d87df4ab59a9dc3667db",
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v2.json": "c5eefac673cd34529793d83bb860fbb07ef5393507c99652dfe4eef2e76a0818",
+    "default_snapshot_formal.json": "500f8ffa736d7a6af42beb94595f9b243648d4b5d654ed016a87e292d5372305",
+    "default_snapshot_preflight.json": "500f8ffa736d7a6af42beb94595f9b243648d4b5d654ed016a87e292d5372305",
+    "dev_dataset_v2.json": "e49037acd561248f93b5e72ce23ab1d20b3fed1b9d7910b2ba8448f64d9fb002",
+    "finalize.py": "3309a8152e0788839e51c0ecc987761cfe81774b7822ffe8a6a034803fead978",
+    "freeze_v2.json": "7ea0b1c40d430de13fead53ed1f21af082410efc7c0cdf6bb967c22030524f79",
+    "gold_review_v2.md": "3007e3adc2a5ca41bdd2788262bdaa1f73823bcaca7106896fb09470f6e31308",
+    "gold_v1_to_v2_diff.md": "9fc7efb951bcc78b705a946cd4b49ddb2517cabe03f8e1b5aeaf5828add909f8",
+    "manifest.json": "98e1d13714e6cafacfe18845efe953ec98f4747aa6de682956a51b5ddd018621",
+    "n06_snapshot.json": "76e3bdffdd34e3d74db4f7ab68debc2aec44966df728a048ba827bf515334676",
+    "observations.json": "39e5640c4f7208a29a7f131b59dc6f0cf37222e8eabae137b35932c44bf4aa38",
+    "per_case.csv": "a1b8cb73a185fd03afd79093a78bf3e61fd3b4c5e0a33739f3beb1bb3ac2ba82",
+    "per_case.md": "290fbc524dfd40c7ffe48debe2b46aac8b03d0b32129337db1ac2f6cb08331b3",
+    "preflight_formal.json": "98e1d13714e6cafacfe18845efe953ec98f4747aa6de682956a51b5ddd018621",
+    "preflight_preflight.json": "f3fff42062f8377b27938b67f4913030464666a5d89fb796c667722126deae9a",
+    "protected_inputs.json": "30f83c0e1cd5fd89f4d0ff63f8263666763689eb692f6460ba3ed74480453a67",
+    "report.md": "8f7801b07ba2e855f63b46d77b6939e42ff0aabae4193a1ad19256e2f8088ed7",
+    "run_verified.py": "810337631f39f477f8ade3ba3da6c7069de8ad049a7adf8f09a35e2346edf719",
+    "summary.json": "3d11e31bb1199453ca73301294486ece7d0b3bdcc4e1b60e499283a752ca2cae"
+  },
+  "final_checks": {
+    "one_shot_guard": "PASS: existing observations rejected before HTTP; manifest/observations/preflight bytes unchanged",
+    "A05_only_progress_updates": "PASS: all other tasks equal HEAD JSON",
+    "artifact_integrity": "PASS: all stored SHA256 hashes verified",
+    "state": "A05 doing/partial; B0-calibrated measured/verify"
+  },
+  "reproduction": {
+    "original_measurement": "Do not remove or overwrite evidence. The formal runner deliberately rejects another attempt in this directory.",
+    "new_authorized_run": "Copy only run_verified.py into a fresh evaluation/reports/hardening/A05 directory; from repo root execute its module without --formal then with --formal. All locked code/data/dependency gates must pass. This records a new run, not a second independent 30-case population.",
+    "offline_analysis": "uv run python -m evaluation.reports.hardening.A05.b0-calibrated-20261013.analyze (no network; report writes only)"
+  }
+}
