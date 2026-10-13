@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "approval": "user_approved_content_and_metadata_only",
+  "approval_recorded_at_utc": "2026-10-13T07:26:39Z",
+  "approval_time_note": "Timestamp records receipt in this execution, not an inferred time of earlier human review.",
+  "approval_source": "Current user instruction: 用户现已逐篇审核并批准六篇最终知识正文及对应 Metadata。",
+  "asset": "default_business_v1.json",
+  "asset_sha256": "17e3c606365c203589919321b166e942e6aab569d539ce631f447a5439cd018d",
+  "formal_publication_authorized": false,
+  "documents": [
+    {
+      "document_id": "doc_8450205ee234ce108cbd",
+      "publication_revision": "9c3ac875a00994ef876dcafeafa7369c7e4820586cf587271a7e95a206d9310f",
+      "content_sha256": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37"
+    },
+    {
+      "document_id": "doc_ed1fae0ed79e04b2ee03",
+      "publication_revision": "09d6c7f65a9498771ec0c484d2081edb9574f889376d3866c05ef55aa481ea62",
+      "content_sha256": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a"
+    },
+    {
+      "document_id": "doc_9958ba736af96fca4e70",
+      "publication_revision": "15f31f6f528980171726219e7aabcc646bf6ab9731269574a7dbebd635048547",
+      "content_sha256": "24b01681d3f3382daefc878fb078ece779c51a761457161c21240060bfe5f0b7"
+    },
+    {
+      "document_id": "doc_cd81fe468580a43ee0bd",
+      "publication_revision": "5b4e272453b82e4b1ede6fadef627be8916ef88da560c14d8faeeedc9dd06801",
+      "content_sha256": "be1e03477186c9510907873b1afb83066bc4fdf99cd412b0e5020d0fb6e2b13b"
+    },
+    {
+      "document_id": "doc_4e9e6195c6f9e8cfe749",
+      "publication_revision": "8e945e54cfc0b4b76944e04f6681dd1af622f6d06aeca47dd182161164b6351a",
+      "content_sha256": "4e044b244b4a03f4f45d0cc996e89eff99707f81e76a38480d35bf320e007ca8"
+    },
+    {
+      "document_id": "doc_73ae51e45fb2abb8ce23",
+      "publication_revision": "8593ba741e04a88774a211f48785227255a26a7511b3062444fe8c02e412908c",
+      "content_sha256": "a3364b784216e4804f3beb8ec3e5ef8eb210e340fab62ffd45198787a8450bb3"
+    }
+  ]
+}

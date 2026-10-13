@@ -96,6 +96,9 @@ def test_candidate_reviews_and_all_history_hashes_preserved():
     validation = read(HERE / 'gold_v2_candidate_validation.json')
     for name, expected in validation['protected_sha256'].items():
         path = HERE / 'history/run_baseline_v1.py.txt' if name == 'evaluation/rag_quality/run_baseline.py' else ROOT / name
+        if name == 'mcp/knowledge_base.py':
+            # Seed-only preparation changed the active source; preserve the measured source bytes.
+            path = ROOT / 'evaluation/reports/hardening/A05/default-kb-publication-20261013/source_before/knowledge_base.py.txt'
         assert digest(path) == expected
     for name, expected in validation['candidate_sha256'].items():
         assert digest(HERE / name) == expected

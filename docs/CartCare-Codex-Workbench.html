@@ -119,6 +119,7 @@
       </article>
       <article class="task-card" data-task="A05">
         <h3>A05 / N06、N07、P1 · 知识契约与冻结检索基线</h3>
+        <p>2026-10-13 DEFAULT-KB-CONTENT 六篇正文及Metadata已由用户逐篇批准。DEFAULT-KB-PUBLICATION=implemented/verify：唯一审批资产/hash与六个revision一致，空库/普通seed/reset统一读取；非空升级先核验完整备份、目标与未变化快照，未知身份/生命周期冲突拒绝。真实HTTP随机集合七场景通过，含旧格式克隆、故障恢复、重复发布和完整向量恢复；全部清理，实际默认库未访问。新业务用例raw目标6/6、最终目标usable5/6，退款问法0.3395低于保留的0.35，未调参；Skills冲突仍阻塞最终/chat验收。全量483 passed/1 skipped/2 warnings。正式发布未获授权；A05继续doing/partial，B1-PREP与B1继续blocked，不重试B1。材料见evaluation/reports/hardening/A05/default-kb-publication-20261013/REPORT.md。</p>
         <p>2026-10-12：N06=fixed，verify待验收。显式发布状态与supersedes/时间区间控制候选；同版本精确替换、失败禁用旧依据、citation绑定内容hash。旧无发布记录资料保留并要求审核重发布；Chroma非事务/单发布者边界见技术说明。N07=fixed/verify：空或异常排序不伪usable，fallback须通过证据及N06复核；真实reranked与rerank_status可观察。A05-P1=implemented/verify：30题冻结，真实HTTP B0两轮一致，Recall@1/3/5=6/21、MRR=.2857、无答案误报4/9；无模型费用。整个A05=partial/doing。A05-P2-GATE=implemented/verify：30条Gold作者审核建议19合理/10需判断/1疑似错误，dev16题分离；BGE512维优先、E5备选，revision/权重标识已核查。人工Gold和模型授权未完成，正式P2=blocked/未执行，无下载或依赖安装。</p>
         <p>2026-10-13：用户验收Gold v2/B0-original v2为done。DEV-CAL=verify：仅16题dev真实HTTP两轮，rawRecall5=8/8；按预定FPR≤1/8和tie锁定0.20，最终Recall5=2/8、MRR=.25、误报1/8、引用2/3。0.35在dev全部拒答；.20仍漏6/8，非测试集改进结论。正式test-calibrated未运行，整体partial，B1 blocked。</p>
         <p>2026-10-13：用户批准Gold v2正式冻结，A05-P2-GOLD-V2=done；A05-B0-v2=verify待结果验收。真实HTTP两轮一致，Recall1/3/5=6/21、rawRecall5=18/21、MRR=.2857、误报4/9、引用精度6/10；仅03候选分数/排名因Query修改变化，非算法提升。v1和旧报告保留，整体partial，正式B1 blocked，无模型下载/大型依赖/生产配置变更。</p>

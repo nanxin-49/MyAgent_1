@@ -1,0 +1,1 @@
+{"collection":"cartcare_kbprep_4620332e5d8642298b9444a051b50fa4","metadata":{"dataset_kind":"demo","embedding_version":"char-bigram-1024-v1","hnsw:space":"cosine"},"rows":[],"schema_version":1,"target":{"database":"default_database","host":"127.0.0.1","port":8001,"ssl":false,"tenant":"default_tenant"}}

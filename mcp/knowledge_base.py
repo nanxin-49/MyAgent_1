@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional
 import chromadb
 from .knowledge_embeddings import EMBEDDING_VERSION, embed_document, embed_query
 from .rag_contract import KnowledgeDocument, ChunkMetadata, build_hit
+from .default_knowledge_asset import load_approved_defaults
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,8 @@ class KnowledgeBase:
         collection_name: str | None = None,
         seed_defaults: bool = True,
     ):
+        if seed_defaults:
+            load_approved_defaults()  # Verify approval before creating/opening a collection.
         self.min_score = float(min_score if min_score is not None else os.getenv(
             "CARTCARE_RAG_MIN_SCORE", str(self.DEFAULT_MIN_SCORE)))
         if not math.isfinite(self.min_score) or not 0.0 <= self.min_score <= 1.0:
@@ -319,6 +322,7 @@ class KnowledgeBase:
 
     def rebuild_demo_collection(self) -> int:
         """Explicitly replace only the versioned demo seed; refuse unknown sources."""
+        load_approved_defaults()  # Never delete first and discover an invalid asset later.
         if self._collection_name != self.COLLECTION_NAME:
             raise ValueError("demo rebuild is limited to the default demo collection")
         if (self._collection.metadata or {}).get("dataset_kind") != "demo":
@@ -328,8 +332,10 @@ class KnowledgeBase:
                not str(meta.get("source", "")).startswith("demo:cartcare-default/")
                for meta in stored.get("metadatas", [])):
             raise ValueError("collection contains records without known demo provenance; reset refused")
+        metadata = dict(self._collection.metadata or {})
         self._client.delete_collection(self._collection_name)
-        self._collection = self._open_collection()
+        self._collection = self._client.get_or_create_collection(
+            name=self._collection_name, metadata=metadata)
         self._load_default_docs()
         return self.doc_count
 
@@ -381,89 +387,7 @@ class KnowledgeBase:
         return chunks
 
     def _load_default_docs(self) -> None:
-        """导入默认知识库文档（客服场景常见问题）。"""
-        default_docs = [
-            {
-                "title": "退款政策",
-                "source": "demo:cartcare-default/refund-policy",
-                "doc_type": "policy",
-                "policy_version": "refund-cancel-v1",
-                "effective_at": "2026-09-30T00:00:00+00:00",
-                "content": (
-                    "CartCare 模拟客服政策说明，仅用于演示。"
-                    "订单创建后 7 天内、订单状态符合要求时可以请求退款。"
-                    "退款金额不能超过订单总额；超过 500 元需人工审批。"
-                    "退款请求是否可执行由实时订单事实和 PolicyEngine 决定。"
-                    "此文档不代表真实商城承诺或支付渠道处理时效。"
-                ),
-            },
-            {
-                "title": "订单查询",
-                "source": "demo:cartcare-default/order-guide",
-                "doc_type": "guide",
-                "content": (
-                    "订单查询指南。"
-                    "用户可以通过订单号查询订单状态。"
-                    "订单状态包括：待支付、已支付、已发货、运输中、已签收、已完成。"
-                    "如果订单显示已发货但超过 7 天未收到，可以联系客服申请查件。"
-                    "物流信息通常在发货后 24 小时内更新。"
-                    "如果订单显示异常，请提供订单号联系客服处理。"
-                ),
-            },
-            {
-                "title": "账户安全",
-                "source": "demo:cartcare-default/account-guide",
-                "doc_type": "guide",
-                "content": (
-                    "账户安全说明。"
-                    "建议用户定期修改密码，密码长度至少 8 位，包含字母和数字。"
-                    "如果忘记密码，可以通过绑定的手机号或邮箱重置。"
-                    "发现账户异常登录时，系统会自动锁定账户并发送通知。"
-                    "用户可以在安全设置中开启两步验证，提高账户安全性。"
-                    "不要将密码分享给他人，客服人员不会索要用户密码。"
-                ),
-            },
-            {
-                "title": "技术故障排查",
-                "source": "demo:cartcare-default/technical-guide",
-                "doc_type": "guide",
-                "content": (
-                    "常见技术问题排查。"
-                    "应用崩溃：请尝试清除缓存后重启应用，如果问题持续请更新到最新版本。"
-                    "登录失败 401 错误：表示认证失败，请检查用户名密码是否正确，或尝试重置密码。"
-                    "页面加载慢：检查网络连接，尝试切换 WiFi 或移动数据。"
-                    "支付失败：确认银行卡余额充足，检查是否开启了网上支付功能。"
-                    "500 服务器错误：这是服务端问题，请稍后重试，如果持续出现请联系技术支持。"
-                ),
-            },
-            {
-                "title": "会员与积分",
-                "source": "demo:cartcare-default/membership-faq",
-                "doc_type": "faq",
-                "content": (
-                    "会员积分规则。"
-                    "每消费 1 元累积 1 积分。"
-                    "积分可以在下次购物时抵扣，100 积分 = 1 元。"
-                    "会员等级分为：普通会员、银卡会员（累计消费 1000 元）、金卡会员（累计消费 5000 元）。"
-                    "银卡会员享受 95 折优惠，金卡会员享受 9 折优惠。"
-                    "积分有效期为 1 年，过期自动清零。"
-                    "生日当月消费可获得双倍积分。"
-                ),
-            },
-            {
-                "title": "配送说明",
-                "source": "demo:cartcare-default/shipping-guide",
-                "doc_type": "guide",
-                "content": (
-                    "配送服务说明。"
-                    "标准配送：3-5 个工作日送达，免运费（订单满 99 元）。"
-                    "加急配送：1-2 个工作日送达，运费 15 元。"
-                    "同城配送：当日达或次日达，运费 10 元。"
-                    "偏远地区可能需要额外 2-3 天。"
-                    "配送时间为每天 9:00-18:00，节假日可能延迟。"
-                    "如果需要修改收货地址，请在发货前联系客服。"
-                ),
-            },
-        ]
+        """Load the exact user-approved asset; no legacy inline fallback."""
+        default_docs = load_approved_defaults()
         self.add_documents(default_docs)
-        logger.info(f"已导入默认知识库: {len(default_docs)} 篇文档")
+        logger.info("已导入获批默认知识库: %s 篇文档", len(default_docs))

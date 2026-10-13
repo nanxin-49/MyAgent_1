@@ -1,0 +1,10 @@
+Final command: uv run python -m pytest -q
+Process-only environment: NO_PROXY=127.0.0.1,localhost; CARTCARE_RUN_CHROMA_HTTP_TEST=1; CHROMA_HOST=127.0.0.1; CHROMA_PORT=8001
+483 passed, 1 skipped, 2 warnings in 8.06s
+SKIPPED tests/test_memory_live_services.py:13: requires live Redis/Chroma (Memory live opt-in not enabled)
+Warnings: existing AnyIO BlockingPortal deprecation; existing pytest cash/cache/pytest/stepwise write permission.
+Red: test_default_seed_is_exact_approved_documents, 1 failed before removing old inline seed, then green.
+Earlier verification iterations: 74 passed; 68 passed; 481 passed; 482 passed.
+One added reset unit test initially had missing KnowledgeBase import: 12 passed/1 failed; fixed test import before final regression.
+uv lock --check: Resolved 53 packages in 1ms; no dependency changes.
+Real HTTP final: 7 scenarios passed; all owned collections deleted and absence verified. Chroma telemetry capture signature warnings recorded separately as pre-existing.
