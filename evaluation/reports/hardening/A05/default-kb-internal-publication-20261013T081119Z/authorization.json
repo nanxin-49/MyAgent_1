@@ -1,0 +1,15 @@
+{
+  "task": "A05 DEFAULT-KB-PUBLICATION internal maintenance publication",
+  "authority": "explicit current user instruction",
+  "recorded_at_utc": "2026-10-13T08:26:25Z",
+  "scope": "confirmed local CartCare demo default collection only",
+  "local_internal_publication_authorized": true,
+  "external_production_authorized": false,
+  "reset_authorized": false,
+  "threshold_or_approved_content_changes_authorized": false,
+  "business_acceptance": false,
+  "known_refund_low_confidence_accepted_for_this_internal_window": true,
+  "model_calls_or_B1_experiment_authorized": false,
+  "commit_or_push_authorized": false,
+  "receipt_time_note": "Record time during this execution; not an inferred exact timestamp of human message submission."
+}

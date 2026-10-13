@@ -1,0 +1,9 @@
+{
+  "required": false,
+  "executed": false,
+  "reason": "Mechanical verification succeeded; known refund low-confidence accepted for this internal window.",
+  "verified_restore_input": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\hardening\\A05\\default-kb-internal-publication-20261013T081119Z\\before.json",
+  "before_sha256": "2dcb6589e29f01cf80d5e1f92aa2b81fa1c4485eb4f9433a7d11694558980b8d",
+  "second_copy": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\data\\default-kb-backups\\default-kb-internal-publication-20261013T081119Z\\before.json",
+  "api_stays_stopped": true
+}

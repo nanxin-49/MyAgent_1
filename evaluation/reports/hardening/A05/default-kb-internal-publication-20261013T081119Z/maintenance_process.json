@@ -1,0 +1,161 @@
+{
+  "captured_at_utc": "2026-10-13T08:26:24.9838423Z",
+  "local_demo_confirmed": true,
+  "api_stopped": true,
+  "no_observed_writer": true,
+  "explicit_stop_command": "docker stop echomind-app (already exited, kept stopped)",
+  "processes": [],
+  "listeners": [
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 8001,
+      "OwningProcess": 19672
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 8001,
+      "OwningProcess": 32764
+    }
+  ],
+  "established_chroma_connections": [],
+  "docker_endpoint": "npipe:////./pipe/dockerDesktopLinuxEngine",
+  "running_containers": [
+    "echomind-redis",
+    "echomind-chromadb"
+  ],
+  "app_state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 137,
+    "Error": "",
+    "StartedAt": "2026-10-02T06:28:55.688478894Z",
+    "FinishedAt": "2026-10-02T12:55:05.17601223Z",
+    "Health": {
+      "Status": "unhealthy",
+      "FailingStreak": 0,
+      "Log": [
+        {
+          "Start": "2026-10-02T12:52:32.814483994Z",
+          "End": "2026-10-02T12:52:33.167667816Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-02T12:53:03.166205459Z",
+          "End": "2026-10-02T12:53:03.525267593Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-02T12:53:33.524387974Z",
+          "End": "2026-10-02T12:53:33.860444669Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-02T12:54:03.860898462Z",
+          "End": "2026-10-02T12:54:04.215371687Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-02T12:54:34.214279352Z",
+          "End": "2026-10-02T12:54:35.150152007Z",
+          "ExitCode": 0,
+          "Output": ""
+        }
+      ]
+    }
+  },
+  "chroma_labels": {
+    "com.docker.compose.config-hash": "096642064a3fea579c4cfa92e2842205ee1bb542282c588a7302a668d1953e78",
+    "com.docker.compose.container-number": "1",
+    "com.docker.compose.depends_on": "",
+    "com.docker.compose.image": "sha256:3ef590e372af07cd333af4f1b3f085466de81c6a465ba92c0d04a6d70024909b",
+    "com.docker.compose.oneoff": "False",
+    "com.docker.compose.project": "echomind",
+    "com.docker.compose.project.config_files": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\docker-compose.yml",
+    "com.docker.compose.project.working_dir": "E:\\AAA_NEED\\Echomind_new\\EchoMind",
+    "com.docker.compose.replace": "echomind-chromadb",
+    "com.docker.compose.service": "chromadb",
+    "com.docker.compose.version": "5.5.1"
+  },
+  "chroma_port_bindings": {
+    "8000/tcp": [
+      {
+        "HostIp": "",
+        "HostPort": "8001"
+      }
+    ]
+  },
+  "chroma_mounts": {
+    "Type": "volume",
+    "Name": "echomind_chromadb-data",
+    "Source": "/var/lib/docker/volumes/echomind_chromadb-data/_data",
+    "Destination": "/chroma/chroma",
+    "Driver": "local",
+    "Mode": "rw",
+    "RW": true,
+    "Propagation": ""
+  },
+  "chroma_state": {
+    "Status": "running",
+    "Running": true,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 588,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-12T03:25:21.92179089Z",
+    "FinishedAt": "2026-10-11T12:46:16.923491413Z",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0,
+      "Log": [
+        {
+          "Start": "2026-10-13T08:23:56.940850157Z",
+          "End": "2026-10-13T08:23:56.990413772Z",
+          "ExitCode": 0,
+          "Output": "{\"nanosecond heartbeat\":1791879836986135958}"
+        },
+        {
+          "Start": "2026-10-13T08:24:26.989761301Z",
+          "End": "2026-10-13T08:24:27.054948699Z",
+          "ExitCode": 0,
+          "Output": "{\"nanosecond heartbeat\":1791879867050519037}"
+        },
+        {
+          "Start": "2026-10-13T08:24:57.054614232Z",
+          "End": "2026-10-13T08:24:57.107113239Z",
+          "ExitCode": 0,
+          "Output": "{\"nanosecond heartbeat\":1791879897102689891}"
+        },
+        {
+          "Start": "2026-10-13T08:25:27.106576402Z",
+          "End": "2026-10-13T08:25:27.154149246Z",
+          "ExitCode": 0,
+          "Output": "{\"nanosecond heartbeat\":1791879927150805534}"
+        },
+        {
+          "Start": "2026-10-13T08:25:57.152933547Z",
+          "End": "2026-10-13T08:25:57.202523215Z",
+          "ExitCode": 0,
+          "Output": "{\"nanosecond heartbeat\":1791879957198542870}"
+        }
+      ]
+    }
+  },
+  "chroma_processes": [
+    "PID                 COMMAND",
+    "588                 uvicorn"
+  ],
+  "wsl_state": "  NAME              STATE           VERSION\n\n* Ubuntu            Stopped         2\n\n  docker-desktop    Running         2\n\n",
+  "guarantee_limit": "Maintenance inventory and snapshot checks; not a distributed lock against future external writers."
+}

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "python",
+    "-m",
+    "mcp.seed_demo_knowledge",
+    "--check-assets"
+  ],
+  "utc": "2026-10-13T08:20:43.455509+00:00",
+  "returncode": 0,
+  "stdout": "approved_documents=6 asset_sha256=17e3c606365c203589919321b166e942e6aab569d539ce631f447a5439cd018d\n",
+  "stderr": ""
+}

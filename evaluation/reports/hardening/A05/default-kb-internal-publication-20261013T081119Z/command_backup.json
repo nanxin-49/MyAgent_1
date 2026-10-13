@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python",
+    "-m",
+    "mcp.seed_demo_knowledge",
+    "--backup",
+    "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\hardening\\A05\\default-kb-internal-publication-20261013T081119Z\\before.json"
+  ],
+  "utc": "2026-10-13T08:20:47.544271+00:00",
+  "returncode": 0,
+  "stdout": "backup_sha256=2dcb6589e29f01cf80d5e1f92aa2b81fa1c4485eb4f9433a7d11694558980b8d\n",
+  "stderr": "Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given\n"
+}

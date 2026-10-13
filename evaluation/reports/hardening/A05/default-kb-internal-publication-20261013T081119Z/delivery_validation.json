@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "tracked_changed_files": [
+    "README.md",
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "all_other_tracked_files_unchanged": true,
+  "protected_tracked_count": 478,
+  "env_unchanged": true,
+  "before_and_second_copy_sha256": "2dcb6589e29f01cf80d5e1f92aa2b81fa1c4485eb4f9433a7d11694558980b8d",
+  "after_sha256": "e8e6efa31e0b4288050f98b66cf4b0bda127ded2b6496e876d9faecbb53d63c9",
+  "current_full_snapshot_equal_after": true
+}
