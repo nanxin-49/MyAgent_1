@@ -112,14 +112,47 @@ def validate_dataset(corpus, dataset):
     return chunks
 
 
-def load_frozen():
-    lock = json.loads((HERE / 'freeze_v1.json').read_text(encoding='utf-8'))
+def load_frozen(dataset_version='v1'):
+    if dataset_version not in {'v1', 'v2'}:
+        raise ValueError('unsupported dataset version; expected v1 or v2')
+    dataset_name = f'dataset_{dataset_version}.json'
+    lock = json.loads((HERE / f'freeze_{dataset_version}.json').read_text(encoding='utf-8'))
+    required = {'corpus_v1.json', dataset_name}
+    if dataset_version == 'v2':
+        required.update({'dev_dataset_v2.json', 'gold_review_v2.md', 'gold_v1_to_v2_diff.md'})
+    if set(lock['files']) != required or lock['version'] != f'a05-freeze-{dataset_version}':
+        raise ValueError('freeze does not bind the required versioned files')
     for name, expected in lock['files'].items():
         if digest(HERE / name) != expected:
             raise ValueError('frozen file hash mismatch: ' + name)
     corpus = json.loads((HERE / 'corpus_v1.json').read_text(encoding='utf-8'))
-    dataset = json.loads((HERE / 'dataset_v1.json').read_text(encoding='utf-8'))
+    dataset = json.loads((HERE / dataset_name).read_text(encoding='utf-8'))
+    if dataset['version'] != f'a05-dataset-{dataset_version}':
+        raise ValueError('dataset content version mismatch')
     validate_dataset(corpus, dataset)
+    if dataset_version == 'v2':
+        if (lock['review']['status'] != 'user_approved_v2'
+                or lock['as_of'] != corpus['as_of']
+                or lock['dataset_version'] != dataset['version']
+                or lock['corpus_version'] != corpus['version']):
+            raise ValueError('v2 approval/version/time mismatch')
+        from evaluation.rag_quality.prepare_gate import validate_dev
+        dev = json.loads((HERE / 'dev_dataset_v2.json').read_text(encoding='utf-8'))
+        if dev['version'] != lock['dev_dataset_version'] or dev['human_review_status'] != 'user_approved_v2':
+            raise ValueError('v2 development approval/version mismatch')
+        validate_dev(corpus, dev, dataset)  # Structure/labels only, never retrieval or calibration.
+        for items, labels, fields in (
+                (dataset['cases'], lock['test_gold_labels'], ('case_id', 'answerable', 'category',
+                 'gold_document_id', 'gold_chunk_id', 'gold_evidence', 'policy_version')),
+                (dev['cases'], lock['dev_gold_labels'], ('case_id', 'answerable',
+                 'gold_document_id', 'gold_chunk_id', 'gold_evidence', 'policy_version'))):
+            if labels != [{key: item[key] for key in fields} for item in items]:
+                raise ValueError('v2 frozen Gold labels differ from dataset')
+        counts = lambda items: {'total': len(items), 'answerable': sum(c['answerable'] for c in items),
+                                'no_answer': sum(not c['answerable'] for c in items)}
+        if (lock['test_counts'] != {**counts(dataset['cases']), 'categories': dataset['stratification']}
+                or lock['dev_counts'] != counts(dev['cases'])):
+            raise ValueError('v2 frozen counts differ from dataset')
     return corpus, dataset, lock
 
 
@@ -266,17 +299,19 @@ def write_json(path, value):
 
 
 async def run(args):
-    corpus, dataset, lock = load_frozen()
+    corpus, dataset, lock = load_frozen(args.dataset_version)
     chunks = validate_dataset(corpus, dataset)
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + uuid.uuid4().hex[:8]
-    output = ROOT / 'evaluation/reports/rag_quality' / run_id
+    report_root = ROOT / 'evaluation/reports/rag_quality'
+    output = (report_root / 'v2' if args.dataset_version == 'v2' else report_root) / run_id
     output.mkdir(parents=True, exist_ok=False)
     for name in lock['files']:
         (output / name).write_bytes((HERE / name).read_bytes())
-    write_json(output / 'freeze_v1.json', lock)
+    freeze_name = f'freeze_{args.dataset_version}.json'
+    (output / freeze_name).write_bytes((HERE / freeze_name).read_bytes())
     write_json(output / 'chunks.json', list(chunks.values()))
     collection = 'cartcare_a05_p1_' + uuid.uuid4().hex
-    manifest = dict(run_id=run_id, group='B0', started_at_utc=datetime.now(timezone.utc).isoformat(),
+    manifest = dict(run_id=run_id, group='B0-original', started_at_utc=datetime.now(timezone.utc).isoformat(),
                     head=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                     dirty_worktree=subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True),
                     python=platform.python_version(), platform=platform.platform(),
@@ -285,6 +320,10 @@ async def run(args):
                         ('mcp/knowledge_embeddings.py', 'mcp/knowledge_base.py', 'mcp/rag_contract.py',
                          'mcp/tool_manager.py', 'evaluation/rag_quality/run_baseline.py', 'uv.lock')},
                     freeze=lock, corpus_version=corpus['version'], dataset_version=dataset['version'],
+                    dataset_path=str(HERE / f'dataset_{args.dataset_version}.json'),
+                    dataset_sha256=digest(HERE / f'dataset_{args.dataset_version}.json'),
+                    freeze_path=str(HERE / freeze_name), freeze_sha256=digest(HERE / freeze_name),
+                    input_sha256=dict(lock['files']), review=lock.get('review'),
                     collection=collection, endpoint=f'{args.host}:{args.port}', backend='real Chroma HTTP',
                     embedding_version=EMBEDDING_VERSION, dimensions=DIMENSIONS, title_feature_boost=6,
                     top_k=5, min_score=.35, distance='cosine; score=1-distance (not probability)',
@@ -313,6 +352,8 @@ async def run(args):
             raise RuntimeError('identical republication changed corpus / chunk IDs')
         manifest['repeat_publication_identical'] = True
         manifest['physical_chunks'] = kb.doc_count
+        if kb.doc_count != len(chunks):
+            raise RuntimeError('physical chunk count differs from frozen corpus')
         fixed_time = datetime.fromisoformat(corpus['as_of'].replace('Z', '+00:00'))
         class FrozenDatetime(datetime):
             @classmethod
@@ -348,8 +389,10 @@ async def run(args):
         manifest['outcome'] = 'measured' if all(r['success'] for r in observations) else 'partial_dependency_failure'
         write_json(output / 'summary.json', summaries)
         primary = observations[:len(dataset['cases'])]
-        report = ['# A05-P1 B0 lexical retrieval baseline', '',
-                  'Real Chroma HTTP; no model calls. Labels frozen before retrieval; human acceptance pending.',
+        report = [f'# {dataset["version"]} B0-original lexical retrieval baseline', '',
+                  'Real Chroma HTTP; no model calls. Labels frozen before retrieval; '
+                  + ('user-approved v2 after human discussion/candidate verification.' if args.dataset_version == 'v2'
+                     else 'v1 author labels, original human-review status retained.'),
                   'Production call paths/configuration unchanged. B-prod not executed (no paid-model authorization).',
                   '21 answerable / 9 no-answer. One gold chunk per answerable query. Final usable hits determine metrics.', '',
                   '```json', json.dumps(summaries, ensure_ascii=False, indent=2), '```', '',
@@ -387,6 +430,8 @@ def main():
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8001)
     parser.add_argument('--repeats', type=int, default=2)
+    parser.add_argument('--dataset-version', choices=('v1', 'v2'), default='v1',
+                        help='Select version explicitly; v2 requires the approved freeze_v2.json')
     args = parser.parse_args()
     if args.repeats < 1:
         parser.error('repeats must be >=1')

@@ -20,7 +20,9 @@ def test_original_inputs_and_reports_match_gate_entry_snapshot():
     assert lock['human_review_status'] == 'pending'
     assert lock['formal_experiment_status'] == 'blocked'
     for filename, expected in lock['preserved_original_sha256'].items():
-        assert digest(HERE / filename) == expected
+        # The old source remains byte-identical in an archive; the active runner now selects versions.
+        path = HERE / ('history/run_baseline_v1.py.txt' if filename == 'run_baseline.py' else filename)
+        assert digest(path) == expected
     for filename, expected in lock['p1_report_sha256'].items():
         assert digest(P1 / filename) == expected
     for filename, expected in lock['gate_inputs_sha256'].items():

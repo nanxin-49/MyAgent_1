@@ -95,13 +95,18 @@ def test_negative_lifecycle_labels_and_dev_test_separation():
 def test_candidate_reviews_and_all_history_hashes_preserved():
     validation = read(HERE / 'gold_v2_candidate_validation.json')
     for name, expected in validation['protected_sha256'].items():
-        assert digest(ROOT / name) == expected
+        path = HERE / 'history/run_baseline_v1.py.txt' if name == 'evaluation/rag_quality/run_baseline.py' else ROOT / name
+        assert digest(path) == expected
     for name, expected in validation['candidate_sha256'].items():
         assert digest(HERE / name) == expected
     new, dev = candidates()
     assert new['version'].endswith('-candidate') and dev['version'].endswith('-candidate')
     assert dev['human_review_status'] == 'candidate_pending_final_acceptance'
-    assert not (HERE / 'freeze_v2.json').exists()
+    # Candidate history stays pending; the user's later approval is in a separate official freeze.
+    if (HERE / 'freeze_v2.json').exists():
+        _, official, lock = load_frozen('v2')
+        assert official['cases'] == new['cases']
+        assert lock['review']['status'] == 'user_approved_v2'
     assert validation['status'] == 'candidate_pending_final_acceptance'
     review = (HERE / 'gold_review_v2.md').read_text(encoding='utf-8')
     assert len(re.findall(r'^## A05-\d\d ', review, re.M)) == 30

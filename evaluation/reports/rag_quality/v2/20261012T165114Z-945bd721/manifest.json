@@ -1,0 +1,551 @@
+{
+  "run_id": "20261012T165114Z-945bd721",
+  "group": "B0-original",
+  "started_at_utc": "2026-10-12T16:51:14.361046+00:00",
+  "head": "677b787710ab1f4e8f3a22e5532eddc92e4bbe84",
+  "dirty_worktree": " M evaluation/rag_quality/run_baseline.py\n M tests/test_rag_gold_v2_candidate.py\n M tests/test_rag_quality_gate.py\n?? evaluation/rag_quality/dataset_v2.json\n?? evaluation/rag_quality/dev_dataset_v2.json\n?? evaluation/rag_quality/freeze_v2.json\n?? evaluation/rag_quality/history/\n?? evaluation/reports/rag_quality/v2/\n?? tests/test_rag_frozen_v2.py\n",
+  "python": "3.12.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "chromadb-client": "0.5.23",
+    "pydantic": "2.10.3",
+    "anthropic": "0.40.0",
+    "httpx": "0.28.1",
+    "pytest": "8.3.4"
+  },
+  "implementation_sha256": {
+    "mcp/knowledge_embeddings.py": "bca9827430c4d871cf9c7608b2d4a38b086d2c38876d2f4cb0bdd11bf1ec3033",
+    "mcp/knowledge_base.py": "4a0b8518ce3749a97a49a287044af3ce8cb9cd54ad3b96872773ae8e8aa7883d",
+    "mcp/rag_contract.py": "33c8dbddb9c8a173afbfaa886273c113f59b273b1e32689ce0191c74aa48e527",
+    "mcp/tool_manager.py": "af90e5a419503ece6d0b910f0134c3901343596624cb81390e61dc8101ad6844",
+    "evaluation/rag_quality/run_baseline.py": "61c21f3e16e6cf7daeebeb3c46189d6ac91882906490c48be57ab989666242d2",
+    "uv.lock": "392b74a8798b2a576cf33aeb13fa6ab73c5ecfe2a27eb669cae6a88e64b5687b"
+  },
+  "freeze": {
+    "version": "a05-freeze-v2",
+    "dataset_version": "a05-dataset-v2",
+    "dev_dataset_version": "a05-threshold-dev-v2",
+    "corpus_version": "a05-corpus-v1",
+    "as_of": "2026-10-12T00:00:00Z",
+    "files": {
+      "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+      "dataset_v2.json": "c5eefac673cd34529793d83bb860fbb07ef5393507c99652dfe4eef2e76a0818",
+      "dev_dataset_v2.json": "e49037acd561248f93b5e72ce23ab1d20b3fed1b9d7910b2ba8448f64d9fb002",
+      "gold_review_v2.md": "3007e3adc2a5ca41bdd2788262bdaa1f73823bcaca7106896fb09470f6e31308",
+      "gold_v1_to_v2_diff.md": "9fc7efb951bcc78b705a946cd4b49ddb2517cabe03f8e1b5aeaf5828add909f8"
+    },
+    "review": {
+      "status": "user_approved_v2",
+      "approved_date": "2026-10-13",
+      "timezone": "Asia/Shanghai",
+      "source": "Direct user instruction A05-P2-FREEZE-B0 in this chat, following human discussion and final candidate/diff verification",
+      "authorization_excerpt": "我已核对 A05 Gold v2 候选版及逐项差异，批准按当前候选内容正式冻结 v2。",
+      "independent_double_annotation": false,
+      "fully_blind_review": false,
+      "approved_candidate_sha256": {
+        "dataset_v2.candidate.json": "716aa776041f947de704e5d338b8819a7e1f1fb582af2f2dd0f1a4b67a6fdb6e",
+        "dev_dataset_v2.candidate.json": "316a3737fee734db592e45676852b445d95e7e06ccb4d96430bf1dc6e3f7ad0a"
+      }
+    },
+    "scope": "Fact Retrieval Quality; only knowledge published ready and valid at as_of. Single Gold Chunk may supply multiple facts. No Agent answer completeness or historical archive evaluation.",
+    "test_counts": {
+      "total": 30,
+      "answerable": 21,
+      "no_answer": 9,
+      "categories": {
+        "paraphrase": 10,
+        "ambiguity": 8,
+        "no_answer": 5,
+        "lifecycle": 7
+      }
+    },
+    "dev_counts": {
+      "total": 16,
+      "answerable": 8,
+      "no_answer": 8
+    },
+    "test_gold_labels": [
+      {
+        "case_id": "A05-01",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_dd816769efe7659f114e",
+        "gold_chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+        "gold_evidence": "订单创建后 7 天内",
+        "policy_version": "refund-cancel-v1"
+      },
+      {
+        "case_id": "A05-02",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_1348d91e6f873b93a77a",
+        "gold_chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+        "gold_evidence": "通过绑定的手机号或邮箱重置",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-03",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_b18d553a21972fe4b3f5",
+        "gold_chunk_id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+        "gold_evidence": "通过订单号查询订单状态",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-04",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_2efff27478d4aa1b0a90",
+        "gold_chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "gold_evidence": "标准配送：3-5 个工作日送达",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-05",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_2efff27478d4aa1b0a90",
+        "gold_chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "gold_evidence": "加急配送：1-2 个工作日送达，运费 15 元。同城配送：当日达或次日达，运费 10 元",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-06",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_15eee479ec6749cbefce",
+        "gold_chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "gold_evidence": "100 积分 = 1 元",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-07",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_f4878e309f60ff328b5d",
+        "gold_chunk_id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+        "gold_evidence": "清除缓存后重启应用",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-08",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_1348d91e6f873b93a77a",
+        "gold_chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+        "gold_evidence": "开启两步验证",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-09",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_15eee479ec6749cbefce",
+        "gold_chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "gold_evidence": "生日当月消费可获得双倍积分",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-10",
+        "answerable": true,
+        "category": "paraphrase",
+        "gold_document_id": "doc_dd816769efe7659f114e",
+        "gold_chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+        "gold_evidence": "超过 500 元需人工审批",
+        "policy_version": "refund-cancel-v1"
+      },
+      {
+        "case_id": "A05-11",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_1348d91e6f873b93a77a",
+        "gold_chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+        "gold_evidence": "密码长度至少 8 位",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-12",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_f4878e309f60ff328b5d",
+        "gold_chunk_id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+        "gold_evidence": "登录失败 401 错误：表示认证失败，请检查用户名密码是否正确，或尝试重置密码。页面加载慢：检查网络连接，尝试切换 WiFi 或移动数据。支付失败：确认银行卡余额充足，检查是否开启了网上支付功能。500 服务器错误：这是服务端问题",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-13",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_15eee479ec6749cbefce",
+        "gold_chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "gold_evidence": "银卡会员（累计消费 1000 元）、金卡会员（累计消费 5000 元）",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-14",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_2efff27478d4aa1b0a90",
+        "gold_chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "gold_evidence": "免运费（订单满 99 元）",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-15",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_b18d553a21972fe4b3f5",
+        "gold_chunk_id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+        "gold_evidence": "物流信息通常在发货后 24 小时内更新",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-16",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_dd816769efe7659f114e",
+        "gold_chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+        "gold_evidence": "退款请求是否可执行由实时订单事实和 PolicyEngine 决定",
+        "policy_version": "refund-cancel-v1"
+      },
+      {
+        "case_id": "A05-17",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_15eee479ec6749cbefce",
+        "gold_chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "gold_evidence": "积分有效期为 1 年",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-18",
+        "answerable": true,
+        "category": "ambiguity",
+        "gold_document_id": "doc_b18d553a21972fe4b3f5",
+        "gold_chunk_id": "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+        "gold_evidence": "联系客服申请查件",
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-19",
+        "answerable": false,
+        "category": "no_answer",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-20",
+        "answerable": false,
+        "category": "no_answer",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-21",
+        "answerable": false,
+        "category": "no_answer",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-22",
+        "answerable": false,
+        "category": "no_answer",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-23",
+        "answerable": false,
+        "category": "no_answer",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-24",
+        "answerable": true,
+        "category": "lifecycle",
+        "gold_document_id": "eval-exchange",
+        "gold_chunk_id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+        "gold_evidence": "换货期限为21天",
+        "policy_version": "demo-v2"
+      },
+      {
+        "case_id": "A05-25",
+        "answerable": true,
+        "category": "lifecycle",
+        "gold_document_id": "eval-exchange",
+        "gold_chunk_id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+        "gold_evidence": "换货商品必须保留完整包装",
+        "policy_version": "demo-v2"
+      },
+      {
+        "case_id": "A05-26",
+        "answerable": true,
+        "category": "lifecycle",
+        "gold_document_id": "eval-exchange",
+        "gold_chunk_id": "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525",
+        "gold_evidence": "每笔订单最多换货一次",
+        "policy_version": "demo-v2"
+      },
+      {
+        "case_id": "A05-27",
+        "answerable": false,
+        "category": "lifecycle",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-28",
+        "answerable": false,
+        "category": "lifecycle",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-29",
+        "answerable": false,
+        "category": "lifecycle",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "A05-30",
+        "answerable": false,
+        "category": "lifecycle",
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      }
+    ],
+    "dev_gold_labels": [
+      {
+        "case_id": "DEV-01",
+        "answerable": true,
+        "gold_document_id": "doc_1348d91e6f873b93a77a",
+        "gold_chunk_id": "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+        "gold_evidence": "系统会自动锁定账户并发送通知",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-02",
+        "answerable": true,
+        "gold_document_id": "doc_2efff27478d4aa1b0a90",
+        "gold_chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "gold_evidence": "配送时间为每天 9:00-18:00",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-03",
+        "answerable": true,
+        "gold_document_id": "doc_2efff27478d4aa1b0a90",
+        "gold_chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "gold_evidence": "如果需要修改收货地址，请在发货前联系客服",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-04",
+        "answerable": true,
+        "gold_document_id": "doc_15eee479ec6749cbefce",
+        "gold_chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "gold_evidence": "每消费 1 元累积 1 积分",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-05",
+        "answerable": true,
+        "gold_document_id": "doc_15eee479ec6749cbefce",
+        "gold_chunk_id": "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+        "gold_evidence": "银卡会员享受 95 折优惠，金卡会员享受 9 折优惠",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-06",
+        "answerable": true,
+        "gold_document_id": "doc_f4878e309f60ff328b5d",
+        "gold_chunk_id": "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+        "gold_evidence": "页面加载慢：检查网络连接，尝试切换 WiFi 或移动数据",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-07",
+        "answerable": true,
+        "gold_document_id": "doc_2efff27478d4aa1b0a90",
+        "gold_chunk_id": "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+        "gold_evidence": "偏远地区可能需要额外 2-3 天",
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-08",
+        "answerable": true,
+        "gold_document_id": "doc_dd816769efe7659f114e",
+        "gold_chunk_id": "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+        "gold_evidence": "退款金额不能超过订单总额",
+        "policy_version": "refund-cancel-v1"
+      },
+      {
+        "case_id": "DEV-09",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-10",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-11",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-12",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-13",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-14",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-15",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      },
+      {
+        "case_id": "DEV-16",
+        "answerable": false,
+        "gold_document_id": null,
+        "gold_chunk_id": null,
+        "gold_evidence": null,
+        "policy_version": null
+      }
+    ],
+    "head_at_freeze": "677b787710ab1f4e8f3a22e5532eddc92e4bbe84",
+    "physical_chunks": 11,
+    "eligible_chunks": 7,
+    "chunk_rules": {
+      "implementation": "KnowledgeBase._chunk_text",
+      "chunk_size": 500,
+      "overlap": 0,
+      "short_document": "whole text",
+      "long_document": "split on Chinese full stop / newline, greedy packing; single long sentence may exceed 500"
+    },
+    "baseline": {
+      "embedding_version": "char-bigram-1024-v1",
+      "dimensions": 1024,
+      "top_k": 5,
+      "min_score": 0.35,
+      "rewrite": false,
+      "rerank": false,
+      "cache": false
+    }
+  },
+  "corpus_version": "a05-corpus-v1",
+  "dataset_version": "a05-dataset-v2",
+  "dataset_path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\rag_quality\\dataset_v2.json",
+  "dataset_sha256": "c5eefac673cd34529793d83bb860fbb07ef5393507c99652dfe4eef2e76a0818",
+  "freeze_path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\rag_quality\\freeze_v2.json",
+  "freeze_sha256": "7ea0b1c40d430de13fead53ed1f21af082410efc7c0cdf6bb967c22030524f79",
+  "input_sha256": {
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v2.json": "c5eefac673cd34529793d83bb860fbb07ef5393507c99652dfe4eef2e76a0818",
+    "dev_dataset_v2.json": "e49037acd561248f93b5e72ce23ab1d20b3fed1b9d7910b2ba8448f64d9fb002",
+    "gold_review_v2.md": "3007e3adc2a5ca41bdd2788262bdaa1f73823bcaca7106896fb09470f6e31308",
+    "gold_v1_to_v2_diff.md": "9fc7efb951bcc78b705a946cd4b49ddb2517cabe03f8e1b5aeaf5828add909f8"
+  },
+  "review": {
+    "status": "user_approved_v2",
+    "approved_date": "2026-10-13",
+    "timezone": "Asia/Shanghai",
+    "source": "Direct user instruction A05-P2-FREEZE-B0 in this chat, following human discussion and final candidate/diff verification",
+    "authorization_excerpt": "我已核对 A05 Gold v2 候选版及逐项差异，批准按当前候选内容正式冻结 v2。",
+    "independent_double_annotation": false,
+    "fully_blind_review": false,
+    "approved_candidate_sha256": {
+      "dataset_v2.candidate.json": "716aa776041f947de704e5d338b8819a7e1f1fb582af2f2dd0f1a4b67a6fdb6e",
+      "dev_dataset_v2.candidate.json": "316a3737fee734db592e45676852b445d95e7e06ccb4d96430bf1dc6e3f7ad0a"
+    }
+  },
+  "collection": "cartcare_a05_p1_89b43a7db18749f69cdd3f469a4294e7",
+  "endpoint": "127.0.0.1:8001",
+  "backend": "real Chroma HTTP",
+  "embedding_version": "char-bigram-1024-v1",
+  "dimensions": 1024,
+  "title_feature_boost": 6,
+  "top_k": 5,
+  "min_score": 0.35,
+  "distance": "cosine; score=1-distance (not probability)",
+  "as_of": "2026-10-12T00:00:00Z",
+  "clock": "evaluation-process-only KnowledgeBase datetime patch",
+  "rewrite": false,
+  "rerank": false,
+  "cache": false,
+  "model": "none; fail-closed NoModel sentinel",
+  "repeats": 2,
+  "B_prod": {
+    "status": "not_executed",
+    "reason": "No paid model authorization"
+  },
+  "collection_deleted": true,
+  "outcome": "measured",
+  "chroma_server_version": "0.5.23",
+  "repeat_publication_identical": true,
+  "physical_chunks": 11,
+  "eligible_chunk_ids": [
+    "4a28204fe9202ea4e9c313412ec533f1da53a42ef4728afe8e7dd49addc52aa3",
+    "4d339c4fb426761092ee96eb40fad8a5555da0cb099e958de8257111f0e63f3d",
+    "7fe603c19a8302870d453c48180ac963df4e4ad6d0b189d7a3aaff4d71562864",
+    "830fe9c9a841076d87353846f412320957a1239645ce308039b9b0fbeba739d3",
+    "9665d55df881fdb718bb4b909f03af9c8a3db971bfd375e25006e144c8e70419",
+    "df529ae0e9a9998cda16d9807afc4fb0a426c5a87135428becaea7e82158b2b2",
+    "e899e0c553a4a9210d55cc3da52404009fbbb664f0c2540999b936bdcb294525"
+  ],
+  "repeat_retrieval_identical": true,
+  "finished_at_utc": "2026-10-12T16:51:18.793580+00:00"
+}
