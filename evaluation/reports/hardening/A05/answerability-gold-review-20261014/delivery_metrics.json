@@ -1,0 +1,38 @@
+{
+  "historical_formula": "BASE_RULES substrings in first captured support system AND 事实充分 in final rag answer_guidance",
+  "historical_before_boundary_delivered": 0,
+  "historical_after_boundary_delivered": 26,
+  "historical_payload_guidance_presence_before": 16,
+  "historical_payload_guidance_presence_after": 26,
+  "current_cases": 26,
+  "current_constructed_prompt_has_rules": 26,
+  "current_model_invoked_case_denominator": 26,
+  "current_deterministic_gate_case_count": 0,
+  "current_support_sdk_request_count": 52,
+  "current_all_sdk_requests_received_rules_case_count": 26,
+  "current_final_sdk_base_rules_received": 26,
+  "current_payload_guidance_present": 26,
+  "current_final_sdk_guidance_received": 26,
+  "ANS24_exact": {
+    "id": "ANS-24",
+    "query": "订单查询：模拟人工交接记录创建成功是否说明真人接单？",
+    "explicit_gate": false,
+    "constructed_prompt_has_rules": true,
+    "sdk_invoked": true,
+    "support_sdk_calls": 2,
+    "every_sdk_system_has_rules": true,
+    "final_sdk_contains_base_rules": true,
+    "rag_payload_answer_guidance_present": true,
+    "guidance_in_final_sdk_tool_message": true,
+    "final_fake_response": "本次未创建人工交接记录。",
+    "new_handoff_records": 0
+  },
+  "statuses": {
+    "usable": 10,
+    "low_confidence": 12,
+    "no_answer": 3,
+    "degraded": 1
+  },
+  "forced_tool_selection": "scripted fake, not model tool-routing quality",
+  "not_model_accuracy": true
+}

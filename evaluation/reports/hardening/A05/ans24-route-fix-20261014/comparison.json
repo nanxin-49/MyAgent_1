@@ -1,0 +1,104 @@
+[
+  {
+    "query": "模拟记录成功是否说明已转人工客服？",
+    "before_branch": "deterministic_handoff_gate",
+    "after_branch": "model_tool_loop",
+    "before_sdk_calls": 0,
+    "after_sdk_calls": 1,
+    "before_record_delta": 1,
+    "after_record_delta": 0,
+    "before_handoff": {
+      "status": "created",
+      "handoff_required": true,
+      "handoff_requested": true,
+      "handoff_created": true,
+      "handoff_failed": false,
+      "handoff_id": "eebdb445-79af-4991-9f3b-b35a4de6756d",
+      "reason_code": "explicit_request",
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    },
+    "after_handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    },
+    "business_changed_after": false
+  },
+  {
+    "query": "请帮我转人工客服。",
+    "before_branch": "deterministic_handoff_gate",
+    "after_branch": "deterministic_handoff_gate",
+    "before_sdk_calls": 0,
+    "after_sdk_calls": 0,
+    "before_record_delta": 1,
+    "after_record_delta": 1,
+    "before_handoff": {
+      "status": "created",
+      "handoff_required": true,
+      "handoff_requested": true,
+      "handoff_created": true,
+      "handoff_failed": false,
+      "handoff_id": "5e9224e0-73ae-4a06-881c-0fee0d299214",
+      "reason_code": "explicit_request",
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    },
+    "after_handoff": {
+      "status": "created",
+      "handoff_required": true,
+      "handoff_requested": true,
+      "handoff_created": true,
+      "handoff_failed": false,
+      "handoff_id": "f1768878-2e45-46b5-bffa-706f0a8ea07a",
+      "reason_code": "explicit_request",
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    },
+    "business_changed_after": false
+  },
+  {
+    "query": "我不需要人工客服，请说明模拟交接记录是什么意思。",
+    "before_branch": "model_tool_loop",
+    "after_branch": "model_tool_loop",
+    "before_sdk_calls": 1,
+    "after_sdk_calls": 1,
+    "before_record_delta": 0,
+    "after_record_delta": 0,
+    "before_handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    },
+    "after_handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    },
+    "business_changed_after": false
+  }
+]

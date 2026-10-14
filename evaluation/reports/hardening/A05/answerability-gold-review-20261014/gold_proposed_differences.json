@@ -1,0 +1,25 @@
+{
+  "status": "human_decision_required_not_applied",
+  "base_candidate_sha256": "89f987aa623a9ba23ea8cf7bcf0234dc7d6c86e46f42028507d11f7c866dee4f",
+  "ANS-07_options": {
+    "A": "keep partial_dynamic, define it as verified supplementary context, not partial match of asked facts",
+    "B_recommended": {
+      "field": "gold_behavior",
+      "before": "partial_dynamic",
+      "proposed": "supported_boundary",
+      "note": "keep dynamic_tool/get_order; order total is supplementary context only"
+    }
+  },
+  "ANS-13_candidate_fields": {
+    "necessary_facts_add": [
+      "实时地理位置不可核验"
+    ],
+    "unavailable_facts_proposed": [
+      "实时地理位置"
+    ]
+  },
+  "ANS-18": "confirm existing addendum only",
+  "ANS-24": "keep read-only Gold; route repair separate approval",
+  "Gold_file_writes": 0,
+  "approved_freeze_created": false
+}

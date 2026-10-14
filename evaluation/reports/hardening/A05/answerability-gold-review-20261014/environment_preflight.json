@@ -1,0 +1,285 @@
+{
+  "at_utc": "2026-10-14T04:24:12.918057+00:00",
+  "at_beijing": "2026-10-14T12:24:12.918057+08:00",
+  "head": "1fd93b5a4372dccb03e9bb8ad0f8647358b28fad",
+  "local_env_config_redacted": {
+    "api_key_present": true,
+    "api_key_looks_placeholder": false,
+    "model": "deepseek-flash",
+    "endpoint_scheme": "https",
+    "endpoint_hostname": "api.deepseek.com",
+    "endpoint_port": 443,
+    "official_deepseek_anthropic_base_matches": true,
+    "credentials_validated_by_model_request": false,
+    "auth_mode": "unset (deny default)",
+    "APP_ENV": "production",
+    "API_HOST": "0.0.0.0",
+    "valid_demo_identity_count": 0,
+    "configured_role_counts": {},
+    "scoped_independent_reviewer_count": 0,
+    "demo_credential_parse_error": null,
+    "demo_loopback_config_gate": false,
+    "credentials_in_output": false
+  },
+  "container": {
+    "id": "b0cad93b0d33624008acf951e62e793c45300570eeee663ac43eef24fe467355",
+    "created": "2026-09-27T04:35:39.394560297Z",
+    "state": "exited",
+    "running": false,
+    "image_id": "sha256:c7e321ed43d7a1055ce038090b089092c3c15c34e45964601c949b047365cc17",
+    "mounts": [
+      {
+        "destination": "/app/logs",
+        "type": "bind",
+        "read_write": true
+      },
+      {
+        "destination": "/app/skills",
+        "type": "bind",
+        "read_write": true
+      },
+      {
+        "destination": "/app/data/chroma",
+        "type": "bind",
+        "read_write": true
+      },
+      {
+        "destination": "/app/data/eval",
+        "type": "bind",
+        "read_write": true
+      }
+    ],
+    "config_redacted": {
+      "api_key_present": true,
+      "api_key_looks_placeholder": false,
+      "model": "deepseek-flash",
+      "endpoint_scheme": "https",
+      "endpoint_hostname": "api.deepseek.com",
+      "endpoint_port": 443,
+      "official_deepseek_anthropic_base_matches": true,
+      "credentials_validated_by_model_request": false,
+      "auth_mode": "unset (deny default)",
+      "APP_ENV": "production",
+      "API_HOST": "0.0.0.0",
+      "valid_demo_identity_count": 0,
+      "configured_role_counts": {},
+      "scoped_independent_reviewer_count": 0,
+      "demo_credential_parse_error": null,
+      "demo_loopback_config_gate": false,
+      "credentials_in_output": false
+    }
+  },
+  "image": {
+    "id": "sha256:c7e321ed43d7a1055ce038090b089092c3c15c34e45964601c949b047365cc17",
+    "created": "2026-09-27T04:35:23.058312594Z",
+    "oci_revision": null,
+    "revision_equals_head": null,
+    "repo_tags": [
+      "echomind-echomind:latest"
+    ]
+  },
+  "service_start_attempts": 0,
+  "image_build_attempts": 0,
+  "docker_exec_attempts": 0,
+  "real_model_calls": 0,
+  "paid_requests": 0,
+  "model_downloads": 0,
+  "config_changes": 0,
+  "default_knowledge_writes": 0,
+  "packaged_source_comparison": {
+    "api/main.py": {
+      "present": true,
+      "container_sha256": "3b01c3a771c708eb4ea1dcbc7a8ff5d8d30fb74cdce2181da37efba21d60bcff",
+      "workspace_sha256": "3cfa5c4f4467aab7e0fd2f1a2d0b61396ba38ada7afa02526673a59e76431658",
+      "same": false
+    },
+    "agents/support_agent.py": {
+      "present": false,
+      "docker_cp_exit": 1
+    },
+    "agents/tools.py": {
+      "present": true,
+      "container_sha256": "30eaf765c5d6bf5fb6e8c1550fa1cd508361f0566f27715d87fbfe0c26faebf2",
+      "workspace_sha256": "6ee4b291e45683cf452abd48b8aa639b4e096dcd253931422697b7cbd8867d7f",
+      "same": false
+    },
+    "core/handoff.py": {
+      "present": false,
+      "docker_cp_exit": 1
+    },
+    "mcp/knowledge_base.py": {
+      "present": true,
+      "container_sha256": "5869466a02ebfe3115f5107a75a51832a5dee9a56131036a31eef3d656373750",
+      "workspace_sha256": "45308227e583668ade3896bf235f1f991b671ba3bb8d81095e2010059c611f30",
+      "same": false
+    },
+    "mcp/knowledge_assets/default_business_v1.json": {
+      "present": false,
+      "docker_cp_exit": 1
+    },
+    "mcp/knowledge_assets/default_business_v1.approval.json": {
+      "present": false,
+      "docker_cp_exit": 1
+    }
+  },
+  "container_overlay_selected_source_changes": [],
+  "tcp": {
+    "8000": {
+      "reachable": false,
+      "error_type": "ConnectionRefusedError"
+    },
+    "8001": {
+      "reachable": true
+    },
+    "6379": {
+      "reachable": true
+    }
+  },
+  "echomind-chromadb": {
+    "state": "running",
+    "health": "healthy",
+    "running": true
+  },
+  "echomind-redis": {
+    "state": "running",
+    "health": "healthy",
+    "running": true
+  },
+  "chroma_heartbeat": {
+    "status": 200,
+    "valid_heartbeat": true
+  },
+  "default_collection": {
+    "name": "cartcare_demo_knowledge_chargram_v1",
+    "metadata": {
+      "dataset_kind": "demo",
+      "description": "CartCare demo RAG knowledge",
+      "embedding_version": "char-bigram-1024-v1",
+      "hnsw:space": "cosine"
+    },
+    "physical_rows": 12,
+    "publications": 6,
+    "effective_chunks": 6,
+    "assertions": {
+      "six_publications": true,
+      "six_effective_chunks": true,
+      "twelve_physical_rows": true,
+      "exact_approved_documents": true,
+      "all_ready": true,
+      "read_only_snapshot_unchanged": true
+    },
+    "all_passed": true,
+    "snapshot_sha256": "a40dd176314775016aa476f02c11bee9553dea0808bd6c4e35e3237dd4ddc0a7",
+    "documents": [
+      {
+        "document_id": "doc_8450205ee234ce108cbd",
+        "source": "demo:cartcare-default/refund-policy",
+        "policy_version": "refund-cancel-v1",
+        "content_hash": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+        "publication_revision": "9c3ac875a00994ef876dcafeafa7369c7e4820586cf587271a7e95a206d9310f",
+        "state": "ready",
+        "chunk_ids": [
+          "5a1308c35d85ae8dd432653cc9aa7ce6b00ff23a824ae30088c2fd2a436d71a3"
+        ]
+      },
+      {
+        "document_id": "doc_ed1fae0ed79e04b2ee03",
+        "source": "demo:cartcare-default/order-guide",
+        "policy_version": null,
+        "content_hash": "cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a",
+        "publication_revision": "09d6c7f65a9498771ec0c484d2081edb9574f889376d3866c05ef55aa481ea62",
+        "state": "ready",
+        "chunk_ids": [
+          "49429556fa9f4f9e94501b4996dce7644a1b4bf4ec416b00335a72003cbe6412"
+        ]
+      },
+      {
+        "document_id": "doc_9958ba736af96fca4e70",
+        "source": "demo:cartcare-default/account-guide",
+        "policy_version": null,
+        "content_hash": "24b01681d3f3382daefc878fb078ece779c51a761457161c21240060bfe5f0b7",
+        "publication_revision": "15f31f6f528980171726219e7aabcc646bf6ab9731269574a7dbebd635048547",
+        "state": "ready",
+        "chunk_ids": [
+          "a1484d1fdc44ed0c0aaf57161253bd3b1ce3fe4d6abe15c81087e31e111a9b54"
+        ]
+      },
+      {
+        "document_id": "doc_cd81fe468580a43ee0bd",
+        "source": "demo:cartcare-default/technical-guide",
+        "policy_version": null,
+        "content_hash": "be1e03477186c9510907873b1afb83066bc4fdf99cd412b0e5020d0fb6e2b13b",
+        "publication_revision": "5b4e272453b82e4b1ede6fadef627be8916ef88da560c14d8faeeedc9dd06801",
+        "state": "ready",
+        "chunk_ids": [
+          "12bb76e3b1b19e8ff7cc4ec9d36af6655a7aa2d387893d8855aaf0b0abefdd95"
+        ]
+      },
+      {
+        "document_id": "doc_4e9e6195c6f9e8cfe749",
+        "source": "demo:cartcare-default/membership-faq",
+        "policy_version": null,
+        "content_hash": "4e044b244b4a03f4f45d0cc996e89eff99707f81e76a38480d35bf320e007ca8",
+        "publication_revision": "8e945e54cfc0b4b76944e04f6681dd1af622f6d06aeca47dd182161164b6351a",
+        "state": "ready",
+        "chunk_ids": [
+          "f5239688bac3b047ff5cf6826a2fd19c2e0c98ab82bde72bb014adbea84dc1d0"
+        ]
+      },
+      {
+        "document_id": "doc_73ae51e45fb2abb8ce23",
+        "source": "demo:cartcare-default/shipping-guide",
+        "policy_version": null,
+        "content_hash": "a3364b784216e4804f3beb8ec3e5ef8eb210e340fab62ffd45198787a8450bb3",
+        "publication_revision": "8593ba741e04a88774a211f48785227255a26a7511b3062444fe8c02e412908c",
+        "state": "ready",
+        "chunk_ids": [
+          "708d7b3e3e6c861804ce362fa3c76fcbf2691142110c3f560577d2f36232cbd4"
+        ]
+      }
+    ],
+    "constructor_used": false,
+    "collection_created": false,
+    "query_calls": 0
+  },
+  "redis_ping": {
+    "success": true,
+    "credential_source": "container_runtime_secret_read_without_output",
+    "customer_keys_read": 0,
+    "writes": 0
+  },
+  "model_network": {
+    "dns_resolves": true,
+    "tcp": {
+      "reachable": true
+    },
+    "http_model_requests": 0,
+    "credentials_not_tested": true
+  },
+  "workspace_runtime_assets": {
+    "approved_asset_hash": "17e3c606365c203589919321b166e942e6aab569d539ce631f447a5439cd018d",
+    "skills_count": 3,
+    "skill_errors": 0,
+    "skills_prompt_budget": 5000,
+    "all_match_skill_prompt_chars": 4855,
+    "skill_hashes": {
+      "skills/billing_support/SKILL.md": "6d0ab756c6996d6e47447acd6a589d98e464790a2a7aa262a12bfbdfb6b30451",
+      "skills/general_customer_service/SKILL.md": "4204d924ef6f20203b0747373fa3e3a17e5bf6a4aa7cf42e0f48acf7ea7a977a",
+      "skills/technical_support/SKILL.md": "4df87bcaf6f823e19a0c7d757207f14339fa95a18ab4da59adcaa1a84f7dddba"
+    }
+  },
+  "sdk_defaults": {
+    "default_max_retries": 2,
+    "timeout_connect_s": 5.0,
+    "timeout_read_s": 600.0,
+    "timeout_write_s": 600.0,
+    "SupportRuntime_explicit_timeout_set": false,
+    "support_tool_rounds": 3,
+    "support_max_tokens_per_call": 1200,
+    "rewrite_max_tokens": 256,
+    "rerank_max_tokens": 256,
+    "knowledge_read_attempts": 2,
+    "tool_timeout_s": 30,
+    "thinking_explicitly_set_in_current_requests": false
+  }
+}

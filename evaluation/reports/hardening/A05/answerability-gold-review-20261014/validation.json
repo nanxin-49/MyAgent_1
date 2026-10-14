@@ -1,0 +1,47 @@
+{
+  "head": "1fd93b5a4372dccb03e9bb8ad0f8647358b28fad",
+  "tracked_files_checked": 553,
+  "changed_existing_files": [
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "unexpected_changes": [],
+  "all_production_code_historical_Gold_B0_B1_knowledge_Skills_unchanged": true,
+  "new_report_hashes": {
+    "delivery_metrics.json": "98b1ec5059e376255bd1ca0899a0a4bf72b71d871e826df5c5a6ac27bbba724c",
+    "delivery_metrics.md": "40dafaae2306eec860285ab4f441858f8f11c7ae485fcaf36ce2753388663e08",
+    "e2e_candidate_protocol.json": "c067eacaa6ab81a5f571ba907a6ca753708395d9a935bcda74432751d5d2f62b",
+    "e2e_preflight_and_plan.md": "7c71e054ddbdedfb1e234f89dacde52415df9fbfe5b79a8d00ec222b1b4c5f0a",
+    "environment_preflight.json": "1299a85077a72be15dbb90d1374fae6c08ea1afe3e8e3b5b157d202f774eccac",
+    "focused_checks_and_routes.md": "e0240a264dec030128eb3ea4375ef8a416e87019a4b58856ad1fa18a171cd0b8",
+    "gold_integrity.json": "d271ac01a1499b4554b1383ce76d85a7d9699cd8dc335f6bae00a518577ea0ac",
+    "gold_proposed_differences.json": "bf5d9d857cd93a544cc0e758882cd28cd979b108f3b276034d54284de4f728bf",
+    "gold_review_matrix.md": "395523b8ed3cbb09a40011329fa58a7de42552f45b89728d246def0dabe95524",
+    "handoff_routes.json": "f5db4373d455c1ecd8f0a0d0ee87d2bb8776f729adccc9367d3c266c1ff90f16",
+    "preflight_final_run.txt": "cb4b99374ee4cb33a3152e9dfb16e31edc1bd8b2f20025a47d09733f340484fd",
+    "preflight_run.txt": "a6bb0a027682527c99fefe6edac1384980eb488a6d235943e8df25ce63be3834",
+    "protected_before.json": "e9cfbf27814b8d818e90abbbbb543c010bf6c03fa5d41d27e13a6f57cc1ded9f",
+    "routing_expected_safe_red.txt": "599c3450abdd8083eb5d76e268713b902b4f0b1a3764ea22abb8f44179874b16",
+    "sdk_delivery_actual.json": "96e9a5076c4230cfd75c3a1301119df4c12ea2070edf4822f59045c473342f3d"
+  },
+  "related_tests": {
+    "command": "uv run python -m pytest -q tests/test_answerability_boundary.py tests/test_handoff.py tests/test_runtime_skills_consistency.py",
+    "passed": 58,
+    "failed": 0,
+    "warnings": 1
+  },
+  "new_expected_safe_routing_tests": {
+    "passed": 1,
+    "failed": 2,
+    "outcome": "confirmed_unfixed; intentionally explicit-only regression probes"
+  },
+  "full_regression_rerun": false,
+  "reason": "no production changes; only focused isolated probes and additive review docs",
+  "uv_lock_check": "passed (53 packages)",
+  "git_diff_check": "passed",
+  "Gold_approved": false,
+  "services_started": false,
+  "real_model_calls": 0,
+  "new_default_collection_writes": 0,
+  "commit_or_push": false
+}

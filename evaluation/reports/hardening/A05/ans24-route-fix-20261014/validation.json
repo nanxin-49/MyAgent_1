@@ -1,0 +1,41 @@
+{
+  "HEAD": "1fd93b5a4372dccb03e9bb8ad0f8647358b28fad",
+  "protected_files_checked": 576,
+  "changed_existing_files": [
+    "core/handoff.py",
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "unexpected_changes": [],
+  "previous_dirty_review_materials_preserved": true,
+  "non_explicit_handoff_AST_unchanged": true,
+  "SingleSupportAgent_unchanged": true,
+  "REPLY_stage_unchanged": true,
+  "Gold_RAG_assets_and_historical_inputs_unchanged": true,
+  "tests": {
+    "initial_red": {
+      "failed": 13,
+      "passed": 11
+    },
+    "handoff": {
+      "passed": 54
+    },
+    "related": {
+      "passed": 192
+    },
+    "full": {
+      "passed": 541,
+      "skipped": 3,
+      "warnings": 1
+    }
+  },
+  "uv_lock_check": "53 packages passed",
+  "git_diff_check": "passed",
+  "real_model_calls": 0,
+  "API_started": false,
+  "commit_or_push": false,
+  "input_hashes": {
+    "core/handoff.py": "4be8fcfc55087fdfaf422494122f411c17f08689d0cc834d1f7951e318abba97",
+    "tests/test_handoff_explicit_request.py": "3fe9a364fe5a18d6356cace87a556f28b8c57037f84c946ae1b5dfe35a7d18a8"
+  }
+}

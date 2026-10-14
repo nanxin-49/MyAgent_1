@@ -1,0 +1,1179 @@
+[
+  {
+    "query": "模拟记录成功是否说明已转人工客服？",
+    "scope": "independent process-local state + authenticated TestClient; no lifespan/live services",
+    "matched_explicit_handoff": true,
+    "matched_branch": "deterministic_handoff_gate",
+    "http_status": 200,
+    "body": {
+      "conv_id": "isolated-review",
+      "request_id": "f438236c",
+      "response": "已创建模拟人工交接记录。交接编号：eebdb445-79af-4991-9f3b-b35a4de6756d。这不代表真实客服已接单。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "request_handoff"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": true,
+      "latency_ms": 0.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 0,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "created",
+        "handoff_required": true,
+        "handoff_requested": true,
+        "handoff_created": true,
+        "handoff_failed": false,
+        "handoff_id": "eebdb445-79af-4991-9f3b-b35a4de6756d",
+        "reason_code": "explicit_request",
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace": {
+      "request_id": "f438236c",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "request_handoff"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "f438236c",
+          "agent_type": "support",
+          "tool_name": "request_handoff",
+          "risk_level": "write",
+          "tool_use_id": "deterministic_handoff_gate",
+          "input": {
+            "reason_code": "explicit_request"
+          },
+          "validated_input": {
+            "reason_code": "explicit_request"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "handoff_result": {
+            "status": "created",
+            "handoff_required": true,
+            "handoff_requested": true,
+            "handoff_created": true,
+            "handoff_failed": false,
+            "handoff_id": "eebdb445-79af-4991-9f3b-b35a4de6756d",
+            "reason_code": "explicit_request",
+            "error_code": null,
+            "reused": false,
+            "simulated": true
+          }
+        }
+      ],
+      "escalated": true,
+      "latency_ms": 0.0,
+      "handoff": {
+        "status": "created",
+        "handoff_required": true,
+        "handoff_requested": true,
+        "handoff_created": true,
+        "handoff_failed": false,
+        "handoff_id": "eebdb445-79af-4991-9f3b-b35a4de6756d",
+        "reason_code": "explicit_request",
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 0,
+      "model_calls": [],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 47.0,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0.0
+      },
+      "request_latency_ms": 47.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    },
+    "sdk_calls": 0,
+    "sdk_requests": [],
+    "state_before": {
+      "business": {
+        "products": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "name": "CartCare Demo Backpack",
+            "price": "129.90",
+            "currency": "CNY",
+            "active": true
+          }
+        },
+        "orders": {
+          "ORD-1001": {
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "shipped",
+            "items": [
+              {
+                "product_id": "SKU-1001",
+                "quantity": 1,
+                "unit_price": "129.90"
+              }
+            ],
+            "total_amount": "129.90",
+            "currency": "CNY",
+            "created_at": "2026-09-20T10:00:00Z"
+          }
+        },
+        "inventory": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "available_quantity": 12,
+            "reserved_quantity": 2,
+            "as_of": "2026-09-27T10:00:00Z"
+          }
+        },
+        "shipments": {
+          "ORD-1001": {
+            "shipment_id": "SHP-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "carrier": "demo-carrier",
+            "tracking_number": "TRACK-1001",
+            "status": "in_transit",
+            "estimated_delivery": "2026-09-29",
+            "updated_at": "2026-09-27T09:30:00Z"
+          }
+        },
+        "refunds": {
+          "REF-1001": {
+            "refund_id": "REF-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "requested",
+            "amount": "129.90",
+            "currency": "CNY",
+            "reason": "demo return request",
+            "created_at": "2026-09-27T08:00:00Z",
+            "updated_at": "2026-09-27T08:00:00Z"
+          }
+        }
+      },
+      "actions": {},
+      "handoff_records": {},
+      "handoff_attempts_count": 0,
+      "memory_writes": []
+    },
+    "state_after": {
+      "business": {
+        "products": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "name": "CartCare Demo Backpack",
+            "price": "129.90",
+            "currency": "CNY",
+            "active": true
+          }
+        },
+        "orders": {
+          "ORD-1001": {
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "shipped",
+            "items": [
+              {
+                "product_id": "SKU-1001",
+                "quantity": 1,
+                "unit_price": "129.90"
+              }
+            ],
+            "total_amount": "129.90",
+            "currency": "CNY",
+            "created_at": "2026-09-20T10:00:00Z"
+          }
+        },
+        "inventory": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "available_quantity": 12,
+            "reserved_quantity": 2,
+            "as_of": "2026-09-27T10:00:00Z"
+          }
+        },
+        "shipments": {
+          "ORD-1001": {
+            "shipment_id": "SHP-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "carrier": "demo-carrier",
+            "tracking_number": "TRACK-1001",
+            "status": "in_transit",
+            "estimated_delivery": "2026-09-29",
+            "updated_at": "2026-09-27T09:30:00Z"
+          }
+        },
+        "refunds": {
+          "REF-1001": {
+            "refund_id": "REF-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "requested",
+            "amount": "129.90",
+            "currency": "CNY",
+            "reason": "demo return request",
+            "created_at": "2026-09-27T08:00:00Z",
+            "updated_at": "2026-09-27T08:00:00Z"
+          }
+        }
+      },
+      "actions": {},
+      "handoff_records": {
+        "eebdb445-79af-4991-9f3b-b35a4de6756d": {
+          "owner": "customer-1",
+          "requested_by": "isolated-review-subject",
+          "handoff_id": "eebdb445-79af-4991-9f3b-b35a4de6756d",
+          "status": "created",
+          "reason_code": "explicit_request",
+          "simulated": true,
+          "summary": "用户请求人工协助"
+        }
+      },
+      "handoff_attempts_count": 1,
+      "memory_writes": [
+        {
+          "user": "customer-1",
+          "conv": "isolated-review",
+          "role": "user",
+          "text": "模拟记录成功是否说明已转人工客服？"
+        },
+        {
+          "user": "customer-1",
+          "conv": "isolated-review",
+          "role": "assistant",
+          "text": "已创建模拟人工交接记录。交接编号：eebdb445-79af-4991-9f3b-b35a4de6756d。这不代表真实客服已接单。"
+        }
+      ]
+    },
+    "state_diff": {
+      "business_changed": false,
+      "action_count_before": 0,
+      "action_count_after": 0,
+      "handoff_count_before": 0,
+      "handoff_count_after": 1,
+      "handoff_attempts_delta": 1,
+      "memory_writes_delta": 2
+    }
+  },
+  {
+    "query": "请帮我转人工客服。",
+    "scope": "independent process-local state + authenticated TestClient; no lifespan/live services",
+    "matched_explicit_handoff": true,
+    "matched_branch": "deterministic_handoff_gate",
+    "http_status": 200,
+    "body": {
+      "conv_id": "isolated-review",
+      "request_id": "4e89a5e3",
+      "response": "已创建模拟人工交接记录。交接编号：5e9224e0-73ae-4a06-881c-0fee0d299214。这不代表真实客服已接单。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "request_handoff"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": true,
+      "latency_ms": 0.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 0,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "created",
+        "handoff_required": true,
+        "handoff_requested": true,
+        "handoff_created": true,
+        "handoff_failed": false,
+        "handoff_id": "5e9224e0-73ae-4a06-881c-0fee0d299214",
+        "reason_code": "explicit_request",
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace": {
+      "request_id": "4e89a5e3",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "request_handoff"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "4e89a5e3",
+          "agent_type": "support",
+          "tool_name": "request_handoff",
+          "risk_level": "write",
+          "tool_use_id": "deterministic_handoff_gate",
+          "input": {
+            "reason_code": "explicit_request"
+          },
+          "validated_input": {
+            "reason_code": "explicit_request"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "handoff_result": {
+            "status": "created",
+            "handoff_required": true,
+            "handoff_requested": true,
+            "handoff_created": true,
+            "handoff_failed": false,
+            "handoff_id": "5e9224e0-73ae-4a06-881c-0fee0d299214",
+            "reason_code": "explicit_request",
+            "error_code": null,
+            "reused": false,
+            "simulated": true
+          }
+        }
+      ],
+      "escalated": true,
+      "latency_ms": 0.0,
+      "handoff": {
+        "status": "created",
+        "handoff_required": true,
+        "handoff_requested": true,
+        "handoff_created": true,
+        "handoff_failed": false,
+        "handoff_id": "5e9224e0-73ae-4a06-881c-0fee0d299214",
+        "reason_code": "explicit_request",
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 0,
+      "model_calls": [],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 0.0,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0.0
+      },
+      "request_latency_ms": 0.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    },
+    "sdk_calls": 0,
+    "sdk_requests": [],
+    "state_before": {
+      "business": {
+        "products": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "name": "CartCare Demo Backpack",
+            "price": "129.90",
+            "currency": "CNY",
+            "active": true
+          }
+        },
+        "orders": {
+          "ORD-1001": {
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "shipped",
+            "items": [
+              {
+                "product_id": "SKU-1001",
+                "quantity": 1,
+                "unit_price": "129.90"
+              }
+            ],
+            "total_amount": "129.90",
+            "currency": "CNY",
+            "created_at": "2026-09-20T10:00:00Z"
+          }
+        },
+        "inventory": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "available_quantity": 12,
+            "reserved_quantity": 2,
+            "as_of": "2026-09-27T10:00:00Z"
+          }
+        },
+        "shipments": {
+          "ORD-1001": {
+            "shipment_id": "SHP-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "carrier": "demo-carrier",
+            "tracking_number": "TRACK-1001",
+            "status": "in_transit",
+            "estimated_delivery": "2026-09-29",
+            "updated_at": "2026-09-27T09:30:00Z"
+          }
+        },
+        "refunds": {
+          "REF-1001": {
+            "refund_id": "REF-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "requested",
+            "amount": "129.90",
+            "currency": "CNY",
+            "reason": "demo return request",
+            "created_at": "2026-09-27T08:00:00Z",
+            "updated_at": "2026-09-27T08:00:00Z"
+          }
+        }
+      },
+      "actions": {},
+      "handoff_records": {},
+      "handoff_attempts_count": 0,
+      "memory_writes": []
+    },
+    "state_after": {
+      "business": {
+        "products": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "name": "CartCare Demo Backpack",
+            "price": "129.90",
+            "currency": "CNY",
+            "active": true
+          }
+        },
+        "orders": {
+          "ORD-1001": {
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "shipped",
+            "items": [
+              {
+                "product_id": "SKU-1001",
+                "quantity": 1,
+                "unit_price": "129.90"
+              }
+            ],
+            "total_amount": "129.90",
+            "currency": "CNY",
+            "created_at": "2026-09-20T10:00:00Z"
+          }
+        },
+        "inventory": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "available_quantity": 12,
+            "reserved_quantity": 2,
+            "as_of": "2026-09-27T10:00:00Z"
+          }
+        },
+        "shipments": {
+          "ORD-1001": {
+            "shipment_id": "SHP-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "carrier": "demo-carrier",
+            "tracking_number": "TRACK-1001",
+            "status": "in_transit",
+            "estimated_delivery": "2026-09-29",
+            "updated_at": "2026-09-27T09:30:00Z"
+          }
+        },
+        "refunds": {
+          "REF-1001": {
+            "refund_id": "REF-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "requested",
+            "amount": "129.90",
+            "currency": "CNY",
+            "reason": "demo return request",
+            "created_at": "2026-09-27T08:00:00Z",
+            "updated_at": "2026-09-27T08:00:00Z"
+          }
+        }
+      },
+      "actions": {},
+      "handoff_records": {
+        "5e9224e0-73ae-4a06-881c-0fee0d299214": {
+          "owner": "customer-1",
+          "requested_by": "isolated-review-subject",
+          "handoff_id": "5e9224e0-73ae-4a06-881c-0fee0d299214",
+          "status": "created",
+          "reason_code": "explicit_request",
+          "simulated": true,
+          "summary": "用户请求人工协助"
+        }
+      },
+      "handoff_attempts_count": 1,
+      "memory_writes": [
+        {
+          "user": "customer-1",
+          "conv": "isolated-review",
+          "role": "user",
+          "text": "请帮我转人工客服。"
+        },
+        {
+          "user": "customer-1",
+          "conv": "isolated-review",
+          "role": "assistant",
+          "text": "已创建模拟人工交接记录。交接编号：5e9224e0-73ae-4a06-881c-0fee0d299214。这不代表真实客服已接单。"
+        }
+      ]
+    },
+    "state_diff": {
+      "business_changed": false,
+      "action_count_before": 0,
+      "action_count_after": 0,
+      "handoff_count_before": 0,
+      "handoff_count_after": 1,
+      "handoff_attempts_delta": 1,
+      "memory_writes_delta": 2
+    }
+  },
+  {
+    "query": "我不需要人工客服，请说明模拟交接记录是什么意思。",
+    "scope": "independent process-local state + authenticated TestClient; no lifespan/live services",
+    "matched_explicit_handoff": false,
+    "matched_branch": "model_tool_loop",
+    "http_status": 200,
+    "body": {
+      "conv_id": "isolated-review",
+      "request_id": "96f77c74",
+      "response": "本次未创建人工交接记录。",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 0.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 1,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace": {
+      "request_id": "96f77c74",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 0.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "fake-model",
+          "input_tokens": null,
+          "output_tokens": null,
+          "latency_ms": 0.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 0.0,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0.0
+      },
+      "request_latency_ms": 0.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    },
+    "sdk_calls": 1,
+    "sdk_requests": [
+      {
+        "model": "fake-model",
+        "max_tokens": 1200,
+        "temperature": 0.2,
+        "system": "你是 CartCare 电商客服助手。友好、简洁地回答用户问题。如果问题超出你的能力范围，明确说明并建议转接专业客服。\n\n[角色契约]\n角色：电商客服\n职责：处理商品、订单、物流和售后问题，明确证据与人工处理边界。\n处理流程：确认诉求 -> 回答或收集必要信息 -> 按工具结果说明下一步\n可用输入：用户消息；相同的冻结会话上下文\n输出要求：先回应核心问题；信息不足时只询问必要字段；明确下一步和边界\n升级条件：涉及权限、资金、隐私或复杂投诉；用户明确要求人工\n允许的数据/工具范围：search_knowledge_base、get_product、get_order、get_shipment、check_inventory、get_refund_status、request_refund、request_cancel_order、request_handoff、inspect_request_context、suggest_required_fields、lookup_error_code、build_diagnostic_plan、check_billing_fields、compare_amounts、create_handoff_summary\n不要声称执行了未提供的查询、修改或退款操作；缺少证据时明确说明需要核验。\n\n[动态 Skills]\n以下是当前请求可用的 CartCare Skills。请优先遵循这些业务规则；如果与系统角色冲突，以系统角色和安全边界为准。\n\n### 通用客服接待规范\n说明: SingleSupportAgent 的接待、澄清、业务证据边界和模拟人工交接规范\n## 角色定位\n\n当前只有 SingleSupportAgent，同一 Agent 按工具处理诉求，不执行独立领域 Agent 分流。静态知识解释用可用引用，动态事实用 Provider，动作由 ActionService 和 PolicyEngine 控制。缺少证据不能自行补全。\n\n未实现会员与积分、运费报价、运费/免邮资格、发票、订阅、密码重置、异常登录自动锁定或两步验证管理；不承诺数值、优惠或已经完成操作。\n\n## 回复总原则\n\n- 先直接回应用户的核心问题，再补充必要说明，不要先写大段背景介绍。\n- 用户信息不足时，先说明需要补充哪些信息，并解释这些信息用于什么目的。\n- 不要编造订单、物流、账户、余额、会员等级、优惠资格、处理结果等系统事实。\n- 如果问题涉及隐私、支付、退款、发票、账号安全、后台权限或人工审核，必须提醒需要身份或订单核验。\n- 遇到多问题混合咨询时，先按优先级拆分，再逐项回应。\n\n## 标准接待流程\n\n1. 识别用户意图：判断是咨询、投诉、售后、账户、订单、技术、账单还是转人工。\n2. 区分静态解释、动态查询、受控动作和未接入能力，不虚构分流或操作入口。\n3. 信息澄清：只索取当前工具必要参数或不含敏感信息的错误摘要。\n4. 给出下一步：按已验证工具回执说明当前状态，不编造时效。\n5. 收尾确认：询问是否还需要继续查看相关问题，但不要强行追加无关推荐。\n\n## 信息收集要求\n\n- 订单和物流按订单号查询当前客户可访问记录；未找到可访问记录时不区分不存在与不属于该客户，不泄露其他客户记录是否存在。\n- 订单总额不是已核实的实付金额；物流状态不替代订单状态，预计送达日期可为空，是估计而非保证。\n- 收集问题描述和必要工具参数；模拟交接前总结已知信息，不索取凭证。\n\n## 处理范围与模拟人工交接\n\n- 混合诉求由同一 Agent 逐项解释或使用当前已提供的工具；未接入的商城能力明确无法确认。\n- 人工交接仅通过 request_handoff，理由受 explicit_request、complex_complaint、business_dependency_failure 限制；缺参数、越界拒绝、摘要、权限审核本身不代表交接。\n- 只有成功回执和交接编号才能称已创建模拟记录，不等于真人接单、通知发送、承运商查件或地址修改。\n\n## 回复格式要求\n\n- 简洁说明核验结果、必要参数、限制和下一步；风险边界不得隐藏在长段落里。\n\n## 禁止事项\n\n- 禁止承诺“马上到账”“一定成功”“百分百解决”“肯定退款”等无法保证的结果。\n- 禁止要求用户提供密码、短信验证码、支付密码、完整银行卡号、身份证照片等敏感信息。\n- 禁止在没有系统查询结果时声称“我已查到”“订单已经处理”“退款已经通过”。\n- 禁止把所有问题都推给人工；能解释清楚的基础问题应先完成说明。\n\n## 示例表达\n\n- “这项能力尚未接入；缺少可核验信息时不能确认事实或声称已经代办。”\n[事实充分性与回答边界]\n主题相关不等于事实充分。search_knowledge_base的usable与citation只证明检索来源和有效性，不会自动证明最终回答。Skill仅指导流程，不能替代事实证据。按用户原始问题逐项识别必要事实，核对有效片段的直接依据；不得因查询改写而遗漏原问题中的限定条件。多个必要事实必须分别有依据；允许仅回答有依据的部分，明确其余部分无法确认，不自行补数字、时效或渠道。正文明确不支持该功能时，允许引用它回答能力边界，不机械拒绝所有相关问题。订单、物流、库存、退款状态等动态事实必须以当前客户有权限的Provider结果为依据；not_found只说明未找到可访问记录，不确认记录不存在或他人记录存在。正常no_answer/low_confidence是没有可引用证据，不证明事实不存在；依赖故障/degraded不能说成正常知识不足。模拟动作completed不证明真实资金到账；模拟交接记录不证明真人接单。\n人工交接只能通过 request_handoff 创建模拟记录。理由码仅 explicit_request、complex_complaint、business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。",
+        "messages": [
+          {
+            "role": "user",
+            "content": "我不需要人工客服，请说明模拟交接记录是什么意思。"
+          }
+        ],
+        "tools": [
+          {
+            "name": "search_knowledge_base",
+            "description": "检索知识库并返回最相关的文档片段；可用于通用、技术、账单和升级场景。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "用户问题或检索关键词",
+                  "minLength": 1
+                },
+                "top_k": {
+                  "type": "integer",
+                  "description": "返回结果条数"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "get_product",
+            "description": "读取商品基础信息；数据来自 Business Provider 的测试/演示 backend。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "description": "商品 SKU",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "product_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "get_order",
+            "description": "读取当前客户自己的订单状态和明细；customer_id 由请求身份确定。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "type": "string",
+                  "description": "订单号",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "order_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "get_shipment",
+            "description": "读取当前客户自己的订单物流状态；customer_id 由请求身份确定。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "type": "string",
+                  "description": "订单号",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "order_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "check_inventory",
+            "description": "读取商品库存快照；不会修改库存。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "description": "商品 SKU",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "product_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "get_refund_status",
+            "description": "读取当前客户订单的退款状态；不会创建或执行退款。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "type": "string",
+                  "description": "订单号",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "order_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "request_refund",
+            "description": "请求退款；必须经过 Provider、Policy 和 ActionService，可能需要审批，不保证立即执行。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "type": "string",
+                  "description": "订单号",
+                  "minLength": 1
+                },
+                "amount": {
+                  "type": "number",
+                  "description": "可选退款金额"
+                },
+                "idempotency_key": {
+                  "type": "string",
+                  "description": "可选的重复请求幂等键",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "order_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "request_cancel_order",
+            "description": "请求取消订单；必须经过 Provider、Policy 和 ActionService，不代表无条件取消成功。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "type": "string",
+                  "description": "订单号",
+                  "minLength": 1
+                },
+                "idempotency_key": {
+                  "type": "string",
+                  "description": "可选的重复请求幂等键",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "order_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "request_handoff",
+            "description": "申请模拟人工交接。仅用户明确要求、复杂电商投诉或已观察到的业务查询依赖故障可用。摘要不等于建单。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "reason_code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "reason_code"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "inspect_request_context",
+            "description": "查看当前请求的意图、紧急度、实体和上下文可用性；不查询外部业务系统。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "focus": {
+                  "type": "string",
+                  "description": "希望关注的业务方向"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "suggest_required_fields",
+            "description": "根据当前意图建议下一轮只需向用户补充的字段。",
+            "input_schema": {
+              "type": "object",
+              "properties": {},
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "lookup_error_code",
+            "description": "解释常见 HTTP 错误码的可能含义和低风险排查方向；不会读取服务端日志。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "error_code": {
+                  "type": "string",
+                  "description": "例如 401、403、500"
+                }
+              },
+              "required": [
+                "error_code"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "build_diagnostic_plan",
+            "description": "根据运行环境和是否可复现生成排障顺序，不执行修改配置等操作。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "environment": {
+                  "type": "string",
+                  "description": "App、浏览器、服务端或 Docker 等"
+                },
+                "reproduced": {
+                  "type": "boolean",
+                  "description": "问题是否可以稳定复现"
+                }
+              },
+              "required": [
+                "environment",
+                "reproduced"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "check_billing_fields",
+            "description": "检查账单核验字段是否齐全；不连接订单、支付或退款系统。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "payment_channel": {
+                  "type": "string",
+                  "description": "支付渠道，例如微信、支付宝、银行卡"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "compare_amounts",
+            "description": "计算用户明确提供的两笔金额差值；不判断是否重复扣款，也不执行退款。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "amount_a": {
+                  "type": "number",
+                  "description": "第一笔金额"
+                },
+                "amount_b": {
+                  "type": "number",
+                  "description": "第二笔金额"
+                }
+              },
+              "required": [
+                "amount_a",
+                "amount_b"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "create_handoff_summary",
+            "description": "生成交给人工客服的结构化交接摘要，不会创建真实工单。",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "description": "需要升级的原因"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          }
+        ]
+      }
+    ],
+    "state_before": {
+      "business": {
+        "products": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "name": "CartCare Demo Backpack",
+            "price": "129.90",
+            "currency": "CNY",
+            "active": true
+          }
+        },
+        "orders": {
+          "ORD-1001": {
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "shipped",
+            "items": [
+              {
+                "product_id": "SKU-1001",
+                "quantity": 1,
+                "unit_price": "129.90"
+              }
+            ],
+            "total_amount": "129.90",
+            "currency": "CNY",
+            "created_at": "2026-09-20T10:00:00Z"
+          }
+        },
+        "inventory": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "available_quantity": 12,
+            "reserved_quantity": 2,
+            "as_of": "2026-09-27T10:00:00Z"
+          }
+        },
+        "shipments": {
+          "ORD-1001": {
+            "shipment_id": "SHP-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "carrier": "demo-carrier",
+            "tracking_number": "TRACK-1001",
+            "status": "in_transit",
+            "estimated_delivery": "2026-09-29",
+            "updated_at": "2026-09-27T09:30:00Z"
+          }
+        },
+        "refunds": {
+          "REF-1001": {
+            "refund_id": "REF-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "requested",
+            "amount": "129.90",
+            "currency": "CNY",
+            "reason": "demo return request",
+            "created_at": "2026-09-27T08:00:00Z",
+            "updated_at": "2026-09-27T08:00:00Z"
+          }
+        }
+      },
+      "actions": {},
+      "handoff_records": {},
+      "handoff_attempts_count": 0,
+      "memory_writes": []
+    },
+    "state_after": {
+      "business": {
+        "products": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "name": "CartCare Demo Backpack",
+            "price": "129.90",
+            "currency": "CNY",
+            "active": true
+          }
+        },
+        "orders": {
+          "ORD-1001": {
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "shipped",
+            "items": [
+              {
+                "product_id": "SKU-1001",
+                "quantity": 1,
+                "unit_price": "129.90"
+              }
+            ],
+            "total_amount": "129.90",
+            "currency": "CNY",
+            "created_at": "2026-09-20T10:00:00Z"
+          }
+        },
+        "inventory": {
+          "SKU-1001": {
+            "product_id": "SKU-1001",
+            "available_quantity": 12,
+            "reserved_quantity": 2,
+            "as_of": "2026-09-27T10:00:00Z"
+          }
+        },
+        "shipments": {
+          "ORD-1001": {
+            "shipment_id": "SHP-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "carrier": "demo-carrier",
+            "tracking_number": "TRACK-1001",
+            "status": "in_transit",
+            "estimated_delivery": "2026-09-29",
+            "updated_at": "2026-09-27T09:30:00Z"
+          }
+        },
+        "refunds": {
+          "REF-1001": {
+            "refund_id": "REF-1001",
+            "order_id": "ORD-1001",
+            "customer_id": "customer-1",
+            "status": "requested",
+            "amount": "129.90",
+            "currency": "CNY",
+            "reason": "demo return request",
+            "created_at": "2026-09-27T08:00:00Z",
+            "updated_at": "2026-09-27T08:00:00Z"
+          }
+        }
+      },
+      "actions": {},
+      "handoff_records": {},
+      "handoff_attempts_count": 0,
+      "memory_writes": [
+        {
+          "user": "customer-1",
+          "conv": "isolated-review",
+          "role": "user",
+          "text": "我不需要人工客服，请说明模拟交接记录是什么意思。"
+        },
+        {
+          "user": "customer-1",
+          "conv": "isolated-review",
+          "role": "assistant",
+          "text": "本次未创建人工交接记录。"
+        }
+      ]
+    },
+    "state_diff": {
+      "business_changed": false,
+      "action_count_before": 0,
+      "action_count_after": 0,
+      "handoff_count_before": 0,
+      "handoff_count_after": 0,
+      "handoff_attempts_delta": 0,
+      "memory_writes_delta": 2
+    }
+  }
+]

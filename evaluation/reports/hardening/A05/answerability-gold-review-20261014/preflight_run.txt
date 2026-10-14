@@ -1,0 +1,28 @@
+2026-10-14 12:21:32,885 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v1/heartbeat "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,240 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/auth/identity "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,271 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,276 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,279 [ERROR] chromadb.telemetry.product.posthog: Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-10-14 12:21:33,282 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/heartbeat "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,290 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/cartcare_demo_knowledge_chargram_v1 "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,321 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,332 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-14 12:21:33,666 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-14 12:21:33,667 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款, 发票); 通用客服接待规范(keywords=订单, 会员); 技术支持处理规范(keywords=接口, 500) message='订单退款接口500发票会员'
+{"container_state": "exited", "image_created": "2026-09-27T04:35:23.058312594Z", "source_comparison": {"api/main.py": {"present": true, "container_sha256": "3b01c3a771c708eb4ea1dcbc7a8ff5d8d30fb74cdce2181da37efba21d60bcff", "workspace_sha256": "3cfa5c4f4467aab7e0fd2f1a2d0b61396ba38ada7afa02526673a59e76431658", "same": false}, "agents/support_agent.py": {"present": false, "docker_cp_exit": 1}, "agents/tools.py": {"present": true, "container_sha256": "30eaf765c5d6bf5fb6e8c1550fa1cd508361f0566f27715d87fbfe0c26faebf2", "workspace_sha256": "6ee4b291e45683cf452abd48b8aa639b4e096dcd253931422697b7cbd8867d7f", "same": false}, "core/handoff.py": {"present": false, "docker_cp_exit": 1}, "mcp/knowledge_base.py": {"present": true, "container_sha256": "5869466a02ebfe3115f5107a75a51832a5dee9a56131036a31eef3d656373750", "workspace_sha256": "45308227e583668ade3896bf235f1f991b671ba3bb8d81095e2010059c611f30", "same": false}, "mcp/knowledge_assets/default_business_v1.json": {"present": false, "docker_cp_exit": 1}, "mcp/knowledge_assets/default_business_v1.approval.json": {"present": false, "docker_cp_exit": 1}}, "default_collection": true, "redis_ping": true, "real_model_calls": 0}

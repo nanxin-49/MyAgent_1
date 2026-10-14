@@ -1,0 +1,52 @@
+...............FF.........                                               [100%]
+================================== FAILURES ===================================
+_ test_chat_creates_only_for_current_creation_request[\u201c\u8f6c\u4eba\u5de5\u5ba2\u670d\u201d\u662f\u4ec0\u4e48\u610f\u601d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002507902EF60>
+message = '“转人工客服”是什么意思？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('“转人工客服”是什么意思？')
+
+tests\test_handoff_explicit_request.py:49: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:41:08,335 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u8bb0\u5f55\u4e0a\u5199\u7740\u201c\u8f6c\u4eba\u5de5\u5ba2\u670d\u201d\uff0c\u8fd9\u662f\u4ec0\u4e48\u610f\u601d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250792530B0>
+message = '记录上写着“转人工客服”，这是什么意思？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('记录上写着“转人工客服”，这是什么意思？')
+
+tests\test_handoff_explicit_request.py:49: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:41:08,795 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u201c\u8f6c\u4eba\u5de5\u5ba2\u670d\u201d\u662f\u4ec0\u4e48\u610f\u601d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u8bb0\u5f55\u4e0a\u5199\u7740\u201c\u8f6c\u4eba\u5de5\u5ba2\u670d\u201d\uff0c\u8fd9\u662f\u4ec0\u4e48\u610f\u601d\uff1f-False]
+2 failed, 24 passed, 1 warning in 2.16s

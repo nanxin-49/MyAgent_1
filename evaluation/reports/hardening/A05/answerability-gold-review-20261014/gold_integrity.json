@@ -1,0 +1,276 @@
+{
+  "head": "1fd93b5a4372dccb03e9bb8ad0f8647358b28fad",
+  "original_candidate_freeze_addendum_hashes_valid": true,
+  "candidate_differences": [
+    {
+      "path": "/cases/17/allowed_boundary",
+      "before": "隔离fixture未ready，不作证据；publishing被现有契约视为依赖不可用。",
+      "after": "只在隔离fixture设置publishing；不可引用未ready版本；合法publishing无有效chunk为no_answer，不自动判依赖故障。"
+    }
+  ],
+  "input_hashes": {
+    "evaluation/answerability/dataset_v1.json": "bc86eb7bde56071fae87d426e6667a771ac8f5778b57a5a80e2c940f72f961e4",
+    "evaluation/answerability/dataset_v1.review_candidate.json": "89f987aa623a9ba23ea8cf7bcf0234dc7d6c86e46f42028507d11f7c866dee4f",
+    "evaluation/answerability/freeze_v1.json": "876fddfa295e1ce49834f60c3c962bc4738bf12781af89d95c846ace8419b516",
+    "evaluation/answerability/review_addendum.json": "47aae82b03bd88a623b7efc554c14280a718aaced97e9fe862908aab7b700420",
+    "evaluation/answerability/gold_review_v1.md": "679cdd17e73fbf97e8b6b98a7170fa6d6fb9e566dcf0784cc9fe1f76cc75f9e3",
+    "evaluation/reports/hardening/A05/answerability-20261013/corpus_snapshot.json": "dc49dadcc4dc186ef63789792d88aa0f0d33a4e3e7e919fbec8188b42b83d310",
+    "evaluation/reports/hardening/A05/answerability-20261013/before.json": "c6df1b914850c150d421a5d7cf1438881908ba5fd853a9eae1487f9d831fc04f",
+    "evaluation/reports/hardening/A05/answerability-20261013/after_final.json": "cfd2afb22c439b3b479b657bba91a5a826571ffea881ebfbf3969c3cb746bdcf",
+    "evaluation/reports/hardening/A05/answerability-20261013/per_case.md": "306b31c2a01fcba471ac9f5c1c20f16bd40867cf716ff6988da4fa2a98823f1e",
+    "evaluation/reports/hardening/A05/answerability-20261013/REPORT.md": "e0fb383b7e24132fe40e460afacc53622990e9141b775ea55a3562d1207cbc55",
+    "evaluation/reports/hardening/A05/answerability-20261013/final_inputs_sha256.json": "8ba13506a0c4368e5c4e214017ea4bee9fcc4b41ceaa760d7c7c47356264f7ad",
+    "mcp/knowledge_assets/default_business_v1.json": "17e3c606365c203589919321b166e942e6aab569d539ce631f447a5439cd018d",
+    "mcp/knowledge_assets/default_business_v1.approval.json": "cac087b27c7030c9d7e85a781f020084a1a1618fa8575c4d58c99a9af5a15f9f"
+  },
+  "historical_final_inputs_manifest_check": {
+    "evaluation/answerability/dataset_v1.json": {
+      "expected": "bc86eb7bde56071fae87d426e6667a771ac8f5778b57a5a80e2c940f72f961e4",
+      "actual": "bc86eb7bde56071fae87d426e6667a771ac8f5778b57a5a80e2c940f72f961e4",
+      "match": true
+    },
+    "evaluation/answerability/freeze_v1.json": {
+      "expected": "876fddfa295e1ce49834f60c3c962bc4738bf12781af89d95c846ace8419b516",
+      "actual": "876fddfa295e1ce49834f60c3c962bc4738bf12781af89d95c846ace8419b516",
+      "match": true
+    },
+    "evaluation/answerability/dataset_v1.review_candidate.json": {
+      "expected": "89f987aa623a9ba23ea8cf7bcf0234dc7d6c86e46f42028507d11f7c866dee4f",
+      "actual": "89f987aa623a9ba23ea8cf7bcf0234dc7d6c86e46f42028507d11f7c866dee4f",
+      "match": true
+    },
+    "evaluation/answerability/review_addendum.json": {
+      "expected": "47aae82b03bd88a623b7efc554c14280a718aaced97e9fe862908aab7b700420",
+      "actual": "47aae82b03bd88a623b7efc554c14280a718aaced97e9fe862908aab7b700420",
+      "match": true
+    },
+    "evaluation/answerability/gold_review_v1.md": {
+      "expected": "679cdd17e73fbf97e8b6b98a7170fa6d6fb9e566dcf0784cc9fe1f76cc75f9e3",
+      "actual": "679cdd17e73fbf97e8b6b98a7170fa6d6fb9e566dcf0784cc9fe1f76cc75f9e3",
+      "match": true
+    },
+    "evaluation/answerability/harness.py": {
+      "expected": "c237ccd2d02ed96bbed79e035c13faed201fb297fe1096ea22cbb9021147407b",
+      "actual": "c237ccd2d02ed96bbed79e035c13faed201fb297fe1096ea22cbb9021147407b",
+      "match": true
+    },
+    "agents/tools.py": {
+      "expected": "6ee4b291e45683cf452abd48b8aa639b4e096dcd253931422697b7cbd8867d7f",
+      "actual": "6ee4b291e45683cf452abd48b8aa639b4e096dcd253931422697b7cbd8867d7f",
+      "match": true
+    },
+    "agents/support_agent.py": {
+      "expected": "e93f8f5a2471c53de4dcd074bb172d4338406c0f4b3b3a21e5fb02a035399902",
+      "actual": "e93f8f5a2471c53de4dcd074bb172d4338406c0f4b3b3a21e5fb02a035399902",
+      "match": true
+    }
+  },
+  "cases": [
+    {
+      "id": "ANS-01",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-02",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-03",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-04",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-05",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-06",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-07",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": "get_order",
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-08",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-09",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-10",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-11",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-12",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": "get_order",
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-13",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": "get_shipment",
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-14",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": "get_order",
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-15",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": "get_order",
+      "isolation_scenario": "cross_owner"
+    },
+    {
+      "id": "ANS-16",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "expired"
+    },
+    {
+      "id": "ANS-17",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "future"
+    },
+    {
+      "id": "ANS-18",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "publishing"
+    },
+    {
+      "id": "ANS-19",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-20",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "chroma_failure"
+    },
+    {
+      "id": "ANS-21",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": "get_order",
+      "isolation_scenario": "provider_failure"
+    },
+    {
+      "id": "ANS-22",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-23",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-24",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-25",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    },
+    {
+      "id": "ANS-26",
+      "complete": true,
+      "evidence_quote_and_hash_valid": true,
+      "dynamic_tool": null,
+      "isolation_scenario": "default"
+    }
+  ],
+  "requested_corpus_path_exists": false,
+  "actual_corpus_path": "evaluation/reports/hardening/A05/answerability-20261013/corpus_snapshot.json",
+  "Order_fields": [
+    "order_id",
+    "customer_id",
+    "status",
+    "items",
+    "total_amount",
+    "currency",
+    "created_at"
+  ],
+  "Shipment_fields": [
+    "shipment_id",
+    "order_id",
+    "customer_id",
+    "carrier",
+    "tracking_number",
+    "status",
+    "estimated_delivery",
+    "updated_at"
+  ],
+  "provider_fixture_sha256": "db21505e05798664fa3afa4b9f84b52465ed4602f2ed532d338ee7000c122384",
+  "no_Gold_approval": true,
+  "no_freeze_created": true
+}

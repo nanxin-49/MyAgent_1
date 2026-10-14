@@ -29,8 +29,28 @@ def explicit_handoff(message):
     for clause in clauses:
         if re.search(r"不需要|不想|不要|不用|无需|别|do not|don't|no need", clause):
             continue
-        if re.search(r"(?:转|找|联系|需要|要求|想要|想)(?:接|一下|个|要)?(?:人工(?:客服)?|真人客服)|(?:talk to|transfer to|want) (?:a |an )?(?:human|agent)", clause):
-            return True
+        match = re.search(r"(?:转|找|联系|需要|要求|想要|想)(?:接|一下|个|要)?(?:人工(?:客服)?|真人客服)|(?:talk to|transfer to|want) (?:a |an )?(?:human|agent)", clause)
+        if match is None:
+            continue
+        prefix = clause[:match.start()]
+        suffix = clause[match.end():].lstrip(' \t“”"\'‘’「」')
+        # Interpret the matched action in its clause: reported completion and
+        # questions about meaning/rules are not requests to create a record.
+        # Do not reject question punctuation: "可以帮我转人工客服吗" is a request.
+        if re.search(
+            r"(?:是否|是不是|能否|算不算).*(?:说明|表示|代表|意味|等于|已|完成)"
+            r"|(?:是否|是不是|有没有)(?:已(?:经)?)?(?:帮我|为我)?$"
+            r"|(?:已(?:经)?|成功|完成)(?:帮我|为我)?$"
+            r"|(?:写着|显示为?|记载为?|标记为?|提示)[“\"'「\s]*$"
+            r"|(?:如何|怎么|何时|什么时候|什么情况|为什么)"
+            r"|\b(?:how|when|why|what does)\b|\balready\s*$", prefix,
+        ) or re.search(
+            r"^(?:的)?(?:意思|含义|规则|流程|条件|状态|结果)"
+            r"|^(?:是什么|是指|代表|意味|成功|完成|了吗|是否|是不是)"
+            r"|^\s+(?:mean|means|work|status|rules|process)\b", suffix,
+        ):
+            continue
+        return True
     return False
 
 

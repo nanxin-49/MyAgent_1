@@ -1,0 +1,274 @@
+.......FFFFFFFFFF...FFF.                                                 [100%]
+================================== FAILURES ===================================
+_ test_chat_creates_only_for_current_creation_request[\u6a21\u62df\u8bb0\u5f55\u6210\u529f\u662f\u5426\u8bf4\u660e\u5df2\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BCEFC0>
+message = '模拟记录成功是否说明已转人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('模拟记录成功是否说明已转人工客服？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:12,846 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u8ba2\u5355\u67e5\u8be2\uff1a\u6a21\u62df\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\u521b\u5efa\u6210\u529f\u662f\u5426\u8bf4\u660e\u5df2\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C09AE4B0>
+message = '订单查询：模拟人工交接记录创建成功是否说明已转人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('订单查询：模拟人工交接记录创建成功是否说明已转人工客服？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,156 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u8bb0\u5f55\u521b\u5efa\u6210\u529f\u662f\u4e0d\u662f\u4ee3\u8868\u5df2\u8054\u7cfb\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BCEED0>
+message = '记录创建成功是不是代表已联系人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('记录创建成功是不是代表已联系人工客服？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,168 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u4ea4\u63a5\u56de\u6267\u662f\u5426\u610f\u5473\u7740\u5df2\u8f6c\u63a5\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BEF260>
+message = '交接回执是否意味着已转接人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('交接回执是否意味着已转接人工客服？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,179 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u73b0\u5728\u662f\u5426\u5df2\u7ecf\u5e2e\u6211\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BECDA0>
+message = '现在是否已经帮我转人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('现在是否已经帮我转人工客服？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,190 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u8f6c\u4eba\u5de5\u5ba2\u670d\u6210\u529f\u4e86\u5417\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BED9A0>
+message = '转人工客服成功了吗？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('转人工客服成功了吗？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,202 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u8f6c\u4eba\u5de5\u5ba2\u670d\u662f\u4ec0\u4e48\u610f\u601d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BEEA20>
+message = '转人工客服是什么意思？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('转人工客服是什么意思？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,217 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u8f6c\u4eba\u5de5\u5ba2\u670d\u7684\u6761\u4ef6\u662f\u4ec0\u4e48\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0C7F200>
+message = '转人工客服的条件是什么？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('转人工客服的条件是什么？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,230 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[\u4ec0\u4e48\u60c5\u51b5\u4e0b\u9700\u8981\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BCFE00>
+message = '什么情况下需要人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('什么情况下需要人工客服？')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,242 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_chat_creates_only_for_current_creation_request[How does transfer to a human work?-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C0BEE390>
+message = 'How does transfer to a human work?', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('How does transfer to a human work?')
+
+tests\test_handoff_explicit_request.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,257 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_model_explicit_tool_request_cannot_bypass_read_only_question[\u6a21\u62df\u8bb0\u5f55\u6210\u529f\u662f\u5426\u8bf4\u660e\u5df2\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C09AF4D0>
+message = '模拟记录成功是否说明已转人工客服？'
+
+    @pytest.mark.parametrize('message',[QUESTIONS[0],QUESTIONS[4],QUESTIONS[6]])
+    def test_model_explicit_tool_request_cannot_bypass_read_only_question(monkeypatch,message):
+        http,runtime,sdk = setup(monkeypatch,tool='request_handoff',args={'reason_code':'explicit_request'})
+        body = http.post('/chat',json={'message':message}).json()
+>       assert not body['handoff']['handoff_created']
+E       assert not True
+
+tests\test_handoff_explicit_request.py:68: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,291 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_model_explicit_tool_request_cannot_bypass_read_only_question[\u73b0\u5728\u662f\u5426\u5df2\u7ecf\u5e2e\u6211\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C09AE4B0>
+message = '现在是否已经帮我转人工客服？'
+
+    @pytest.mark.parametrize('message',[QUESTIONS[0],QUESTIONS[4],QUESTIONS[6]])
+    def test_model_explicit_tool_request_cannot_bypass_read_only_question(monkeypatch,message):
+        http,runtime,sdk = setup(monkeypatch,tool='request_handoff',args={'reason_code':'explicit_request'})
+        body = http.post('/chat',json={'message':message}).json()
+>       assert not body['handoff']['handoff_created']
+E       assert not True
+
+tests\test_handoff_explicit_request.py:68: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,302 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_model_explicit_tool_request_cannot_bypass_read_only_question[\u8f6c\u4eba\u5de5\u5ba2\u670d\u662f\u4ec0\u4e48\u610f\u601d\uff1f] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000250C09AF9B0>
+message = '转人工客服是什么意思？'
+
+    @pytest.mark.parametrize('message',[QUESTIONS[0],QUESTIONS[4],QUESTIONS[6]])
+    def test_model_explicit_tool_request_cannot_bypass_read_only_question(monkeypatch,message):
+        http,runtime,sdk = setup(monkeypatch,tool='request_handoff',args={'reason_code':'explicit_request'})
+        body = http.post('/chat',json={'message':message}).json()
+>       assert not body['handoff']['handoff_created']
+E       assert not True
+
+tests\test_handoff_explicit_request.py:68: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:38:13,316 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u6a21\u62df\u8bb0\u5f55\u6210\u529f\u662f\u5426\u8bf4\u660e\u5df2\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u8ba2\u5355\u67e5\u8be2\uff1a\u6a21\u62df\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\u521b\u5efa\u6210\u529f\u662f\u5426\u8bf4\u660e\u5df2\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u8bb0\u5f55\u521b\u5efa\u6210\u529f\u662f\u4e0d\u662f\u4ee3\u8868\u5df2\u8054\u7cfb\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u4ea4\u63a5\u56de\u6267\u662f\u5426\u610f\u5473\u7740\u5df2\u8f6c\u63a5\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u73b0\u5728\u662f\u5426\u5df2\u7ecf\u5e2e\u6211\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u8f6c\u4eba\u5de5\u5ba2\u670d\u6210\u529f\u4e86\u5417\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u8f6c\u4eba\u5de5\u5ba2\u670d\u662f\u4ec0\u4e48\u610f\u601d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u8f6c\u4eba\u5de5\u5ba2\u670d\u7684\u6761\u4ef6\u662f\u4ec0\u4e48\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u4ec0\u4e48\u60c5\u51b5\u4e0b\u9700\u8981\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[How does transfer to a human work?-False]
+FAILED tests/test_handoff_explicit_request.py::test_model_explicit_tool_request_cannot_bypass_read_only_question[\u6a21\u62df\u8bb0\u5f55\u6210\u529f\u662f\u5426\u8bf4\u660e\u5df2\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f]
+FAILED tests/test_handoff_explicit_request.py::test_model_explicit_tool_request_cannot_bypass_read_only_question[\u73b0\u5728\u662f\u5426\u5df2\u7ecf\u5e2e\u6211\u8f6c\u4eba\u5de5\u5ba2\u670d\uff1f]
+FAILED tests/test_handoff_explicit_request.py::test_model_explicit_tool_request_cannot_bypass_read_only_question[\u8f6c\u4eba\u5de5\u5ba2\u670d\u662f\u4ec0\u4e48\u610f\u601d\uff1f]
+13 failed, 11 passed, 1 warning in 1.82s

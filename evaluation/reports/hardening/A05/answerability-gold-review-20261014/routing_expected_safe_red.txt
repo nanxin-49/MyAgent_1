@@ -1,0 +1,29 @@
+.FF                                                                      [100%]
+================================== FAILURES ===================================
+_________ test_rule_question_paraphrase_must_not_mutate_handoff_state _________
+
+    def test_rule_question_paraphrase_must_not_mutate_handoff_state():
+        row = route_probe('订单查询：模拟人工交接记录创建成功是否说明已转人工客服？')
+>       assert row['state_diff']['handoff_count_after']==0
+E       assert 1 == 0
+
+evaluation\answerability\review_20261014\test_routing_regression.py:25: AssertionError
+______________ test_grounded_negative_explanation_is_not_deleted ______________
+
+exact = {'body': {'action_results': [], 'agent_type': 'support', 'agent_types': ['support'], 'citations': [{'chunk_index': 0, ...n': None, ...}], ...}, 'http_status': 200, 'matched_branch': 'model_tool_loop', 'matched_explicit_handoff': False, ...}
+
+    def test_grounded_negative_explanation_is_not_deleted(exact):
+>       assert '不代表真人接单' in exact['body']['response']
+E       AssertionError: assert '不代表真人接单' in '本次未创建人工交接记录。\n\n知识库引用：doc_ed1fae0ed79e04b2ee03#chunk-0~cf47fe62eb882245f08516389346ee0fddbfb9bc58e0b18a04bcc328ae2d3f6a'
+
+evaluation\answerability\review_20261014\test_routing_regression.py:30: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED evaluation/answerability/review_20261014/test_routing_regression.py::test_rule_question_paraphrase_must_not_mutate_handoff_state
+FAILED evaluation/answerability/review_20261014/test_routing_regression.py::test_grounded_negative_explanation_is_not_deleted
+2 failed, 1 passed, 1 warning in 1.96s

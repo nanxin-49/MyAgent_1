@@ -1,0 +1,31 @@
+.............F..............                                             [100%]
+================================== FAILURES ===================================
+_ test_chat_creates_only_for_current_creation_request[\u6709\u6ca1\u6709\u8054\u7cfb\u4eba\u5de5\u5ba2\u670d\uff1f-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000228863E36E0>
+message = '有没有联系人工客服？', expected = False
+
+    @pytest.mark.parametrize('message,expected',[(m,True) for m in REQUESTS]+[(m,False) for m in QUESTIONS])
+    def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expected):
+        http,runtime,sdk = setup(monkeypatch,text='请提供订单号。')
+        before = (len(runtime.handoff_service._records),len(runtime.handoff_service._attempts))
+        body = http.post('/chat',json={'message':message,'conv_id':'route-regression'}).json()
+        trace = runtime.get_tool_trace(body['request_id'])
+>       assert explicit_handoff(message) is expected
+E       AssertionError: assert True is False
+E        +  where True = explicit_handoff('有没有联系人工客服？')
+
+tests\test_handoff_explicit_request.py:51: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 16:42:58,105 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_handoff_explicit_request.py::test_chat_creates_only_for_current_creation_request[\u6709\u6ca1\u6709\u8054\u7cfb\u4eba\u5de5\u5ba2\u670d\uff1f-False]
+1 failed, 27 passed, 1 warning in 1.61s
