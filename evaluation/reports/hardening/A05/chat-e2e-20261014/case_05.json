@@ -1,0 +1,126 @@
+{
+  "case": 5,
+  "request": {
+    "message": "退款一般多久到账？",
+    "conv_id": "a05-e2e-20261014-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "latency_ms": 1828.0,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "809f964b",
+    "response": "你好！关于退款到账时间，我需要如实说明一下：\n\n**目前无法确认具体的到账时效。** 原因是：\n\n- 当前系统只能查询到**退款申请的状态记录**，没有接入真实的支付渠道或交易流水查询能力；\n- 因此我**无法承诺**原路退款、到账时间、手续费等具体结果；\n- 退款申请提交成功（甚至状态显示完成）**也不代表资金已经实际到账**。\n\n**我能帮你做的：**\n\n- 如果你已经提交过退款申请，我可以帮你查询该订单当前的**退款状态记录**；\n- 如果你还没提交，需要先确认是否就 **ORD-1001** 申请退款（金额 ¥100 或订单总额 ¥129.90）。\n\n请问你希望我帮你查询 **ORD-1001** 的退款状态吗？或者需要现在提交退款申请？",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 1782.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 1,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "manual_review": null,
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "809f964b",
+    "found": true,
+    "trace": {
+      "request_id": "809f964b",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 1782.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 799,
+          "output_tokens": 179,
+          "latency_ms": 1782.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 8,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 15.0
+      },
+      "request_latency_ms": 1828.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    8,
+    8
+  ],
+  "model_requests_for_case": 1
+}

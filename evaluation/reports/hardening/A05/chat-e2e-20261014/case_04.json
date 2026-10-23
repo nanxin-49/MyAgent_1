@@ -1,0 +1,204 @@
+{
+  "case": 4,
+  "request": {
+    "message": "我的订单可以申请退100元吗？",
+    "conv_id": "a05-e2e-20261014-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "latency_ms": 3593.0,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "3531dba2",
+    "response": "已为你核验订单 **ORD-1001** 的当前情况：\n\n- **订单状态**：已发货（shipped）\n- **订单金额**：¥129.90（CNY）\n- **下单时间**：2026-10-12\n- **退款记录**：未找到可访问的退款记录（说明目前该订单没有已存在的退款申请）\n\n**关于退 100 元：**\n\n从金额上看，¥100 大于 0 且不超过订单总额 ¥129.90，符合金额范围要求。但能否成功申请，还需满足以下条件：\n\n- 订单需在**创建后 7×24 小时内**申请退款。你的订单下单时间是 2026-10-12，**是否仍在窗口内需要以系统审核为准**；\n- 订单状态及退款记录需符合要求（当前为已发货状态）；\n- 最终资格以系统审核结果为准。\n\n**下一步：**\n\n如果你确认要就 ORD-1001 申请退款 **¥100**，我可以为你提交退款申请。请注意：\n\n- 申请需经系统审核，**提交成功不代表立即通过，也不代表资金立即到账**；\n- 是否在 7 天窗口内、能否通过，以系统实际审核结果为准。\n\n请确认是否提交这笔 ¥100 的退款申请？",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [
+      "get_order",
+      "get_refund_status"
+    ],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 3531.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 2,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "manual_review": null,
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "3531dba2",
+    "found": true,
+    "trace": {
+      "request_id": "3531dba2",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_refund_status"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "3531dba2",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_fI1TUnJv7iHzPtBOS8be4074",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        },
+        {
+          "request_id": "3531dba2",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_01_O9ISvgLOyNDBIHoAtLA17222",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "未找到可访问的业务记录"
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 3531.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 2,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 587,
+          "output_tokens": 99,
+          "latency_ms": 1218.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 258,
+          "output_tokens": 277,
+          "latency_ms": 2313.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 6,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 15.0
+      },
+      "request_latency_ms": 3593.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    6,
+    7
+  ],
+  "model_requests_for_case": 2
+}

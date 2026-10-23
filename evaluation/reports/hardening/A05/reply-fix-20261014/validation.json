@@ -1,0 +1,36 @@
+{
+  "head": "cae395ff38cf96e3a021999ec0f6b9c5b166afa4",
+  "protected_files": 634,
+  "changed_existing_files": [
+    "agents/support_agent.py",
+    "docs/CartCare-Codex-Workbench.html",
+    "docs/cartcare-workbench-progress.json"
+  ],
+  "original_e2e_manifest_files": 42,
+  "original_e2e_manifest_matches": true,
+  "core_handoff_and_route_tests_unchanged": true,
+  "original_Single_methods_unchanged_except_handle": [
+    "get_tools",
+    "_build_role_packet",
+    "_needs_escalation",
+    "_build_system_prompt"
+  ],
+  "handle_existing_structured_receipt_branch_unchanged": true,
+  "real_cases": 3,
+  "original_API_reproduced_exactly": true,
+  "raw_model_bodies_preserved_exactly": true,
+  "new_handoff_records": 0,
+  "new_real_model_calls": 0,
+  "api_started": false,
+  "new_fees": 0,
+  "committed": false,
+  "pushed": false,
+  "status": "verify",
+  "outcome": "fixed",
+  "hashes": {
+    "agents/support_agent.py": "9f4ad9549f5c46bf15b465c2a96d67b7b934bc84418a18953683a07519c256ee",
+    "tests/test_handoff_reply.py": "4d54b8668360672fdaad38d9a1a0288a934414e1eb1052cd49735ad9af1bae23",
+    "docs/cartcare-workbench-progress.json": "8382aa624bb2002e36dd7b55a758bca2546c3682e140fac18bb3350841bf0e4d",
+    "docs/CartCare-Codex-Workbench.html": "09c12cf06fef73872e541cf8eefb801d687e0fcec6a7cc466c0d2c4816e4684f"
+  }
+}

@@ -1,0 +1,19 @@
+........................................................................ [ 12%]
+........................................................................ [ 25%]
+........................................................................ [ 38%]
+................................................................s....... [ 51%]
+........................................................................ [ 64%]
+............ss.......................................................... [ 77%]
+........................................................................ [ 90%]
+..................................................                       [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_memory_live_services.py:13: requires live Redis/Chroma
+SKIPPED [1] tests\test_rag_http_integration.py:13: requires a real Chroma HTTP server
+SKIPPED [1] tests\test_rag_http_integration.py:41: requires a real Chroma HTTP server
+551 passed, 3 skipped, 1 warning in 12.63s

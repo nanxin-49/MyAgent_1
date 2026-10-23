@@ -1,0 +1,85 @@
+{
+  "reviewer": "Codex逐条对照证据审阅，待用户验收；不是独立人工统计研究",
+  "cases": {
+    "1": {
+      "verdict": "pass",
+      "correct": true,
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "none",
+      "reason": "当前get_order回执shipped/129.90/创建时间与回答一致；状态不变。"
+    },
+    "2": {
+      "verdict": "pass",
+      "correct": true,
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "none",
+      "reason": "get_shipment回执运输中、承运商、单号、预计10月16日与回答一致；未编造实时位置。"
+    },
+    "3": {
+      "verdict": "fail",
+      "correct": false,
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "P1 answer_postprocessing; tool_selection",
+      "reason": "原模型超过500元需人工审核说明被REPLY删除，留下空标题；未调用RAG，静态政策来自Skills。"
+    },
+    "4": {
+      "verdict": "partial",
+      "correct": "partial",
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "P2 answer_generation",
+      "reason": "查订单及退款、无写入、要求用户确认正确；把not_found解释成没有申请超出契约。"
+    },
+    "5": {
+      "verdict": "pass",
+      "correct": true,
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "none",
+      "reason": "明确无法确认到账时效，无支付查询能力；无编造或写入。"
+    },
+    "6": {
+      "verdict": "partial",
+      "correct": "partial",
+      "ungrounded_promise": "ambiguous capability phrasing",
+      "unrequested_write": false,
+      "source": "P1 candidate tool_selection; P2 wording",
+      "reason": "金额与fixture相同但未重查Provider，沿用历史动态事实；未观察到过时金额。渠道/实付缺字段说明正确，进一步核实支付摘要的能力表述模糊。"
+    },
+    "7": {
+      "verdict": "pass",
+      "correct": true,
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "none",
+      "reason": "拒绝读取他人ORD-2001且不披露是否存在或owner；没有调用Provider，故不能声称本题实际命中了Provider权限门。"
+    },
+    "8": {
+      "verdict": "partial",
+      "correct": "partial",
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "P2 postprocessing; RAG not selected",
+      "reason": "不编造积分比例；未调用RAG；人工建议被删除，留下无前文指代的这个交接记录。"
+    },
+    "9": {
+      "verdict": "pass",
+      "correct": true,
+      "ungrounded_promise": false,
+      "unrequested_write": false,
+      "source": "none",
+      "reason": "当前用户明确授权；Principal及allowed_reason门通过，创建模拟记录，回执明确非真人接手；无HITL资金动作。"
+    },
+    "10": {
+      "verdict": "fail",
+      "correct": false,
+      "ungrounded_promise": false,
+      "unrequested_write": true,
+      "source": "P0 deterministic_route",
+      "reason": "历史申请追问被当新申请，0模型调用仍创建第二条模拟交接；原始失败保留。"
+    }
+  }
+}

@@ -19,6 +19,8 @@ REQUESTS = [
     'Please transfer to a human.',
     '模拟记录成功是否说明已转人工客服？请帮我转人工客服。',
     '请帮我转人工客服确认记录是否已经完成。',
+    '我申请转人工。',
+    '我刚才申请转人工了，请再帮我转人工客服。',
 ]
 QUESTIONS = [
     '模拟记录成功是否说明已转人工客服？',
@@ -37,6 +39,10 @@ QUESTIONS = [
     '我不需要人工客服，请说明模拟交接记录是什么意思。',
     '请查询订单ORD-1001。',
     '退款政策的500元审批规则是什么？',
+    '我刚才申请转人工了，现在有客服接手了吗？',
+    '我刚刚申请转人工，现在有客服接手了吗？',
+    '我之前申请转人工客服了，现在有客服接手了吗？',
+    '我已经申请过转人工客服，现在有客服接手了吗？',
 ]
 
 pytestmark = pytest.mark.usefixtures('authenticated_http')
@@ -62,7 +68,7 @@ def test_chat_creates_only_for_current_creation_request(monkeypatch,message,expe
         assert trace['tool_calls']==[]
 
 
-@pytest.mark.parametrize('message',[QUESTIONS[0],QUESTIONS[4],QUESTIONS[6]])
+@pytest.mark.parametrize('message',[QUESTIONS[0],QUESTIONS[4],QUESTIONS[6],*QUESTIONS[-4:]])
 def test_model_explicit_tool_request_cannot_bypass_read_only_question(monkeypatch,message):
     http,runtime,sdk = setup(monkeypatch,tool='request_handoff',args={'reason_code':'explicit_request'})
     body = http.post('/chat',json={'message':message}).json()

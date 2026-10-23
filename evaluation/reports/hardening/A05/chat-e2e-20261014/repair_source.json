@@ -1,0 +1,7 @@
+{
+  "head": "cae395ff38cf96e3a021999ec0f6b9c5b166afa4",
+  "core_handoff_sha256": "cbeaa5c2087c4a45ce7771f8dab464610af7b05e3e00a18c6d91ba2e6c999e40",
+  "tests_sha256": "1dae38a7a8b81de1eb1f9246a31d9a26b562c1c90d61453e148f0944346db787",
+  "original_10_source": "environment.json: pre-repair hashes",
+  "repair_verification_source": "HEAD + core/handoff.py diff; separate repair_case10.json"
+}

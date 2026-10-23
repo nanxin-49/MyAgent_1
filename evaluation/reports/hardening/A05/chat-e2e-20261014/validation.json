@@ -1,0 +1,22 @@
+{
+  "model_wire_requests": 12,
+  "original_http_cases": 10,
+  "original_model_requests": 11,
+  "repair_model_requests": 1,
+  "original_observations_preserved": true,
+  "business_fixture_state_unchanged": true,
+  "authorized_handoffs": 1,
+  "unsolicited_handoffs_in_original": 1,
+  "repair_state_unchanged": true,
+  "source_changes_vs_baseline": [
+    "core/handoff.py"
+  ],
+  "approved_knowledge_unchanged": true,
+  "credentials_not_in_report": true,
+  "test_api_stopped": true,
+  "test_redis_stopped": true,
+  "original_services_preserved": true,
+  "uv_lock": "53 packages",
+  "git_diff_check": "passed",
+  "full_regression": "551 passed / 3 skipped / 1 existing warning"
+}

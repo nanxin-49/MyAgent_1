@@ -1,0 +1,155 @@
+{
+  "case": 9,
+  "request": {
+    "message": "请帮我转人工客服。",
+    "conv_id": "a05-e2e-20261014-customer1",
+    "handoff_key": "a05-e2e-handoff-01"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "latency_ms": 63.0,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "17753fa8",
+    "response": "已创建模拟人工交接记录。交接编号：2e5edb4d-9608-4926-8ff3-da655a95fc7c。这不代表真实客服已接单。",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [
+      "request_handoff"
+    ],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": true,
+    "latency_ms": 0.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 0,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "created",
+      "handoff_required": true,
+      "handoff_requested": true,
+      "handoff_created": true,
+      "handoff_failed": false,
+      "handoff_id": "2e5edb4d-9608-4926-8ff3-da655a95fc7c",
+      "reason_code": "explicit_request",
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "manual_review": null,
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "17753fa8",
+    "found": true,
+    "trace": {
+      "request_id": "17753fa8",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "request_handoff"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "17753fa8",
+          "agent_type": "support",
+          "tool_name": "request_handoff",
+          "risk_level": "write",
+          "tool_use_id": "deterministic_handoff_gate",
+          "input": {
+            "reason_code": "explicit_request"
+          },
+          "validated_input": {
+            "reason_code": "explicit_request"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "handoff_result": {
+            "status": "created",
+            "handoff_required": true,
+            "handoff_requested": true,
+            "handoff_created": true,
+            "handoff_failed": false,
+            "handoff_id": "2e5edb4d-9608-4926-8ff3-da655a95fc7c",
+            "reason_code": "explicit_request",
+            "error_code": null,
+            "reused": false,
+            "simulated": true
+          }
+        }
+      ],
+      "escalated": true,
+      "latency_ms": 0.0,
+      "handoff": {
+        "status": "created",
+        "handoff_required": true,
+        "handoff_requested": true,
+        "handoff_created": true,
+        "handoff_failed": false,
+        "handoff_id": "2e5edb4d-9608-4926-8ff3-da655a95fc7c",
+        "reason_code": "explicit_request",
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 0,
+      "model_calls": [],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 6,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": true,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 16.0
+      },
+      "request_latency_ms": 47.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    12,
+    11
+  ],
+  "model_requests_for_case": 0
+}

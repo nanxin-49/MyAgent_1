@@ -1,0 +1,550 @@
+FFFFFFFFFFFF..FFFFFF..                                                   [100%]
+================================== FAILURES ===================================
+_ test_saved_real_model_body_and_format_survive_reply_processing[case_03.json] _
+
+name = 'case_03.json'
+
+    @pytest.mark.parametrize('name',['case_03.json','case_08.json','repair_case10.json'])
+    def test_saved_real_model_body_and_format_survive_reply_processing(name):
+        saved,raw,result,runtime,sdk,api_text = offline_replay(name)
+>       assert result.response==raw
+E       AssertionError: assert '你好！关于退款条件，我先...。本次未创建人工交接记录。' == '你好！关于退款条件，我先...功不代表资金立即到账**。'
+E         
+E         Skipping 157 identical leading characters in diff, use -v to show
+E           关于金额审核：**
+E         - - 单笔超过 **500 元**需人工审核；恰好 500 元不因金额单独触发审批
+E           
+E           不过，你的订单 **ORD-1001** 下单时间是 **2026-10-12**，目前订单状态为**已发货**。是否仍在 7 天窗口内、以及是否符合退款资格，需要我实际查询订单和退款记录后才能确认。
+E           ...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests\test_handoff_reply.py:61: AssertionError
+_ test_saved_real_model_body_and_format_survive_reply_processing[case_08.json] _
+
+name = 'case_08.json'
+
+    @pytest.mark.parametrize('name',['case_03.json','case_08.json','repair_case10.json'])
+    def test_saved_real_model_body_and_format_survive_reply_processing(name):
+        saved,raw,result,runtime,sdk,api_text = offline_replay(name)
+>       assert result.response==raw
+E       AssertionError: assert '你好！关于会员积分，我需...。本次未创建人工交接记录。' == '你好！关于会员积分，我需...，我可以直接帮你查询处理。'
+E         
+E         Skipping 91 identical leading characters in diff, use -v to show
+E           不能凭猜测回答。
+E           
+E         - **建议：** 如果你需要了解会员积分规则，我可以帮你申请转接人工客服进一步确认。是否需要我为你创建这个交接记录？
+E         + 是否需要我为你创建这个交接记录？
+E           ...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests\test_handoff_reply.py:61: AssertionError
+_ test_saved_real_model_body_and_format_survive_reply_processing[repair_case10.json] _
+
+name = 'repair_case10.json'
+
+    @pytest.mark.parametrize('name',['case_03.json','case_08.json','repair_case10.json'])
+    def test_saved_real_model_body_and_format_survive_reply_processing(name):
+        saved,raw,result,runtime,sdk,api_text = offline_replay(name)
+>       assert result.response==raw
+E       AssertionError: assert '你好！\n**\n\n\...。本次未创建人工交接记录。' == '你好！关于你之前申请的转...先看看能不能直接帮你处理。'
+E         
+E         - 你好！关于你之前申请的转人工，我需要如实说明：
+E         + 你好！
+E         + **
+E           
+E         - **目前无法确认已有真人客服接手。**
+E           ...
+E         
+E         ...Full output truncated (11 lines hidden), use '-vv' to show
+
+tests\test_handoff_reply.py:61: AssertionError
+________ test_fixed_real_text_through_actual_api_handler[case_03.json] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF0EC3B0>
+name = 'case_03.json'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('name',['case_03.json','case_08.json','repair_case10.json'])
+    def test_fixed_real_text_through_actual_api_handler(monkeypatch,name):
+        saved,raw = real_failure(name)
+        http,runtime,sdk = setup(monkeypatch,text=raw)
+        body = http.post('/chat',json={'message':saved['request']['message']}).json()
+>       assert body['response']==raw
+E       AssertionError: assert '你好！关于退款条件，我先...。本次未创建人工交接记录。' == '你好！关于退款条件，我先...功不代表资金立即到账**。'
+E         
+E         Skipping 157 identical leading characters in diff, use -v to show
+E           关于金额审核：**
+E         - - 单笔超过 **500 元**需人工审核；恰好 500 元不因金额单独触发审批
+E           
+E           不过，你的订单 **ORD-1001** 下单时间是 **2026-10-12**，目前订单状态为**已发货**。是否仍在 7 天窗口内、以及是否符合退款资格，需要我实际查询订单和退款记录后才能确认。
+E           ...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests\test_handoff_reply.py:74: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,413 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+________ test_fixed_real_text_through_actual_api_handler[case_08.json] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF0ECB30>
+name = 'case_08.json'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('name',['case_03.json','case_08.json','repair_case10.json'])
+    def test_fixed_real_text_through_actual_api_handler(monkeypatch,name):
+        saved,raw = real_failure(name)
+        http,runtime,sdk = setup(monkeypatch,text=raw)
+        body = http.post('/chat',json={'message':saved['request']['message']}).json()
+>       assert body['response']==raw
+E       AssertionError: assert '你好！关于会员积分，我需...。本次未创建人工交接记录。' == '你好！关于会员积分，我需...，我可以直接帮你查询处理。'
+E         
+E         Skipping 91 identical leading characters in diff, use -v to show
+E           不能凭猜测回答。
+E           
+E         - **建议：** 如果你需要了解会员积分规则，我可以帮你申请转接人工客服进一步确认。是否需要我为你创建这个交接记录？
+E         + 是否需要我为你创建这个交接记录？
+E           ...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests\test_handoff_reply.py:74: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,428 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_____ test_fixed_real_text_through_actual_api_handler[repair_case10.json] _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF0ED040>
+name = 'repair_case10.json'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('name',['case_03.json','case_08.json','repair_case10.json'])
+    def test_fixed_real_text_through_actual_api_handler(monkeypatch,name):
+        saved,raw = real_failure(name)
+        http,runtime,sdk = setup(monkeypatch,text=raw)
+        body = http.post('/chat',json={'message':saved['request']['message']}).json()
+>       assert body['response']==raw
+E       AssertionError: assert '你好！\n**\n\n\...。本次未创建人工交接记录。' == '你好！关于你之前申请的转...先看看能不能直接帮你处理。'
+E         
+E         - 你好！关于你之前申请的转人工，我需要如实说明：
+E         + 你好！
+E         + **
+E           
+E         - **目前无法确认已有真人客服接手。**
+E           ...
+E         
+E         ...Full output truncated (11 lines hidden), use '-vv' to show
+
+tests\test_handoff_reply.py:74: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,444 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u5355\u7b14\u8d85\u8fc7500\u5143\u9700\u8981\u4eba\u5de5\u5ba1\u6838\uff0c\u6070\u597d500\u5143\u4e0d\u56e0\u91d1\u989d\u89e6\u53d1\u5ba1\u6279\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF0ED4C0>
+text = '单笔超过500元需要人工审核，恰好500元不因金额触发审批。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '单笔超过500元需要人工审核，恰好500元不因金额触发审批。',
+        '模拟记录不代表真人客服已接单，也不代表已经发送通知。',
+        '目前无法确认已有真人客服接手。',
+        '不能保证真人客服已经接手。',
+        '如果已创建人工交接记录，可查看编号；目前尚未确认。',
+        '没有成功转接人工客服。',
+        '订单为已发货状态；退款申请成功不代表资金到账。',
+        '关于会员：\n\n当前未实现积分计算；可以说明能力边界。',
+    ])
+    def test_correct_explanation_is_unchanged_without_unrelated_handoff_footer(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text=text)
+        body = http.post('/chat',json={'message':'请解释当前业务规则。'}).json()
+>       assert body['response']==text
+E       AssertionError: assert '本次未创建人工交接记录。' == '单笔超过500元需要人工...500元不因金额触发审批。'
+E         
+E         - 单笔超过500元需要人工审核，恰好500元不因金额触发审批。
+E         + 本次未创建人工交接记录。
+
+tests\test_handoff_reply.py:93: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,457 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u6a21\u62df\u8bb0\u5f55\u4e0d\u4ee3\u8868\u771f\u4eba\u5ba2\u670d\u5df2\u63a5\u5355\uff0c\u4e5f\u4e0d\u4ee3\u8868\u5df2\u7ecf\u53d1\u9001\u901a\u77e5\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF2ECE90>
+text = '模拟记录不代表真人客服已接单，也不代表已经发送通知。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '单笔超过500元需要人工审核，恰好500元不因金额触发审批。',
+        '模拟记录不代表真人客服已接单，也不代表已经发送通知。',
+        '目前无法确认已有真人客服接手。',
+        '不能保证真人客服已经接手。',
+        '如果已创建人工交接记录，可查看编号；目前尚未确认。',
+        '没有成功转接人工客服。',
+        '订单为已发货状态；退款申请成功不代表资金到账。',
+        '关于会员：\n\n当前未实现积分计算；可以说明能力边界。',
+    ])
+    def test_correct_explanation_is_unchanged_without_unrelated_handoff_footer(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text=text)
+        body = http.post('/chat',json={'message':'请解释当前业务规则。'}).json()
+>       assert body['response']==text
+E       AssertionError: assert '本次未创建人工交接记录。' == '模拟记录不代表真人客服已接单，也不代表已经发送通知。'
+E         
+E         - 模拟记录不代表真人客服已接单，也不代表已经发送通知。
+E         + 本次未创建人工交接记录。
+
+tests\test_handoff_reply.py:93: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,469 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u76ee\u524d\u65e0\u6cd5\u786e\u8ba4\u5df2\u6709\u771f\u4eba\u5ba2\u670d\u63a5\u624b\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF2EF050>
+text = '目前无法确认已有真人客服接手。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '单笔超过500元需要人工审核，恰好500元不因金额触发审批。',
+        '模拟记录不代表真人客服已接单，也不代表已经发送通知。',
+        '目前无法确认已有真人客服接手。',
+        '不能保证真人客服已经接手。',
+        '如果已创建人工交接记录，可查看编号；目前尚未确认。',
+        '没有成功转接人工客服。',
+        '订单为已发货状态；退款申请成功不代表资金到账。',
+        '关于会员：\n\n当前未实现积分计算；可以说明能力边界。',
+    ])
+    def test_correct_explanation_is_unchanged_without_unrelated_handoff_footer(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text=text)
+        body = http.post('/chat',json={'message':'请解释当前业务规则。'}).json()
+>       assert body['response']==text
+E       AssertionError: assert '本次未创建人工交接记录。' == '目前无法确认已有真人客服接手。'
+E         
+E         - 目前无法确认已有真人客服接手。
+E         + 本次未创建人工交接记录。
+
+tests\test_handoff_reply.py:93: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,483 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u4e0d\u80fd\u4fdd\u8bc1\u771f\u4eba\u5ba2\u670d\u5df2\u7ecf\u63a5\u624b\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF2EC2C0>
+text = '不能保证真人客服已经接手。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '单笔超过500元需要人工审核，恰好500元不因金额触发审批。',
+        '模拟记录不代表真人客服已接单，也不代表已经发送通知。',
+        '目前无法确认已有真人客服接手。',
+        '不能保证真人客服已经接手。',
+        '如果已创建人工交接记录，可查看编号；目前尚未确认。',
+        '没有成功转接人工客服。',
+        '订单为已发货状态；退款申请成功不代表资金到账。',
+        '关于会员：\n\n当前未实现积分计算；可以说明能力边界。',
+    ])
+    def test_correct_explanation_is_unchanged_without_unrelated_handoff_footer(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text=text)
+        body = http.post('/chat',json={'message':'请解释当前业务规则。'}).json()
+>       assert body['response']==text
+E       AssertionError: assert '本次未创建人工交接记录。' == '不能保证真人客服已经接手。'
+E         
+E         - 不能保证真人客服已经接手。
+E         + 本次未创建人工交接记录。
+
+tests\test_handoff_reply.py:93: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,496 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u5982\u679c\u5df2\u521b\u5efa\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\uff0c\u53ef\u67e5\u770b\u7f16\u53f7\uff1b\u76ee\u524d\u5c1a\u672a\u786e\u8ba4\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF2ED070>
+text = '如果已创建人工交接记录，可查看编号；目前尚未确认。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '单笔超过500元需要人工审核，恰好500元不因金额触发审批。',
+        '模拟记录不代表真人客服已接单，也不代表已经发送通知。',
+        '目前无法确认已有真人客服接手。',
+        '不能保证真人客服已经接手。',
+        '如果已创建人工交接记录，可查看编号；目前尚未确认。',
+        '没有成功转接人工客服。',
+        '订单为已发货状态；退款申请成功不代表资金到账。',
+        '关于会员：\n\n当前未实现积分计算；可以说明能力边界。',
+    ])
+    def test_correct_explanation_is_unchanged_without_unrelated_handoff_footer(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text=text)
+        body = http.post('/chat',json={'message':'请解释当前业务规则。'}).json()
+>       assert body['response']==text
+E       AssertionError: assert '本次未创建人工交接记录。' == '如果已创建人工交接记录，可查看编号；目前尚未确认。'
+E         
+E         - 如果已创建人工交接记录，可查看编号；目前尚未确认。
+E         + 本次未创建人工交接记录。
+
+tests\test_handoff_reply.py:93: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,510 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u6ca1\u6709\u6210\u529f\u8f6c\u63a5\u4eba\u5de5\u5ba2\u670d\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF33C110>
+text = '没有成功转接人工客服。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '单笔超过500元需要人工审核，恰好500元不因金额触发审批。',
+        '模拟记录不代表真人客服已接单，也不代表已经发送通知。',
+        '目前无法确认已有真人客服接手。',
+        '不能保证真人客服已经接手。',
+        '如果已创建人工交接记录，可查看编号；目前尚未确认。',
+        '没有成功转接人工客服。',
+        '订单为已发货状态；退款申请成功不代表资金到账。',
+        '关于会员：\n\n当前未实现积分计算；可以说明能力边界。',
+    ])
+    def test_correct_explanation_is_unchanged_without_unrelated_handoff_footer(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text=text)
+        body = http.post('/chat',json={'message':'请解释当前业务规则。'}).json()
+>       assert body['response']==text
+E       AssertionError: assert '本次未创建人工交接记录。' == '没有成功转接人工客服。'
+E         
+E         - 没有成功转接人工客服。
+E         + 本次未创建人工交接记录。
+
+tests\test_handoff_reply.py:93: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,528 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u5df2\u6210\u529f\u8f6c\u63a5\u4eba\u5de5\u5ba2\u670d\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF33DC10>
+text = '已成功转接人工客服。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '已成功转接人工客服。',
+        '我已经为您创建模拟人工交接记录。',
+        '人工交接记录已创建成功。',
+        '真人客服已经接单。',
+        '已有真人客服接手了。',
+        '无法确认真人接单，但我已经帮你创建交接记录。',
+    ])
+    def test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text='**处理结果：**\n\n'+text+'\n\n请查看上述记录。')
+        body = http.post('/chat',json={'message':'请查询订单。'}).json()
+>       assert body['response']=='本次未创建人工交接记录。'
+E       AssertionError: assert '**处理结果：**\n\...。本次未创建人工交接记录。' == '本次未创建人工交接记录。'
+E         
+E         + **处理结果：**
+E         + 
+E         + 
+E         + 
+E         - 本次未创建人工交接记录。
+E         + 请查看上述记录。本次未创建人工交接记录。
+E         ? ++++++++
+
+tests\test_handoff_reply.py:109: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,557 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u6211\u5df2\u7ecf\u4e3a\u60a8\u521b\u5efa\u6a21\u62df\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF33EB40>
+text = '我已经为您创建模拟人工交接记录。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '已成功转接人工客服。',
+        '我已经为您创建模拟人工交接记录。',
+        '人工交接记录已创建成功。',
+        '真人客服已经接单。',
+        '已有真人客服接手了。',
+        '无法确认真人接单，但我已经帮你创建交接记录。',
+    ])
+    def test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text='**处理结果：**\n\n'+text+'\n\n请查看上述记录。')
+        body = http.post('/chat',json={'message':'请查询订单。'}).json()
+>       assert body['response']=='本次未创建人工交接记录。'
+E       AssertionError: assert '**处理结果：**\n\...。本次未创建人工交接记录。' == '本次未创建人工交接记录。'
+E         
+E         + **处理结果：**
+E         + 
+E         + 
+E         + 
+E         - 本次未创建人工交接记录。
+E         + 请查看上述记录。本次未创建人工交接记录。
+E         ? ++++++++
+
+tests\test_handoff_reply.py:109: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,574 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\u5df2\u521b\u5efa\u6210\u529f\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF33F3B0>
+text = '人工交接记录已创建成功。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '已成功转接人工客服。',
+        '我已经为您创建模拟人工交接记录。',
+        '人工交接记录已创建成功。',
+        '真人客服已经接单。',
+        '已有真人客服接手了。',
+        '无法确认真人接单，但我已经帮你创建交接记录。',
+    ])
+    def test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text='**处理结果：**\n\n'+text+'\n\n请查看上述记录。')
+        body = http.post('/chat',json={'message':'请查询订单。'}).json()
+>       assert body['response']=='本次未创建人工交接记录。'
+E       AssertionError: assert '**处理结果：**\n\...。本次未创建人工交接记录。' == '本次未创建人工交接记录。'
+E         
+E         + **处理结果：**
+E         + 
+E         + 
+E         + 
+E         - 本次未创建人工交接记录。
+E         + 请查看上述记录。本次未创建人工交接记录。
+E         ? ++++++++
+
+tests\test_handoff_reply.py:109: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,588 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u771f\u4eba\u5ba2\u670d\u5df2\u7ecf\u63a5\u5355\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF34B1D0>
+text = '真人客服已经接单。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '已成功转接人工客服。',
+        '我已经为您创建模拟人工交接记录。',
+        '人工交接记录已创建成功。',
+        '真人客服已经接单。',
+        '已有真人客服接手了。',
+        '无法确认真人接单，但我已经帮你创建交接记录。',
+    ])
+    def test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text='**处理结果：**\n\n'+text+'\n\n请查看上述记录。')
+        body = http.post('/chat',json={'message':'请查询订单。'}).json()
+>       assert body['response']=='本次未创建人工交接记录。'
+E       AssertionError: assert '**处理结果：**\n\...。本次未创建人工交接记录。' == '本次未创建人工交接记录。'
+E         
+E         + **处理结果：**
+E         + 
+E         + 
+E         + 
+E         - 本次未创建人工交接记录。
+E         + 请查看上述记录。本次未创建人工交接记录。
+E         ? ++++++++
+
+tests\test_handoff_reply.py:109: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,602 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u5df2\u6709\u771f\u4eba\u5ba2\u670d\u63a5\u624b\u4e86\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF34B080>
+text = '已有真人客服接手了。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '已成功转接人工客服。',
+        '我已经为您创建模拟人工交接记录。',
+        '人工交接记录已创建成功。',
+        '真人客服已经接单。',
+        '已有真人客服接手了。',
+        '无法确认真人接单，但我已经帮你创建交接记录。',
+    ])
+    def test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text='**处理结果：**\n\n'+text+'\n\n请查看上述记录。')
+        body = http.post('/chat',json={'message':'请查询订单。'}).json()
+>       assert body['response']=='本次未创建人工交接记录。'
+E       AssertionError: assert '**处理结果：**\n\...。本次未创建人工交接记录。' == '本次未创建人工交接记录。'
+E         
+E         + **处理结果：**
+E         + 
+E         + 
+E         + 
+E         - 本次未创建人工交接记录。
+E         + 请查看上述记录。本次未创建人工交接记录。
+E         ? ++++++++
+
+tests\test_handoff_reply.py:109: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,615 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+_ test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u65e0\u6cd5\u786e\u8ba4\u771f\u4eba\u63a5\u5355\uff0c\u4f46\u6211\u5df2\u7ecf\u5e2e\u4f60\u521b\u5efa\u4ea4\u63a5\u8bb0\u5f55\u3002] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019DFF33E000>
+text = '无法确认真人接单，但我已经帮你创建交接记录。'
+
+    @pytest.mark.usefixtures('authenticated_http')
+    @pytest.mark.parametrize('text',[
+        '已成功转接人工客服。',
+        '我已经为您创建模拟人工交接记录。',
+        '人工交接记录已创建成功。',
+        '真人客服已经接单。',
+        '已有真人客服接手了。',
+        '无法确认真人接单，但我已经帮你创建交接记录。',
+    ])
+    def test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion(monkeypatch,text):
+        http,runtime,sdk = setup(monkeypatch,text='**处理结果：**\n\n'+text+'\n\n请查看上述记录。')
+        body = http.post('/chat',json={'message':'请查询订单。'}).json()
+>       assert body['response']=='本次未创建人工交接记录。'
+E       AssertionError: assert '**处理结果：**\n\...。本次未创建人工交接记录。' == '本次未创建人工交接记录。'
+E         
+E         + **处理结果：**
+E         + 
+E         + 
+E         + 
+E         - 本次未创建人工交接记录。
+E         + 请查看上述记录。本次未创建人工交接记录。
+E         ? ++++++++
+
+tests\test_handoff_reply.py:109: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-10-14 22:56:44,629 [INFO] httpx: HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/chat "HTTP/1.1 200 OK"
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  E:\AAA_NEED\Echomind_new\EchoMind\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_handoff_reply.py::test_saved_real_model_body_and_format_survive_reply_processing[case_03.json]
+FAILED tests/test_handoff_reply.py::test_saved_real_model_body_and_format_survive_reply_processing[case_08.json]
+FAILED tests/test_handoff_reply.py::test_saved_real_model_body_and_format_survive_reply_processing[repair_case10.json]
+FAILED tests/test_handoff_reply.py::test_fixed_real_text_through_actual_api_handler[case_03.json]
+FAILED tests/test_handoff_reply.py::test_fixed_real_text_through_actual_api_handler[case_08.json]
+FAILED tests/test_handoff_reply.py::test_fixed_real_text_through_actual_api_handler[repair_case10.json]
+FAILED tests/test_handoff_reply.py::test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u5355\u7b14\u8d85\u8fc7500\u5143\u9700\u8981\u4eba\u5de5\u5ba1\u6838\uff0c\u6070\u597d500\u5143\u4e0d\u56e0\u91d1\u989d\u89e6\u53d1\u5ba1\u6279\u3002]
+FAILED tests/test_handoff_reply.py::test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u6a21\u62df\u8bb0\u5f55\u4e0d\u4ee3\u8868\u771f\u4eba\u5ba2\u670d\u5df2\u63a5\u5355\uff0c\u4e5f\u4e0d\u4ee3\u8868\u5df2\u7ecf\u53d1\u9001\u901a\u77e5\u3002]
+FAILED tests/test_handoff_reply.py::test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u76ee\u524d\u65e0\u6cd5\u786e\u8ba4\u5df2\u6709\u771f\u4eba\u5ba2\u670d\u63a5\u624b\u3002]
+FAILED tests/test_handoff_reply.py::test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u4e0d\u80fd\u4fdd\u8bc1\u771f\u4eba\u5ba2\u670d\u5df2\u7ecf\u63a5\u624b\u3002]
+FAILED tests/test_handoff_reply.py::test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u5982\u679c\u5df2\u521b\u5efa\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\uff0c\u53ef\u67e5\u770b\u7f16\u53f7\uff1b\u76ee\u524d\u5c1a\u672a\u786e\u8ba4\u3002]
+FAILED tests/test_handoff_reply.py::test_correct_explanation_is_unchanged_without_unrelated_handoff_footer[\u6ca1\u6709\u6210\u529f\u8f6c\u63a5\u4eba\u5de5\u5ba2\u670d\u3002]
+FAILED tests/test_handoff_reply.py::test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u5df2\u6210\u529f\u8f6c\u63a5\u4eba\u5de5\u5ba2\u670d\u3002]
+FAILED tests/test_handoff_reply.py::test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u6211\u5df2\u7ecf\u4e3a\u60a8\u521b\u5efa\u6a21\u62df\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\u3002]
+FAILED tests/test_handoff_reply.py::test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u4eba\u5de5\u4ea4\u63a5\u8bb0\u5f55\u5df2\u521b\u5efa\u6210\u529f\u3002]
+FAILED tests/test_handoff_reply.py::test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u771f\u4eba\u5ba2\u670d\u5df2\u7ecf\u63a5\u5355\u3002]
+FAILED tests/test_handoff_reply.py::test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u5df2\u6709\u771f\u4eba\u5ba2\u670d\u63a5\u624b\u4e86\u3002]
+FAILED tests/test_handoff_reply.py::test_unconfirmed_completion_gets_whole_safe_reply_not_fragment_deletion[\u65e0\u6cd5\u786e\u8ba4\u771f\u4eba\u63a5\u5355\uff0c\u4f46\u6211\u5df2\u7ecf\u5e2e\u4f60\u521b\u5efa\u4ea4\u63a5\u8bb0\u5f55\u3002]
+18 failed, 4 passed, 1 warning in 2.04s

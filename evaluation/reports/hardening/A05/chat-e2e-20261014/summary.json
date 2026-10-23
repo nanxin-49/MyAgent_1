@@ -1,0 +1,42 @@
+{
+  "status": "partial; basic demo acceptance not reached",
+  "baseline_chat_count": 10,
+  "baseline_model_requests": 11,
+  "repair_chat_count": 1,
+  "model_requests_total": 12,
+  "input_tokens_noncache": 13967,
+  "input_tokens_cache_read": 26240,
+  "input_tokens_total": 40207,
+  "output_tokens": 1671,
+  "cost_upper_estimate_usd": 0.014067300000000005,
+  "offpeak_cached_cost_estimate_usd": 0.0031763699999999995,
+  "billing_statement_verified": false,
+  "budget_max_requests": 30,
+  "budget_max_usd": 0.5,
+  "actual_rag_tool_calls": 0,
+  "actual_rewrite_calls": 0,
+  "actual_rerank_calls": 0,
+  "refunds_created": 0,
+  "cancellations_created": 0,
+  "baseline_handoffs_created": 2,
+  "unsolicited_baseline_handoff": 1,
+  "baseline_reviews": {
+    "pass_count": 5,
+    "partial_count": 3,
+    "fail_count": 2
+  },
+  "issues": {
+    "A05-CHAT-E2E-HANDOFF-PAST": "fixed/verify",
+    "A05-ANS24-REPLY": "P1 reproduced; deferred/known_open",
+    "DYNAMIC-REFRESH": "P1 candidate; no wrong amount observed",
+    "RAG-SELECTION": "not demonstrated"
+  },
+  "tests": {
+    "route_red_failed": 8,
+    "route_red_passed": 30,
+    "related_green_passed": 147,
+    "full_passed": 551,
+    "full_skipped": 3,
+    "full_warnings": 1
+  }
+}

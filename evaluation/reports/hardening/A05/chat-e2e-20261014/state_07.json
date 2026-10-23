@@ -1,0 +1,139 @@
+{
+  "before": {
+    "business": {
+      "products": {
+        "SKU-1001": {
+          "product_id": "SKU-1001",
+          "name": "CartCare Demo Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-1001": {
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-1001",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-12T13:48:07.920850+00:00"
+        },
+        "ORD-2001": {
+          "order_id": "ORD-2001",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-1001",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-12T13:48:07.920850+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-1001": {
+          "product_id": "SKU-1001",
+          "available_quantity": 12,
+          "reserved_quantity": 2,
+          "as_of": "2026-10-14T13:48:07.920850+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-1001": {
+          "shipment_id": "SHP-1001",
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-1001",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-16",
+          "updated_at": "2026-10-14T13:48:07.920850+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {}
+  },
+  "after": {
+    "business": {
+      "products": {
+        "SKU-1001": {
+          "product_id": "SKU-1001",
+          "name": "CartCare Demo Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-1001": {
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-1001",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-12T13:48:07.920850+00:00"
+        },
+        "ORD-2001": {
+          "order_id": "ORD-2001",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-1001",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-12T13:48:07.920850+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-1001": {
+          "product_id": "SKU-1001",
+          "available_quantity": 12,
+          "reserved_quantity": 2,
+          "as_of": "2026-10-14T13:48:07.920850+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-1001": {
+          "shipment_id": "SHP-1001",
+          "order_id": "ORD-1001",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-1001",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-16",
+          "updated_at": "2026-10-14T13:48:07.920850+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {}
+  },
+  "http_status": 200
+}

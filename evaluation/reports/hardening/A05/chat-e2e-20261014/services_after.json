@@ -1,0 +1,13 @@
+{
+  "knowledge_unchanged": true,
+  "memory_counts": {
+    "a05_e2e_20261014_topics": 0,
+    "a05_e2e_20261014_profile": 0
+  },
+  "isolated_redis_key_count": 2,
+  "isolated_redis_keys": [
+    "wm:customer-1:a05-e2e-20261014-customer1",
+    "summary:customer-1:a05-e2e-20261014-customer1"
+  ],
+  "api_old_pid_stopped": 33532
+}

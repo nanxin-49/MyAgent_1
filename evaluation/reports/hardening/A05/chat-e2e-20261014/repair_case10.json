@@ -1,0 +1,115 @@
+{
+  "scope": "single post-repair verification; excluded from original 10 results; process-local actions/handoffs reset on restart; isolated Memory retained",
+  "request": {
+    "message": "我刚才申请转人工了，现在有客服接手了吗？",
+    "conv_id": "a05-e2e-20261014-customer1"
+  },
+  "http_status": 200,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "bafa4768",
+    "response": "你好！\n**\n\n\n\n**我能帮你做的：**\n\n\n\n请问你目前最想解决的是哪个具体问题？告诉我，我先看看能不能直接帮你处理。本次未创建人工交接记录。",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 1922.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 1,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "trace": {
+    "request_id": "bafa4768",
+    "found": true,
+    "trace": {
+      "request_id": "bafa4768",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 1922.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 508,
+          "output_tokens": 168,
+          "latency_ms": 1922.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 10,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": true,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0.0
+      },
+      "request_latency_ms": 1953.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    12,
+    12
+  ]
+}

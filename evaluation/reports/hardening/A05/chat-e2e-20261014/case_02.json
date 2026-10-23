@@ -1,0 +1,172 @@
+{
+  "case": 2,
+  "request": {
+    "message": "我的快递到哪了？大概什么时候送到？",
+    "conv_id": "a05-e2e-20261014-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "latency_ms": 1984.0,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "f6b7e981",
+    "response": "已为你查到订单 **ORD-1001** 的物流信息：\n\n- **承运商**：demo-carrier\n- **运单号**：TRACK-1001\n- **物流状态**：运输中（in_transit）\n- **预计送达**：2026-10-16\n- **信息更新时间**：2026-10-14\n\n目前包裹正在运输途中，预计 **10月16日** 送达。物流信息可能会有更新，建议临近日期再留意一下。\n\n还需要我帮你做其他查询吗？",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [
+      "get_shipment"
+    ],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 1937.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 2,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "manual_review": null,
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "f6b7e981",
+    "found": true,
+    "trace": {
+      "request_id": "f6b7e981",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_shipment"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "f6b7e981",
+          "agent_type": "support",
+          "tool_name": "get_shipment",
+          "risk_level": "read",
+          "tool_use_id": "call_00_W9p611AB1kF3G34Fy8eG1226",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 16.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "shipment_id": "SHP-1001",
+            "status": "in_transit"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 1937.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 2,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 2272,
+          "output_tokens": 57,
+          "latency_ms": 1078.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 159,
+          "output_tokens": 113,
+          "latency_ms": 843.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 2,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 16.0
+      },
+      "request_latency_ms": 1984.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    3,
+    4
+  ],
+  "model_requests_for_case": 2
+}

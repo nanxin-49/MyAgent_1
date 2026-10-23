@@ -1,0 +1,126 @@
+{
+  "case": 6,
+  "request": {
+    "message": "我这单一共多少钱？通过什么渠道付款的？",
+    "conv_id": "a05-e2e-20261014-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "latency_ms": 1906.0,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "a5db0361",
+    "response": "你好！关于这两个问题，我需要如实说明一下：\n\n**1. 订单金额**\n\n订单 **ORD-1001** 的金额为 **¥129.90（CNY）**。\n\n需要说明的是：这是**订单总额**，系统目前**没有实付金额字段**，所以我无法确认你实际支付了多少。\n\n**2. 支付渠道**\n\n很抱歉，**当前系统没有接入支付渠道查询能力**，我无法查到你这笔订单是通过微信、支付宝还是银行卡等方式付款的，也无法核实相关的交易流水。\n\n如果你对扣款有疑问，可以告诉我你看到的支付摘要（比如渠道、金额），我可以帮你做进一步核实。\n\n请问还需要我帮你做其他查询吗？本次未创建人工交接记录。",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 1844.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 1,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "manual_review": null,
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "a5db0361",
+    "found": true,
+    "trace": {
+      "request_id": "a5db0361",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 1844.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 1017,
+          "output_tokens": 161,
+          "latency_ms": 1844.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 10,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0.0
+      },
+      "request_latency_ms": 1875.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    9,
+    9
+  ],
+  "model_requests_for_case": 1
+}

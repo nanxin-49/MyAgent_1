@@ -70,14 +70,34 @@ class SingleSupportAgent(BaseAgent):
             action_receipt = self._last_action_receipt()
             response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
             response.success = req.handoff.handoff_created or bool(action_receipt)
-        else:
-            # Wording guard only: generated handoff language cannot certify an
-            # absent record. It never changes any business state or escalated.
-            sentences = re.split(r"(?<=[。！？.!?\n])", response.content)
-            if any(re.search(r"人工|真人|转接|handoff|escalat|human|specialist", s, re.I) for s in sentences):
-                response.content = "".join(s for s in sentences if not re.search(
-                    r"人工|真人|转接|handoff|escalat|human|specialist", s, re.I)) + handoff_reply(req.handoff)
+        elif self._claims_completed_handoff(response.content):
+            # No receipt: fail closed on completion claims, without cutting
+            # sentences out of a formatted answer or attaching unrelated state.
+            response.content = handoff_reply(req.handoff)
         return response
+
+    @staticmethod
+    def _claims_completed_handoff(content):
+        """Narrow wording guard, not factual verification or an intent router."""
+        text = re.sub(r"[*_`]", "", content).lower()
+        completion = (
+            r"(?:已(?:经)?(?:成功)?|成功)(?:为[你您]|帮[你您])?"
+            r"(?:创建|登记|提交|转接|转|联系)(?:一条|一个|新|的|模拟|了)*(?:交接|人工|真人)"
+            r"|(?:交接(?:记录)?|人工(?:客服)?|真人(?:客服)?)"
+            r"(?:已(?:经)?(?:成功)?(?:创建|登记|提交|转接|接单|接手)|创建成功)"
+            r"|已有(?:真人|人工)(?:客服)?(?:接单|接手)"
+            r"|(?:already|successfully|have)\s+(?:been\s+)?"
+            r"(?:created|submitted|transferred|escalated)[^，,.!?;\n]{0,40}(?:handoff|human|specialist)"
+        )
+        qualified = (
+            r"(?:不代表|不意味着|不等于|无法确认|不能确认|不能保证|无法保证|未能|尚未|并未|没有|是否|如果|假如)"
+            r".{0,12}$|(?:does not mean|cannot confirm|can't confirm|never|not|if).{0,16}$"
+        )
+        for clause in re.split(r"[，,。！？.!?；;\n]|但是|但|不过|然而", text):
+            for claim in re.finditer(completion, clause):
+                if not re.search(qualified, clause[:claim.start()]):
+                    return True
+        return False
 
     def _needs_escalation(self, content):
         return False

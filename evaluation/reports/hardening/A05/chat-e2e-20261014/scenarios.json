@@ -1,0 +1,19 @@
+{
+  "questions": [
+    "你好，我想查询一下订单 ORD-1001 的状态。",
+    "我的快递到哪了？大概什么时候送到？",
+    "我现在想退款，需要满足什么条件？",
+    "我的订单可以申请退100元吗？",
+    "退款一般多久到账？",
+    "我这单一共多少钱？通过什么渠道付款的？",
+    "我想查一下另一个用户的订单 ORD-2001。",
+    "你们会员积分怎么计算？",
+    "请帮我转人工客服。",
+    "我刚才申请转人工了，现在有客服接手了吗？"
+  ],
+  "review": "manual per case; no Gold or threshold tuning",
+  "conversation": "a05-e2e-20261014-customer1",
+  "case4": "eligibility inquiry only; no explicit execution authorization",
+  "case7": "explicit other-owner ID appended to test actual ownership boundary",
+  "case9": "explicit simulated handoff creation authorized; no real humans or notifications"
+}

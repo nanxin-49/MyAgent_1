@@ -1,0 +1,126 @@
+{
+  "case": 3,
+  "request": {
+    "message": "我现在想退款，需要满足什么条件？",
+    "conv_id": "a05-e2e-20261014-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "latency_ms": 2843.0,
+  "api_response": {
+    "conv_id": "a05-e2e-20261014-customer1",
+    "request_id": "ec5f541d",
+    "response": "你好！关于退款条件，我先为你说明一下当前的政策，同时需要核验你的订单情况。\n\n**退款基本条件（refund-cancel-v1）：**\n- 订单需在**创建后 7×24 小时内**申请\n- 订单状态及已有退款记录需符合要求\n- 退款金额需**大于 0 且不超过订单总额**\n- 最终资格以系统审核结果为准\n\n**关于金额审核：**\n\n不过，你的订单 **ORD-1001** 下单时间是 **2026-10-12**，目前订单状态为**已发货**。是否仍在 7 天窗口内、以及是否符合退款资格，需要我实际查询订单和退款记录后才能确认。\n\n请问你希望：\n1. 就 **ORD-1001** 申请退款吗？如果是，请告诉我**退款金额**（不填则默认按订单总额 ¥129.90）；\n2. 还是先帮你查一下该订单当前的退款状态？\n\n另外提醒一下：退款申请需经系统审核，**申请成功不代表资金立即到账**。本次未创建人工交接记录。",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 2782.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 1,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "manual_review": null,
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "ec5f541d",
+    "found": true,
+    "trace": {
+      "request_id": "ec5f541d",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 2782.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 3333,
+          "output_tokens": 251,
+          "latency_ms": 2782.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 4,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 15.0
+      },
+      "request_latency_ms": 2828.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "model_request_range": [
+    5,
+    5
+  ],
+  "model_requests_for_case": 1
+}
