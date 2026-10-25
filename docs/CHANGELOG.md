@@ -46,3 +46,10 @@
   - 保留 `data/chroma`（Compose 挂载点）和 `logs/`（运行时目录）。
 - **结果**：根目录剩 19 个目录，全部对应源码、运行数据、测试、评测或文档；无空目录（除上述两个运行时目录）。
 - **验证**：`pytest` **577 passed / 3 skipped**；Node **12 passed**。
+
+## 2026-10-25 — H0-1 修复 CI setup-uv 版本
+
+- **改动**：`.github/workflows/tests.yml` 中 `astral-sh/setup-uv@v10` → `@v10.3.2`（标签已用 `git ls-remote` 核实存在）。
+- **验证**：`uv lock --check` 53 packages；`pytest` **577 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
+- **状态**：`verify`；远端 CI 尚未运行（功能分支推送不触发，需 PR 或 `workflow_dispatch`）。
+- **报告**：`docs/reports/H0-1.md`。建议提交信息：`ci: pin setup-uv to v10.3.2`。
