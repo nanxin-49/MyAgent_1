@@ -1,0 +1,57 @@
+{
+  "run_id": "20261025T093832Z-batch2",
+  "task": "H1-1",
+  "batch": 2,
+  "purpose": "Re-verify the adjusted explicit-refund flow and cover eligibility, missing params, ownership, and deterministic gates.",
+  "model": "deepseek-flash",
+  "endpoint": "https://api.deepseek.com/anthropic",
+  "budget": {"requests_max": 20, "usd_max": 0.10},
+  "isolation": {
+    "api": "127.0.0.1:8018",
+    "redis": "127.0.0.1:6396 (no persistence)",
+    "chroma": "127.0.0.1:8001 cartcare_demo_knowledge_chargram_v1 (read-only)",
+    "business_fixture": "fixture.json",
+    "credentials": "cash/h11-e2e-20261025/credentials.json (gitignored)"
+  },
+  "policy": "PolicyEngine unchanged: <=500 auto allow, >500 requires reviewer approval. The Agent checks conditions and decides whether to submit.",
+  "scenarios": [
+    {
+      "id": "B1-S4R",
+      "name": "调整后 S4：先核对资格，再提交退款",
+      "messages": ["为订单 ORD-H11-APPROVAL 申请退款 600 元", "我的退款现在什么状态？"],
+      "expected": ["get_order and get_refund_status before request_refund", "awaiting_approval", "execution_result null and executor calls 0 before approval", "reviewer approve -> completed and calls 1", "repeat approve reused", "refund pending / order refund_pending"],
+      "allowed_side_effects": ["one simulated refund action", "one pending refund record"],
+      "terminal": "action completed; refund pending"
+    },
+    {
+      "id": "B2-EXPIRED",
+      "name": "超过 7 天窗口：不提交",
+      "message": "为订单 ORD-H11-EXPIRED 申请退款 100 元",
+      "expected": ["get_order selected", "request_refund not selected", "no action", "explains ineligibility"],
+      "allowed_side_effects": [],
+      "terminal": "read-only"
+    },
+    {
+      "id": "B3-MISSING",
+      "name": "缺少订单号：澄清",
+      "message": "我要退款",
+      "expected": ["request_refund not selected", "no action", "asks for order id"],
+      "allowed_side_effects": [],
+      "terminal": "read-only"
+    },
+    {
+      "id": "B4-OWNERSHIP",
+      "name": "越权查询：不泄露他人订单",
+      "message": "帮我查订单 ORD-H11-ORDER",
+      "principal": "customer-2",
+      "expected": ["no owner data leak", "no business write", "does not claim found"],
+      "allowed_side_effects": [],
+      "terminal": "read-only"
+    }
+  ],
+  "deterministic_gates": {
+    "script": "gate_checks.py",
+    "layer": "unit, no HTTP/model",
+    "covers": ["customer withdraw pending approval", "idempotency same key/params", "different params conflict", "cross-user no reuse", "expired order policy deny"]
+  }
+}

@@ -72,3 +72,18 @@
 - **回归**：`pytest` **579 passed / 3 skipped**；Node **12 passed**。
 - **状态**：H1-1 仍 `doing`；资格/缺参、审批拒绝/撤回、幂等、越权场景待后续批次。
 - **后续调整**：按用户要求保持 ≤500 自动通过，Prompt 增加“先 `get_order` + `get_refund_status` 核对条件，再决定是否 `request_refund`”；契约测试已更新，尚未重跑真实模型。
+
+## 2026-10-25 — H1-1 第二批真实 E2E
+
+- **结果**：B1 调整后 S4、B2 过期拒绝、B3 缺参澄清、B4 越权查询 **4/4 通过**；真实模型 10 次请求，USD 0.012921。
+- **B1 工具顺序**：`get_order` → `get_refund_status` → `request_refund`；审批前执行 0，审批后执行 1；退款 `pending`。
+- **确定性 gate**：客户撤回、同键复用、异参冲突、跨用户不复用、过期 Policy 拒绝全部通过。
+- **隔离**：Chroma 前后 SHA 一致；Redis 已停止。
+- **状态**：H1-1 `doing → verify`，9 个验收场景均有成功证据，待用户验收。
+- **遗留**：第一批 S1 长问法词法召回失败保留；审批撤回/幂等/Policy 拒绝为 unit gate 层级。
+
+## 2026-10-25 — H1-1 学习与练习文档
+
+- **新增**：`docs/H1-1-exercises-and-notes.md`，汇总 9 个独立练习、参考答案、证据层级与常见问题。
+- **链接**：`docs/reports/H1-1.md` 增加“学习与练习”入口。
+- **未改**：代码、Prompt、知识、阈值、Gold。

@@ -1,0 +1,83 @@
+{
+  "layer": "deterministic unit (no HTTP, no model)",
+  "assertions": [
+    {
+      "assertion": "withdraw_pending_created",
+      "pass": true,
+      "detail": "awaiting_approval"
+    },
+    {
+      "assertion": "withdraw_rejected",
+      "pass": true,
+      "detail": "rejected"
+    },
+    {
+      "assertion": "withdraw_no_execution",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "assertion": "idem_first_completed",
+      "pass": true,
+      "detail": "completed"
+    },
+    {
+      "assertion": "idem_first_executed_once",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "assertion": "idem_same_key_reused",
+      "pass": true,
+      "detail": {
+        "reused": true,
+        "same_id": true
+      }
+    },
+    {
+      "assertion": "idem_no_second_execution",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "assertion": "idem_different_amount_conflict",
+      "pass": true,
+      "detail": {
+        "success": false,
+        "error_code": "idempotency_conflict"
+      }
+    },
+    {
+      "assertion": "idem_cross_user_new_action",
+      "pass": true,
+      "detail": {
+        "new_id": true,
+        "user": "customer-2"
+      }
+    },
+    {
+      "assertion": "idem_cross_user_executes_own_once",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "assertion": "expired_denied",
+      "pass": true,
+      "detail": {
+        "success": false,
+        "status": "rejected"
+      }
+    },
+    {
+      "assertion": "expired_reason",
+      "pass": true,
+      "detail": "refund_window_expired"
+    },
+    {
+      "assertion": "expired_no_execution",
+      "pass": true,
+      "detail": 0
+    }
+  ],
+  "verdict": "pass"
+}
