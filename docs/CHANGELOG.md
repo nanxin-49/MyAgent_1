@@ -96,3 +96,12 @@
 - **验证**：`pytest` **589 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
 - **限制**：context_compression 在评测工厂中暂无可观察效果（工厂未构造 Memory）；policy_guard 仅评测假后端；loop_control 关闭仍有 1000 轮硬停止。
 - **状态**：H2-1 `todo → verify`。
+
+## 2026-10-25 — H2-2 录制回放 + 故障注入 + 轨迹打分 + pass^k
+
+- **新增**：`evaluation/trajectory.py`（schema/录制器/H1-1 ledger 转换）、`evaluation/fault_injection.py`（5 类故障、on_call/sticky）、`evaluation/run_harness_eval.py`、`evaluation/cases/h2_2_cases.json`、`evaluation/trajectories/` 样本、5 个测试文件（16 测试）。
+- **扩展**：`ScriptedModel` 支持 canonical content/stop_reason/usage/error 与 `from_trajectory`；`agent_trace_eval` 增加轨迹/禁止调用/终态评分；`system_eval` 增加 `pass_metrics`（pass@runs / pass^runs）。
+- **运行**：`python -m evaluation.run_harness_eval` → pass@runs 6/6，pass^runs 5/6，trajectory_accuracy 7/8，forbidden_call_rate 0/8。
+- **验证**：`pytest` **605 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
+- **限制**：invalid_arguments handler 级非 validation 原形；RAG 失败统一 degraded；动作无 timeout；无本次真实模型调用。
+- **状态**：H2-2 `todo → verify`。
