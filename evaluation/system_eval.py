@@ -45,6 +45,7 @@ class SystemEvalCase:
     observed: dict[str, Any] = field(default_factory=dict)
     mode: str = "component_replay"
     error: str | None = None
+    run: int | None = None
 
     def __post_init__(self) -> None:
         if not self.case_id or not self.domain or not isinstance(self.expected, dict):
@@ -60,6 +61,8 @@ def _tool_metrics(cases: list[SystemEvalCase]) -> dict[str, Any]:
     failures = [(e, o) for e, o in rows if "technical_failure" in o]
     invalid = [(e, o) for e, o in rows if "invalid_tool" in o]
     unnecessary = [(e, o) for e, o in rows if "unnecessary_tool_call" in o]
+    trajectory = [(e, o) for e, o in rows if "trajectory_match" in o]
+    forbidden = [(e, o) for e, o in rows if "forbidden_call" in o]
     def selected_correct(row: tuple[dict[str, Any], dict[str, Any]]) -> bool:
         expected, observed = row
         chosen = observed["selected_by_agent"]
@@ -77,6 +80,8 @@ def _tool_metrics(cases: list[SystemEvalCase]) -> dict[str, Any]:
         "technical_failure_rate": _fraction(failures, lambda row: row[1]["technical_failure"]),
         "invalid_tool_rate": _fraction(invalid, lambda row: row[1]["invalid_tool"]),
         "unnecessary_tool_call_rate": _fraction(unnecessary, lambda row: row[1]["unnecessary_tool_call"]),
+        "trajectory_accuracy": _fraction(trajectory, lambda row: row[1]["trajectory_match"]),
+        "forbidden_call_rate": _fraction(forbidden, lambda row: row[1]["forbidden_call"]),
     }
     for risk in ("read", "write", "dangerous"):
         group = [(e, o) for e, o in outcomes if o.get("risk_level") == risk]
@@ -202,12 +207,42 @@ def detect_regressions(current: dict[str, Any], baseline: dict[str, Any] | None 
                     continue
                 if (domain, name) in SAFETY_METRICS:
                     continue
-                lower_is_better = name.endswith("_rate") and name in {"invalid_tool_rate", "unnecessary_tool_call_rate", "false_usable_rate"}
+                lower_is_better = name.endswith("_rate") and name in {
+                    "invalid_tool_rate", "unnecessary_tool_call_rate", "false_usable_rate",
+                    "forbidden_call_rate",
+                }
                 if (not lower_is_better and previous > 0 and item["value"] < previous * 0.95) or (
                     lower_is_better and item["value"] > previous + 0.05
                 ):
                     regressions.append(f"{domain}.{name}: {previous} -> {item['value']}")
     return regressions
+
+
+def pass_metrics(cases: list[SystemEvalCase]) -> dict[str, Any]:
+    """pass@runs (any success) and pass^runs (all successes) per case.
+
+    ``run`` is an explicit repetition id; it is deliberately not ``k`` because
+    ``k`` already means retrieval depth in this module.
+    """
+    grouped: dict[str, dict[int, bool]] = {}
+    for case in cases:
+        if case.run is None:
+            continue
+        passed = case.observed.get("passed")
+        if passed is None:
+            checks = case.observed.get("checks")
+            passed = bool(checks) and all(checks.values()) if isinstance(checks, dict) else False
+        grouped.setdefault(case.case_id, {})[case.run] = bool(passed)
+    rows = []
+    for case_id, runs in sorted(grouped.items()):
+        values = list(runs.values())
+        rows.append({"case_id": case_id, "runs": len(values), "passes": sum(values),
+                     "pass@runs": any(values), "pass^runs": all(values)})
+    return {
+        "cases": rows,
+        "pass@runs": _fraction(rows, lambda row: row["pass@runs"]),
+        "pass^runs": _fraction(rows, lambda row: row["pass^runs"]),
+    }
 
 
 def evaluate_system(cases: list[SystemEvalCase], *, k: int = 3,
@@ -238,6 +273,7 @@ def evaluate_system(cases: list[SystemEvalCase], *, k: int = 3,
         "errors": [{"case_id": case.case_id, "error": case.error} for case in cases if case.error],
         "metrics": metrics,
         "threshold_sweep": threshold_sweep(sweep_cases, (0.2, 0.35, 0.5, 0.7), k=k) if sweep_cases is not None else [],
+        "pass_metrics": pass_metrics(cases),
         "regressions": detect_regressions(metrics, baseline),
         "cases": [{"case_id": case.case_id, "domain": case.domain, "mode": case.mode,
                    "expected": case.expected, "observed": case.observed, "error": case.error} for case in cases],

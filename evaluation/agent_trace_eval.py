@@ -26,6 +26,57 @@ def _arguments_match(expected: dict[str, Any], actual: dict[str, Any], tool: str
     return not (set(actual) - set(expected) - allowed_extra)
 
 
+def trajectory_match(expected: list[str], observed: list[str], mode: str = "partial") -> bool:
+    """Compare tool names.
+
+    ordered: exact sequence and count (no extras).
+    unordered: same multiset, any order.
+    partial: expected is a subsequence; extra observed calls are allowed.
+    """
+    if mode == "ordered":
+        return list(observed) == list(expected)
+    if mode == "unordered":
+        return sorted(observed) == sorted(expected)
+    if mode == "partial":
+        iterator = iter(observed)
+        return all(any(item == wanted for item in iterator) for wanted in expected)
+    raise ValueError(f"unsupported trajectory mode: {mode}")
+
+
+def forbidden_call(expected: list[str], observed: list[str]) -> bool:
+    return any(name in expected for name in observed)
+
+
+def terminal_state_match(expected: dict[str, Any], observed: dict[str, Any] | None) -> bool:
+    observed = observed or {}
+    return all(observed.get(key) == value for key, value in expected.items())
+
+
+def score_trajectory(traces: list[dict[str, Any]], expected: dict[str, Any],
+                     terminal_state: dict[str, Any] | None = None) -> dict[str, bool]:
+    names = [trace.get("tool_name") for trace in traces]
+    checks: dict[str, bool] = {}
+    if "tools" in expected:
+        checks["trajectory"] = trajectory_match(
+            list(expected["tools"]), names, expected.get("tool_mode", "partial"))
+    if "forbidden_tools" in expected:
+        checks["forbidden_tools"] = not forbidden_call(expected["forbidden_tools"], names)
+    if "error_codes" in expected:
+        observed_codes = [trace.get("error_code") for trace in traces]
+        checks["error_codes"] = all(code in observed_codes for code in expected["error_codes"])
+    for tool, args in (expected.get("key_args") or {}).items():
+        checks[f"key_args:{tool}"] = any(
+            trace.get("tool_name") == tool
+            and isinstance(trace.get("validated_input"), dict)
+            and _arguments_match(args, trace["validated_input"], tool)
+            for trace in traces
+        )
+    if "terminal_state" in expected:
+        checks["terminal_state"] = terminal_state_match(
+            expected["terminal_state"], terminal_state)
+    return checks
+
+
 def score_agent_records(catalog: list[dict[str, Any]], records: list[dict[str, Any]]) -> dict[str, Any]:
     cases = {case["id"]: case for case in catalog}
     rows: list[SystemEvalCase] = []
@@ -61,6 +112,17 @@ def score_agent_records(catalog: list[dict[str, Any]], records: list[dict[str, A
                                         or any(names.count(name) > 1 and name in {
                                             "request_refund", "request_cancel_order"} for name in names)}
             checks["tool_selection"] = expected_tool in names if expected_tool else not names
+            trajectory_checks = score_trajectory(traces, expected, record.get("terminal_state"))
+            if "trajectory" in trajectory_checks:
+                observed["trajectory_match"] = trajectory_checks["trajectory"]
+                checks["trajectory"] = trajectory_checks["trajectory"]
+            if "forbidden_tools" in trajectory_checks:
+                observed["forbidden_call"] = not trajectory_checks["forbidden_tools"]
+                checks["forbidden_tools"] = trajectory_checks["forbidden_tools"]
+            for key, value in trajectory_checks.items():
+                if key.startswith("key_args:") or key == "terminal_state":
+                    checks[key] = value
+                    observed[key] = value
             if target and target.get("validated_input") is not None and "arguments" in case:
                 observed["arguments"] = target["validated_input"]
                 observed["arguments_match"] = _arguments_match(case["arguments"], target["validated_input"], expected_tool)

@@ -6,6 +6,7 @@ from dataclasses import replace
 
 from core.auth import Principal
 from core.harness import HarnessConfig
+from evaluation.fault_injection import FaultInjector, wrap_tools
 
 
 EVALUATION_PRINCIPAL = Principal(
@@ -15,7 +16,7 @@ EVALUATION_PRINCIPAL = Principal(
 
 class EvaluationRuntimeFactory:
     def __init__(self, *, fixture_data, cfg, knowledge_tool, skills_dir, max_prompt_chars,
-                 harness: HarnessConfig = HarnessConfig()):
+                 harness: HarnessConfig = HarnessConfig(), faults=(), fail_operations=()):
         # Immutable serialized fixture, captured before chat mutates any records.
         self._fixture_json = json.dumps(fixture_data)
         self._cfg = dict(cfg)
@@ -23,6 +24,8 @@ class EvaluationRuntimeFactory:
         self._skills_dir = skills_dir
         self._max_prompt_chars = max_prompt_chars
         self._harness = harness
+        self._faults = list(faults or ())
+        self._fail_operations = tuple(fail_operations or ())
 
     @asynccontextmanager
     async def __call__(self):
@@ -34,9 +37,11 @@ class EvaluationRuntimeFactory:
         from mcp.tool_manager import MCPToolManager
         from providers.mock_backend import InMemoryBusinessBackend
 
-        backend = InMemoryBusinessBackend(json.loads(self._fixture_json))
+        backend = InMemoryBusinessBackend(json.loads(self._fixture_json),
+                                          fail_operations=self._fail_operations)
         service = ActionService(business_backend=backend,
-            action_backend=InMemoryBusinessActionBackend(backend.state),
+            action_backend=InMemoryBusinessActionBackend(
+                backend.state, fail_operations=self._fail_operations),
             harness=self._harness)
         skills = SkillManager(root_dir=self._skills_dir, max_prompt_chars=self._max_prompt_chars)
         skills.load()
@@ -52,6 +57,8 @@ class EvaluationRuntimeFactory:
             tools = build_shared_rag_tools(manager)
             tools.update(build_business_tools(backend))
             tools.update(build_action_tools(service))
+            if self._faults:
+                tools = wrap_tools(tools, FaultInjector(self._faults))
             runtime.set_shared_tools(tools)
             yield runtime
         finally:
