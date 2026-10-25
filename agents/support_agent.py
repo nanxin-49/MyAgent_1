@@ -10,6 +10,7 @@ from agents.agent_orchestrator import AgentProfile, AgentType, BaseAgent, Genera
 from agents.tools import general_tools, technical_tools, billing_tools, escalation_tools
 from core.model_observation import ObservedClient, model_events
 from core.handoff import HandoffService, HandoffResult, explicit_handoff, handoff_reply
+from core.harness import HarnessConfig
 from core.tool_contract import execute_tool
 from agents.tools import build_handoff_tools
 from agents.agent_orchestrator import AgentResponse
@@ -64,16 +65,17 @@ class SingleSupportAgent(BaseAgent):
         else:
             response = await super().handle(req)
         response.escalate = req.handoff.handoff_created
-        if req.handoff.handoff_requested or req.handoff.handoff_failed or any(
-            t.get("tool_name") == "request_handoff" for t in response.tool_traces
-        ):
-            action_receipt = self._last_action_receipt()
-            response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
-            response.success = req.handoff.handoff_created or bool(action_receipt)
-        elif self._claims_completed_handoff(response.content):
-            # No receipt: fail closed on completion claims, without cutting
-            # sentences out of a formatted answer or attaching unrelated state.
-            response.content = handoff_reply(req.handoff)
+        if self._harness.output_consistency:
+            if req.handoff.handoff_requested or req.handoff.handoff_failed or any(
+                t.get("tool_name") == "request_handoff" for t in response.tool_traces
+            ):
+                action_receipt = self._last_action_receipt()
+                response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
+                response.success = req.handoff.handoff_created or bool(action_receipt)
+            elif self._claims_completed_handoff(response.content):
+                # No receipt: fail closed on completion claims, without cutting
+                # sentences out of a formatted answer or attaching unrelated state.
+                response.content = handoff_reply(req.handoff)
         return response
 
     @staticmethod
@@ -146,13 +148,14 @@ class SupportRuntime:
     """One topology, independent Agent state per request, shared guarded handlers."""
     supports_routing = False
 
-    def __init__(self, api_key, model, base_url=None, skill_manager=None, client=None):
+    def __init__(self, api_key, model, base_url=None, skill_manager=None, client=None, *, harness=None):
         kwargs = {"api_key": api_key}
         if base_url:
             kwargs["base_url"] = base_url
         self._raw_client = client or AsyncAnthropic(**kwargs)
         self._client = ObservedClient(self._raw_client, "support")
         self._model, self._skills = model, skill_manager
+        self._harness = harness or HarnessConfig()
         self._tools = {}
         self.handoff_service = HandoffService()
         self._traces = deque(maxlen=int(os.getenv("ECHOMIND_TOOL_TRACE_MAX", "200")))
@@ -166,7 +169,7 @@ class SupportRuntime:
 
     def make_agent(self):
         agent = SingleSupportAgent(self._client, self._model,
-            AllRoleSkills(self._skills) if self._skills else None)
+            AllRoleSkills(self._skills) if self._skills else None, harness=self._harness)
         agent.set_shared_tools({**self._tools, **build_handoff_tools(self.handoff_service)})
         agent.profile = replace(agent.profile, tool_scope=tuple(agent.get_tools()))
         return agent

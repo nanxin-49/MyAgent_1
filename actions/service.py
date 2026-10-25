@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 from threading import RLock
 from typing import Any, Callable
 from core.auth import Principal
+from core.harness import HarnessConfig
 
 from policies import PolicyDecision, PolicyDecisionType, PolicyEngine
 from providers import OrderProvider, RefundProvider
@@ -33,11 +34,13 @@ class ActionService:
         policy_engine: PolicyEngine | None = None,
         store: ActionStore | None = None,
         clock: Callable[[], datetime] | None = None,
+        harness: HarnessConfig | None = None,
     ) -> None:
         self._business_backend = business_backend
         self._order_provider = OrderProvider(business_backend)
         self._refund_provider = RefundProvider(business_backend)
         self._policy = policy_engine or PolicyEngine()
+        self._policy_guard = (harness or HarnessConfig()).policy_guard
         self._store = store or InMemoryActionStore()
         self._executor = ActionExecutor(action_backend)
         self._clock = clock or (lambda: datetime.now(timezone.utc))
@@ -308,6 +311,18 @@ class ActionService:
             return self._fail_action(action, "execution_failure", str(exc))
 
     def _evaluate(self, action_type, order, user_id, amount, existing_refund):
+        if not self._policy_guard:
+            return PolicyDecision(
+                action="refund" if action_type is ActionType.REFUND else "cancel",
+                decision=PolicyDecisionType.ALLOW,
+                reason_code="harness_policy_disabled",
+                policy_version=self._policy.policy_version,
+                explanation="Policy guard disabled for evaluation",
+                order_id=order.order_id,
+                amount=amount if amount is not None else order.total_amount,
+                evaluated_at=self._now(),
+                requires_approval=False,
+            )
         if action_type is ActionType.REFUND:
             return self._policy.evaluate_refund(
                 order,

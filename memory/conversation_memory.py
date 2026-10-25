@@ -11,6 +11,7 @@ from urllib.parse import quote
 
 import chromadb
 import redis.asyncio as redis
+from core.harness import HarnessConfig
 from mcp.knowledge_embeddings import EMBEDDING_VERSION, embed_query
 from memory.policy import (compressed_summary, episodic_topics, explicit_preferences,
                            fresh_metadata, validated_preferences)
@@ -89,8 +90,10 @@ class MemoryManager:
         api_key:      str = "",
         base_url:     Optional[str] = None,
         model:        str = "claude-3-5-sonnet-20241022",
+        harness:      Optional[HarnessConfig] = None,
     ):
         self._redis = redis.from_url(redis_url, decode_responses=True)
+        self._context_compression = (harness or HarnessConfig()).context_compression
 
         # ChromaDB：只连接独立服务（docker compose 模式）；chroma_path 仅为兼容旧调用方保留。
         try:
@@ -143,8 +146,9 @@ class MemoryManager:
         }))
         await self._redis.expire(key, 86400)  # 24h TTL
 
-        # 超过压缩阈值时触发压缩
-        if await self._redis.llen(key) >= self.COMPRESS_AT:
+        # 超过压缩阈值时触发压缩（评测可关闭；默认开启）
+        if (getattr(self, "_context_compression", True)
+                and await self._redis.llen(key) >= self.COMPRESS_AT):
             await self._compress(user_id, conv_id)
 
     async def update_profile(self, user_id: str, conv_id: str) -> None:

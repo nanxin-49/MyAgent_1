@@ -17,6 +17,7 @@
 """
 import asyncio
 from core.auth import Principal
+from core.harness import HarnessConfig
 import json
 import logging
 import os
@@ -191,11 +192,14 @@ class BaseAgent:
         model: str,
         skill_manager: Optional[Any] = None,
         profile: Optional[AgentProfile] = None,
+        *,
+        harness: Optional[HarnessConfig] = None,
     ):
         self._client = client
         self.profile = profile or self.profile
         self._model  = self.profile.model or model
         self._skill_manager = skill_manager
+        self._harness = harness or HarnessConfig()
         self.stats   = AgentStats()
         self._last_tools_used: List[str] = []
         self._last_tool_traces: List[Dict[str, Any]] = []
@@ -263,7 +267,7 @@ class BaseAgent:
         tools = self.get_tools()
         tools_used: List[str] = []
         tool_traces: List[Dict[str, Any]] = []
-        for _ in range(3):
+        for _ in range(self._harness.tool_round_limit):
             request_kwargs: Dict[str, Any] = {
                 "model": self._model,
                 "max_tokens": self.profile.max_tokens,
@@ -403,10 +407,16 @@ class BaseAgent:
                 self._last_tools_used = list(tools_used)
                 self._last_tool_traces = list(tool_traces)
                 req.handoff_evidence = list(tool_traces)
+                tool_payload = result
+                if (not self._harness.error_feedback
+                        and isinstance(result, dict) and result.get("success") is False):
+                    # Keep the required one-tool_result-per-tool_use shape while
+                    # withholding error details from the model (ablation only).
+                    tool_payload = {"success": True, "acknowledged": True}
                 tool_results.append({
                     "type": "tool_result",
                     "tool_use_id": tool_use_id,
-                    "content": json.dumps(result, ensure_ascii=False),
+                    "content": json.dumps(tool_payload, ensure_ascii=False),
                 })
             messages.append({"role": "user", "content": tool_results})
 
