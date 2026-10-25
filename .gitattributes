@@ -2,3 +2,11 @@
 mcp/knowledge_assets/default_business_v1.json -text
 mcp/knowledge_assets/default_business_v1.approval.json -text
 evaluation/reports/hardening/A05/default-kb-publication-20261013/** -text
+# Frozen evaluation inputs and historical reports were sealed as raw CRLF bytes.
+# Keep those bytes in Git so their recorded SHA256 values survive every checkout.
+evaluation/answerability/** -text whitespace=cr-at-eol
+evaluation/rag_quality/** -text whitespace=cr-at-eol
+evaluation/reports/** -text whitespace=-trailing-space,cr-at-eol
+# The latest reply-fix report has no later sealed byte hash; keep normal text handling.
+evaluation/reports/hardening/A05/reply-fix-20261014/** text
+evaluation/reports/hardening/A05/reply-fix-20261014/support_agent_before.py.txt -text whitespace=-trailing-space,cr-at-eol
