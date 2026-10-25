@@ -1,0 +1,741 @@
+{
+  "scenario": "S3",
+  "turn1": {
+    "request": {
+      "message": "帮我查订单 ORD-H11-ORDER 的状态",
+      "conv_id": "h11-s3-customer1"
+    },
+    "principal": {
+      "subject_id": "e2e-customer-1",
+      "customer_id": "customer-1",
+      "roles": [
+        "customer"
+      ]
+    },
+    "http_status": 200,
+    "api_response": {
+      "conv_id": "h11-s3-customer1",
+      "request_id": "9675298a",
+      "response": "订单 ORD-H11-ORDER 当前状态为**已发货（shipped）**。\n\n- 商品：SKU-H11 × 1，单价 129.90 CNY\n- 订单金额：129.90 CNY（订单总额，非实付金额核验）\n- 下单时间：2026-10-23\n\n需要我继续查一下这个订单的物流进度吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 1843.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace_http_status": 200,
+    "trace": {
+      "request_id": "9675298a",
+      "found": true,
+      "trace": {
+        "request_id": "9675298a",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "get_order"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "9675298a",
+            "agent_type": "support",
+            "tool_name": "get_order",
+            "risk_level": "read",
+            "tool_use_id": "call_00_8gB7ehN0INCt0SSMHVfg3469",
+            "input": {
+              "order_id": "ORD-H11-ORDER"
+            },
+            "validated_input": {
+              "order_id": "ORD-H11-ORDER"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "rerank_status": null,
+            "retrieval_status": null,
+            "citations": [],
+            "action_result": null,
+            "handoff_result": null,
+            "business_result": {
+              "order_id": "ORD-H11-ORDER",
+              "status": "shipped",
+              "total_amount": "129.90"
+            },
+            "retrieval_hits": null,
+            "helper_result": null,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 1843.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 2,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 2748,
+            "output_tokens": 42,
+            "latency_ms": 1062.0
+          },
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 233,
+            "output_tokens": 83,
+            "latency_ms": 781.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 32.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 1875.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      }
+    }
+  },
+  "turn2": {
+    "request": {
+      "message": "现在呢？",
+      "conv_id": "h11-s3-customer1"
+    },
+    "principal": {
+      "subject_id": "e2e-customer-1",
+      "customer_id": "customer-1",
+      "roles": [
+        "customer"
+      ]
+    },
+    "http_status": 200,
+    "api_response": {
+      "conv_id": "h11-s3-customer1",
+      "request_id": "d8a28e56",
+      "response": "刚重新查了一下，状态有更新：\n\n**订单 ORD-H11-ORDER：已签收（delivered）**\n- 商品：SKU-H11 × 1，单价 129.90 CNY\n- 订单金额：129.90 CNY\n- 下单时间：2026-10-23\n\n**物流：已签收**\n- 承运商：demo-carrier\n- 运单号：TRACK-ORD-H11-ORDER\n- 预计送达：2026-10-27\n- 物流最后更新：2026-10-25\n\n需要我帮您查其他信息（比如退款状态）吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_order",
+        "get_shipment"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 2344.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace_http_status": 200,
+    "trace": {
+      "request_id": "d8a28e56",
+      "found": true,
+      "trace": {
+        "request_id": "d8a28e56",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "get_order",
+          "get_shipment"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "d8a28e56",
+            "agent_type": "support",
+            "tool_name": "get_order",
+            "risk_level": "read",
+            "tool_use_id": "call_00_zP60sn3nONxQEwhZw9EY9246",
+            "input": {
+              "order_id": "ORD-H11-ORDER"
+            },
+            "validated_input": {
+              "order_id": "ORD-H11-ORDER"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "rerank_status": null,
+            "retrieval_status": null,
+            "citations": [],
+            "action_result": null,
+            "handoff_result": null,
+            "business_result": {
+              "order_id": "ORD-H11-ORDER",
+              "status": "delivered",
+              "total_amount": "129.90"
+            },
+            "retrieval_hits": null,
+            "helper_result": null,
+            "error": ""
+          },
+          {
+            "request_id": "d8a28e56",
+            "agent_type": "support",
+            "tool_name": "get_shipment",
+            "risk_level": "read",
+            "tool_use_id": "call_01_D5eYJCCQDAwmv8vd6zuB4523",
+            "input": {
+              "order_id": "ORD-H11-ORDER"
+            },
+            "validated_input": {
+              "order_id": "ORD-H11-ORDER"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "rerank_status": null,
+            "retrieval_status": null,
+            "citations": [],
+            "action_result": null,
+            "handoff_result": null,
+            "business_result": {
+              "order_id": "ORD-H11-ORDER",
+              "shipment_id": "SHP-H11-ORDER",
+              "status": "delivered"
+            },
+            "retrieval_hits": null,
+            "helper_result": null,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 2344.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 2,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 2260,
+            "output_tokens": 77,
+            "latency_ms": 1156.0
+          },
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 426,
+            "output_tokens": 137,
+            "latency_ms": 1188.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 47.0,
+          "recent_message_count": 2,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 2391.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      }
+    }
+  },
+  "state_before": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "state_between": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "delivered",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "delivered",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "state_after": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "delivered",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "delivered",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "assertions": [
+    {
+      "assertion": "turn1_http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "turn1_get_order_selected",
+      "pass": true,
+      "detail": [
+        "get_order"
+      ]
+    },
+    {
+      "assertion": "turn1_shipped_seen",
+      "pass": true,
+      "detail": "订单 ORD-H11-ORDER 当前状态为**已发货（shipped）**。\n\n- 商品：SKU-H11 × 1，单价 129.90 CNY\n- 订单金额：129.90 CNY（订单总额，非实付金额核验）\n- 下单时间：2026-10-23\n\n需要我继续查一下这个订单的物流进度吗？"
+    },
+    {
+      "assertion": "isolated_state_mutated",
+      "pass": true,
+      "detail": "delivered"
+    },
+    {
+      "assertion": "turn2_http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "turn2_get_order_selected",
+      "pass": true,
+      "detail": [
+        "get_order",
+        "get_shipment"
+      ]
+    },
+    {
+      "assertion": "turn2_delivered_seen",
+      "pass": true,
+      "detail": "刚重新查了一下，状态有更新：\n\n**订单 ORD-H11-ORDER：已签收（delivered）**\n- 商品：SKU-H11 × 1，单价 129.90 CNY\n- 订单金额：129.90 CNY\n- 下单时间：2026-10-23\n\n**物流：已签收**\n- 承运商：demo-carrier\n- 运单号：TRACK-ORD-H11-ORDER\n- 预计送达：2026-10-27\n- 物流最后"
+    },
+    {
+      "assertion": "no_business_write",
+      "pass": true,
+      "detail": {
+        "before": 0,
+        "after": 0
+      }
+    }
+  ],
+  "verdict": "pass",
+  "ledger_before": {
+    "requests": 4,
+    "charged_or_reserved_usd": 0.0034779000000000008,
+    "halted": false
+  },
+  "ledger_after": {
+    "requests": 8,
+    "charged_or_reserved_usd": 0.0071208,
+    "halted": false
+  },
+  "isolated_mutation": "ORD-H11-ORDER shipped -> delivered"
+}

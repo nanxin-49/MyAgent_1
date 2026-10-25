@@ -1,0 +1,802 @@
+{
+  "scenario": "S4",
+  "apply_turn": {
+    "request": {
+      "message": "为订单 ORD-H11-APPROVAL 申请退款 600 元",
+      "conv_id": "h11-s4-customer1"
+    },
+    "principal": {
+      "subject_id": "e2e-customer-1",
+      "customer_id": "customer-1",
+      "roles": [
+        "customer"
+      ]
+    },
+    "http_status": 200,
+    "api_response": {
+      "conv_id": "h11-s4-customer1",
+      "request_id": "87cdfb6b",
+      "response": "退款申请已提交，当前状态为**待审核**。\n\n- 订单号：ORD-H11-APPROVAL\n- 申请金额：600 元\n- 动作编号：act_d2dd01b5fde9424b\n- 审核原因：退款金额超过自动处理阈值 500 元，需人工审核（政策版本 refund-cancel-v1）\n\n需要说明的是：提交成功不等于退款已通过或已到账，最终结果以审核结论为准。审核通过后，退款状态可再帮你查询。\n\n需要我继续查看该订单当前的退款状态吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "request_refund"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 2703.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [
+        {
+          "success": true,
+          "status": "awaiting_approval",
+          "action_id": "act_d2dd01b5fde9424b",
+          "action": {
+            "action_id": "act_d2dd01b5fde9424b",
+            "action_type": "refund",
+            "user_id": "customer-1",
+            "order_id": "ORD-H11-APPROVAL",
+            "amount": "600",
+            "policy_decision": {
+              "action": "refund",
+              "decision": "require_approval",
+              "reason_code": "amount_requires_approval",
+              "policy_version": "refund-cancel-v1",
+              "explanation": "退款金额超过自动处理阈值 500.00",
+              "order_id": "ORD-H11-APPROVAL",
+              "amount": "600",
+              "evaluated_at": "2026-10-25T09:16:19.182880Z",
+              "requires_approval": true,
+              "metadata": {}
+            },
+            "policy_version": "refund-cancel-v1",
+            "status": "awaiting_approval",
+            "created_at": "2026-10-25T09:16:19.182880Z",
+            "updated_at": "2026-10-25T09:16:19.182880Z",
+            "idempotency_key": "auto_51edb74be642fb01199cf878a1bbc4e3",
+            "request_id": "87cdfb6b",
+            "error_code": null,
+            "error_message": null,
+            "execution_result": null,
+            "reviewed_by": null,
+            "requested_by": "e2e-customer-1"
+          },
+          "error_code": null,
+          "message": null,
+          "reused": false
+        }
+      ],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace_http_status": 200,
+    "trace": {
+      "request_id": "87cdfb6b",
+      "found": true,
+      "trace": {
+        "request_id": "87cdfb6b",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "request_refund"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "87cdfb6b",
+            "agent_type": "support",
+            "tool_name": "request_refund",
+            "risk_level": "dangerous",
+            "tool_use_id": "call_00_T6Uvz816Yn5fYs6zLT5R4204",
+            "input": {
+              "order_id": "ORD-H11-APPROVAL",
+              "amount": 600
+            },
+            "validated_input": {
+              "order_id": "ORD-H11-APPROVAL",
+              "amount": 600
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "rerank_status": null,
+            "retrieval_status": null,
+            "citations": [],
+            "action_result": {
+              "action_id": "act_d2dd01b5fde9424b",
+              "status": "awaiting_approval",
+              "error_code": null,
+              "policy_decision": "require_approval",
+              "reason_code": "amount_requires_approval",
+              "policy_version": "refund-cancel-v1",
+              "execution_simulated": null,
+              "reused": false
+            },
+            "handoff_result": null,
+            "business_result": null,
+            "retrieval_hits": null,
+            "helper_result": null,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 2703.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 2,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 1992,
+            "output_tokens": 67,
+            "latency_ms": 1281.0
+          },
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 392,
+            "output_tokens": 125,
+            "latency_ms": 1406.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 32.0,
+          "recent_message_count": 0,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 0.0
+        },
+        "request_latency_ms": 2735.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      }
+    }
+  },
+  "query_turn": {
+    "request": {
+      "message": "我的退款现在什么状态？",
+      "conv_id": "h11-s4-customer1"
+    },
+    "principal": {
+      "subject_id": "e2e-customer-1",
+      "customer_id": "customer-1",
+      "roles": [
+        "customer"
+      ]
+    },
+    "http_status": 200,
+    "api_response": {
+      "conv_id": "h11-s4-customer1",
+      "request_id": "ac4e9853",
+      "response": "您的退款当前状态是**待审核（pending）**。\n\n- 退款单号：REF-act_d2dd01b5fde9424b\n- 订单号：ORD-H11-APPROVAL\n- 申请金额：600 元（CNY）\n- 提交时间：2026-10-25 09:16（UTC）\n\n说明：因为金额超过 500 元自动处理阈值，需要人工审核，目前仍在等待审核结论。**待审核不等于退款已通过或资金已到账**，最终结果以审核结论为准。\n\n需要我帮您做其他查询吗？",
+      "topology": "single",
+      "intent": null,
+      "intent_group": null,
+      "agent_type": "support",
+      "agent_types": [
+        "support"
+      ],
+      "primary_agent": null,
+      "supporting_agents": null,
+      "tools_used": [
+        "get_refund_status"
+      ],
+      "routing_reason": null,
+      "routing_confidence": null,
+      "escalated": false,
+      "latency_ms": 2375.0,
+      "knowledge_used": false,
+      "retrieval_status": null,
+      "citations": [],
+      "entities": {},
+      "intent_confidence": null,
+      "intent_source_scores": null,
+      "model_call_count": 2,
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+      "action_results": [],
+      "memory_write_status": "completed",
+      "warning_codes": [],
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      }
+    },
+    "trace_http_status": 200,
+    "trace": {
+      "request_id": "ac4e9853",
+      "found": true,
+      "trace": {
+        "request_id": "ac4e9853",
+        "topology": "single",
+        "agent_type": "support",
+        "intent": null,
+        "primary_agent": null,
+        "supporting_agents": null,
+        "routing_reason": null,
+        "routing_confidence": null,
+        "deprecated_fields": [
+          "primary_agent",
+          "supporting_agents",
+          "routing_reason",
+          "routing_confidence"
+        ],
+        "tools_used": [
+          "get_refund_status"
+        ],
+        "tool_calls": [
+          {
+            "request_id": "ac4e9853",
+            "agent_type": "support",
+            "tool_name": "get_refund_status",
+            "risk_level": "read",
+            "tool_use_id": "call_00_eQvsWzpPJaSlrTd3K0pg9287",
+            "input": {
+              "order_id": "ORD-H11-APPROVAL"
+            },
+            "validated_input": {
+              "order_id": "ORD-H11-APPROVAL"
+            },
+            "success": true,
+            "result_success": true,
+            "error_code": null,
+            "error_type": null,
+            "retryable": false,
+            "latency_ms": 0.0,
+            "cached": false,
+            "reranked": false,
+            "rerank_status": null,
+            "retrieval_status": null,
+            "citations": [],
+            "action_result": null,
+            "handoff_result": null,
+            "business_result": {
+              "order_id": "ORD-H11-APPROVAL",
+              "refund_id": "REF-act_d2dd01b5fde9424b",
+              "status": "pending",
+              "amount": "600"
+            },
+            "retrieval_hits": null,
+            "helper_result": null,
+            "error": ""
+          }
+        ],
+        "escalated": false,
+        "latency_ms": 2375.0,
+        "handoff": {
+          "status": "not_required",
+          "handoff_required": false,
+          "handoff_requested": false,
+          "handoff_created": false,
+          "handoff_failed": false,
+          "handoff_id": null,
+          "reason_code": null,
+          "error_code": null,
+          "reused": false,
+          "simulated": true
+        },
+        "model_call_count": 2,
+        "model_calls": [
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 302,
+            "output_tokens": 55,
+            "latency_ms": 938.0
+          },
+          {
+            "stage": "support",
+            "model": "deepseek-flash",
+            "input_tokens": 254,
+            "output_tokens": 129,
+            "latency_ms": 1437.0
+          }
+        ],
+        "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+        "memory": {
+          "read_status": "completed",
+          "read_latency_ms": 46.0,
+          "recent_message_count": 2,
+          "relevant_history_count": 0,
+          "profile_field_count": 0,
+          "summary_present": false,
+          "write_status": "completed",
+          "profile_update_status": "scheduled_unobserved",
+          "messages_written": 2,
+          "write_latency_ms": 16.0
+        },
+        "request_latency_ms": 2437.0,
+        "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+      }
+    }
+  },
+  "action_id": "act_d2dd01b5fde9424b",
+  "state_before": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "state_after": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "refund_pending",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {
+        "REF-act_d2dd01b5fde9424b": {
+          "refund_id": "REF-act_d2dd01b5fde9424b",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "600",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-25T09:16:20.632567Z",
+          "updated_at": "2026-10-25T09:16:20.632567Z"
+        }
+      }
+    },
+    "handoffs": {},
+    "actions": {
+      "act_d2dd01b5fde9424b": {
+        "action_id": "act_d2dd01b5fde9424b",
+        "action_type": "refund",
+        "user_id": "customer-1",
+        "order_id": "ORD-H11-APPROVAL",
+        "amount": "600",
+        "policy_decision": {
+          "action": "refund",
+          "decision": "require_approval",
+          "reason_code": "amount_requires_approval",
+          "policy_version": "refund-cancel-v1",
+          "explanation": "退款金额超过自动处理阈值 500.00",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "evaluated_at": "2026-10-25T09:16:20.632567Z",
+          "requires_approval": true,
+          "metadata": {}
+        },
+        "policy_version": "refund-cancel-v1",
+        "status": "completed",
+        "created_at": "2026-10-25T09:16:19.182880Z",
+        "updated_at": "2026-10-25T09:16:20.632567Z",
+        "idempotency_key": "auto_51edb74be642fb01199cf878a1bbc4e3",
+        "request_id": "87cdfb6b",
+        "error_code": null,
+        "error_message": null,
+        "execution_result": {
+          "simulated": true,
+          "operation": "refund",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "status": "completed",
+          "refund_id": "REF-act_d2dd01b5fde9424b",
+          "refund_status": "pending"
+        },
+        "reviewed_by": "e2e-reviewer",
+        "requested_by": "e2e-customer-1"
+      }
+    },
+    "executor_calls": 1
+  },
+  "assertions": [
+    {
+      "assertion": "apply_http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "request_refund_selected",
+      "pass": true,
+      "detail": [
+        "request_refund"
+      ]
+    },
+    {
+      "assertion": "action_receipt_present",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "assertion": "apply_status_awaiting_approval",
+      "pass": true,
+      "detail": "awaiting_approval"
+    },
+    {
+      "assertion": "apply_amount_600",
+      "pass": true,
+      "detail": "600"
+    },
+    {
+      "assertion": "pre_approval_execution_result_null",
+      "pass": true,
+      "detail": {
+        "success": true,
+        "status": "awaiting_approval",
+        "action_id": "act_d2dd01b5fde9424b",
+        "action": {
+          "action_id": "act_d2dd01b5fde9424b",
+          "action_type": "refund",
+          "user_id": "customer-1",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "policy_decision": {
+            "action": "refund",
+            "decision": "require_approval",
+            "reason_code": "amount_requires_approval",
+            "policy_version": "refund-cancel-v1",
+            "explanation": "退款金额超过自动处理阈值 500.00",
+            "order_id": "ORD-H11-APPROVAL",
+            "amount": "600",
+            "evaluated_at": "2026-10-25T09:16:19.182880Z",
+            "requires_approval": true,
+            "metadata": {}
+          },
+          "policy_version": "refund-cancel-v1",
+          "status": "awaiting_approval",
+          "created_at": "2026-10-25T09:16:19.182880Z",
+          "updated_at": "2026-10-25T09:16:19.182880Z",
+          "idempotency_key": "auto_51edb74be642fb01199cf878a1bbc4e3",
+          "request_id": "87cdfb6b",
+          "error_code": null,
+          "error_message": null,
+          "execution_result": null,
+          "reviewed_by": null,
+          "requested_by": "e2e-customer-1"
+        },
+        "error_code": null,
+        "message": null,
+        "reused": false
+      }
+    },
+    {
+      "assertion": "pre_approval_executor_calls_zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "assertion": "reviewer_approve_http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "approved_completed",
+      "pass": true,
+      "detail": "completed"
+    },
+    {
+      "assertion": "approved_execution_result",
+      "pass": true,
+      "detail": {
+        "simulated": true,
+        "operation": "refund",
+        "order_id": "ORD-H11-APPROVAL",
+        "amount": "600",
+        "status": "completed",
+        "refund_id": "REF-act_d2dd01b5fde9424b",
+        "refund_status": "pending"
+      }
+    },
+    {
+      "assertion": "post_approval_executor_calls_one",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "assertion": "repeat_approve_reused",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "assertion": "repeat_approve_no_second_execution",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "assertion": "query_http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "get_refund_status_selected",
+      "pass": true,
+      "detail": [
+        "get_refund_status"
+      ]
+    },
+    {
+      "assertion": "refund_record_pending",
+      "pass": true,
+      "detail": {
+        "REF-act_d2dd01b5fde9424b": {
+          "refund_id": "REF-act_d2dd01b5fde9424b",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "600",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-25T09:16:20.632567Z",
+          "updated_at": "2026-10-25T09:16:20.632567Z"
+        }
+      }
+    },
+    {
+      "assertion": "order_refund_pending",
+      "pass": true,
+      "detail": "refund_pending"
+    },
+    {
+      "assertion": "answer_distinguishes_pending",
+      "pass": true,
+      "detail": "您的退款当前状态是**待审核（pending）**。\n\n- 退款单号：REF-act_d2dd01b5fde9424b\n- 订单号：ORD-H11-APPROVAL\n- 申请金额：600 元（CNY）\n- 提交时间：2026-10-25 09:16（UTC）\n\n说明：因为金额超过 500 元自动处理阈值，需要人工审核，目前仍在等待审核结论。**待审核不等于退款已通过或资金已到账**，最终结果以审核结论为准。\n\n需要我帮您做其他查询吗？"
+    }
+  ],
+  "verdict": "pass",
+  "ledger_before": {
+    "requests": 6,
+    "charged_or_reserved_usd": 0.005166,
+    "halted": false
+  },
+  "ledger_after": {
+    "requests": 10,
+    "charged_or_reserved_usd": 0.010339200000000002,
+    "halted": false
+  }
+}

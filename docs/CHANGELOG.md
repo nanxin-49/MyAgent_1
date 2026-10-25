@@ -51,5 +51,24 @@
 
 - **改动**：`.github/workflows/tests.yml` 中 `astral-sh/setup-uv@v10` → `@v10.3.2`（标签已用 `git ls-remote` 核实存在）。
 - **验证**：`uv lock --check` 53 packages；`pytest` **577 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
-- **状态**：`verify`；远端 CI 尚未运行（功能分支推送不触发，需 PR 或 `workflow_dispatch`）。
+- **状态**：`verify` → 远端 PR 已通过（用户确认 All checks have passed），待用户确认置为 `done`。
 - **报告**：`docs/reports/H0-1.md`。建议提交信息：`ci: pin setup-uv to v10.3.2`。
+
+## 2026-10-25 — H1-1 第一批真实 `/chat` E2E
+
+- **新增**：`evaluation/reports/H1-1/20261025T085310Z-batch1/` 独立运行器、fixture、5 个场景、原始证据与报告。
+- **结果**：S3、S5 通过；S1 检索分数不足（0.168/0.215 < 0.35）、S2 未选检索、S4 未发起退款，共 2 pass / 3 fail。
+- **预算**：真实模型 13 次请求，USD 0.013001（保守估算），未触发 halt。
+- **隔离**：独立 Redis 6396 已停止；Chroma 前后 SHA 一致，无知识写入。
+- **未改**：生产代码、Prompt、知识、阈值、Gold。
+- **状态**：H1-1 `todo → doing`；修复运行（S2/S4/S1b，12 次请求 / USD 0.06）待授权。
+
+## 2026-10-25 — H1-1 修复运行 1
+
+- **改动**：`agents/support_agent.py` 增加通用 `[检索与显式动作]` 规则；新增 `tests/test_support_prompt_contract.py`（红 2 failed → 绿）。
+- **结果**：S1B、S2、S4 **3/3 通过**；S1B 获得 `usable` citation，S4 直接提交退款并在 reviewer 审批后执行 1 次。
+- **预算**：10/12 次请求，USD 0.0103392；Chroma 前后 SHA 一致；隔离 Redis 已停止。
+- **未改**：PolicyEngine（≤500 自动、>500 审核）、知识、阈值、Gold；“所有退款都需人工审核”记为独立待办。
+- **回归**：`pytest` **579 passed / 3 skipped**；Node **12 passed**。
+- **状态**：H1-1 仍 `doing`；资格/缺参、审批拒绝/撤回、幂等、越权场景待后续批次。
+- **后续调整**：按用户要求保持 ≤500 自动通过，Prompt 增加“先 `get_order` + `get_refund_status` 核对条件，再决定是否 `request_refund`”；契约测试已更新，尚未重跑真实模型。

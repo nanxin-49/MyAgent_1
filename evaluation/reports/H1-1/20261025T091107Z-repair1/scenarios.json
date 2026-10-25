@@ -1,0 +1,50 @@
+{
+  "run_id": "20261025T091107Z-repair1",
+  "task": "H1-1",
+  "batch": "repair-1",
+  "purpose": "Verify the general prompt fix for static-policy grounding and explicit refund submission.",
+  "prompt_change": {
+    "file": "agents/support_agent.py",
+    "rules": [
+      "static policy/FAQ/process/rule questions should call search_knowledge_base first; without usable citations, say only that the fact cannot be confirmed",
+      "an explicit order id + amount + direct refund request is treated as authorization to submit; call request_refund without asking for confirmation again",
+      "approval, rejection and execution remain backend Policy/HITL decisions"
+    ]
+  },
+  "model": "deepseek-flash",
+  "endpoint": "https://api.deepseek.com/anthropic",
+  "budget": {"requests_max": 12, "usd_max": 0.06},
+  "isolation": {
+    "api": "127.0.0.1:8017",
+    "redis": "127.0.0.1:6396 (cartcare-h11-e2e-20261025-redis, no persistence)",
+    "chroma": "127.0.0.1:8001 cartcare_demo_knowledge_chargram_v1 (read-only)",
+    "business_fixture": "fixture.json",
+    "credentials": "cash/h11-e2e-20261025/credentials.json (gitignored)"
+  },
+  "scenarios": [
+    {
+      "id": "S1B",
+      "name": "有依据的政策问答（自然问法）",
+      "message": "退款政策是什么？",
+      "expected": ["search_knowledge_base selected", "retrieval_status=usable", "citation policy_version=refund-cancel-v1", "answer covers 7-day window and 500 threshold"],
+      "allowed_side_effects": [],
+      "terminal": "read-only"
+    },
+    {
+      "id": "S2",
+      "name": "缺事实的相近问题",
+      "message": "退款审核通过后，钱几天能到我的银行卡？",
+      "expected": ["search_knowledge_base selected", "low_confidence/no_answer or no usable citation", "no fabricated arrival days/channel", "states inability to confirm"],
+      "allowed_side_effects": [],
+      "terminal": "read-only"
+    },
+    {
+      "id": "S4",
+      "name": "退款申请 -> 审批 -> 查询",
+      "messages": ["为订单 ORD-H11-APPROVAL 申请退款 600 元", "我的退款现在什么状态？"],
+      "expected": ["request_refund selected without reconfirmation", "awaiting_approval before approval", "execution_result null and executor calls 0 before approval", "reviewer approve -> completed, executor calls 1", "repeat approve reused, still 1", "get_refund_status pending", "answer distinguishes completed action / pending refund / not arrived"],
+      "allowed_side_effects": ["one simulated refund action", "one pending refund record", "order status refund_pending"],
+      "terminal": "action completed; refund pending; no real payment"
+    }
+  ]
+}

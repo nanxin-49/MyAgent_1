@@ -48,8 +48,8 @@
 
 | ID | 任务 | 阶段 | 依赖 | 时间盒 | 状态 | REPORT |
 | --- | --- | --- | --- | --- | --- | --- |
-| H0-1 | 修复 CI 中 setup-uv 版本，远端变绿 | G0 | — | 1 天 | verify | [H0-1](docs/reports/H0-1.md) |
-| H1-1 | 真实 `/chat` 核心闭环诊断与修复 | G1 | H0-1 | 5 天 | todo | |
+| H0-1 | 修复 CI 中 setup-uv 版本，远端变绿 | G0 | — | 1 天 | done | [H0-1](docs/reports/H0-1.md) |
+| H1-1 | 真实 `/chat` 核心闭环诊断与修复 | G1 | H0-1 | 5 天 | doing | [batch 1](evaluation/reports/H1-1/20261025T085310Z-batch1/REPORT.md) / [repair 1](evaluation/reports/H1-1/20261025T091107Z-repair1/REPORT.md) |
 | H2-1 | 评测框架：组件开关 + 脚本化假模型 | G2 | H0-1 | 2 天 | todo | |
 | H2-2 | 评测框架：录制回放 + 故障注入 + 轨迹打分 + pass^k | G2 | H2-1 | 3 天 | todo | |
 | H2-3 | 150–200 条规模化评测集与指标报告 | G2 | H2-2 | 3 天 | todo | |

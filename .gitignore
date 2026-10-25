@@ -12,7 +12,7 @@ build/
 venv/
 
 # cash/: 跟踪人工整理的归档与说明；忽略缓存、临时检出、本机数据和凭据
-/cash/cache/
+cash/cache/
 /cash/a07-ci-repro/
 /cash/legacy-data/
 /cash/local/
