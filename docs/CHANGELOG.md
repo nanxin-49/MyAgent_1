@@ -87,3 +87,12 @@
 - **新增**：`docs/H1-1-exercises-and-notes.md`，汇总 9 个独立练习、参考答案、证据层级与常见问题。
 - **链接**：`docs/reports/H1-1.md` 增加“学习与练习”入口。
 - **未改**：代码、Prompt、知识、阈值、Gold。
+
+## 2026-10-25 — H2-1 评测框架：组件开关 + 脚本化假模型
+
+- **新增**：`core/harness.py`（`HarnessConfig`，默认全开、非 evaluation 关闭即 raise）、`evaluation/scripted_model.py`（JSON 多轮脚本假模型）、`evaluation/scripts/` 示例、`tests/test_harness_switches.py`（10 测试）。
+- **接入**：`EvaluationRuntimeFactory` → `ActionService`/`SupportRuntime`；`BaseAgent`、`SingleSupportAgent`、`MemoryManager` 接收配置。`ChatRequest`/`EvalRunInput` 无开关字段。
+- **行为**：policy_guard、error_feedback、context_compression、loop_control、output_consistency 均可单独关闭；生产默认不变。
+- **验证**：`pytest` **589 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
+- **限制**：context_compression 在评测工厂中暂无可观察效果（工厂未构造 Memory）；policy_guard 仅评测假后端；loop_control 关闭仍有 1000 轮硬停止。
+- **状态**：H2-1 `todo → verify`。
