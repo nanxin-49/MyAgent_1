@@ -22,9 +22,9 @@ venv/
 # 环境变量（含敏感信息）
 .env
 
-# 数据目录
-data/
-logs/
+# 数据目录（仅根目录；cash 归档内的 data/ 需要跟踪）
+/data/
+/logs/
 
 # IDE
 .idea/

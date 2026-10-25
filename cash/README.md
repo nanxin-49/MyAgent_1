@@ -6,7 +6,7 @@
 
 | 路径 | 是否跟踪 | 内容 |
 | --- | --- | --- |
-| `archive-20261025/` | 是 | 2026-10-25 文档整理归档：旧 Workbench、progress JSON、A 系列 hardening、旧工程说明、T12 记录、演示截图、交接文档、一次性脚本。清单见 `archive-20261025/MANIFEST.md` |
+| `archive-20261025/` | 是 | 2026-10-25 文档整理归档：旧 Workbench、progress JSON、A 系列 hardening、旧工程说明、T12 记录、演示截图、交接文档、一次性脚本、旧演示文档与知识库发布备份。清单见 `archive-20261025/MANIFEST.md` |
 | `wiki/` | 是 | 旧 Wiki 与配图历史版本 |
 | `cache/` | 否 | uv / pytest 缓存（可删除后重建） |
 | `a07-ci-repro/` | 否 | A07 CI 复现用的独立检出与临时运行目录（约 165 MB） |

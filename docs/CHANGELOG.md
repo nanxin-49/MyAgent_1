@@ -35,3 +35,14 @@
   - 新增本文件 `docs/CHANGELOG.md`，作为后续每轮修改的统一记录。
 - **验证**：`git status` 确认无 `.env`、凭据或缓存进入暂存区；`pytest` 与 Node 结果不变。
 - **提交**：见本次提交 `chore: archive superseded docs, track curated cash archive, add changelog`。
+
+## 2026-10-25 — 根目录二次清理
+
+- **改动**：
+  - 删除空的 `scripts/`（无代码引用、未被跟踪）。
+  - 删除 207 个 `__pycache__` 目录、`data/test-cache/` 和本次启动验证产生的临时日志。
+  - 将 `data/default-kb-backups/`、`data/demo_docs/` 归档到 `cash/archive-20261025/data/`。
+  - 删除 `docker-deploy.sh` 会自动重建的空挂载点目录 `config/alerts`、`config/grafana/*`、`config/nginx/ssl`。
+  - 保留 `data/chroma`（Compose 挂载点）和 `logs/`（运行时目录）。
+- **结果**：根目录剩 19 个目录，全部对应源码、运行数据、测试、评测或文档；无空目录（除上述两个运行时目录）。
+- **验证**：`pytest` **577 passed / 3 skipped**；Node **12 passed**。

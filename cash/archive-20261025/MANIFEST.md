@@ -31,6 +31,8 @@
 
 `stage-pr-body.md`、`stage_pr_api.py`、`t12-workbench-check.js`（一次性脚本/草稿）；同时删除 `data/.DS_Store`。
 
+2026-10-25 二次清理追加：`default-kb-backups/`（2026-10-13 知识库内部发布前快照）、`demo_docs/`（旧演示文档，代码无引用）。
+
 ## 保留在版本库
 
 - 根目录：`README.md`、`CLAUDE.md`、`CARTCARE_PLAN.md`、`settings.json`、构建/部署/依赖入口。
