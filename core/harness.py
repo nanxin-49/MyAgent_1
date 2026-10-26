@@ -18,6 +18,10 @@ class HarnessConfig:
     loop_control: bool = True
     output_consistency: bool = True
     max_tool_rounds: int = 3
+    max_tool_steps: int = 8
+    max_tokens_per_turn: int = 60000
+    duplicate_call_limit: int = 3
+    tool_timeout_s: float = 30.0
     unguarded_max_tool_rounds: int = 1000
     mode: str = "production"
 
@@ -26,6 +30,14 @@ class HarnessConfig:
             raise ValueError("mode must be production or evaluation")
         if self.max_tool_rounds < 1:
             raise ValueError("max_tool_rounds must be >= 1")
+        if self.max_tool_steps < 1:
+            raise ValueError("max_tool_steps must be >= 1")
+        if self.max_tokens_per_turn < 1:
+            raise ValueError("max_tokens_per_turn must be >= 1")
+        if self.duplicate_call_limit < 1:
+            raise ValueError("duplicate_call_limit must be >= 1")
+        if self.tool_timeout_s <= 0:
+            raise ValueError("tool_timeout_s must be > 0")
         if self.unguarded_max_tool_rounds < self.max_tool_rounds:
             raise ValueError("unguarded_max_tool_rounds must be >= max_tool_rounds")
         disabled = [

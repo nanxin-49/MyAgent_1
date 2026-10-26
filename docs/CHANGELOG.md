@@ -152,3 +152,13 @@
 - **验证**：全量 `pytest` **638 passed / 3 skipped**；Node **12 passed**；相关回归 43 passed；`git diff --check` 通过。
 - **证据**：`evaluation/reports/H2-4/bare/FIRST_PASS.md`（首轮口径）、`final.json`（297 run）、`PARTIAL.md`（中断快照）。
 - **状态**：H2-4 `todo → verify`。
+
+## 2026-10-26 — H3-1 工具循环控制
+
+- **新增**：`core/stop_reason.py`（六种 `StopReason` + 窄澄清分类）、`tests/test_h3_1_loop_control.py`（15 测试）。
+- **扩展**：`HarnessConfig` 增加 `max_tool_steps=8`、`max_tokens_per_turn=60000`、`duplicate_call_limit=3`、`tool_timeout_s=30`；`BaseAgent` 循环累计 token、检测连续重复调用、检查步数预算，超限返回回执或固定话术并写停止原因；`execute_tool` 支持只读超时上限；`SupportResult`/Trace 增加 `stop_reason`；trace 增加 `attempts`/`timeout_s`。
+- **默认值依据**：H2-3 real2 + H2-4 首轮共 373 个真实 turn，工具步数 p50=2 / p95=3 / max=4，仅 1 个 >3；轮次上限保持 3。
+- **行为变化**：生产默认下，连续第 3 次相同调用、第 9 个工具步或单轮 60k token 会主动停止；`loop_control=False` 时四项限制一起关闭；两个旧测试显式提高 `duplicate_call_limit` 以隔离重复检测（未放宽断言）。
+- **验证**：全量 `pytest` **653 passed / 3 skipped**；相关回归 113 passed；180 条确定性套件 180/180、safety 0；Node **12 passed**；`git diff --check` 通过。
+- **限制**：写动作仍不设执行超时（N11 归 H4-3）；`needs_clarification` 仅观测；token 预算未在真实模型下验证。
+- **状态**：H3-1 `todo → verify`。

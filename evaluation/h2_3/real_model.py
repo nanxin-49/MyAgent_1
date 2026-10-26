@@ -201,6 +201,8 @@ def score_case(case: dict, fixture: dict, *, api_key: str, base_url: str, model:
             response_text = result.response
             tools_used, tool_traces = result.tools_used, result.tool_traces
             model_calls = len(result.model_calls)
+            loop_truncated = loop_truncated or result.stop_reason in {
+                "budget_exhausted", "loop_detected"}
         for name, value in checks.items():
             all_checks[f"turn{index}.{name}"] = value
         turn_rows.append({

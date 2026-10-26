@@ -19,6 +19,7 @@ from actions import (
 from actions.backend import ActionBackendError
 from agents.agent_orchestrator import BillingAgent, Request
 from agents.tools import build_action_tools
+from core.harness import HarnessConfig
 from core.intent_recognizer import IntentCategory, UrgencyLevel
 from providers.mock_backend import InMemoryBusinessBackend
 
@@ -444,7 +445,9 @@ def test_agent_max_tool_rounds_returns_observed_action_receipt_once():
     service, backend = make_service(refunds=False)
     client = _WriteToolClient()
     client.responses = [type("Response", (), {"content": [_ToolUseBlock()]})() for _ in range(3)]
-    agent = BillingAgent(client, "test-model")
+    # Repeated identical calls here exercise the round-limit receipt path, not
+    # duplicate detection (covered separately in H3-1).
+    agent = BillingAgent(client, "test-model", harness=HarnessConfig(duplicate_call_limit=10))
     agent.set_shared_tools(build_action_tools(service))
     response = asyncio.run(agent.handle(Request(
         message="申请退款", user_id="customer-1", conv_id="conv-max-tool",

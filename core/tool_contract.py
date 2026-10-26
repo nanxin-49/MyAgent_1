@@ -44,6 +44,7 @@ class ToolExecutionResult:
     error: str | None = None
     attempts: int = 0
     validated_input: dict[str, Any] | None = None
+    timeout_s: float | None = None
 
     def agent_payload(self) -> Any:
         # Preserve the existing domain payload while adding common failure fields.
@@ -120,8 +121,14 @@ async def _invoke(handler: Callable[[], Any]) -> Any:
     return result
 
 
-async def execute_tool(contract: Any, params: Any, handler: Callable[[], Any]) -> ToolExecutionResult:
-    """Execute a validated call. Automatic retries are restricted to idempotent reads."""
+async def execute_tool(contract: Any, params: Any, handler: Callable[[], Any],
+                       *, timeout_s: float | None = None) -> ToolExecutionResult:
+    """Execute a validated call. Automatic retries are restricted to idempotent reads.
+
+    ``timeout_s`` is an optional harness-level cap: the effective timeout is the
+    smaller of the contract's and this value. Writes never get an executor
+    timeout, because a cancelled worker thread may keep running.
+    """
     started = time.monotonic()
     try:
         validated = validate_tool_input(contract.input_schema, params)
@@ -130,14 +137,17 @@ async def execute_tool(contract: Any, params: Any, handler: Callable[[], Any]) -
                                    error=str(exc), latency_ms=(time.monotonic() - started) * 1000)
 
     risk = RiskLevel(contract.risk_level)
+    effective_timeout = contract.timeout_s
+    if timeout_s is not None and (effective_timeout is None or timeout_s < effective_timeout):
+        effective_timeout = timeout_s
     retry = contract.retry_policy.max_attempts if risk is RiskLevel.READ and contract.idempotent else 1
     for attempt in range(1, retry + 1):
         try:
             operation = _invoke(handler)
             # A timed-out synchronous write might continue in its worker thread.
             # Never apply executor timeout or retry to state-changing tools.
-            if risk is RiskLevel.READ and contract.timeout_s is not None:
-                payload = await asyncio.wait_for(operation, timeout=contract.timeout_s)
+            if risk is RiskLevel.READ and effective_timeout is not None:
+                payload = await asyncio.wait_for(operation, timeout=effective_timeout)
             else:
                 payload = await operation
             if isinstance(payload, dict) and payload.get("success") is False:
@@ -145,21 +155,24 @@ async def execute_tool(contract: Any, params: Any, handler: Callable[[], Any]) -
                 result = ToolExecutionResult(False, payload, code, category,
                                              retryable and risk is RiskLevel.READ and contract.idempotent,
                                              (time.monotonic() - started) * 1000, message,
-                                             attempt, validated)
+                                             attempt, validated, effective_timeout)
             else:
                 return ToolExecutionResult(True, payload, latency_ms=(time.monotonic() - started) * 1000,
-                                           attempts=attempt, validated_input=validated)
+                                           attempts=attempt, validated_input=validated,
+                                           timeout_s=effective_timeout)
         except asyncio.TimeoutError:
             result = ToolExecutionResult(False, error_code="timeout", error_type="timeout",
                                          retryable=contract.idempotent,
                                          latency_ms=(time.monotonic() - started) * 1000,
-                                         error="执行超时", attempts=attempt, validated_input=validated)
+                                         error="执行超时", attempts=attempt, validated_input=validated,
+                                         timeout_s=effective_timeout)
         except Exception as exc:
             code = str(getattr(exc, "code", "execution_failure"))
             result = ToolExecutionResult(False, error_code=code, error_type="execution",
                                          retryable=code in _RETRYABLE_CODES and risk is RiskLevel.READ and contract.idempotent,
                                          latency_ms=(time.monotonic() - started) * 1000,
-                                         error=str(exc), attempts=attempt, validated_input=validated)
+                                         error=str(exc), attempts=attempt, validated_input=validated,
+                                         timeout_s=effective_timeout)
         if not result.retryable or attempt == retry:
             return result
     raise AssertionError("unreachable")

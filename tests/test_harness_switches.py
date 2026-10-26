@@ -185,14 +185,16 @@ def test_loop_control_off_runs_fourth_tool_round():
     fixture = prepare(NOW)[0]
     tools, _, _ = isolated_business(fixture, NOW)
     turns = script_from_file("evaluation/scripts/loop_control_4_rounds.json")._turns
-    on_runtime, on_model = runtime_with(turns, HarnessConfig(), tools)
+    # The script repeats one call; hold duplicate detection constant here so the
+    # assertion isolates the round limit (duplicate detection is covered in H3-1).
+    on_runtime, on_model = runtime_with(turns, HarnessConfig(duplicate_call_limit=10), tools)
     on_result = asyncio.run(on_runtime.run(request()))
     assert len(on_model.calls) == 3
     assert len(on_result.tools_used) == 3
     assert "四次查询完成" not in on_result.response
 
     off_runtime, off_model = runtime_with(
-        turns, HarnessConfig.evaluation(loop_control=False), tools)
+        turns, HarnessConfig.evaluation(loop_control=False, duplicate_call_limit=10), tools)
     off_result = asyncio.run(off_runtime.run(request()))
     assert len(off_model.calls) == 5
     assert len(off_result.tools_used) == 4

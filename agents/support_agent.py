@@ -61,7 +61,8 @@ class SingleSupportAgent(BaseAgent):
                      "retryable": False, "latency_ms": execution.latency_ms,
                      "handoff_result": req.handoff.model_dump()}
             response = AgentResponse(self.agent_type, "", execution.success,
-                                     tools_used=[spec.name], tool_traces=[trace])
+                                     tools_used=[spec.name], tool_traces=[trace],
+                                     stop_reason="completed")
         else:
             response = await super().handle(req)
         response.escalate = req.handoff.handoff_created
@@ -142,6 +143,7 @@ class SupportResult:
     handoff: HandoffResult = field(default_factory=HandoffResult)
     agent_type: AgentType = AgentType.SUPPORT
     intent: None = None
+    stop_reason: str | None = None
 
 
 class SupportRuntime:
@@ -189,7 +191,8 @@ class SupportRuntime:
         self._success += int(response.success)
         self._total_ms += elapsed
         result = SupportResult(req.request_id, response.content, response.escalate, elapsed,
-                               response.tools_used, response.tool_traces, events, handoff=req.handoff)
+                               response.tools_used, response.tool_traces, events, handoff=req.handoff,
+                               stop_reason=response.stop_reason)
         self._traces.append({"request_id": req.request_id, "topology": "single", "agent_type": "support",
             "intent": None, "primary_agent": None, "supporting_agents": None,
             "routing_reason": None, "routing_confidence": None,
@@ -197,6 +200,7 @@ class SupportRuntime:
             "tools_used": list(result.tools_used), "tool_calls": list(result.tool_traces),
             "escalated": result.escalated, "latency_ms": round(elapsed, 1),
             "handoff": result.handoff.model_dump(),
+            "stop_reason": result.stop_reason,
             "model_call_count": len(events), "model_calls": list(events),
             "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"})
         return result

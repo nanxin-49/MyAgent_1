@@ -18,6 +18,7 @@
 import asyncio
 from core.auth import Principal
 from core.harness import HarnessConfig
+from core.stop_reason import StopReason, classify_answer
 import json
 import logging
 import os
@@ -122,6 +123,7 @@ class AgentResponse:
     escalate:    bool  = False   # 是否需要升级
     tools_used:  List[str] = field(default_factory=list)
     tool_traces: List[Dict[str, Any]] = field(default_factory=list)
+    stop_reason: Optional[str] = None
 
 
 @dataclass
@@ -203,6 +205,7 @@ class BaseAgent:
         self.stats   = AgentStats()
         self._last_tools_used: List[str] = []
         self._last_tool_traces: List[Dict[str, Any]] = []
+        self._last_stop_reason: StopReason = StopReason.COMPLETED
         self._shared_tools: Dict[str, AgentToolSpec] = {}
 
     def get_tools(self) -> Dict[str, AgentToolSpec]:
@@ -217,6 +220,7 @@ class BaseAgent:
         self.stats.total += 1
         self._last_tools_used = []
         self._last_tool_traces = []
+        self._last_stop_reason = StopReason.COMPLETED
         try:
             content = await self._call_llm(req)
             ms = (time.monotonic() - t0) * 1000
@@ -231,11 +235,13 @@ class BaseAgent:
                 escalate=escalate,
                 tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
+                stop_reason=self._last_stop_reason.value,
             )
         except Exception as ex:
             ms = (time.monotonic() - t0) * 1000
             self.stats.total_ms += ms
             logger.error(f"{self.agent_type.value} 处理失败: {ex}")
+            self._last_stop_reason = StopReason.UNRECOVERABLE_ERROR
             receipt = self._last_action_receipt()
             return AgentResponse(
                 agent_type=self.agent_type,
@@ -244,6 +250,7 @@ class BaseAgent:
                 latency_ms=ms,
                 tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
+                stop_reason=self._last_stop_reason.value,
             )
 
     async def _call_llm(self, req: Request) -> str:
@@ -267,6 +274,18 @@ class BaseAgent:
         tools = self.get_tools()
         tools_used: List[str] = []
         tool_traces: List[Dict[str, Any]] = []
+        steps = 0
+        tokens = 0
+        previous_fingerprint: Optional[str] = None
+        repeats = 0
+        stop_reason: Optional[StopReason] = None
+        # Step, token and duplicate limits belong to the loop-control component;
+        # the evaluation-only ablation turns them off together.
+        max_steps = self._harness.max_tool_steps if self._harness.loop_control else None
+        max_tokens = (self._harness.max_tokens_per_turn
+                      if self._harness.loop_control else None)
+        duplicate_limit = (self._harness.duplicate_call_limit
+                           if self._harness.loop_control else None)
         for _ in range(self._harness.tool_round_limit):
             request_kwargs: Dict[str, Any] = {
                 "model": self._model,
@@ -285,11 +304,20 @@ class BaseAgent:
                     for spec in tools.values()
                 ]
             resp = await self._client.messages.create(**request_kwargs)
+            usage = getattr(resp, "usage", None)
+            if usage is not None:
+                tokens += int(getattr(usage, "input_tokens", 0) or 0)
+                tokens += int(getattr(usage, "output_tokens", 0) or 0)
             tool_uses = [block for block in (resp.content or []) if self._block_type(block) == "tool_use"]
             if not tool_uses:
+                text = extract_text_content(resp.content)
+                self._last_stop_reason = classify_answer(text, tool_traces)
                 self._last_tools_used = tools_used
                 self._last_tool_traces = tool_traces
-                return extract_text_content(resp.content)
+                return text
+            if max_tokens is not None and tokens >= max_tokens:
+                stop_reason = StopReason.BUDGET_EXHAUSTED
+                break
 
             messages.append({"role": "assistant", "content": resp.content})
             tool_results = []
@@ -300,6 +328,26 @@ class BaseAgent:
                 if args is None:
                     args = {}
                 spec = tools.get(name)
+                fingerprint = f"{name}:{json.dumps(args, sort_keys=True, ensure_ascii=False, default=str)}"
+                if fingerprint == previous_fingerprint:
+                    repeats += 1
+                else:
+                    previous_fingerprint, repeats = fingerprint, 1
+                if duplicate_limit is not None and repeats >= duplicate_limit:
+                    stop_reason = StopReason.LOOP_DETECTED
+                    tool_traces.append(self._skipped_trace(req, name, tool_use_id, args,
+                                                           "loop_detected", spec))
+                    self._last_tools_used = list(tools_used)
+                    self._last_tool_traces = list(tool_traces)
+                    break
+                if max_steps is not None and steps >= max_steps:
+                    stop_reason = StopReason.BUDGET_EXHAUSTED
+                    tool_traces.append(self._skipped_trace(req, name, tool_use_id, args,
+                                                           "budget_exhausted", spec))
+                    self._last_tools_used = list(tools_used)
+                    self._last_tool_traces = list(tool_traces)
+                    break
+                steps += 1
                 call_success = True
                 result_success: Optional[bool] = None
                 error_text = ""
@@ -309,6 +357,8 @@ class BaseAgent:
                 risk_level = spec.risk_level.value if spec else "unknown"
                 validated_input: Optional[Dict[str, Any]] = None
                 tool_latency_ms = 0.0
+                tool_attempts = 0
+                tool_timeout_s: Optional[float] = None
                 if spec is None:
                     call_success = False
                     result: Any = {"success": False, "error": f"工具不在 {self.agent_type.value} Agent 白名单中"}
@@ -316,7 +366,9 @@ class BaseAgent:
                     error_code = "tool_not_allowed"
                     error_type = "permission"
                 else:
-                    execution = await execute_tool(spec, args, lambda: spec.handler(req, args))
+                    execution = await execute_tool(
+                        spec, args, lambda: spec.handler(req, args),
+                        timeout_s=self._harness.tool_timeout_s)
                     result = execution.agent_payload()
                     call_success = execution.success
                     error_code = execution.error_code
@@ -325,6 +377,8 @@ class BaseAgent:
                     error_text = execution.error or ""
                     validated_input = execution.validated_input
                     tool_latency_ms = execution.latency_ms
+                    tool_attempts = execution.attempts
+                    tool_timeout_s = execution.timeout_s
                     if execution.attempts > 0:
                         tools_used.append(name)
                     if isinstance(result, dict) and "success" in result:
@@ -388,6 +442,8 @@ class BaseAgent:
                         "error_type": error_type,
                         "retryable": retryable,
                         "latency_ms": round(tool_latency_ms, 1),
+                        "attempts": tool_attempts,
+                        "timeout_s": tool_timeout_s,
                         "cached": bool(result.get("cached")) if isinstance(result, dict) else False,
                         "reranked": bool(result.get("reranked")) if isinstance(result, dict) else False,
                         "rerank_status": result.get("rerank_status") if isinstance(result, dict) else None,
@@ -418,14 +474,50 @@ class BaseAgent:
                     "tool_use_id": tool_use_id,
                     "content": json.dumps(tool_payload, ensure_ascii=False),
                 })
+            if stop_reason is not None:
+                break
             messages.append({"role": "user", "content": tool_results})
 
         self._last_tools_used = tools_used
         self._last_tool_traces = tool_traces
+        self._last_stop_reason = stop_reason or StopReason.BUDGET_EXHAUSTED
         receipt = self._last_action_receipt()
         if receipt is not None:
             return receipt
-        raise RuntimeError(f"{self.agent_type.value} 工具调用超过最大轮数")
+        return "本次处理已达到工具调用上限，已停止继续尝试。请补充必要信息或稍后重试。"
+
+    def _skipped_trace(self, req: Request, name: str, tool_use_id: str, args: Any,
+                       code: str, spec: Optional[AgentToolSpec]) -> Dict[str, Any]:
+        """Trace a tool call the harness refused to execute (budget or loop)."""
+        return {
+            "request_id": req.request_id,
+            "agent_type": self.agent_type.value,
+            "tool_name": name,
+            "risk_level": spec.risk_level.value if spec else "unknown",
+            "tool_use_id": tool_use_id,
+            "input": dict(args) if isinstance(args, dict) else args,
+            "validated_input": None,
+            "success": False,
+            "result_success": False,
+            "error_code": code,
+            "error_type": "harness",
+            "retryable": False,
+            "latency_ms": 0.0,
+            "attempts": 0,
+            "timeout_s": None,
+            "cached": False,
+            "reranked": False,
+            "rerank_status": None,
+            "retrieval_status": None,
+            "citations": [],
+            "action_result": None,
+            "handoff_result": None,
+            "business_result": None,
+            "retrieval_hits": None,
+            "helper_result": None,
+            "error": ("重复调用已停止：同一工具与参数连续达到上限"
+                      if code == "loop_detected" else "工具步数预算已用尽"),
+        }
 
     def _last_action_receipt(self) -> Optional[str]:
         """Report an observed action result if a later model step fails or loops."""
