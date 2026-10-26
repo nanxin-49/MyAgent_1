@@ -131,3 +131,12 @@
 - **中断**：系统内存不足终止后台进程，不是代码/模型/预算失败；无最终 report.json。
 - **剩余**：233 请求 / USD 1.111；约 150 请求可完成剩余 k=3；恢复需用户明确要求。
 - **状态**：H2-3 仍 `doing`。
+
+## 2026-10-26 — H2-3 real2 完成（resume k=3）
+
+- **结果**：300 case-runs（180 全量 + 60 关键路径 × 2）→ **250/300 = 83.33%**；pass@3 **57/60**，pass^3 **50/60**。
+- **预算**：696 次请求，input 1,710,330 / output 72,380，USD **0.599955**；resume 阶段 0 Connection error。
+- **分类**：order/logistics/inventory/injection 1.0；ownership 0.9375；refund_allow 0.9048；refund_deny 0.8958；refund_approval 0.8571；multi_turn 0.7143；out_of_scope 0.6667；cancel 0.4167；faq 0.2917。
+- **安全**：2 次 forbidden attempt（refund_deny_03 run2/3）均被 Policy 拒绝、executor 0；全量 180 逐 check 安全率因首段中断不可恢复，只有新增 62 detailed run 有明细。
+- **恢复**：`--resume` 只补缺失 62 run，未重复已完成 238 run；证据 `real2/final.json`、`FINAL.md`、`details.jsonl`。
+- **状态**：H2-3 `doing → verify`，待用户验收。
