@@ -53,6 +53,18 @@ class BudgetLedger:
         self.halted = False
         self.events = []
 
+    @classmethod
+    def load(cls, path: Path, *, max_requests: int, max_usd: float) -> "BudgetLedger":
+        data = json.loads(path.read_text(encoding="utf-8"))
+        ledger = cls(path, max_requests=max_requests, max_usd=max_usd)
+        ledger.requests = int(data.get("requests", 0))
+        ledger.input_tokens = int(data.get("input_tokens", 0))
+        ledger.output_tokens = int(data.get("output_tokens", 0))
+        ledger.cost_usd = float(data.get("cost_usd", 0.0))
+        ledger.halted = bool(data.get("halted", False))
+        ledger.events = list(data.get("events") or [])
+        return ledger
+
     def before(self):
         if self.halted or self.requests >= self.max_requests or self.cost_usd >= self.max_usd:
             self.halted = True
@@ -284,6 +296,84 @@ def aggregate(results, ledger: BudgetLedger, key_results: list[dict]) -> dict:
     }
 
 
+def aggregate_combined(prior_rows: list[dict], new_results: list[dict],
+                       ledger: BudgetLedger) -> dict:
+    summary = []
+    for row in prior_rows:
+        summary.append({"case_id": row["case_id"], "category": row["category"],
+                        "run": row["run"], "passed": bool(row.get("passed")),
+                        "latency_ms": row.get("latency_ms") or 0})
+    for result in new_results:
+        summary.append({"case_id": result["case_id"], "category": result["category"],
+                        "run": result["run"], "passed": result["passed"],
+                        "latency_ms": result.get("latency_ms") or 0})
+    by_category = defaultdict(lambda: [0, 0])
+    for row in summary:
+        group = by_category[row["category"]]
+        group[0] += 1
+        group[1] += int(row["passed"])
+    by_case = defaultdict(dict)
+    for row in summary:
+        by_case[row["case_id"]][row["run"]] = row["passed"]
+    key_categories = {"refund_allow", "refund_approval", "refund_deny", "ownership"}
+    pass_rows = []
+    for case_id, runs in sorted(by_case.items()):
+        category = next(row["category"] for row in summary if row["case_id"] == case_id)
+        if category not in key_categories:
+            continue
+        values = list(runs.values())
+        pass_rows.append({"case_id": case_id, "runs": len(values), "passes": sum(values),
+                          "pass@runs": any(values), "pass^runs": all(values)})
+    latencies = [row["latency_ms"] for row in summary if row.get("latency_ms")]
+    detailed = new_results
+    detailed_checks = [check for result in detailed for check in result["checks"].items()]
+    forbidden_failures = sum(1 for name, passed in detailed_checks
+                             if name.split(".", 1)[-1] == "forbidden_tools" and not passed)
+    trajectory = [(name, passed) for name, passed in detailed_checks
+                  if name.split(".", 1)[-1] == "trajectory"]
+    arguments = [(name, passed) for name, passed in detailed_checks
+                 if name.split(".", 1)[-1].startswith("key_args:")]
+    return {
+        "overall": {
+            "case_runs": len(summary),
+            "task_success_rate": round(sum(row["passed"] for row in summary) / len(summary), 4)
+            if summary else None,
+            "safety_violation_rate": round(forbidden_failures / len(detailed), 4)
+            if detailed else None,
+            "safety_scope": "new_detailed_runs_only; prior 180 rows lack per-check detail",
+            "latency_p50_ms": percentile(latencies, 50),
+            "latency_p95_ms": percentile(latencies, 95),
+            "model_requests": ledger.requests,
+            "input_tokens": ledger.input_tokens,
+            "output_tokens": ledger.output_tokens,
+            "cost_usd": round(ledger.cost_usd, 8),
+            "budget_max_requests": ledger.max_requests,
+            "budget_max_usd": ledger.max_usd,
+            "halted": ledger.halted,
+            "detailed_case_runs": len(detailed),
+        },
+        "categories": {
+            cat: {"case_count": values[0],
+                  "task_success_rate": round(values[1] / values[0], 4) if values[0] else None}
+            for cat, values in sorted(by_category.items())
+        },
+        "detailed_model_metrics": {
+            "tool_selection_accuracy": round(sum(p for _, p in trajectory) / len(trajectory), 4)
+            if trajectory else None,
+            "argument_accuracy": round(sum(p for _, p in arguments) / len(arguments), 4)
+            if arguments else None,
+            "scope": "new_detailed_runs_only",
+        },
+        "pass_metrics": {
+            "cases": pass_rows,
+            "pass@runs": round(sum(row["pass@runs"] for row in pass_rows) / len(pass_rows), 4)
+            if pass_rows else None,
+            "pass^runs": round(sum(row["pass^runs"] for row in pass_rows) / len(pass_rows), 4)
+            if pass_rows else None,
+        },
+    }
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cases", default=str(DEFAULT_CASES))
@@ -293,6 +383,8 @@ def main(argv=None) -> int:
     parser.add_argument("--max-usd", type=float, default=2.0)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--only", default=None, help="comma-separated case ids")
+    parser.add_argument("--only-categories", default=None, help="comma-separated categories")
+    parser.add_argument("--resume", action="store_true")
     parser.add_argument("--fresh", action="store_true")
     args = parser.parse_args(argv)
 
@@ -304,11 +396,26 @@ def main(argv=None) -> int:
         raise RuntimeError("ANTHROPIC_API_KEY is required")
     out = Path(args.output_dir)
     ledger_path = out / "ledger.json"
-    if ledger_path.exists() and not args.fresh:
-        raise SystemExit(f"{ledger_path} exists; pass --fresh to start a new run")
+    progress_path = out / "progress.jsonl"
+    prior_rows: list[dict] = []
     out.mkdir(parents=True, exist_ok=True)
-    (out / "progress.jsonl").write_text("", encoding="utf-8")
-    ledger = BudgetLedger(ledger_path, max_requests=args.max_requests, max_usd=args.max_usd)
+    if args.resume:
+        if not ledger_path.exists():
+            raise SystemExit(f"{ledger_path} missing; cannot resume")
+        ledger = BudgetLedger.load(ledger_path, max_requests=args.max_requests,
+                                   max_usd=args.max_usd)
+        if progress_path.exists():
+            prior_rows = [json.loads(line) for line in
+                          progress_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    else:
+        if ledger_path.exists() and not args.fresh:
+            raise SystemExit(f"{ledger_path} exists; pass --fresh to start a new run")
+        progress_path.write_text("", encoding="utf-8")
+        ledger = BudgetLedger(ledger_path, max_requests=args.max_requests,
+                              max_usd=args.max_usd)
+    details_path = out / "details.jsonl"
+    if not args.resume:
+        details_path.write_text("", encoding="utf-8")
     raw = AsyncAnthropic(
         api_key=api_key, base_url=base_url, max_retries=0,
         timeout=httpx.Timeout(60, connect=5),
@@ -324,10 +431,16 @@ def main(argv=None) -> int:
     if args.only:
         wanted = {item.strip() for item in args.only.split(",") if item.strip()}
         cases = [case for case in cases if case["id"] in wanted]
+    if args.only_categories:
+        wanted_categories = {item.strip() for item in args.only_categories.split(",")
+                             if item.strip()}
+        cases = [case for case in cases if case["category"] in wanted_categories]
     key_categories = {"refund_allow", "refund_approval", "refund_deny", "ownership"}
+    completed = {(row["case_id"], int(row["run"])) for row in prior_rows}
     plan = [(case, 1) for case in cases]
     plan += [(case, run) for case in cases if case["category"] in key_categories
              for run in (2, 3)]
+    plan = [(case, run) for case, run in plan if (case["id"], run) not in completed]
     results: list[dict] = []
     key_results: list[dict] = []
     halted = False
@@ -350,10 +463,12 @@ def main(argv=None) -> int:
         results.append(result)
         if case["category"] in key_categories:
             key_results.append(result)
-        with (out / "progress.jsonl").open("a", encoding="utf-8") as handle:
+        with progress_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps({key: result.get(key) for key in (
                 "case_id", "category", "run", "passed", "latency_ms", "model_calls", "error")},
                 ensure_ascii=False) + "\n")
+        with details_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(result, ensure_ascii=False, default=str) + "\n")
         print(json.dumps({"case": result["case_id"], "run": run, "passed": result["passed"],
                           "requests": ledger.requests, "usd": round(ledger.cost_usd, 5)},
                          ensure_ascii=False), flush=True)
@@ -363,9 +478,36 @@ def main(argv=None) -> int:
         "model": model, "base_url": base_url, "layer": "real_model",
         "halted": halted or ledger.halted, "results": results,
     }
-    report.update(aggregate(results, ledger, key_results))
-    (out / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str),
-                                     encoding="utf-8")
+    if args.resume:
+        report["resume"] = True
+        report["prior_rows"] = len(prior_rows)
+        report["new_results"] = len(results)
+        report.update(aggregate_combined(prior_rows, results, ledger))
+        target = out / "final.json"
+        target.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str),
+                          encoding="utf-8")
+        lines = ["# H2-3 real2 Final", "",
+                 f"- case_runs: {report['overall']['case_runs']}",
+                 f"- task_success_rate: {report['overall']['task_success_rate']}",
+                 f"- safety_violation_rate: {report['overall']['safety_violation_rate']} "
+                 f"({report['overall']['safety_scope']})",
+                 f"- requests/cost: {report['overall']['model_requests']} / "
+                 f"USD {report['overall']['cost_usd']}",
+                 f"- p50/p95: {report['overall']['latency_p50_ms']} / "
+                 f"{report['overall']['latency_p95_ms']} ms",
+                 f"- pass@runs/pass^runs: {report['pass_metrics']['pass@runs']} / "
+                 f"{report['pass_metrics']['pass^runs']}", "",
+                 "| Case | Runs | Passes | pass@runs | pass^runs |",
+                 "| --- | ---: | ---: | --- | --- |"]
+        for row in report["pass_metrics"]["cases"]:
+            lines.append(f"| {row['case_id']} | {row['runs']} | {row['passes']} | "
+                         f"{row['pass@runs']} | {row['pass^runs']} |")
+        (out / "FINAL.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    else:
+        report.update(aggregate(results, ledger, key_results))
+        target = out / "report.json"
+        target.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str),
+                          encoding="utf-8")
     print(json.dumps({"overall": report["overall"], "pass_metrics": report["pass_metrics"]},
                      ensure_ascii=False, indent=2))
     return 0 if not report["overall"]["halted"] else 1

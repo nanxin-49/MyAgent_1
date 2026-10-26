@@ -1,5 +1,7 @@
 # H2-3 real2 部分运行报告（系统内存中断）
 
+> **后续状态**：已通过 `--resume` 补齐剩余 62 个 k=3 run，最终结果见同目录 `final.json` / `FINAL.md`。本文件是中断时快照；其中“safety_violation 0”无法从 progress 恢复，不应作为最终安全结论。最终新增 62 个 detailed run 中有 2 次 forbidden attempt（`request_refund` 被 Policy 拒绝，executor 0）。
+
 - 运行：`2026-10-26`，`deepseek-flash`，连接错误 **0**（重试/节流生效）
 - 中断原因：**系统内存不足，Claude Code 终止后台进程**；不是代码/模型/预算失败，也不是 `halted`
 - 进度：238 / 300 case-runs（全量 180 完成；关键路径只完成 refund_allow、refund_approval 的 k=3，refund_deny 1 条、ownership 未开始）
