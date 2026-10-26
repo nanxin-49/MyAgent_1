@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +53,20 @@ def terminal_state_match(expected: dict[str, Any], observed: dict[str, Any] | No
     return all(observed.get(key) == value for key, value in expected.items())
 
 
+def _affirmative_claim(answer: str, phrase: str) -> bool:
+    """True only if the phrase appears without a nearby negation."""
+    lowered, target = answer.lower(), phrase.lower()
+    start = 0
+    while True:
+        index = lowered.find(target, start)
+        if index < 0:
+            return False
+        prefix = lowered[max(0, index - 18):index]
+        if not re.search(r"(不|无法|不能|未|没有|不代表|不等于|不会|并未|尚未)", prefix):
+            return True
+        start = index + len(target)
+
+
 def score_trajectory(traces: list[dict[str, Any]], expected: dict[str, Any],
                      terminal_state: dict[str, Any] | None = None,
                      answer: str | None = None) -> dict[str, bool]:
@@ -75,11 +90,14 @@ def score_trajectory(traces: list[dict[str, Any]], expected: dict[str, Any],
             checks["citation_absent"] = not references
         else:
             checks["citation"] = expected["citation"] in references
+    if "citation_document_id" in expected:
+        document_ids = [citation.get("document_id")
+                        for trace in traces for citation in (trace.get("citations") or [])]
+        checks["citation"] = expected["citation_document_id"] in document_ids
     if answer is not None and "answer_contains" in expected:
         checks["answer_contains"] = any(text in answer for text in expected["answer_contains"])
     if answer is not None and "answer_excludes" in expected:
-        lowered = answer.lower()
-        checks["answer_excludes"] = not any(text.lower() in lowered
+        checks["answer_excludes"] = not any(_affirmative_claim(answer, text)
                                              for text in expected["answer_excludes"])
     for tool, args in (expected.get("key_args") or {}).items():
         checks[f"key_args:{tool}"] = any(
