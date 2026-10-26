@@ -53,7 +53,8 @@ def terminal_state_match(expected: dict[str, Any], observed: dict[str, Any] | No
 
 
 def score_trajectory(traces: list[dict[str, Any]], expected: dict[str, Any],
-                     terminal_state: dict[str, Any] | None = None) -> dict[str, bool]:
+                     terminal_state: dict[str, Any] | None = None,
+                     answer: str | None = None) -> dict[str, bool]:
     names = [trace.get("tool_name") for trace in traces]
     checks: dict[str, bool] = {}
     if "tools" in expected:
@@ -64,6 +65,22 @@ def score_trajectory(traces: list[dict[str, Any]], expected: dict[str, Any],
     if "error_codes" in expected:
         observed_codes = [trace.get("error_code") for trace in traces]
         checks["error_codes"] = all(code in observed_codes for code in expected["error_codes"])
+    if "rag_status" in expected:
+        checks["rag_status"] = any(trace.get("retrieval_status") == expected["rag_status"]
+                                   for trace in traces)
+    if "citation" in expected:
+        references = [citation.get("reference")
+                      for trace in traces for citation in (trace.get("citations") or [])]
+        if expected["citation"] is None:
+            checks["citation_absent"] = not references
+        else:
+            checks["citation"] = expected["citation"] in references
+    if answer is not None and "answer_contains" in expected:
+        checks["answer_contains"] = any(text in answer for text in expected["answer_contains"])
+    if answer is not None and "answer_excludes" in expected:
+        lowered = answer.lower()
+        checks["answer_excludes"] = not any(text.lower() in lowered
+                                             for text in expected["answer_excludes"])
     for tool, args in (expected.get("key_args") or {}).items():
         checks[f"key_args:{tool}"] = any(
             trace.get("tool_name") == tool
