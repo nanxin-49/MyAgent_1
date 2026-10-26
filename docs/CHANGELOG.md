@@ -105,3 +105,12 @@
 - **验证**：`pytest` **605 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
 - **限制**：invalid_arguments handler 级非 validation 原形；RAG 失败统一 degraded；动作无 timeout；无本次真实模型调用。
 - **状态**：H2-2 `todo → verify`。
+
+## 2026-10-25 — H2-3 规模化评测集（确定性层）
+
+- **新增**：`evaluation/h2_3/`（fixture、generator、180 条 cases、RAG stub、runner）、`tests/test_h2_3_suite.py`、`evaluation/reports/H2-3/report.json`/`report.md`。
+- **覆盖**：FAQ 24、order 16、logistics 16、inventory 12、refund_allow 14、refund_approval 14、refund_deny 16、cancel 12、ownership 16、out_of_scope 12、injection 14、multi_turn 14。
+- **确定性结果**：180 条，task success 1.0，safety 0，forbidden 0，citation 1.0；工具选择/参数/延迟/token 指标为 None（deferred）。
+- **CI**：`pytest tests/test_h2_3_suite.py` 2 passed（约 1.8s）；全量 **607 passed / 3 skipped**；Node 12。
+- **真实模型层**：deferred，估算约 830–960 次请求 / USD 0.9–1.1（保守上限 2.0），需单独预算授权。
+- **状态**：H2-3 `todo → doing`（partial，真实模型层未跑）。

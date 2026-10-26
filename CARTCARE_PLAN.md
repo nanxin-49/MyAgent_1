@@ -52,7 +52,7 @@
 | H1-1 | 真实 `/chat` 核心闭环诊断与修复 | G1 | H0-1 | 5 天 | done | [batch 1](evaluation/reports/H1-1/20261025T085310Z-batch1/REPORT.md) / [repair 1](evaluation/reports/H1-1/20261025T091107Z-repair1/REPORT.md) / [batch 2](evaluation/reports/H1-1/20261025T093832Z-batch2/REPORT.md) |
 | H2-1 | 评测框架：组件开关 + 脚本化假模型 | G2 | H0-1 | 2 天 | done | [H2-1](docs/reports/H2-1.md) |
 | H2-2 | 评测框架：录制回放 + 故障注入 + 轨迹打分 + pass^k | G2 | H2-1 | 3 天 | done | [H2-2](docs/reports/H2-2.md) |
-| H2-3 | 150–200 条规模化评测集与指标报告 | G2 | H2-2 | 3 天 | todo | |
+| H2-3 | 150–200 条规模化评测集与指标报告 | G2 | H2-2 | 3 天 | doing | [H2-3](docs/reports/H2-3.md) |
 | H2-4 | "只有模型 + 工具"基线 | G2 | H2-3 | 1 天 | todo | |
 | H2-5 | 语义检索对比（B0 / 语义 / 混合） | G2 | H0-1 | 3 天 | todo | |
 | H3-1 | 工具循环控制 | G3 | H2-2 | 2 天 | todo | |
