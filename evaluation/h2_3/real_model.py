@@ -11,6 +11,7 @@ import json
 import os
 import time
 from collections import Counter, defaultdict
+from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -23,9 +24,12 @@ from agents.agent_orchestrator import Request
 from agents.support_agent import SupportRuntime
 from agents.tools import build_shared_rag_tools
 from core.handoff import HandoffService
+from core.harness import HarnessConfig
 from evaluation.agent_trace_eval import score_trajectory
 from evaluation.h2_3.run_suite import (DEFAULT_CASES, DEFAULT_FIXTURE, load_cases,
                                        terminal_state, turns)
+from evaluation.h2_4.metrics import summarize_baseline
+from evaluation.h2_4.profile import harness_for_profile
 from evaluation.scripted_model import ScriptedModel  # noqa: F401  (test seams)
 from evaluation.topology_experiment import isolated_business
 from mcp.knowledge_base import KnowledgeBase
@@ -157,38 +161,56 @@ def run_turn(runtime, turn, principal, context, case_id):
 
 
 def score_case(case: dict, fixture: dict, *, api_key: str, base_url: str, model: str,
-               budgeted, kb: KnowledgeBase):
+               budgeted, kb: KnowledgeBase, harness: HarnessConfig | None = None):
     from evaluation.h2_3.run_suite import principal_for
     principal = principal_for(case)
     handoffs = HandoffService()
     context = ""
     all_checks: dict[str, bool] = {}
     turn_rows = []
+    loop_truncated = False
     for index, turn in enumerate(turns(case), 1):
-        tools, service, backend = isolated_business(fixture, NOW)
+        tools, service, backend = isolated_business(fixture, NOW, harness=harness)
         manager = build_manager(api_key, base_url, model, budgeted, kb)
         tools.update(build_shared_rag_tools(manager))
-        runtime = SupportRuntime(api_key, model, base_url, client=budgeted)
+        runtime = SupportRuntime(api_key, model, base_url, client=budgeted, harness=harness)
         runtime.handoff_service = handoffs
         runtime.set_shared_tools(tools)
         start = time.monotonic()
-        result = run_turn(runtime, turn, principal, context, case["id"])
+        turn_error = None
+        expected = dict(turn.get("expected_agent") or turn.get("expected") or {})
+        forbidden = list(expected.get("forbidden_tools") or [])
+        try:
+            result = run_turn(runtime, turn, principal, context, case["id"])
+        except Exception as exc:  # keep evidence when the tool loop aborts
+            result = None
+            turn_error = f"{type(exc).__name__}: {exc}"
+            loop_truncated = loop_truncated or "最大轮数" in turn_error
         latency = round((time.monotonic() - start) * 1000, 1)
         current = terminal_state(service, backend, handoffs)
-        expected = dict(turn.get("expected_agent") or turn.get("expected") or {})
-        reference = expected.pop("citation", None)
-        if reference:
-            expected["citation_document_id"] = str(reference).split("#", 1)[0]
-        checks = score_trajectory(result.tool_traces, expected, current, answer=result.response)
+        if result is None:
+            checks = {"turn_error": False}
+            response_text = ""
+            tools_used, tool_traces, model_calls = [], [], 0
+        else:
+            reference = expected.pop("citation", None)
+            if reference:
+                expected["citation_document_id"] = str(reference).split("#", 1)[0]
+            checks = score_trajectory(result.tool_traces, expected, current,
+                                      answer=result.response)
+            response_text = result.response
+            tools_used, tool_traces = result.tools_used, result.tool_traces
+            model_calls = len(result.model_calls)
         for name, value in checks.items():
             all_checks[f"turn{index}.{name}"] = value
         turn_rows.append({
-            "turn": index, "message": turn["message"], "response": result.response,
-            "tools_used": result.tools_used, "tool_traces": result.tool_traces,
+            "turn": index, "message": turn["message"], "response": response_text,
+            "tools_used": tools_used, "tool_traces": tool_traces,
             "terminal_state": current, "checks": checks, "latency_ms": latency,
-            "model_calls": len(result.model_calls),
+            "model_calls": model_calls, "error": turn_error,
+            "forbidden_tools": forbidden,
         })
-        context = (context + "\n" if context else "") + f"用户: {turn['message']}\n助手: {result.response}"
+        context = (context + "\n" if context else "") + f"用户: {turn['message']}\n助手: {response_text}"
     return {
         "case_id": case["id"], "category": case["category"],
         "passed": bool(all_checks) and all(all_checks.values()),
@@ -196,6 +218,7 @@ def score_case(case: dict, fixture: dict, *, api_key: str, base_url: str, model:
         "terminal_state": terminal_state(service, backend, handoffs),
         "latency_ms": round(sum(row["latency_ms"] for row in turn_rows), 1),
         "model_calls": sum(row["model_calls"] for row in turn_rows),
+        "loop_truncated": loop_truncated,
         "source": case.get("source", {}),
     }
 
@@ -386,6 +409,12 @@ def main(argv=None) -> int:
     parser.add_argument("--only-categories", default=None, help="comma-separated categories")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--fresh", action="store_true")
+    parser.add_argument("--profile", choices=("full", "bare"), default="full",
+                        help="full = production harness; bare = model + tools only")
+    parser.add_argument("--no-key-runs", action="store_true",
+                        help="run every case once; skip key-category runs 2/3")
+    parser.add_argument("--max-tool-rounds", type=int, default=10,
+                        help="bare profile experiment bound (not a deliverable guardrail)")
     args = parser.parse_args(argv)
 
     load_dotenv(ROOT / ".env")
@@ -414,7 +443,12 @@ def main(argv=None) -> int:
         ledger = BudgetLedger(ledger_path, max_requests=args.max_requests,
                               max_usd=args.max_usd)
     details_path = out / "details.jsonl"
-    if not args.resume:
+    prior_details: list[dict] = []
+    if args.resume:
+        if details_path.exists():
+            prior_details = [json.loads(line) for line in
+                             details_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    else:
         details_path.write_text("", encoding="utf-8")
     raw = AsyncAnthropic(
         api_key=api_key, base_url=base_url, max_retries=0,
@@ -423,6 +457,7 @@ def main(argv=None) -> int:
                                       timeout=httpx.Timeout(60, connect=5), trust_env=False),
     )
     budgeted = BudgetedClient(raw, ledger)
+    harness = harness_for_profile(args.profile, max_tool_rounds=args.max_tool_rounds)
     kb = KnowledgeBase(chroma_host="127.0.0.1", chroma_port=8001)
     _, cases = load_cases(args.cases)
     fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
@@ -438,8 +473,9 @@ def main(argv=None) -> int:
     key_categories = {"refund_allow", "refund_approval", "refund_deny", "ownership"}
     completed = {(row["case_id"], int(row["run"])) for row in prior_rows}
     plan = [(case, 1) for case in cases]
-    plan += [(case, run) for case in cases if case["category"] in key_categories
-             for run in (2, 3)]
+    if not args.no_key_runs:
+        plan += [(case, run) for case in cases if case["category"] in key_categories
+                 for run in (2, 3)]
     plan = [(case, run) for case, run in plan if (case["id"], run) not in completed]
     results: list[dict] = []
     key_results: list[dict] = []
@@ -450,7 +486,7 @@ def main(argv=None) -> int:
             break
         try:
             result = score_case(case, fixture, api_key=api_key, base_url=base_url,
-                                model=model, budgeted=budgeted, kb=kb)
+                                model=model, budgeted=budgeted, kb=kb, harness=harness)
         except BudgetExceeded:
             halted = True
             break
@@ -476,13 +512,25 @@ def main(argv=None) -> int:
         "schema": "echomind.h2_3.real_report", "version": 1,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "model": model, "base_url": base_url, "layer": "real_model",
+        "profile": args.profile,
+        "harness": asdict(harness or HarnessConfig()),
+        "max_tool_rounds": args.max_tool_rounds if harness else None,
         "halted": halted or ledger.halted, "results": results,
     }
+    merged_details = [*prior_details, *results]
+    loop_truncated = sum(1 for result in merged_details if result.get("loop_truncated"))
+    report["baseline_metrics"] = summarize_baseline(
+        merged_details, loop_truncated=loop_truncated)
+    report["baseline_metrics_scope"] = (
+        "all_detailed_runs" if prior_details else
+        "new_results_only" if args.resume else "all_results")
     if args.resume:
         report["resume"] = True
         report["prior_rows"] = len(prior_rows)
         report["new_results"] = len(results)
         report.update(aggregate_combined(prior_rows, results, ledger))
+        if prior_details:
+            report["overall"]["safety_scope"] = "all_detailed_runs"
         target = out / "final.json"
         target.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str),
                           encoding="utf-8")
@@ -508,7 +556,8 @@ def main(argv=None) -> int:
         target = out / "report.json"
         target.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str),
                           encoding="utf-8")
-    print(json.dumps({"overall": report["overall"], "pass_metrics": report["pass_metrics"]},
+    print(json.dumps({"overall": report["overall"], "pass_metrics": report["pass_metrics"],
+                      "baseline_metrics": report["baseline_metrics"]},
                      ensure_ascii=False, indent=2))
     return 0 if not report["overall"]["halted"] else 1
 

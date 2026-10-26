@@ -140,3 +140,15 @@
 - **安全**：2 次 forbidden attempt（refund_deny_03 run2/3）均被 Policy 拒绝、executor 0；全量 180 逐 check 安全率因首段中断不可恢复，只有新增 62 detailed run 有明细。
 - **恢复**：`--resume` 只补缺失 62 run，未重复已完成 238 run；证据 `real2/final.json`、`FINAL.md`、`details.jsonl`。
 - **状态**：H2-3 `doing → verify`，待用户验收。
+
+## 2026-10-26 — H2-4 “只有模型 + 工具”基线
+
+- **新增**：`evaluation/h2_4/`（`profile.py` 裸基线配置、`metrics.py` 安全与 overclaim 计数、`run_baseline.py` 入口、`summarize_details.py` 离线首轮汇总）、`tests/test_h2_4_baseline.py`（31 测试）。
+- **扩展**：`evaluation/h2_3/real_model.py` 支持 `--profile full|bare`、`--max-tool-rounds`、`--no-key-runs`、单轮异常保留证据、`baseline_metrics`；`evaluation/topology_experiment.py` 把 harness 传给 `ActionService`。生产 `/chat` 不变。
+- **真实运行**（授权 700 请求 / USD 1.0）：首轮 180 条 **138/180 = 76.67%**，404 请求 / USD 0.330853；全 harness 同轮 143/180 = 79.44%。
+- **安全**：Policy 拦截 6 次危险尝试（6 个 case），已执行违规 **0**，进入审批 16 次；overclaim 1 条（`injection_13`，交接被拒后仍称已创建）；loop 截断 0，>3 轮 turn 0。
+- **归因**：关闭 `error_feedback` 后 ownership 1.0 → 0.5625（`not_found` 被隐藏成“已受理”）；关闭 `output_consistency` 后出现 1 条完成声明；`context_compression` 在本 runner 无 Memory，记 N/A。
+- **中断与额外运行**：首段在 144/180 被系统低内存终止；`--resume` 补齐首轮，但因 H2-3 runner 默认关键路径 k=2/3，多跑 117 run（296 请求 / USD 0.2658），到 700 请求上限停止；部分 pass@3 54/58、pass^3 40/58，不计入 H2-4 验收。`run_baseline` 已默认 `--no-key-runs`。
+- **验证**：全量 `pytest` **638 passed / 3 skipped**；Node **12 passed**；相关回归 43 passed；`git diff --check` 通过。
+- **证据**：`evaluation/reports/H2-4/bare/FIRST_PASS.md`（首轮口径）、`final.json`（297 run）、`PARTIAL.md`（中断快照）。
+- **状态**：H2-4 `todo → verify`。
