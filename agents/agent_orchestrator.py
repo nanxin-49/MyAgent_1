@@ -42,7 +42,7 @@ from agents.tools import (
 )
 from core.intent_recognizer import IntentCategory, IntentRecognizer, UrgencyLevel
 from core.llm_utils import extract_text_content
-from core.tool_contract import execute_tool, validate_tool_input
+from core.tool_contract import execute_tool, truncate_tool_payload, validate_tool_input
 
 logger = logging.getLogger(__name__)
 
@@ -427,6 +427,10 @@ class BaseAgent:
                         "can_confirm_refund", "reason", "success", "error", "amount_a", "amount_b",
                         "difference", "interpretation", "request_id", "sensitive_data_required",
                     ) if key in result}
+                model_payload = truncate_tool_payload(
+                    result, self._harness.max_tool_result_chars)
+                truncated = (isinstance(model_payload, dict)
+                             and model_payload.get("truncated") is True)
                 tool_traces.append(
                     {
                         "request_id": req.request_id,
@@ -456,6 +460,7 @@ class BaseAgent:
                         "retrieval_hits": retrieval_hits,
                         "helper_result": helper_result,
                         "error": error_text,
+                        "truncated": truncated,
                     }
                 )
                 # Persist incrementally so a later provider failure still
@@ -463,7 +468,7 @@ class BaseAgent:
                 self._last_tools_used = list(tools_used)
                 self._last_tool_traces = list(tool_traces)
                 req.handoff_evidence = list(tool_traces)
-                tool_payload = result
+                tool_payload = model_payload
                 if (not self._harness.error_feedback
                         and isinstance(result, dict) and result.get("success") is False):
                     # Keep the required one-tool_result-per-tool_use shape while
@@ -515,6 +520,7 @@ class BaseAgent:
             "business_result": None,
             "retrieval_hits": None,
             "helper_result": None,
+            "truncated": False,
             "error": ("重复调用已停止：同一工具与参数连续达到上限"
                       if code == "loop_detected" else "工具步数预算已用尽"),
         }

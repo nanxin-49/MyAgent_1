@@ -1,0 +1,296 @@
+{
+  "schema": "cartcare.h3_2.recovery_report",
+  "version": 1,
+  "created_at": "2026-10-26T09:30:01.195530+00:00",
+  "layer": "deterministic_probe",
+  "model": "recovery-probe (acts only on structured error fields)",
+  "note": "Deterministic information-channel comparison, not real-model quality. Real-model recovery is deferred to H3-6.",
+  "arms": {
+    "on": {
+      "cases": [
+        {
+          "case_id": "timeout_once",
+          "category": "timeout",
+          "recovered": true,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": true,
+            "terminal_state": true
+          },
+          "response": "订单查询完成。",
+          "tools_used": [
+            "get_order",
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": false, \"data\": null, \"error\": \"执行超时\", \"error_code\": \"timeout\", \"error_type\": \"timeout\", \"retryable\": true, \"suggested_action\": \"retry_later\"}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "timeout",
+              "error_code": "timeout"
+            }
+          ]
+        },
+        {
+          "case_id": "not_found",
+          "category": "not_found",
+          "recovered": true,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": true,
+            "terminal_state": true
+          },
+          "response": "请提供正确的订单号，我再帮您核对。",
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": false, \"data\": null, \"source\": \"business_provider\", \"error\": {\"code\": \"not_found\", \"message\": \"injected not_found\"}, \"error_code\": \"not_found\", \"error_type\": \"provider\", \"retryable\": false, \"suggested_action\": \"ask_user_to_confirm_identifier\"}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "not_found",
+              "error_code": "not_found"
+            }
+          ]
+        },
+        {
+          "case_id": "invalid_arguments",
+          "category": "invalid_arguments",
+          "recovered": true,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": true,
+            "terminal_state": true
+          },
+          "response": "请补充订单号或商品信息。",
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": false, \"error\": \"injected invalid_arguments\", \"error_code\": \"invalid_arguments\", \"error_type\": \"tool\", \"retryable\": false, \"suggested_action\": \"ask_user_for_missing_fields\"}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "invalid_arguments",
+              "error_code": "invalid_arguments"
+            }
+          ]
+        },
+        {
+          "case_id": "dependency_sticky",
+          "category": "dependency_failure",
+          "recovered": true,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": true,
+            "terminal_state": true
+          },
+          "response": "业务系统暂时不可用，请稍后重试。",
+          "tools_used": [
+            "get_order",
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": false, \"data\": null, \"source\": \"business_provider\", \"error\": {\"code\": \"dependency_failure\", \"message\": \"injected dependency_failure\"}, \"error_code\": \"dependency_failure\", \"error_type\": \"provider\", \"retryable\": true, \"suggested_action\": \"retry_later\"}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "dependency_failure",
+              "error_code": "dependency_failure"
+            },
+            {
+              "tool": "get_order",
+              "call_index": 2,
+              "kind": "dependency_failure",
+              "error_code": "dependency_failure"
+            }
+          ]
+        },
+        {
+          "case_id": "policy_rejection",
+          "category": "policy",
+          "recovered": true,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": true,
+            "terminal_state": true
+          },
+          "response": "该订单已超过退款申请期限，无法提交申请。",
+          "tools_used": [
+            "request_refund"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": "rejected"
+          },
+          "model_visible_payload": "{\"success\": false, \"status\": \"rejected\", \"action_id\": \"act_6b7596afe84a4282\", \"action\": {\"action_id\": \"act_6b7596afe84a4282\", \"action_type\": \"refund\", \"user_id\": \"customer-1\", \"order_id\": \"ORD-1001\", \"amount\": \"50.0\", \"policy_decision\": {\"action\": \"refund\", \"decision\": \"deny\", \"reason_code\": \"refund_window_expired\", \"policy_version\": \"refund-cancel-v1\", \"explanation\": \"退款申请已超过 7 天窗口\", \"order_id\": \"ORD-1001\", \"amount\": null, \"evaluated_at\": \"2026-10-02T00:00:00Z\", \"requires_approval\": false, \"metadata\": {}}, \"policy_version\": \"refund-cancel-v1\", \"status\": \"rejected\", \"created_at\": \"2026-10-02T0",
+          "fault_events": []
+        }
+      ],
+      "recovery_rate": 1.0,
+      "executed_violations": 0
+    },
+    "off": {
+      "cases": [
+        {
+          "case_id": "timeout_once",
+          "category": "timeout",
+          "recovered": false,
+          "checks": {
+            "trajectory": false,
+            "answer_contains": false,
+            "terminal_state": true
+          },
+          "response": "查询已受理。",
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": true, \"acknowledged\": true}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "timeout",
+              "error_code": "timeout"
+            }
+          ]
+        },
+        {
+          "case_id": "not_found",
+          "category": "not_found",
+          "recovered": false,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": false,
+            "terminal_state": true
+          },
+          "response": "查询已受理。",
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": true, \"acknowledged\": true}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "not_found",
+              "error_code": "not_found"
+            }
+          ]
+        },
+        {
+          "case_id": "invalid_arguments",
+          "category": "invalid_arguments",
+          "recovered": false,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": false,
+            "terminal_state": true
+          },
+          "response": "查询已受理。",
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": true, \"acknowledged\": true}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "invalid_arguments",
+              "error_code": "invalid_arguments"
+            }
+          ]
+        },
+        {
+          "case_id": "dependency_sticky",
+          "category": "dependency_failure",
+          "recovered": false,
+          "checks": {
+            "trajectory": false,
+            "answer_contains": false,
+            "terminal_state": true
+          },
+          "response": "查询已受理。",
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "model_visible_payload": "{\"success\": true, \"acknowledged\": true}",
+          "fault_events": [
+            {
+              "tool": "get_order",
+              "call_index": 1,
+              "kind": "dependency_failure",
+              "error_code": "dependency_failure"
+            }
+          ]
+        },
+        {
+          "case_id": "policy_rejection",
+          "category": "policy",
+          "recovered": false,
+          "checks": {
+            "trajectory": true,
+            "answer_contains": false,
+            "terminal_state": true
+          },
+          "response": "退款申请已受理。",
+          "tools_used": [
+            "request_refund"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": "rejected"
+          },
+          "model_visible_payload": "{\"success\": true, \"acknowledged\": true}",
+          "fault_events": []
+        }
+      ],
+      "recovery_rate": 0.0,
+      "executed_violations": 0
+    }
+  }
+}

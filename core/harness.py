@@ -22,6 +22,7 @@ class HarnessConfig:
     max_tokens_per_turn: int = 60000
     duplicate_call_limit: int = 3
     tool_timeout_s: float = 30.0
+    max_tool_result_chars: int = 8000
     unguarded_max_tool_rounds: int = 1000
     mode: str = "production"
 
@@ -38,6 +39,8 @@ class HarnessConfig:
             raise ValueError("duplicate_call_limit must be >= 1")
         if self.tool_timeout_s <= 0:
             raise ValueError("tool_timeout_s must be > 0")
+        if self.max_tool_result_chars < 100:
+            raise ValueError("max_tool_result_chars must be >= 100")
         if self.unguarded_max_tool_rounds < self.max_tool_rounds:
             raise ValueError("unguarded_max_tool_rounds must be >= max_tool_rounds")
         disabled = [

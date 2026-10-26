@@ -162,3 +162,12 @@
 - **验证**：全量 `pytest` **653 passed / 3 skipped**；相关回归 113 passed；180 条确定性套件 180/180、safety 0；Node **12 passed**；`git diff --check` 通过。
 - **限制**：写动作仍不设执行超时（N11 归 H4-3）；`needs_clarification` 仅观测；token 预算未在真实模型下验证。
 - **状态**：H3-1 `todo → verify`。
+
+## 2026-10-26 — H3-2 结构化错误回传
+
+- **新增**：`core/tool_contract.py` 的 `suggested_action_for()`、`truncate_tool_payload()`；`evaluation/h3_2/`（恢复探针、5 条故障用例、对比 runner）；`tests/test_h3_2_structured_errors.py`（23 测试）。
+- **行为**：失败工具 payload 统一补齐 `error_code`/`error_type`/`retryable`/`suggested_action`，业务嵌套 `error` 与动作字段保留；模型可见 tool_result 超过 `max_tool_result_chars=8000` 时截断并标 `truncated`；Trace 记录该标记；`error_feedback=False` 仍在截断后覆盖为 ack。
+- **实测**（确定性恢复探针）：`error_feedback` 开 **5/5 恢复**，关 **0/5**；两臂 `executor_calls=0`。不是真实模型结论，真实对比留给 H3-6。
+- **验证**：全量 `pytest` **676 passed / 3 skipped**；相关回归 83 passed；180 条确定性套件 180/180、safety 0（历史 report.json 已恢复）；Node **12 passed**；`git diff --check` 通过。
+- **限制**：`suggested_action` 只是建议；截断只作用于模型可见 payload；非字典超长 payload 变成带 `preview` 的对象。
+- **状态**：H3-2 `todo → verify`。

@@ -1,0 +1,108 @@
+{
+  "schema": "cartcare.h3_2.recovery_cases",
+  "version": 1,
+  "cases": [
+    {
+      "id": "timeout_once",
+      "category": "timeout",
+      "message": "帮我查订单 ORD-1001",
+      "tool": "get_order",
+      "args": {"order_id": "ORD-1001"},
+      "faults": [{"tool": "get_order", "kind": "timeout", "on_call": 1}],
+      "max_retries": 1,
+      "success_text": "订单查询完成。",
+      "unrecovered_text": "查询已受理。",
+      "ask_text": "请补充订单号。",
+      "confirm_text": "请提供正确的订单号。",
+      "exhausted_text": "系统暂时不可用，请稍后重试。",
+      "explain_text": "无法完成该请求。",
+      "expected": {
+        "tools": ["get_order", "get_order"],
+        "tool_mode": "ordered",
+        "answer_contains": ["查询完成"],
+        "terminal_state": {"executor_calls": 0}
+      }
+    },
+    {
+      "id": "not_found",
+      "category": "not_found",
+      "message": "帮我查订单 ORD-MISSING",
+      "tool": "get_order",
+      "args": {"order_id": "ORD-MISSING"},
+      "faults": [{"tool": "get_order", "kind": "not_found", "on_call": 1}],
+      "success_text": "订单查询完成。",
+      "unrecovered_text": "查询已受理。",
+      "ask_text": "请补充订单号。",
+      "confirm_text": "请提供正确的订单号，我再帮您核对。",
+      "exhausted_text": "请稍后重试。",
+      "explain_text": "无法访问该订单。",
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "partial",
+        "answer_contains": ["订单号"],
+        "terminal_state": {"executor_calls": 0}
+      }
+    },
+    {
+      "id": "invalid_arguments",
+      "category": "invalid_arguments",
+      "message": "帮我查订单",
+      "tool": "get_order",
+      "args": {"order_id": "ORD-1001"},
+      "faults": [{"tool": "get_order", "kind": "invalid_arguments", "on_call": 1}],
+      "success_text": "订单查询完成。",
+      "unrecovered_text": "查询已受理。",
+      "ask_text": "请补充订单号或商品信息。",
+      "confirm_text": "请确认订单号。",
+      "exhausted_text": "请稍后重试。",
+      "explain_text": "无法完成该请求。",
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "partial",
+        "answer_contains": ["补充"],
+        "terminal_state": {"executor_calls": 0}
+      }
+    },
+    {
+      "id": "dependency_sticky",
+      "category": "dependency_failure",
+      "message": "帮我查订单 ORD-1001",
+      "tool": "get_order",
+      "args": {"order_id": "ORD-1001"},
+      "faults": [{"tool": "get_order", "kind": "dependency_failure", "on_call": 1, "mode": "sticky"}],
+      "max_retries": 1,
+      "success_text": "订单查询完成。",
+      "unrecovered_text": "查询已受理。",
+      "ask_text": "请补充订单号。",
+      "confirm_text": "请确认订单号。",
+      "exhausted_text": "业务系统暂时不可用，请稍后重试。",
+      "explain_text": "无法完成该请求。",
+      "expected": {
+        "tools": ["get_order", "get_order"],
+        "tool_mode": "ordered",
+        "answer_contains": ["稍后"],
+        "terminal_state": {"executor_calls": 0}
+      }
+    },
+    {
+      "id": "policy_rejection",
+      "category": "policy",
+      "message": "为订单 ORD-1001 申请退款 50 元",
+      "tool": "request_refund",
+      "args": {"order_id": "ORD-1001", "amount": 50.0},
+      "faults": [],
+      "success_text": "退款申请已提交。",
+      "unrecovered_text": "退款申请已受理。",
+      "ask_text": "请补充订单号。",
+      "confirm_text": "请确认订单号。",
+      "exhausted_text": "请稍后重试。",
+      "explain_text": "该订单已超过退款申请期限，无法提交申请。",
+      "expected": {
+        "tools": ["request_refund"],
+        "tool_mode": "partial",
+        "answer_contains": ["期限"],
+        "terminal_state": {"executor_calls": 0, "action_status": "rejected"}
+      }
+    }
+  ]
+}
