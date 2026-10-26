@@ -17,6 +17,7 @@
 """
 import asyncio
 from core.auth import Principal
+from core.context_budget import compose_context, compress_messages, estimate_tokens
 from core.harness import HarnessConfig
 from core.stop_reason import StopReason, classify_answer
 import json
@@ -124,6 +125,7 @@ class AgentResponse:
     tools_used:  List[str] = field(default_factory=list)
     tool_traces: List[Dict[str, Any]] = field(default_factory=list)
     stop_reason: Optional[str] = None
+    context_rounds: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -206,6 +208,7 @@ class BaseAgent:
         self._last_tools_used: List[str] = []
         self._last_tool_traces: List[Dict[str, Any]] = []
         self._last_stop_reason: StopReason = StopReason.COMPLETED
+        self._context_rounds: List[Dict[str, Any]] = []
         self._shared_tools: Dict[str, AgentToolSpec] = {}
 
     def get_tools(self) -> Dict[str, AgentToolSpec]:
@@ -221,6 +224,7 @@ class BaseAgent:
         self._last_tools_used = []
         self._last_tool_traces = []
         self._last_stop_reason = StopReason.COMPLETED
+        self._context_rounds = []
         try:
             content = await self._call_llm(req)
             ms = (time.monotonic() - t0) * 1000
@@ -236,6 +240,7 @@ class BaseAgent:
                 tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
                 stop_reason=self._last_stop_reason.value,
+                context_rounds=list(self._context_rounds),
             )
         except Exception as ex:
             ms = (time.monotonic() - t0) * 1000
@@ -251,6 +256,7 @@ class BaseAgent:
                 tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
                 stop_reason=self._last_stop_reason.value,
+                context_rounds=list(self._context_rounds),
             )
 
     async def _call_llm(self, req: Request) -> str:
@@ -286,23 +292,47 @@ class BaseAgent:
                       if self._harness.loop_control else None)
         duplicate_limit = (self._harness.duplicate_call_limit
                            if self._harness.loop_control else None)
+        system_prompt = self._build_system_prompt(req)
+        tool_schemas = [
+            {
+                "name": spec.name,
+                "description": spec.description,
+                "input_schema": spec.input_schema,
+            }
+            for spec in tools.values()
+        ] if tools else []
+        fixed_tokens = estimate_tokens(system_prompt) + estimate_tokens(
+            json.dumps(tool_schemas, ensure_ascii=False) if tool_schemas else "")
         for _ in range(self._harness.tool_round_limit):
+            round_no = len(self._context_rounds) + 1
+            composition = compose_context(messages, system=system_prompt,
+                                          tool_schemas=tool_schemas)
+            compressed_round = False
+            over_budget = composition["total"] > self._harness.max_context_tokens
+            if self._harness.context_compression and over_budget:
+                outcome = compress_messages(
+                    messages, budget=self._harness.max_context_tokens,
+                    fixed_tokens=fixed_tokens)
+                messages = outcome["messages"]
+                compressed_round = outcome["compressed"]
+                over_budget = outcome["over_budget"]
+                composition = compose_context(messages, system=system_prompt,
+                                              tool_schemas=tool_schemas)
+            self._context_rounds.append({
+                "round": round_no,
+                "estimated_tokens": composition,
+                "compressed": compressed_round,
+                "over_budget": over_budget,
+            })
             request_kwargs: Dict[str, Any] = {
                 "model": self._model,
                 "max_tokens": self.profile.max_tokens,
                 "temperature": self.profile.temperature,
-                "system": self._build_system_prompt(req),
+                "system": system_prompt,
                 "messages": messages,
             }
-            if tools:
-                request_kwargs["tools"] = [
-                    {
-                        "name": spec.name,
-                        "description": spec.description,
-                        "input_schema": spec.input_schema,
-                    }
-                    for spec in tools.values()
-                ]
+            if tool_schemas:
+                request_kwargs["tools"] = tool_schemas
             resp = await self._client.messages.create(**request_kwargs)
             usage = getattr(resp, "usage", None)
             if usage is not None:

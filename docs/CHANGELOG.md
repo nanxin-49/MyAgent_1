@@ -171,3 +171,12 @@
 - **验证**：全量 `pytest` **676 passed / 3 skipped**；相关回归 83 passed；180 条确定性套件 180/180、safety 0（历史 report.json 已恢复）；Node **12 passed**；`git diff --check` 通过。
 - **限制**：`suggested_action` 只是建议；截断只作用于模型可见 payload；非字典超长 payload 变成带 `preview` 的对象。
 - **状态**：H3-2 `todo → verify`。
+
+## 2026-10-26 — H3-3 上下文预算与工具结果压缩
+
+- **新增**：`core/context_budget.py`（token 估算、六类构成、按优先级压缩）、`evaluation/h3_3/`（8 条用例、两臂对比 runner）、`tests/test_h3_3_context_budget.py`（8 测试）。
+- **接入**：`BaseAgent` 每轮记录 `context_rounds`（`estimated_tokens`、`compressed`、`over_budget`），超 `max_context_tokens=16000` 且 `context_compression` 开启时压缩旧工具结果/背景/对话；system、工具 schema、当前用户消息不动。Trace 根节点可查。
+- **实测**（确定性，预算 4000）：on/off task success 均 **1.0**；估算 token **59,953 vs 170,170（−64.8%）**；压缩轮次 7 vs 0；executor_calls 均 1。token 是估算值，不是 tokenizer 口径；真实模型质量对比留给 H3-6。
+- **验证**：全量 `pytest` **684 passed / 3 skipped**；相关回归 102 passed；180 条确定性套件 180/180、safety 0（历史 report.json 已恢复）；Node **12 passed**；`git diff --check` 通过。
+- **限制**：固定部分本身超预算时标 `over_budget`，不破坏 system/tools；`context_compression` 同时控制 Memory 压缩和 prompt 压缩。
+- **状态**：H3-3 `todo → verify`。

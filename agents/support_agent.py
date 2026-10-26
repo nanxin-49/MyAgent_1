@@ -144,6 +144,7 @@ class SupportResult:
     agent_type: AgentType = AgentType.SUPPORT
     intent: None = None
     stop_reason: str | None = None
+    context_rounds: list = field(default_factory=list)
 
 
 class SupportRuntime:
@@ -192,7 +193,8 @@ class SupportRuntime:
         self._total_ms += elapsed
         result = SupportResult(req.request_id, response.content, response.escalate, elapsed,
                                response.tools_used, response.tool_traces, events, handoff=req.handoff,
-                               stop_reason=response.stop_reason)
+                               stop_reason=response.stop_reason,
+                               context_rounds=response.context_rounds)
         self._traces.append({"request_id": req.request_id, "topology": "single", "agent_type": "support",
             "intent": None, "primary_agent": None, "supporting_agents": None,
             "routing_reason": None, "routing_confidence": None,
@@ -201,6 +203,7 @@ class SupportRuntime:
             "escalated": result.escalated, "latency_ms": round(elapsed, 1),
             "handoff": result.handoff.model_dump(),
             "stop_reason": result.stop_reason,
+            "context_rounds": list(result.context_rounds),
             "model_call_count": len(events), "model_calls": list(events),
             "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"})
         return result
