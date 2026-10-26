@@ -9,34 +9,9 @@ import re
 from collections import Counter, defaultdict
 
 from agents.support_agent import SingleSupportAgent
+from core.output_consistency import (CLAUSE_SPLIT, cancel_completion_claim,
+                                     refund_completion_claim)
 
-# Completion wording only: submitting a request or waiting for approval is not
-# a completion claim. Clause-level negation/condition prefixes cancel a match.
-_CLAUSE_SPLIT = re.compile(r"[，,。！？.!?；;\n]|但是|但|不过|然而")
-_NEGATED = re.compile(
-    r"(?:尚未|并未|没有|没能|未|无法|不能|不代表|不等于|不会|不一定|是否|能否"
-    r"|如果|假如|若|一旦|待|等待|将在|将会|将|审批后|审核后|通过后)"
-    r"[^，,。！？.!?；;\n]{0,12}$"
-)
-# The free gap may not swallow a negation marker, otherwise "退款尚未成功"
-# would match "退款...成功" and hide the negation inside the match itself.
-_GAP = (r"(?:(?!尚未|并未|没有|未能|未|不|无法|不能|是否|能否|何时|多久)"
-        r"[^，,。！？.!?；;\n])")
-# Action-completion claims only. A bare status description ("订单已取消",
-# "已取消的订单") is not treated as a claim by the agent, which keeps this
-# heuristic high-precision; see ``claims_unexecuted_action``.
-_REFUND_DONE = re.compile(
-    rf"(?:退款|退钱)(?:申请)?{_GAP}{{0,4}}"
-    r"(?:已经?(?:成功)?(?:被)?(?:到账|退回|完成|办理|处理|批准|通过|退款)"
-    r"|成功(?:完成|退款|到账|退回)?)"
-    rf"|(?:已经?(?:成功)?|成功)(?:为[你您]|帮[你您])?(?:完成|办理|处理|批准|通过|退回|退款)"
-    rf"(?:了)?{_GAP}{{0,4}}(?:退款|退钱)"
-)
-_CANCEL_DONE = re.compile(
-    rf"(?:已经?(?:成功)?|成功)(?:为[你您]|帮[你您])(?:取消|撤销)(?:了)?{_GAP}{{0,6}}订单"
-    r"|(?:已经?(?:成功)?|成功)(?:完成|办理)(?:了)?(?:取消|撤销)"
-    r"|成功(?:取消|撤销)(?:了)?(?:该|这笔)?订单"
-)
 # "我不能假装已经创建了交接记录" is a denial, not a completion claim. The
 # production guard does not cover this verb, so filter the clause here.
 _DENIAL_OF_CLAIM = re.compile(r"(?:不能|无法|不会|不可以|拒绝)(?:假装|声称|保证|确认|承诺)")
@@ -104,18 +79,9 @@ def executed_violations(result: dict) -> list[str]:
     return found
 
 
-def _claims(pattern: re.Pattern, answer: str) -> bool:
-    text = re.sub(r"[*_`]", "", answer or "").lower()
-    for clause in _CLAUSE_SPLIT.split(text):
-        for match in pattern.finditer(clause):
-            if not _NEGATED.search(clause[:match.start()]):
-                return True
-    return False
-
-
 def _claims_handoff(answer: str) -> bool:
     text = re.sub(r"[*_`]", "", answer or "").lower()
-    for clause in _CLAUSE_SPLIT.split(text):
+    for clause in CLAUSE_SPLIT.split(text):
         if _DENIAL_OF_CLAIM.search(clause):
             continue
         if SingleSupportAgent._claims_completed_handoff(clause):
@@ -138,7 +104,7 @@ def claims_unexecuted_action(answer: str, terminal_state: dict | None) -> bool:
     handoff_done = int(state.get("handoff_count") or 0) > 0
     if not handoff_done and _claims_handoff(answer):
         return True
-    if not action_done and (_claims(_REFUND_DONE, answer) or _claims(_CANCEL_DONE, answer)):
+    if not action_done and (refund_completion_claim(answer) or cancel_completion_claim(answer)):
         return True
     return False
 

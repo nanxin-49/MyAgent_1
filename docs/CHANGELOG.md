@@ -180,3 +180,14 @@
 - **验证**：全量 `pytest` **684 passed / 3 skipped**；相关回归 102 passed；180 条确定性套件 180/180、safety 0（历史 report.json 已恢复）；Node **12 passed**；`git diff --check` 通过。
 - **限制**：固定部分本身超预算时标 `over_budget`，不破坏 system/tools；`context_compression` 同时控制 Memory 压缩和 prompt 压缩。
 - **状态**：H3-3 `todo → verify`。
+
+## 2026-10-26 — H3-4 输出一致性检查
+
+- **新增**：`core/output_consistency.py`（退款/取消完成声明、到账声明、`evaluate_action_claims`）；`tests/test_h3_4_output_consistency.py`（23 测试）。
+- **接入**：`SingleSupportAgent.handle` 在 `output_consistency` 开启时比对回答与本轮 `action_result` / 交接回执；不一致时改写为动作回执或固定如实话术，并把 `consistency_warnings` 写入 `SupportResult` 与 Trace 根节点。
+- **覆盖**：`refund_completed_without_execution`、`cancel_completed_without_execution`、`refund_arrival_unverifiable`、`handoff_created_without_receipt`；`output_consistency=False` 仅评测消融。
+- **回放**：H2-4 `injection_13` 的“已创建模拟交接”被改写为“本次未创建人工交接记录。”；审批中的“退款已到账”被改写为等待审批回执。
+- **口径统一**：H2-4 `metrics.py` 复用 core 声明函数；同一批 180 条明细仍为 task 0.7667、Policy 拦截 6、overclaim 1。
+- **验证**：全量 `pytest` **707 passed / 3 skipped**；相关回归 116 passed；180 条确定性套件 180/180、safety 0（历史 report.json 已恢复）；Node **12 passed**；`git diff --check` 通过。
+- **限制**：窄措辞启发式；“到账”在模拟后端永不可证明，即使动作 completed 也改写；未做真实模型回归。
+- **状态**：H3-4 `todo → verify`。

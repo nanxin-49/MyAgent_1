@@ -11,6 +11,7 @@ from agents.tools import general_tools, technical_tools, billing_tools, escalati
 from core.model_observation import ObservedClient, model_events
 from core.handoff import HandoffService, HandoffResult, explicit_handoff, handoff_reply
 from core.harness import HarnessConfig
+from core.output_consistency import evaluate_action_claims
 from core.tool_contract import execute_tool
 from agents.tools import build_handoff_tools
 from agents.agent_orchestrator import AgentResponse
@@ -67,12 +68,28 @@ class SingleSupportAgent(BaseAgent):
             response = await super().handle(req)
         response.escalate = req.handoff.handoff_created
         if self._harness.output_consistency:
+            warnings = evaluate_action_claims(response.content, response.tool_traces)
+            if (self._claims_completed_handoff(response.content)
+                    and not req.handoff.handoff_created):
+                warnings.append({
+                    "code": "handoff_created_without_receipt",
+                    "kind": "handoff",
+                    "claimed": "handoff_created",
+                    "observed": req.handoff.status,
+                    "blocking": True,
+                })
+            response.consistency_warnings = warnings
             if req.handoff.handoff_requested or req.handoff.handoff_failed or any(
                 t.get("tool_name") == "request_handoff" for t in response.tool_traces
             ):
                 action_receipt = self._last_action_receipt()
                 response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
                 response.success = req.handoff.handoff_created or bool(action_receipt)
+            elif any(w["blocking"] and w["kind"] == "action" for w in warnings):
+                action_receipt = self._last_action_receipt()
+                response.content = action_receipt or (
+                    "本次没有已完成的状态变更动作；相关退款/取消尚未执行。")
+                response.success = bool(action_receipt)
             elif self._claims_completed_handoff(response.content):
                 # No receipt: fail closed on completion claims, without cutting
                 # sentences out of a formatted answer or attaching unrelated state.
@@ -145,6 +162,7 @@ class SupportResult:
     intent: None = None
     stop_reason: str | None = None
     context_rounds: list = field(default_factory=list)
+    consistency_warnings: list = field(default_factory=list)
 
 
 class SupportRuntime:
@@ -194,7 +212,8 @@ class SupportRuntime:
         result = SupportResult(req.request_id, response.content, response.escalate, elapsed,
                                response.tools_used, response.tool_traces, events, handoff=req.handoff,
                                stop_reason=response.stop_reason,
-                               context_rounds=response.context_rounds)
+                               context_rounds=response.context_rounds,
+                               consistency_warnings=response.consistency_warnings)
         self._traces.append({"request_id": req.request_id, "topology": "single", "agent_type": "support",
             "intent": None, "primary_agent": None, "supporting_agents": None,
             "routing_reason": None, "routing_confidence": None,
@@ -204,6 +223,7 @@ class SupportRuntime:
             "handoff": result.handoff.model_dump(),
             "stop_reason": result.stop_reason,
             "context_rounds": list(result.context_rounds),
+            "consistency_warnings": list(result.consistency_warnings),
             "model_call_count": len(events), "model_calls": list(events),
             "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"})
         return result

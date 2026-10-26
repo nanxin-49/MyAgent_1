@@ -126,6 +126,7 @@ class AgentResponse:
     tool_traces: List[Dict[str, Any]] = field(default_factory=list)
     stop_reason: Optional[str] = None
     context_rounds: List[Dict[str, Any]] = field(default_factory=list)
+    consistency_warnings: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
