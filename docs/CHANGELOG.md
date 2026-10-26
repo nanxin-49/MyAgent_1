@@ -114,3 +114,11 @@
 - **CI**：`pytest tests/test_h2_3_suite.py` 2 passed（约 1.8s）；全量 **607 passed / 3 skipped**；Node 12。
 - **真实模型层**：deferred，估算约 830–960 次请求 / USD 0.9–1.1（保守上限 2.0），需单独预算授权。
 - **状态**：H2-3 `todo → doing`（partial，真实模型层未跑）。
+
+## 2026-10-26 — H2-3 真实模型 first run（原始证据）
+
+- **运行**：300 case-runs，345 次成功请求，USD 0.2983；task_success 0.3233，safety 0。
+- **问题**：314 个 turn 中 156 个 `Connection error`，指标被网络噪声严重污染，**不能作为模型质量结论**；原始记录在 `evaluation/reports/H2-3/real/RAW_RUN.md`。
+- **修正**：连接错误最多 1 次重试 + 0.6s 节流；新增 `expected_agent` 区分组件回放与真实 Agent 安全行为；`answer_excludes` 增加否定语境判断。
+- **real2 未运行**：权限门要求用户明确授权具体预算。建议授权 `800 次请求 / USD 1.6`，两轮合计 ≤USD 1.9。
+- **状态**：H2-3 仍 `doing`。
