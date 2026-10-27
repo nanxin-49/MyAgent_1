@@ -191,3 +191,12 @@
 - **验证**：全量 `pytest` **707 passed / 3 skipped**；相关回归 116 passed；180 条确定性套件 180/180、safety 0（历史 report.json 已恢复）；Node **12 passed**；`git diff --check` 通过。
 - **限制**：窄措辞启发式；“到账”在模拟后端永不可证明，即使动作 completed 也改写；未做真实模型回归。
 - **状态**：H3-4 `todo → verify`。
+
+## 2026-10-27 — H3-5 按步可观测
+
+- **新增**：`core/step_trace.py`（参数/结果摘要、`new_model_step()`）；`tests/test_h3_5_step_observability.py`（8 测试）。
+- **接入**：`BaseAgent._call_llm` 每轮模型调用记一步，工具归属到选择它的步骤；每步记录 `input_tokens`/`output_tokens`/`latency_ms`、工具名、参数摘要、结果摘要和 `stop_reason`。`SupportResult` 与 Trace 根节点增加 `steps`、`step_count`、`step_scope`，`/trace/tool/{request_id}` 可复盘。
+- **边界**：不记录 prompt、模型文本、隐藏推理、Memory 原文；工具内部 RAG SDK 调用只计 `aux_model_calls`，详情仍在 `model_calls`；确定性交接路径 `steps=[]`，交接工具仍在 `tool_calls`。
+- **验证**：全量 `pytest` **715 passed / 3 skipped**（新增 8，既有 707 不退化）；相关回归 157 passed；Node **12 passed**；`git diff --check` 通过。admin 依赖未改，无认证访问 Trace 仍为 401。
+- **限制**：Trace 仍为进程内有界队列，重启丢失；H4-1 只持久化待审批动作/检查点，跨重启 Trace 未排期。旧 Multi 路径不接入 `steps`。
+- **状态**：H3-5 `todo → verify`。

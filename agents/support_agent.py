@@ -163,6 +163,7 @@ class SupportResult:
     stop_reason: str | None = None
     context_rounds: list = field(default_factory=list)
     consistency_warnings: list = field(default_factory=list)
+    steps: list = field(default_factory=list)
 
 
 class SupportRuntime:
@@ -213,7 +214,8 @@ class SupportRuntime:
                                response.tools_used, response.tool_traces, events, handoff=req.handoff,
                                stop_reason=response.stop_reason,
                                context_rounds=response.context_rounds,
-                               consistency_warnings=response.consistency_warnings)
+                               consistency_warnings=response.consistency_warnings,
+                               steps=response.steps)
         self._traces.append({"request_id": req.request_id, "topology": "single", "agent_type": "support",
             "intent": None, "primary_agent": None, "supporting_agents": None,
             "routing_reason": None, "routing_confidence": None,
@@ -224,6 +226,10 @@ class SupportRuntime:
             "stop_reason": result.stop_reason,
             "context_rounds": list(result.context_rounds),
             "consistency_warnings": list(result.consistency_warnings),
+            "steps": list(result.steps), "step_count": len(result.steps),
+            "step_scope": ("one step per Agent model call; tool calls are grouped under "
+                           "the step that selected them; tool-internal SDK calls are counted "
+                           "as aux_model_calls and listed in model_calls"),
             "model_call_count": len(events), "model_calls": list(events),
             "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"})
         return result

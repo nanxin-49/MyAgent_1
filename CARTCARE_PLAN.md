@@ -59,7 +59,7 @@
 | H3-2 | 结构化错误回传 | G3 | H3-1 | 1 天 | done | [H3-2](docs/reports/H3-2.md) |
 | H3-3 | 上下文预算与工具结果压缩 | G3 | H3-1 | 2 天 | done | [H3-3](docs/reports/H3-3.md) |
 | H3-4 | 输出一致性检查 | G3 | H3-1 | 1 天 | done | [H3-4](docs/reports/H3-4.md) |
-| H3-5 | 按步可观测 | G3 | H3-1 | 1 天 | todo | |
+| H3-5 | 按步可观测 | G3 | H3-1 | 1 天 | done | [H3-5](docs/reports/H3-5.md) |
 | H3-6 | 复合售后请求 + harness 消融实验 | G3 | H2-4, H3-1~H3-5 | 3 天 | todo | |
 | H4-1 | 检查点与动作状态持久化 | G4 | H3-1 | 3 天 | todo | |
 | H4-2 | 崩溃恢复测试（四个时间点） | G4 | H4-1 | 1 天 | todo | |

@@ -19,6 +19,8 @@ import asyncio
 from core.auth import Principal
 from core.context_budget import compose_context, compress_messages, estimate_tokens
 from core.harness import HarnessConfig
+from core.model_observation import model_events
+from core.step_trace import new_model_step, summarize_tool_trace
 from core.stop_reason import StopReason, classify_answer
 import json
 import logging
@@ -127,6 +129,7 @@ class AgentResponse:
     stop_reason: Optional[str] = None
     context_rounds: List[Dict[str, Any]] = field(default_factory=list)
     consistency_warnings: List[Dict[str, Any]] = field(default_factory=list)
+    steps: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -210,6 +213,7 @@ class BaseAgent:
         self._last_tool_traces: List[Dict[str, Any]] = []
         self._last_stop_reason: StopReason = StopReason.COMPLETED
         self._context_rounds: List[Dict[str, Any]] = []
+        self._last_steps: List[Dict[str, Any]] = []
         self._shared_tools: Dict[str, AgentToolSpec] = {}
 
     def get_tools(self) -> Dict[str, AgentToolSpec]:
@@ -226,6 +230,7 @@ class BaseAgent:
         self._last_tool_traces = []
         self._last_stop_reason = StopReason.COMPLETED
         self._context_rounds = []
+        self._last_steps = []
         try:
             content = await self._call_llm(req)
             ms = (time.monotonic() - t0) * 1000
@@ -242,12 +247,15 @@ class BaseAgent:
                 tool_traces=list(self._last_tool_traces),
                 stop_reason=self._last_stop_reason.value,
                 context_rounds=list(self._context_rounds),
+                steps=list(self._last_steps),
             )
         except Exception as ex:
             ms = (time.monotonic() - t0) * 1000
             self.stats.total_ms += ms
             logger.error(f"{self.agent_type.value} 处理失败: {ex}")
             self._last_stop_reason = StopReason.UNRECOVERABLE_ERROR
+            if self._last_steps:
+                self._last_steps[-1]["stop_reason"] = self._last_stop_reason.value
             receipt = self._last_action_receipt()
             return AgentResponse(
                 agent_type=self.agent_type,
@@ -258,6 +266,7 @@ class BaseAgent:
                 tool_traces=list(self._last_tool_traces),
                 stop_reason=self._last_stop_reason.value,
                 context_rounds=list(self._context_rounds),
+                steps=list(self._last_steps),
             )
 
     async def _call_llm(self, req: Request) -> str:
@@ -281,6 +290,7 @@ class BaseAgent:
         tools = self.get_tools()
         tools_used: List[str] = []
         tool_traces: List[Dict[str, Any]] = []
+        step_records: List[Dict[str, Any]] = []
         steps = 0
         tokens = 0
         previous_fingerprint: Optional[str] = None
@@ -334,20 +344,36 @@ class BaseAgent:
             }
             if tool_schemas:
                 request_kwargs["tools"] = tool_schemas
-            resp = await self._client.messages.create(**request_kwargs)
+            model_step = new_model_step(round_no, model=self._model)
+            step_records.append(model_step)
+            self._last_steps = list(step_records)
+            model_start = time.monotonic()
+            try:
+                resp = await self._client.messages.create(**request_kwargs)
+            except Exception as exc:
+                model_step["error_type"] = type(exc).__name__
+                raise
+            finally:
+                model_step["latency_ms"] = round(
+                    (time.monotonic() - model_start) * 1000, 1)
             usage = getattr(resp, "usage", None)
             if usage is not None:
-                tokens += int(getattr(usage, "input_tokens", 0) or 0)
-                tokens += int(getattr(usage, "output_tokens", 0) or 0)
+                model_step["input_tokens"] = int(
+                    getattr(usage, "input_tokens", 0) or 0)
+                model_step["output_tokens"] = int(
+                    getattr(usage, "output_tokens", 0) or 0)
+                tokens += model_step["input_tokens"] + model_step["output_tokens"]
             tool_uses = [block for block in (resp.content or []) if self._block_type(block) == "tool_use"]
             if not tool_uses:
                 text = extract_text_content(resp.content)
                 self._last_stop_reason = classify_answer(text, tool_traces)
+                model_step["stop_reason"] = self._last_stop_reason.value
                 self._last_tools_used = tools_used
                 self._last_tool_traces = tool_traces
                 return text
             if max_tokens is not None and tokens >= max_tokens:
                 stop_reason = StopReason.BUDGET_EXHAUSTED
+                model_step["stop_reason"] = stop_reason.value
                 break
 
             messages.append({"role": "assistant", "content": resp.content})
@@ -366,15 +392,21 @@ class BaseAgent:
                     previous_fingerprint, repeats = fingerprint, 1
                 if duplicate_limit is not None and repeats >= duplicate_limit:
                     stop_reason = StopReason.LOOP_DETECTED
-                    tool_traces.append(self._skipped_trace(req, name, tool_use_id, args,
-                                                           "loop_detected", spec))
+                    skipped = self._skipped_trace(req, name, tool_use_id, args,
+                                                  "loop_detected", spec)
+                    tool_traces.append(skipped)
+                    model_step["tools"].append(summarize_tool_trace(skipped))
+                    model_step["stop_reason"] = stop_reason.value
                     self._last_tools_used = list(tools_used)
                     self._last_tool_traces = list(tool_traces)
                     break
                 if max_steps is not None and steps >= max_steps:
                     stop_reason = StopReason.BUDGET_EXHAUSTED
-                    tool_traces.append(self._skipped_trace(req, name, tool_use_id, args,
-                                                           "budget_exhausted", spec))
+                    skipped = self._skipped_trace(req, name, tool_use_id, args,
+                                                  "budget_exhausted", spec)
+                    tool_traces.append(skipped)
+                    model_step["tools"].append(summarize_tool_trace(skipped))
+                    model_step["stop_reason"] = stop_reason.value
                     self._last_tools_used = list(tools_used)
                     self._last_tool_traces = list(tool_traces)
                     break
@@ -390,6 +422,7 @@ class BaseAgent:
                 tool_latency_ms = 0.0
                 tool_attempts = 0
                 tool_timeout_s: Optional[float] = None
+                aux_model_calls = 0
                 if spec is None:
                     call_success = False
                     result: Any = {"success": False, "error": f"工具不在 {self.agent_type.value} Agent 白名单中"}
@@ -397,9 +430,12 @@ class BaseAgent:
                     error_code = "tool_not_allowed"
                     error_type = "permission"
                 else:
+                    events_before_tool = len(model_events.get() or ())
                     execution = await execute_tool(
                         spec, args, lambda: spec.handler(req, args),
                         timeout_s=self._harness.tool_timeout_s)
+                    aux_model_calls = max(0, len(model_events.get() or ())
+                                          - events_before_tool)
                     result = execution.agent_payload()
                     call_success = execution.success
                     error_code = execution.error_code
@@ -494,6 +530,9 @@ class BaseAgent:
                         "truncated": truncated,
                     }
                 )
+                model_step["tools"].append(
+                    summarize_tool_trace(tool_traces[-1],
+                                         aux_model_calls=aux_model_calls))
                 # Persist incrementally so a later provider failure still
                 # exposes the tool attempt in the error response and trace API.
                 self._last_tools_used = list(tools_used)
@@ -517,6 +556,9 @@ class BaseAgent:
         self._last_tools_used = tools_used
         self._last_tool_traces = tool_traces
         self._last_stop_reason = stop_reason or StopReason.BUDGET_EXHAUSTED
+        if step_records and step_records[-1].get("stop_reason") is None:
+            step_records[-1]["stop_reason"] = self._last_stop_reason.value
+        self._last_steps = list(step_records)
         receipt = self._last_action_receipt()
         if receipt is not None:
             return receipt

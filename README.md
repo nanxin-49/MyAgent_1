@@ -40,7 +40,7 @@ flowchart TD
 - **单 Agent + 工具**：当前电商 workload 未证明多 Agent 协作收益。T10 对比支持简化，生产入口不再经过 Intent / specialist dispatch / supporting Agent / Composer。旧 Multi 仅保留为历史实验。
 - **知识与事实分离**：政策解释来自 RAG；订单、库存和物流必须重新查 Provider，不能从检索文本或历史回复推断当前状态。
 - **统一工具边界**：严格 schema、read / write / dangerous 风险、typed errors、timeout / retry 元数据。仅幂等读工具自动重试可重试错误；危险动作由 ActionService 控制。
-- **可观察而不暴露隐藏推理**：Trace 展示已执行的工具、校验输入、结果摘要与错误，记录模型调用次数，不保存隐藏 chain-of-thought。`mcp/` 是自研本地工具层，尚非标准 MCP SDK / transport 接入。
+- **可观察而不暴露隐藏推理**：Trace 展示已执行的工具、校验输入、结果摘要与错误，并按步记录每次模型调用的 token、延迟、选择的工具、参数摘要和停止原因；不保存隐藏 chain-of-thought 或原始 Memory 内容。`mcp/` 是自研本地工具层，尚非标准 MCP SDK / transport 接入。
 
 ## End-to-end examples
 
