@@ -24,12 +24,13 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Depends
 from core.auth import Principal, get_principal, require_admin, require_reviewer, customer_identity
+from core.checkpoint import ActionCheckpoint, CheckpointService
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from actions import ActionResult
+from actions import ActionResult, ActionStatus
 from core.handoff import HandoffResult
 
 load_dotenv()
@@ -54,6 +55,9 @@ _monitor      = None
 _evaluator    = None
 _skill_manager = None
 _action_service = None
+_checkpoint_service = None
+_action_store = None
+_checkpoint_store = None
 
 def _anthropic_cfg() -> Dict[str, Any]:
     key = os.getenv("ANTHROPIC_API_KEY", "")
@@ -72,13 +76,16 @@ def _anthropic_cfg() -> Dict[str, Any]:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _orchestrator, _memory, _tool_manager, _monitor, _evaluator, _skill_manager, _action_service
+    global _checkpoint_service, _action_store, _checkpoint_store
 
     print(BANNER, flush=True)
 
     from agents.support_agent import SupportRuntime
     from agents.tools import build_shared_rag_tools
     from agents.tools import build_action_tools, build_business_tools
-    from actions import ActionService, InMemoryBusinessActionBackend
+    from actions import (ActionService, InMemoryBusinessActionBackend,
+                         RedisActionStore, RedisCheckpointStore)
+    from core.checkpoint import CheckpointService
     from core.intent_recognizer import IntentRecognizer
     from evaluation.evaluator import EndToEndEvaluator
     from evaluation.runtime import EvaluationRuntimeFactory, EVALUATION_PRINCIPAL
@@ -180,10 +187,21 @@ async def lifespan(app: FastAPI):
         business_data = json.load(handle)
     business_backend = InMemoryBusinessBackend(business_data)
     action_backend = InMemoryBusinessActionBackend(business_backend.state)
+    redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    _action_store = RedisActionStore(
+        redis_url,
+        prefix=os.getenv("CARTCARE_ACTION_PREFIX", "cartcare:actions"),
+    )
     _action_service = ActionService(
         business_backend=business_backend,
         action_backend=action_backend,
+        store=_action_store,
     )
+    _checkpoint_store = RedisCheckpointStore(
+        redis_url,
+        prefix=os.getenv("CARTCARE_CHECKPOINT_PREFIX", "cartcare:checkpoints"),
+    )
+    _checkpoint_service = CheckpointService(_checkpoint_store)
     business_tools = build_business_tools(business_backend)
     business_tools.update(build_action_tools(_action_service))
     logger.info(
@@ -229,6 +247,10 @@ async def lifespan(app: FastAPI):
     await _monitor.stop()
     if _memory is not None:
         await _memory.close()
+    if _action_store is not None:
+        _action_store.close()
+    if _checkpoint_store is not None:
+        _checkpoint_store.close()
     if _orchestrator is not None:
         await _orchestrator.close()
     logger.info("CartCare 已关闭")
@@ -350,6 +372,16 @@ class RecentToolTracesResponse(BaseModel):
     items: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class CheckpointResumeResponse(BaseModel):
+    request_id: str
+    conv_id: str
+    status: str
+    response: str
+    action_results: List[ActionResult] = Field(default_factory=list)
+    memory_write_status: str = "not_attempted"
+    already_resumed: bool = False
+
+
 # ── 路由 ──────────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
@@ -430,6 +462,12 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
     )
     confirmed_completed = confirmed_completed or result.handoff.handoff_created
     warning_codes = []
+    if _checkpoint_service is not None:
+        try:
+            _checkpoint_service.record_result(result, conv_id=conv_id, user_id=user_id)
+        except Exception:
+            logger.warning("checkpoint_write_failed request_id=%s", result.request_id)
+            warning_codes.append("checkpoint_write_failed")
 
     # Extend the existing bounded trace with counts, never raw memory or prompts.
     trace = _orchestrator.get_tool_trace(result.request_id)
@@ -515,12 +553,14 @@ async def approve_action(action_id: str, req: ActionCommandRequest,
     """Approve an awaiting demo action; repeated approvals are idempotent."""
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
-    return _action_http_result(_action_service.approve(
+    result = _action_service.approve(
         action_id=action_id,
         user_id=req.user_id or "",
         principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    ))
+    )
+    _update_checkpoint_for_result(action_id, result)
+    return _action_http_result(result)
 
 
 @app.post("/actions/{action_id}/reject", response_model=ActionResult, tags=["Actions"])
@@ -530,12 +570,14 @@ async def reject_action(action_id: str, req: ActionCommandRequest,
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
     user_id = customer_identity(principal, req.user_id)
-    return _action_http_result(_action_service.reject(
+    result = _action_service.reject(
         action_id=action_id,
         user_id=user_id,
         principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    ))
+    )
+    _update_checkpoint_for_result(action_id, result)
+    return _action_http_result(result)
 
 
 @app.post("/actions/{action_id}/resume", response_model=ActionResult, tags=["Actions"])
@@ -545,12 +587,14 @@ async def resume_action(action_id: str, req: ActionCommandRequest,
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
     user_id = customer_identity(principal, req.user_id)
-    return _action_http_result(_action_service.resume(
+    result = _action_service.resume(
         action_id=action_id,
         user_id=user_id,
         principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    ))
+    )
+    _update_checkpoint_for_result(action_id, result)
+    return _action_http_result(result)
 
 
 @app.get("/actions/{action_id}", response_model=ActionResult, tags=["Actions"])
@@ -567,6 +611,126 @@ def _action_http_result(result: ActionResult) -> ActionResult:
     if result.error_code in statuses:
         raise HTTPException(statuses[result.error_code], "未找到可访问的动作" if statuses[result.error_code] == 404 else result.message)
     return result
+
+
+def _update_checkpoint_for_result(action_id: str, result: ActionResult) -> None:
+    if _checkpoint_service is None or result.action_id is None:
+        return
+    try:
+        _checkpoint_service.update_for_action(
+            result.action_id, result.status.value, result.error_code)
+    except Exception:
+        logger.warning("checkpoint_update_failed action_id=%s", action_id)
+
+
+def _checkpoint_receipt(results: List[ActionResult]) -> str:
+    lines: List[str] = []
+    for result in results:
+        action = result.action
+        kind = ("退款" if action is not None
+                and action.action_type.value == "refund" else "取消订单")
+        action_id = result.action_id or (action.action_id if action else "未生成")
+        if result.status is ActionStatus.COMPLETED:
+            lines.append(f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。")
+        elif result.status is ActionStatus.AWAITING_APPROVAL:
+            lines.append(f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。")
+        elif result.status is ActionStatus.REJECTED:
+            lines.append(f"{kind}请求已被拒绝，未执行。原因代码："
+                         f"{result.error_code or 'unknown'}。动作编号：{action_id}。")
+        elif result.status is ActionStatus.FAILED:
+            lines.append(f"{kind}请求处理失败，不能视为已执行。错误代码："
+                         f"{result.error_code or 'unknown'}。动作编号：{action_id}。")
+        else:
+            lines.append(f"{kind}动作当前状态：{result.status.value}。动作编号：{action_id}。")
+    if not lines:
+        return "没有可汇报的状态变更动作。"
+    if len(lines) == 1:
+        return lines[0]
+    return ("本次共观察到 %d 个状态变更动作：\n" % len(lines)
+            + "\n".join(f"- {line}" for line in lines))
+
+
+@app.get("/checkpoints/{request_id}", response_model=ActionCheckpoint, tags=["Checkpoints"])
+async def get_checkpoint(request_id: str, principal: Principal = Depends(get_principal)):
+    """Read an owner-visible approval checkpoint; never exposes Memory or prompts."""
+    if _checkpoint_service is None:
+        raise HTTPException(503, "服务未就绪")
+    user_id = customer_identity(principal)
+    checkpoint = _checkpoint_service.get(request_id)
+    if checkpoint is None or checkpoint.user_id != user_id:
+        raise HTTPException(404, "检查点不存在")
+    return checkpoint
+
+
+@app.post("/checkpoints/{request_id}/resume", response_model=CheckpointResumeResponse,
+          tags=["Checkpoints"])
+async def resume_checkpoint(request_id: str, principal: Principal = Depends(get_principal)):
+    """Resume a checkpoint after approval and report back to the original conversation.
+
+    Awaiting actions are not executed here; an independent reviewer must approve them.
+    APPROVED actions are executed through the existing ActionService.resume path.
+    """
+    if _checkpoint_service is None or _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    user_id = customer_identity(principal)
+    checkpoint = _checkpoint_service.get(request_id)
+    if checkpoint is None or checkpoint.user_id != user_id:
+        raise HTTPException(404, "检查点不存在")
+    results: List[ActionResult] = []
+    for item in checkpoint.actions:
+        current = _action_service.get(
+            item.action_id, user_id=user_id, principal=principal)
+        if current.action is not None and current.status is ActionStatus.APPROVED:
+            current = _action_service.resume(
+                action_id=item.action_id,
+                user_id=user_id,
+                principal=principal,
+                request_id=request_id,
+            )
+        results.append(current)
+        if current.action_id is not None:
+            _update_checkpoint_for_result(item.action_id, current)
+    checkpoint = _checkpoint_service.get(request_id) or checkpoint
+    statuses = {result.status for result in results}
+    if statuses & {ActionStatus.PENDING, ActionStatus.AWAITING_APPROVAL}:
+        return CheckpointResumeResponse(
+            request_id=request_id, conv_id=checkpoint.conv_id,
+            status="awaiting_approval",
+            response="仍有动作等待审批；批准后再调用检查点恢复。",
+            action_results=results, memory_write_status="not_attempted")
+    if statuses & {ActionStatus.APPROVED, ActionStatus.EXECUTING}:
+        return CheckpointResumeResponse(
+            request_id=request_id, conv_id=checkpoint.conv_id,
+            status="executing",
+            response="动作仍在执行或执行状态未知，不能确认完成。",
+            action_results=results, memory_write_status="not_attempted")
+    receipt = _checkpoint_receipt(results)
+    if checkpoint.resumed_at is not None:
+        return CheckpointResumeResponse(
+            request_id=request_id, conv_id=checkpoint.conv_id,
+            status=checkpoint.status.value, response=receipt,
+            action_results=results, memory_write_status="already_resumed",
+            already_resumed=True)
+    memory_status = "not_available"
+    if _memory is not None:
+        try:
+            from memory.conversation_memory import MsgRole
+            await _memory.add_message(
+                user_id, checkpoint.conv_id, MsgRole.ASSISTANT, receipt,
+                metadata={"source": "checkpoint_resume",
+                          "request_id": request_id,
+                          "checkpoint_status": checkpoint.status.value},
+            )
+            memory_status = "completed"
+            checkpoint = _checkpoint_service.mark_resumed(request_id) or checkpoint
+        except Exception:
+            memory_status = "failed"
+            logger.warning("checkpoint_resume_memory_failed request_id=%s", request_id)
+    return CheckpointResumeResponse(
+        request_id=request_id, conv_id=checkpoint.conv_id,
+        status=checkpoint.status.value, response=receipt,
+        action_results=results, memory_write_status=memory_status,
+        already_resumed=False)
 
 
 async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) -> tuple[str, bool]:

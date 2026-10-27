@@ -227,3 +227,14 @@
 - **验证**：全量 `pytest` **750 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
 - **限制**：Python 3.11/CUDA torch 环境偏离协议；8 个 dev 负例不足以稳定校准；hybrid 不是融合分数；延迟为预计算+检索分项，不是在线 SLA；生产切换需另开任务。
 - **状态**：H2-5 `todo → verify`。
+
+## 2026-10-27 — H4-1 检查点与动作状态持久化
+
+- **新增**：`actions/redis_store.py`（RedisActionStore/RedisCheckpointStore，Lua 幂等绑定）、`core/checkpoint.py`（ActionCheckpoint/CheckpointService/in-memory store）、`tests/test_h4_1_checkpoints.py`（6 测试）、`tests/test_h4_1_live_persistence.py`（2 opt-in live 测试，含真实子进程重启）。
+- **接入**：lifespan 用 `REDIS_URL` 创建 Redis action/checkpoint store；`/chat` 在出现 `awaiting_approval` 时保存 request/conv/user、actions、H3-5 steps、remaining_actions；approve/reject/resume 更新检查点；新增 owner-only `GET /checkpoints/{request_id}` 与 `POST /checkpoints/{request_id}/resume`。
+- **恢复**：resume 对 `APPROVED` 动作调用 ActionService.resume；awaiting 不执行；终态生成逐动作回执并写回原会话 Memory，重复 resume 不重复写；Memory 失败保留检查点可重试。身份只来自 Principal，审批仍要求独立 reviewer。
+- **持久化**：action 键 `action:<id>` + `idem:<key>`；checkpoint 键 `checkpoint:<request_id>` + `action:<action_id>`；无 TTL；单实例 Redis RLock，不是分布式锁。
+- **证据**：真实本地 Redis + 新 store/service 实例读回 pending action/检查点，reviewer 批准 completed，resume 返回 completed 且 Memory 写一次；同幂等键 reuse，executor 仍 1 次；其他客户 404。另用两个真实 Python 子进程验证进程重启后仍能读回 awaiting 并批准。
+- **验证**：全量 `pytest` **756 passed / 5 skipped**（新增 2 个 live skip）；相关回归 32 passed；Node **12 passed**；`git diff --check` 通过。
+- **限制**：单实例；模拟业务表仍内存；EXECUTING 崩溃窗口留给 H4-2；检查点只覆盖 action 诉求；无 TTL；Redis 不可用时启动失败。
+- **状态**：H4-1 `todo → verify`。

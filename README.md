@@ -164,7 +164,7 @@ uv 缓存统一位于 `cash/cache/uv`（由 pyproject.toml 配置），pytest �
 
 - demo `user_id`，非正式认证；审批 API 仍沿用演示身份模型。
 - demo / in-memory commerce Action backend；external commerce / payment API 未接入。
-- PendingAction 持久化仍有限；当前 Store 与有界 Trace 随进程重启丢失，Trace 默认只保留最近 200 个请求。
+- PendingAction 与审批检查点持久化在 Redis（单实例；多 worker 并发不承诺）；有界 Trace 仍随进程重启丢失，默认只保留最近 200 个请求；模拟业务表仍是内存 fixture。
 - character n-gram lexical embedding baseline；阈值、语义召回和更大知识集效果仍需验证。
 - unsupported escalation 仍需改进；ownership 严格在线任务证据有缺口，不能混同为确定性安全层未检查。
 - long-term expired Chroma records 尚无后台物理清理任务；读取时过滤有效期。
