@@ -216,3 +216,14 @@
 - **验证**：全量 `pytest` **742 passed / 3 skipped**；相关回归 129 passed；Node **12 passed**；`git diff --check` 通过。
 - **限制**：真实模型常对合法 action 反问确认；FAQ 检索多为 low_confidence/no_answer；越权“查不到即不调用 action”按严格口径记为未完成；C03 未新增 Planner/子任务状态。
 - **状态**：H3-6 `todo → verify`（`no_loop_control` 已在用户确认后续跑补齐 24 条）。
+
+## 2026-10-27 — H2-5 语义检索对比
+
+- **新增**：`evaluation/h2_5/`（预计算 bge-small-zh-v1.5、LookupEmbedding、BM25/RRF、dev 校准、test 三组 runner）；`tests/test_h2_5_semantic_retrieval.py`（8 测试）。
+- **环境**：embedding 在现有 conda `pytorch311_RL`（Python 3.11.14、torch 2.9.0+cu128、transformers 5.3.0、CPU、peak RSS 735.2MB）预计算；检索在项目 `.venv`（Python 3.12）通过只读 adapter 使用预计算向量；未改 `pyproject.toml`/`uv.lock`/生产 embedding。
+- **模型**：`BAAI/bge-small-zh-v1.5` revision `7999e1d3...`，512 维，CLS pooling，L2，query prefix；`model.safetensors` SHA256 已校验；权重在 gitignored 缓存，未提交。
+- **三组**：B0-calibrated（0.20）、semantic（dev 锁定 0.65）、hybrid（semantic 阈值门 + 字符 bigram BM25 k1=1.5/b=0.75 + RRF k=60）；test 只跑一次。
+- **结果**：B0-calibrated Recall@5 9/21、FPR 8/9、citation precision 52.94%；semantic/hybrid Recall 7/21、FPR 3/9、citation precision 70%、candidate Recall@5 21/21；hybrid 最终指标与 semantic 相同（BM25 只重排已过阈值候选）。语义未在 Recall 上赢 B0，且 dev→test FPR 泛化差距大；未切换生产默认。
+- **验证**：全量 `pytest` **750 passed / 3 skipped**；Node **12 passed**；`git diff --check` 通过。
+- **限制**：Python 3.11/CUDA torch 环境偏离协议；8 个 dev 负例不足以稳定校准；hybrid 不是融合分数；延迟为预计算+检索分项，不是在线 SLA；生产切换需另开任务。
+- **状态**：H2-5 `todo → verify`。

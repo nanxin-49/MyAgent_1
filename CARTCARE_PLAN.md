@@ -54,7 +54,7 @@
 | H2-2 | 评测框架：录制回放 + 故障注入 + 轨迹打分 + pass^k | G2 | H2-1 | 3 天 | done | [H2-2](docs/reports/H2-2.md) |
 | H2-3 | 150–200 条规模化评测集与指标报告 | G2 | H2-2 | 3 天 | done | [H2-3](docs/reports/H2-3.md) |
 | H2-4 | "只有模型 + 工具"基线 | G2 | H2-3 | 1 天 | done | [H2-4](docs/reports/H2-4.md) |
-| H2-5 | 语义检索对比（B0 / 语义 / 混合） | G2 | H0-1 | 3 天 | todo | |
+| H2-5 | 语义检索对比（B0 / 语义 / 混合） | G2 | H0-1 | 3 天 | verify | [H2-5](docs/reports/H2-5.md) |
 | H3-1 | 工具循环控制 | G3 | H2-2 | 2 天 | done | [H3-1](docs/reports/H3-1.md) |
 | H3-2 | 结构化错误回传 | G3 | H3-1 | 1 天 | done | [H3-2](docs/reports/H3-2.md) |
 | H3-3 | 上下文预算与工具结果压缩 | G3 | H3-1 | 2 天 | done | [H3-3](docs/reports/H3-3.md) |

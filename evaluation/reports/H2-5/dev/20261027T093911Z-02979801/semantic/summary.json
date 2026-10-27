@@ -1,0 +1,108 @@
+{
+  "1": {
+    "Recall@1": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": null,
+      "numerator": 0,
+      "denominator": 0
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 51.30639998242259,
+      "p95": 61.321175133343786,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "degraded": 16
+    },
+    "failure_counts": {
+      "retrieval_degraded": 16
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  },
+  "2": {
+    "Recall@1": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": null,
+      "numerator": 0,
+      "denominator": 0
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 52.895399974659085,
+      "p95": 61.61417503608391,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "degraded": 16
+    },
+    "failure_counts": {
+      "retrieval_degraded": 16
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  }
+}

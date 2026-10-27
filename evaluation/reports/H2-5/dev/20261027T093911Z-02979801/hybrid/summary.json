@@ -1,0 +1,114 @@
+{
+  "1": {
+    "Recall@1": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": null,
+      "numerator": 0,
+      "denominator": 0
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 54.82444993685931,
+      "p95": 63.81630012765527,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "low_confidence": 14,
+      "degraded": 2
+    },
+    "failure_counts": {
+      "gold_below_threshold": 7,
+      "retrieval_degraded": 2,
+      "none": 7
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  },
+  "2": {
+    "Recall@1": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": null,
+      "numerator": 0,
+      "denominator": 0
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 55.70450006052852,
+      "p95": 63.066150003578514,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "low_confidence": 14,
+      "degraded": 2
+    },
+    "failure_counts": {
+      "gold_below_threshold": 7,
+      "retrieval_degraded": 2,
+      "none": 7
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  }
+}
