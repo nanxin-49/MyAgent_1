@@ -24,13 +24,14 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Depends
 from core.auth import Principal, get_principal, require_admin, require_reviewer, customer_identity
-from core.checkpoint import ActionCheckpoint, CheckpointService
+from core.checkpoint import ActionCheckpoint, CheckpointService, reconcile_checkpoint
+from core.checkpoint_resume import CheckpointResumer
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from actions import ActionResult, ActionStatus
+from actions import ActionResult
 from core.handoff import HandoffResult
 
 load_dotenv()
@@ -623,33 +624,6 @@ def _update_checkpoint_for_result(action_id: str, result: ActionResult) -> None:
         logger.warning("checkpoint_update_failed action_id=%s", action_id)
 
 
-def _checkpoint_receipt(results: List[ActionResult]) -> str:
-    lines: List[str] = []
-    for result in results:
-        action = result.action
-        kind = ("退款" if action is not None
-                and action.action_type.value == "refund" else "取消订单")
-        action_id = result.action_id or (action.action_id if action else "未生成")
-        if result.status is ActionStatus.COMPLETED:
-            lines.append(f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。")
-        elif result.status is ActionStatus.AWAITING_APPROVAL:
-            lines.append(f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。")
-        elif result.status is ActionStatus.REJECTED:
-            lines.append(f"{kind}请求已被拒绝，未执行。原因代码："
-                         f"{result.error_code or 'unknown'}。动作编号：{action_id}。")
-        elif result.status is ActionStatus.FAILED:
-            lines.append(f"{kind}请求处理失败，不能视为已执行。错误代码："
-                         f"{result.error_code or 'unknown'}。动作编号：{action_id}。")
-        else:
-            lines.append(f"{kind}动作当前状态：{result.status.value}。动作编号：{action_id}。")
-    if not lines:
-        return "没有可汇报的状态变更动作。"
-    if len(lines) == 1:
-        return lines[0]
-    return ("本次共观察到 %d 个状态变更动作：\n" % len(lines)
-            + "\n".join(f"- {line}" for line in lines))
-
-
 @app.get("/checkpoints/{request_id}", response_model=ActionCheckpoint, tags=["Checkpoints"])
 async def get_checkpoint(request_id: str, principal: Principal = Depends(get_principal)):
     """Read an owner-visible approval checkpoint; never exposes Memory or prompts."""
@@ -659,7 +633,14 @@ async def get_checkpoint(request_id: str, principal: Principal = Depends(get_pri
     checkpoint = _checkpoint_service.get(request_id)
     if checkpoint is None or checkpoint.user_id != user_id:
         raise HTTPException(404, "检查点不存在")
-    return checkpoint
+    observed: Dict[str, tuple[str, Optional[str]]] = {}
+    if _action_service is not None:
+        for item in checkpoint.actions:
+            result = _action_service.get(
+                item.action_id, user_id=user_id, principal=principal)
+            if result.action is not None:
+                observed[item.action_id] = (result.status.value, result.error_code)
+    return reconcile_checkpoint(checkpoint, observed)
 
 
 @app.post("/checkpoints/{request_id}/resume", response_model=CheckpointResumeResponse,
@@ -668,7 +649,8 @@ async def resume_checkpoint(request_id: str, principal: Principal = Depends(get_
     """Resume a checkpoint after approval and report back to the original conversation.
 
     Awaiting actions are not executed here; an independent reviewer must approve them.
-    APPROVED actions are executed through the existing ActionService.resume path.
+    APPROVED actions execute through ActionService.resume; EXECUTING actions are
+    reconciled from their persisted receipt or failed as execution_unknown.
     """
     if _checkpoint_service is None or _action_service is None:
         raise HTTPException(503, "服务未就绪")
@@ -676,61 +658,20 @@ async def resume_checkpoint(request_id: str, principal: Principal = Depends(get_
     checkpoint = _checkpoint_service.get(request_id)
     if checkpoint is None or checkpoint.user_id != user_id:
         raise HTTPException(404, "检查点不存在")
-    results: List[ActionResult] = []
-    for item in checkpoint.actions:
-        current = _action_service.get(
-            item.action_id, user_id=user_id, principal=principal)
-        if current.action is not None and current.status is ActionStatus.APPROVED:
-            current = _action_service.resume(
-                action_id=item.action_id,
-                user_id=user_id,
-                principal=principal,
-                request_id=request_id,
-            )
-        results.append(current)
-        if current.action_id is not None:
-            _update_checkpoint_for_result(item.action_id, current)
-    checkpoint = _checkpoint_service.get(request_id) or checkpoint
-    statuses = {result.status for result in results}
-    if statuses & {ActionStatus.PENDING, ActionStatus.AWAITING_APPROVAL}:
-        return CheckpointResumeResponse(
-            request_id=request_id, conv_id=checkpoint.conv_id,
-            status="awaiting_approval",
-            response="仍有动作等待审批；批准后再调用检查点恢复。",
-            action_results=results, memory_write_status="not_attempted")
-    if statuses & {ActionStatus.APPROVED, ActionStatus.EXECUTING}:
-        return CheckpointResumeResponse(
-            request_id=request_id, conv_id=checkpoint.conv_id,
-            status="executing",
-            response="动作仍在执行或执行状态未知，不能确认完成。",
-            action_results=results, memory_write_status="not_attempted")
-    receipt = _checkpoint_receipt(results)
-    if checkpoint.resumed_at is not None:
-        return CheckpointResumeResponse(
-            request_id=request_id, conv_id=checkpoint.conv_id,
-            status=checkpoint.status.value, response=receipt,
-            action_results=results, memory_write_status="already_resumed",
-            already_resumed=True)
-    memory_status = "not_available"
-    if _memory is not None:
-        try:
-            from memory.conversation_memory import MsgRole
-            await _memory.add_message(
-                user_id, checkpoint.conv_id, MsgRole.ASSISTANT, receipt,
-                metadata={"source": "checkpoint_resume",
-                          "request_id": request_id,
-                          "checkpoint_status": checkpoint.status.value},
-            )
-            memory_status = "completed"
-            checkpoint = _checkpoint_service.mark_resumed(request_id) or checkpoint
-        except Exception:
-            memory_status = "failed"
-            logger.warning("checkpoint_resume_memory_failed request_id=%s", request_id)
+    resumer = CheckpointResumer(_checkpoint_service, _action_service, _memory)
+    outcome = await resumer.resume(
+        request_id, user_id=user_id, principal=principal)
+    if outcome is None:
+        raise HTTPException(404, "检查点不存在")
     return CheckpointResumeResponse(
-        request_id=request_id, conv_id=checkpoint.conv_id,
-        status=checkpoint.status.value, response=receipt,
-        action_results=results, memory_write_status=memory_status,
-        already_resumed=False)
+        request_id=request_id,
+        conv_id=outcome.checkpoint.conv_id,
+        status=outcome.status,
+        response=outcome.response,
+        action_results=outcome.action_results,
+        memory_write_status=outcome.memory_write_status,
+        already_resumed=outcome.already_resumed,
+    )
 
 
 async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) -> tuple[str, bool]:

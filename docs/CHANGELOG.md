@@ -238,3 +238,13 @@
 - **验证**：全量 `pytest` **756 passed / 5 skipped**（新增 2 个 live skip）；相关回归 32 passed；Node **12 passed**；`git diff --check` 通过。
 - **限制**：单实例；模拟业务表仍内存；EXECUTING 崩溃窗口留给 H4-2；检查点只覆盖 action 诉求；无 TTL；Redis 不可用时启动失败。
 - **状态**：H4-1 `todo → verify`。
+
+## 2026-10-27 — H4-2 崩溃恢复测试（四个时间点）
+
+- **新增**：`actions/models.py` 的 `execution_attempted_at`；`actions/service.py` 的执行回执与 `_recover_executing`；`memory/conversation_memory.py` 的 `add_message_once()` + Lua；`core/checkpoint.py` 的 `reconcile_checkpoint()`；`core/checkpoint_resume.py` 的 `CheckpointResumer`；`tests/test_h4_2_crash_recovery.py`（9 测试）、`tests/test_h4_2_live_crash.py` + `tests/h4_2_child.py`（7 opt-in live 测试）。
+- **恢复语义**：`executing` + 已有 `execution_result` → completed（不重跑）；无结果且未派发 → 重新执行一次；无结果且已派发 → failed/`execution_unknown`（不自动重试）。执行回执在 completed 之前写入 action，随 Redis 持久化。
+- **Memory 幂等**：恢复回执与 `wm:once:` marker 在同一个 Lua 中写入；重复/并发 resume 不重复追加；`delete_session`/`delete_user_memory` 同步清理 marker。`GET /checkpoints` 返回 ActionStore 的真实状态只读投影，不因 GET 写 Redis。
+- **真实证据**（本地 Redis + 真杀进程）：审批前、审批中、执行中（无回执）、执行中（有回执）、执行后（未汇报）、执行后（Memory 已写未标记）6 个场景全部通过；新进程 executor 分别为 1/1/0/0/0/0，Memory 均为 1 条；`GET /checkpoints` 与 `GET /actions` 可查恢复后回执。
+- **验证**：全量 `pytest` **765 passed / 12 skipped**（新增 9 单测 + 7 live skip）；H4-1 live 回归 **2 passed**；Node **12 passed**；`git diff --check` 通过。
+- **限制**：执行中已提交但无回执只能按 unknown 收口，模拟业务表不持久；unknown 动作不能用原幂等键自动重试；单实例；GET 对账不写存储；未启动完整 uvicorn 重启；孤立 idem 键问题仍保留。
+- **状态**：H4-2 `todo → verify`。

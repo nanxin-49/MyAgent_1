@@ -18,6 +18,15 @@ from memory.policy import (compressed_summary, episodic_topics, explicit_prefere
 
 logger = logging.getLogger(__name__)
 
+# Append one working-memory message at most once per idempotency key.
+_ADD_MESSAGE_ONCE_LUA = """
+if redis.call('EXISTS', KEYS[2]) == 1 then return 0 end
+redis.call('LPUSH', KEYS[1], ARGV[1])
+redis.call('EXPIRE', KEYS[1], tonumber(ARGV[2]))
+redis.call('SET', KEYS[2], '1', 'EX', tonumber(ARGV[3]))
+return redis.call('LLEN', KEYS[1])
+"""
+
 
 class MsgRole(Enum):
     USER      = "user"
@@ -150,6 +159,50 @@ class MemoryManager:
         if (getattr(self, "_context_compression", True)
                 and await self._redis.llen(key) >= self.COMPRESS_AT):
             await self._compress(user_id, conv_id)
+
+    async def add_message_once(
+        self,
+        user_id: str,
+        conv_id: str,
+        role:    MsgRole,
+        content: str,
+        metadata: Optional[Dict[str, Any]] = None,
+        *,
+        idempotency_key: str,
+    ) -> bool:
+        """Append a message at most once for a stable idempotency key.
+
+        The marker and the list append execute in one Redis script, so a retry
+        after a crash cannot create a duplicate assistant receipt.
+        """
+        if not isinstance(idempotency_key, str) or not idempotency_key.strip():
+            raise ValueError("idempotency_key is required")
+        user_id = self._safe_text(user_id)
+        conv_id = self._safe_text(conv_id)
+        clean_metadata = {
+            self._safe_text(k): self._safe_metadata_value(v)
+            for k, v in (metadata or {}).items()
+        }
+        msg = Message(role=role, content=self._safe_text(content), metadata=clean_metadata)
+        key = self._wm_key(user_id, conv_id)
+        marker = self._once_key(user_id, conv_id, idempotency_key)
+        length = await self._redis.eval(
+            _ADD_MESSAGE_ONCE_LUA, 2, key, marker,
+            json.dumps({
+                "role":      msg.role.value,
+                "content":   msg.content,
+                "ts":        msg.timestamp.isoformat(),
+                "metadata":  msg.metadata,
+            }),
+            86400,
+            86400,
+        )
+        if not length:
+            return False
+        if (getattr(self, "_context_compression", True)
+                and int(length) >= self.COMPRESS_AT):
+            await self._compress(user_id, conv_id)
+        return True
 
     async def update_profile(self, user_id: str, conv_id: str) -> None:
         """Persist only explicit, allowlisted communication preferences."""
@@ -311,6 +364,7 @@ class MemoryManager:
         """Forget one session without deleting the user's explicit preferences."""
         user_id, conv_id = self._safe_text(user_id), self._safe_text(conv_id)
         await self._redis.delete(self._wm_key(user_id, conv_id), self._summary_key(user_id, conv_id))
+        await self._delete_once_keys(user_id, conv_id)
         await asyncio.to_thread(self._episodic.delete,
             where={"$and": [{"user_id": user_id}, {"conv_id": conv_id}]})
 
@@ -321,8 +375,16 @@ class MemoryManager:
         for prefix in ("wm", "summary"):
             async for key in self._redis.scan_iter(match=f"{prefix}:{component}:*"):
                 await self._redis.delete(key)
+        await self._delete_once_keys(user_id)
         await asyncio.to_thread(self._episodic.delete, where={"user_id": user_id})
         await asyncio.to_thread(self._profile.delete, ids=[self._profile_doc_id(user_id)])
+
+    async def _delete_once_keys(self, user_id: str, conv_id: str | None = None) -> None:
+        user = quote(user_id, safe="")
+        pattern = (f"wm:once:{user}:{quote(conv_id, safe='')}:*"
+                   if conv_id is not None else f"wm:once:{user}:*")
+        async for key in self._redis.scan_iter(match=pattern):
+            await self._redis.delete(key)
 
     @staticmethod
     def _wm_key(user_id: str, conv_id: str) -> str:
@@ -331,6 +393,11 @@ class MemoryManager:
     @staticmethod
     def _summary_key(user_id: str, conv_id: str) -> str:
         return f"summary:{quote(user_id, safe='')}:{quote(conv_id, safe='')}"
+
+    @staticmethod
+    def _once_key(user_id: str, conv_id: str, idempotency_key: str) -> str:
+        digest = hashlib.sha256(idempotency_key.encode("utf-8")).hexdigest()[:32]
+        return (f"wm:once:{quote(user_id, safe='')}:{quote(conv_id, safe='')}:{digest}")
 
     @classmethod
     def _profile_doc_id(cls, user_id: str) -> str:

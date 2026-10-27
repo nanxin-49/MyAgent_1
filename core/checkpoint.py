@@ -81,6 +81,33 @@ class InMemoryCheckpointStore:
         return None
 
 
+def reconcile_checkpoint(
+    checkpoint: ActionCheckpoint,
+    observed: dict[str, tuple[str, str | None]],
+) -> ActionCheckpoint:
+    """Project live action statuses onto a checkpoint without writing the store."""
+    actions: list[CheckpointAction] = []
+    changed = False
+    for action in checkpoint.actions:
+        value = observed.get(action.action_id)
+        if value is None:
+            actions.append(action)
+            continue
+        status, error_code = value
+        if action.status != status or action.error_code != error_code:
+            changed = True
+            action = action.model_copy(update={"status": status, "error_code": error_code})
+        actions.append(action)
+    if not changed:
+        return checkpoint
+    return checkpoint.model_copy(update={
+        "actions": actions,
+        "status": checkpoint_status(actions),
+        "remaining_actions": [action.action_id for action in actions
+                              if action.status not in TERMINAL_ACTION_STATUSES],
+    })
+
+
 def checkpoint_status(actions: list[CheckpointAction]) -> CheckpointStatus:
     statuses = {action.status for action in actions}
     if not statuses:
@@ -182,5 +209,5 @@ class CheckpointService:
 __all__ = [
     "ActionCheckpoint", "CheckpointAction", "CheckpointService", "CheckpointStatus",
     "CheckpointStore", "InMemoryCheckpointStore", "checkpoint_status",
-    "TERMINAL_ACTION_STATUSES",
+    "reconcile_checkpoint", "TERMINAL_ACTION_STATUSES",
 ]

@@ -156,13 +156,14 @@ class ActionService:
                 return action
             if action.status is ActionStatus.APPROVED:
                 return self._execute_locked(action, request_id=request_id)
+            if action.status is ActionStatus.EXECUTING:
+                return self._recover_executing(action, request_id=request_id)
             if action.status is ActionStatus.AWAITING_APPROVAL:
                 return self._result(action, reused=True)
             if action.status in {
                 ActionStatus.COMPLETED,
                 ActionStatus.REJECTED,
                 ActionStatus.FAILED,
-                ActionStatus.EXECUTING,
             }:
                 return self._result(action, reused=True)
             return self._invalid_transition(action, "resume")
@@ -290,13 +291,21 @@ class ActionService:
             action.status = ActionStatus.EXECUTING
             action.updated_at = self._now()
             self._store.save(action)
-            action.execution_result = self._executor.execute(
+            # Distinguishes "crashed before dispatch" from "dispatched, outcome unknown".
+            action.execution_attempted_at = self._now()
+            action.updated_at = self._now()
+            self._store.save(action)
+            execution = self._executor.execute(
                 action.action_type,
                 action.order_id,
                 user_id=action.user_id,
                 amount=action.amount,
                 action_id=action.action_id,
             )
+            # Persist the receipt before the terminal status; recovery can finish from it.
+            action.execution_result = execution
+            action.updated_at = self._now()
+            self._store.save(action)
             action.status = ActionStatus.COMPLETED
             action.updated_at = self._now()
             self._store.save(action)
@@ -309,6 +318,23 @@ class ActionService:
             return self._fail_action(action, "dependency_failure", str(exc))
         except Exception as exc:
             return self._fail_action(action, "execution_failure", str(exc))
+
+    def _recover_executing(self, action: PendingAction, *, request_id: str) -> ActionResult:
+        """Resolve an action left in EXECUTING by a crash without guessing a result."""
+        if action.execution_result is not None:
+            action.status = ActionStatus.COMPLETED
+            action.updated_at = self._now()
+            self._store.save(action)
+            return self._result(action)
+        if action.execution_attempted_at is None:
+            # The process died after recording EXECUTING but before dispatch.
+            action.status = ActionStatus.APPROVED
+            action.updated_at = self._now()
+            self._store.save(action)
+            return self._execute_locked(action, request_id=request_id)
+        return self._fail_action(
+            action, "execution_unknown",
+            "上次执行已派发但未记录结果，不能确认是否完成；未自动重试")
 
     def _evaluate(self, action_type, order, user_id, amount, existing_refund):
         if not self._policy_guard:
