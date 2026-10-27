@@ -599,23 +599,59 @@ class BaseAgent:
         }
 
     def _last_action_receipt(self) -> Optional[str]:
-        """Report an observed action result if a later model step fails or loops."""
-        for trace in reversed(self._last_tool_traces):
+        """Report every observed action, not just the most recent one (C03).
+
+        A composite request can contain several business actions; a fallback
+        receipt that only shows the last one can look like the whole request
+        completed. Single-action text is kept byte-identical to the previous
+        behaviour; multiple actions get one line each, in execution order.
+        """
+        lines: List[str] = []
+        line_by_key: Dict[Any, int] = {}
+        for trace in self._last_tool_traces:
             action = trace.get("action_result")
             if not isinstance(action, dict) or not action.get("status"):
                 continue
-            kind = "退款" if trace.get("tool_name") == "request_refund" else "取消订单"
-            action_id = action.get("action_id") or "未生成"
-            status = action["status"]
-            if status == "completed":
-                return f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。"
-            if status == "awaiting_approval":
-                return f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。"
-            if status == "rejected":
-                return f"{kind}请求已被拒绝，未执行。原因代码：{action.get('reason_code') or action.get('error_code') or 'unknown'}。动作编号：{action_id}。"
-            if status == "failed":
-                return f"{kind}请求处理失败，不能视为已执行。错误代码：{action.get('error_code') or 'unknown'}。动作编号：{action_id}。"
-        return None
+            action_id = action.get("action_id")
+            key = action_id or (trace.get("tool_name"), trace.get("tool_use_id"),
+                                action["status"])
+            line = self._action_receipt_line(trace, action)
+            if not line:
+                continue
+            if key in line_by_key:
+                if action.get("reused"):
+                    lines[line_by_key[key]] = line
+                continue
+            line_by_key[key] = len(lines)
+            lines.append(line)
+        if not lines:
+            return None
+        if len(lines) == 1:
+            return lines[0]
+        return (f"本次共观察到 {len(lines)} 个状态变更动作：\n"
+                + "\n".join(f"- {line}" for line in lines))
+
+    @staticmethod
+    def _action_receipt_line(trace: Dict[str, Any], action: Dict[str, Any]) -> Optional[str]:
+        kind = "退款" if trace.get("tool_name") == "request_refund" else "取消订单"
+        action_id = action.get("action_id") or "未生成"
+        status = action["status"]
+        if status == "completed":
+            line = f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。"
+        elif status == "awaiting_approval":
+            line = f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。"
+        elif status == "rejected":
+            line = (f"{kind}请求已被拒绝，未执行。原因代码："
+                    f"{action.get('reason_code') or action.get('error_code') or 'unknown'}。"
+                    f"动作编号：{action_id}。")
+        elif status == "failed":
+            line = (f"{kind}请求处理失败，不能视为已执行。错误代码："
+                    f"{action.get('error_code') or 'unknown'}。动作编号：{action_id}。")
+        else:
+            return None
+        if action.get("reused"):
+            line += "（复用已有请求结果，未重复执行。）"
+        return line
 
     @staticmethod
     def _block_type(block: Any) -> Optional[str]:

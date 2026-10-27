@@ -26,10 +26,12 @@ from agents.tools import build_shared_rag_tools
 from core.handoff import HandoffService
 from core.harness import HarnessConfig
 from evaluation.agent_trace_eval import score_trajectory
+from evaluation.fault_injection import FaultInjector, wrap_tools
 from evaluation.h2_3.run_suite import (DEFAULT_CASES, DEFAULT_FIXTURE, load_cases,
                                        terminal_state, turns)
 from evaluation.h2_4.metrics import summarize_baseline
-from evaluation.h2_4.profile import harness_for_profile
+from evaluation.h2_4.profile import PROFILES, harness_for_profile
+from evaluation.h3_6.composite import evaluate_demands
 from evaluation.scripted_model import ScriptedModel  # noqa: F401  (test seams)
 from evaluation.topology_experiment import isolated_business
 from mcp.knowledge_base import KnowledgeBase
@@ -167,12 +169,16 @@ def score_case(case: dict, fixture: dict, *, api_key: str, base_url: str, model:
     handoffs = HandoffService()
     context = ""
     all_checks: dict[str, bool] = {}
+    all_demand_results: list[dict] = []
     turn_rows = []
     loop_truncated = False
+    injector = FaultInjector(case["faults"]) if case.get("faults") else None
     for index, turn in enumerate(turns(case), 1):
         tools, service, backend = isolated_business(fixture, NOW, harness=harness)
         manager = build_manager(api_key, base_url, model, budgeted, kb)
         tools.update(build_shared_rag_tools(manager))
+        if injector is not None:
+            tools = wrap_tools(tools, injector)
         runtime = SupportRuntime(api_key, model, base_url, client=budgeted, harness=harness)
         runtime.handoff_service = handoffs
         runtime.set_shared_tools(tools)
@@ -188,35 +194,59 @@ def score_case(case: dict, fixture: dict, *, api_key: str, base_url: str, model:
             loop_truncated = loop_truncated or "最大轮数" in turn_error
         latency = round((time.monotonic() - start) * 1000, 1)
         current = terminal_state(service, backend, handoffs)
+        fault_events = list(injector.events) if injector is not None else []
         if result is None:
             checks = {"turn_error": False}
+            demand_results = []
             response_text = ""
             tools_used, tool_traces, model_calls = [], [], 0
+            steps, stop_reason = [], None
         else:
-            reference = expected.pop("citation", None)
-            if reference:
-                expected["citation_document_id"] = str(reference).split("#", 1)[0]
-            checks = score_trajectory(result.tool_traces, expected, current,
-                                      answer=result.response)
             response_text = result.response
             tools_used, tool_traces = result.tools_used, result.tool_traces
             model_calls = len(result.model_calls)
+            steps, stop_reason = result.steps, result.stop_reason
             loop_truncated = loop_truncated or result.stop_reason in {
                 "budget_exhausted", "loop_detected"}
+            if case.get("demands"):
+                checks, demand_results = evaluate_demands(
+                    case, tool_traces, response_text, fault_events)
+            else:
+                demand_results = []
+                reference = expected.pop("citation", None)
+                if reference:
+                    expected["citation_document_id"] = str(reference).split("#", 1)[0]
+                checks = score_trajectory(tool_traces, expected, current,
+                                          answer=response_text)
         for name, value in checks.items():
             all_checks[f"turn{index}.{name}"] = value
+        all_demand_results.extend(demand_results)
         turn_rows.append({
             "turn": index, "message": turn["message"], "response": response_text,
             "tools_used": tools_used, "tool_traces": tool_traces,
+            "steps": steps, "stop_reason": stop_reason,
+            "demand_results": demand_results, "fault_events": fault_events,
             "terminal_state": current, "checks": checks, "latency_ms": latency,
             "model_calls": model_calls, "error": turn_error,
             "forbidden_tools": forbidden,
         })
         context = (context + "\n" if context else "") + f"用户: {turn['message']}\n助手: {response_text}"
+    composite = bool(case.get("demands"))
+    if composite:
+        # Composite checks are already flat; per-demand aggregation needs the
+        # unprefixed names, so keep the turn prefix only for legacy cases.
+        flat_checks = {}
+        for row in turn_rows:
+            flat_checks.update(row["checks"])
+        checks_final = flat_checks
+    else:
+        checks_final = all_checks
     return {
         "case_id": case["id"], "category": case["category"],
-        "passed": bool(all_checks) and all(all_checks.values()),
-        "checks": all_checks, "turns": turn_rows,
+        "passed": bool(checks_final) and all(checks_final.values()),
+        "checks": checks_final, "turns": turn_rows,
+        "demand_results": all_demand_results,
+        "fault_events": fault_events,
         "terminal_state": terminal_state(service, backend, handoffs),
         "latency_ms": round(sum(row["latency_ms"] for row in turn_rows), 1),
         "model_calls": sum(row["model_calls"] for row in turn_rows),
@@ -411,8 +441,8 @@ def main(argv=None) -> int:
     parser.add_argument("--only-categories", default=None, help="comma-separated categories")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--fresh", action="store_true")
-    parser.add_argument("--profile", choices=("full", "bare"), default="full",
-                        help="full = production harness; bare = model + tools only")
+    parser.add_argument("--profile", choices=PROFILES, default="full",
+                        help="full = production harness; other profiles are ablation arms")
     parser.add_argument("--no-key-runs", action="store_true",
                         help="run every case once; skip key-category runs 2/3")
     parser.add_argument("--max-tool-rounds", type=int, default=10,

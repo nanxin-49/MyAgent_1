@@ -26,8 +26,9 @@ DEFAULT_OUTPUT = Path("evaluation/reports/H2-3/report.json")
 
 def load_cases(path: str | Path) -> tuple[dict, list[dict]]:
     data = json.loads(Path(path).read_text(encoding="utf-8"))
-    if data.get("schema") != "echomind.h2_3.cases" or data.get("version") != 1:
-        raise ValueError("unsupported H2-3 cases schema")
+    schemas = {"echomind.h2_3.cases", "echomind.h3_6.composite_cases"}
+    if data.get("schema") not in schemas or data.get("version") != 1:
+        raise ValueError("unsupported evaluation cases schema")
     return data, data["cases"]
 
 

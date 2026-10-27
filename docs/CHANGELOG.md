@@ -200,3 +200,19 @@
 - **验证**：全量 `pytest` **715 passed / 3 skipped**（新增 8，既有 707 不退化）；相关回归 157 passed；Node **12 passed**；`git diff --check` 通过。admin 依赖未改，无认证访问 Trace 仍为 401。
 - **限制**：Trace 仍为进程内有界队列，重启丢失；H4-1 只持久化待审批动作/检查点，跨重启 Trace 未排期。旧 Multi 路径不接入 `steps`。
 - **状态**：H3-5 `todo → verify`。
+
+## 2026-10-27 — H3-6 复合售后请求 + harness 消融实验
+
+- **新增**：`evaluation/h3_6/`（24 条复合用例、生成器、逐诉求评分、确定性 runner、6 臂消融 wrapper）；`tests/test_h3_6_composite.py` + `tests/test_h3_6_ablation.py`（27 测试）。
+- **C03**：`BaseAgent._last_action_receipt` 从“最近一个 action”改为枚举本轮全部 action（按 action_id 去重，reused 标注）；单 action 文本不变，多 action 输出逐项回执，避免复合请求把单一成功动作表达成整单完成。
+- **评测**：`evaluate_demands` 逐诉求输出 completed/awaiting_approval/rejected/failed/answered/no_answer/not_called，检查遗漏、额外写、重复写、写动作独立 Policy 回执、整体完成状态、回答一致性和故障恢复；`real_model.py` 支持 composite schema/faults/复合评分，H2-3 180 条行为不变。
+- **确定性结果**：24/24 严格成功、57/57 诉求、0 已执行违规、0 禁止写尝试、0 overclaim、故障恢复 3/3。
+- **真实模型消融**（deepseek-flash + 真实 Chroma，授权 1200 次/USD 2.0，实际 **453 次 / USD 0.443368**；6 臂各 24 条）：
+  - full 11/24、诉求 35/57、executed violations 0；
+  - bare 13/24、诉求 38/57；no_loop_control 13/24、诉求 40/57；两臂多通过同样的 2 条，其中 `composite_fault_read_retry` 的 full 为 `budget_exhausted`，提示 3 轮上限可能是复合请求的绑定因素，但每臂 1 次、温度非零，需后续对比 3 vs 4/5 轮；
+  - no_guardrails 7/24、**4 个已执行越权完成**（审批阈值/过期窗口/processing 取消/已有退款重复退款），full 0；
+  - no_error_feedback 11/24、no_context_compression 9/24，差异在 24 条样本的噪声范围内。
+- **录屏**：`evaluation/reports/H3-6/DEMO.md` 使用真实模型 `composite_refund_cancel_allow`（两诉求 completed，含 steps/action 回执）。
+- **验证**：全量 `pytest` **742 passed / 3 skipped**；相关回归 129 passed；Node **12 passed**；`git diff --check` 通过。
+- **限制**：真实模型常对合法 action 反问确认；FAQ 检索多为 low_confidence/no_answer；越权“查不到即不调用 action”按严格口径记为未完成；C03 未新增 Planner/子任务状态。
+- **状态**：H3-6 `todo → verify`（`no_loop_control` 已在用户确认后续跑补齐 24 条）。

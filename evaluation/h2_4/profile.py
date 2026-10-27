@@ -1,9 +1,16 @@
-"""H2-4 baseline profiles. Evaluation-only; production /chat never imports these."""
+"""Harness ablation profiles. Evaluation-only; production /chat never imports these."""
 from __future__ import annotations
 
 from core.harness import HarnessConfig
 
-PROFILES = ("full", "bare")
+PROFILES = (
+    "full",
+    "bare",
+    "no_guardrails",
+    "no_error_feedback",
+    "no_context_compression",
+    "no_loop_control",
+)
 
 
 def bare_harness(max_tool_rounds: int = 10) -> HarnessConfig:
@@ -26,9 +33,24 @@ def bare_harness(max_tool_rounds: int = 10) -> HarnessConfig:
 
 
 def harness_for_profile(name: str, *, max_tool_rounds: int = 10) -> HarnessConfig | None:
-    """``full`` keeps production defaults (None); ``bare`` builds the ablation."""
+    """Return the config for an ablation profile.
+
+    ``full`` keeps production defaults (``None``). All other profiles are
+    evaluation-only and may only be constructed through ``HarnessConfig.evaluation``.
+    The ``no_loop_control`` profile keeps a 10-round runner bound so one runaway
+    case cannot consume the whole ablation budget; it is not a deliverable guardrail.
+    """
     if name == "full":
         return None
     if name == "bare":
         return bare_harness(max_tool_rounds=max_tool_rounds)
+    if name == "no_guardrails":
+        return HarnessConfig.evaluation(policy_guard=False, output_consistency=False)
+    if name == "no_error_feedback":
+        return HarnessConfig.evaluation(error_feedback=False)
+    if name == "no_context_compression":
+        return HarnessConfig.evaluation(context_compression=False)
+    if name == "no_loop_control":
+        return HarnessConfig.evaluation(
+            loop_control=False, unguarded_max_tool_rounds=max_tool_rounds)
     raise ValueError(f"unknown profile: {name}")
