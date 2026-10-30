@@ -1,0 +1,316 @@
+{
+  "requests": 10,
+  "charged_or_reserved_usd": 0.010339200000000002,
+  "events": [
+    {
+      "number": 1,
+      "at_utc": "2026-10-25T09:16:08.307490+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0079437,
+      "tool_results_sent": [],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 1898,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 1408,
+        "output_tokens": 73,
+        "service_tier": "standard"
+      },
+      "stop_reason": "tool_use",
+      "content": [
+        {
+          "type": "text",
+          "text": "我先查一下当前有效的退款政策条款。"
+        },
+        {
+          "type": "tool_use",
+          "id": "call_00_wEoAyz6YIrci6S2d70E18745",
+          "name": "search_knowledge_base",
+          "input": {
+            "query": "退款政策 退款条件 时效 规则",
+            "top_k": 5
+          }
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0010793999999999999,
+      "latency_ms": 1594.0
+    },
+    {
+      "number": 2,
+      "at_utc": "2026-10-25T09:16:09.910374+00:00",
+      "stage": "rag_rewrite_or_rerank",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0028973999999999996,
+      "tool_results_sent": [],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 76,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 26,
+        "service_tier": "standard"
+      },
+      "stop_reason": "end_turn",
+      "content": [
+        {
+          "type": "text",
+          "text": "[\"退款政策的具体条件和适用范围\", \"退款申请的处理时效和到账时间\", \"退款规则中的例外情况和限制条款\"]"
+        }
+      ],
+      "peak_cache_miss_cost_usd": 5.4e-05,
+      "latency_ms": 1000.0
+    },
+    {
+      "number": 3,
+      "at_utc": "2026-10-25T09:16:11.165383+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.009027,
+      "tool_results_sent": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "call_00_wEoAyz6YIrci6S2d70E18745",
+          "content": "{\"success\": true, \"query\": \"退款政策 退款条件 时效 规则\", \"top_k\": 5, \"results\": [{\"content\": \"CartCare退款政策仅描述人民币演示用例，不构成真实商城或支付渠道承诺；程序未实现币种准入或换算校验。新建退款申请须核验客户身份和订单归属，在订单创建后不超过7×24小时内提交，执行前仍会复核。已支付、处理中、已发货、已签收、已完成订单可进入资格检查，其他状态不满足当前退款条件。金额须大于0且不超过订单总额；省略金额时使用订单总额。已有待处理、已申请、已批准、处理中或已完成退款记录时，不再新建重复申请。当前进程内，同一客户的合法同键同参数退款重试返回既有动作的当前结果，不另行执行或绕过审批；同键异参不能复用原结果。超过500元须由有审核范围权限且非申请人、非该客户的审核人审批；恰好500元不因金额单独触发审批。当前仅创建模拟退款申请，退款状态为待处理；动作完成不代表退款完成或到账，不承诺原路退回、到账时间、手续费或补偿。\", \"score\": 0.4200630141870336, \"score_kind\": \"one_minus_chroma_distance\", \"document_id\": \"doc_8450205ee234ce108cbd\", \"title\": \"退款政策\", \"source\": \"demo:cartcare-default/refund-policy\", \"doc_type\": \"policy\", \"chunk_index\": 0, \"total_chunks\": 1, \"policy_version\": \"refund-cancel-v1\", \"effective_at\": \"2026-09-30T00:00:00Z\", \"content_hash\": \"8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37\", \"citation\": {\"reference\": \"doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37\", \"content_hash\": \"8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37\", \"document_id\": \"doc_8450205ee234ce108cbd\", \"chunk_index\": 0, \"source\": \"demo:cartcare-default/refund-policy\", \"policy_version\": \"refund-cancel-v1\"}, \"retrieval_status\": \"usable\", \"reason_code\": null}], \"citations\": [{\"reference\": \"doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37\", \"content_hash\": \"8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37\", \"document_id\": \"doc_8450205ee234ce108cbd\", \"chunk_index\": 0, \"source\": \"demo:cartcare-default/refund-policy\", \"policy_version\": \"refund-cancel-v1\"}], \"retrieval_status\": \"usable\", \"answer_guidance\": \"usable仅表示检索片段通过相关性分数、来源、引用和生命周期校验，不表示事实充分或回答已核实。请按用户原始问题逐项核对必要事实和片段中的直接依据，不按改写查询或主题相似度补全事实。只回答有依据的部分并引用对应片段；缺失部分明确无法确认，不能把一个事实的引用用于其他事实。正文明确不支持该功能时，可以有引用地说明能力边界。动态业务事实须查询当前客户有权限的Provider；静态知识不证明具体订单、支付、物流、实付或到账状态。\", \"reranked\": false, \"rerank_status\": \"not_needed\"}"
+        }
+      ],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 1005,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 3328,
+        "output_tokens": 258,
+        "service_tier": "standard"
+      },
+      "stop_reason": "end_turn",
+      "content": [
+        {
+          "type": "text",
+          "text": "以下是当前有效的退款政策（版本 refund-cancel-v1，人民币演示用例）：\n\n**申请条件**\n- 需核验客户身份和订单归属\n- 需在订单创建后 **7×24 小时内**提交（执行前仍会复核）\n- 可进入资格检查的订单状态：已支付、处理中、已发货、已签收、已完成；其他状态不满足当前退款条件\n- 金额须大于 0 且不超过订单总额；不填金额时默认按订单总额\n\n**重复申请**\n- 若已有待处理、已申请、已批准、处理中或已完成的退款记录，不再新建重复申请\n\n**审批**\n- 超过 500 元需由有审核权限、且非申请人本人的审核人审批；恰好 500 元不因金额单独触发审批\n\n**重要说明**\n- 当前仅创建**模拟退款申请**，状态为待处理；动作完成**不代表退款完成或到账**\n- 不承诺原路退回、到账时间、手续费或补偿\n- 该政策为演示用例，程序未实现币种准入或换算校验\n\n需要我帮你查某个订单的退款资格或提交申请吗？提供订单号即可。"
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0016094999999999998,
+      "latency_ms": 2000.0
+    },
+    {
+      "number": 4,
+      "at_utc": "2026-10-25T09:16:13.266082+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0079536,
+      "tool_results_sent": [],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 242,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 3072,
+        "output_tokens": 80,
+        "service_tier": "standard"
+      },
+      "stop_reason": "tool_use",
+      "content": [
+        {
+          "type": "text",
+          "text": "我先查一下当前退款政策里关于到账时效的说明。"
+        },
+        {
+          "type": "tool_use",
+          "id": "call_00_OCSUX8suMXZDCAQanmvN6010",
+          "name": "search_knowledge_base",
+          "input": {
+            "query": "退款审核通过后到账时效 银行卡 几天",
+            "top_k": 5
+          }
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0010901999999999997,
+      "latency_ms": 1219.0
+    },
+    {
+      "number": 5,
+      "at_utc": "2026-10-25T09:16:14.489713+00:00",
+      "stage": "rag_rewrite_or_rerank",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0029007,
+      "tool_results_sent": [],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 78,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 42,
+        "service_tier": "standard"
+      },
+      "stop_reason": "end_turn",
+      "content": [
+        {
+          "type": "text",
+          "text": "[\"退款审核通过后银行卡到账需要几天\",\"退款到账时效受哪些因素影响 银行卡类型 银行处理时间\",\"不同支付方式退款到账时间对比 银行卡 支付宝 微信\"]"
+        }
+      ],
+      "peak_cache_miss_cost_usd": 7.379999999999999e-05,
+      "latency_ms": 1078.0
+    },
+    {
+      "number": 6,
+      "at_utc": "2026-10-25T09:16:15.747522+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.008270399999999999,
+      "tool_results_sent": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "call_00_OCSUX8suMXZDCAQanmvN6010",
+          "content": "{\"success\": true, \"query\": \"退款审核通过后到账时效 银行卡 几天\", \"error\": null, \"error_code\": null, \"retrieval_status\": \"low_confidence\", \"results\": [], \"citations\": [], \"answer_guidance\": \"本次没有可引用证据，是正常知识不足或低置信检索，不代表依赖故障，也不证明该事实不存在。不要将检索候选或降级内容当作已核实的知识；只说明无法确认所问事实，必要时澄清或查询动态工具。检索状态没有判定事实充分；应按用户原始问题逐项核对事实依据。\", \"reranked\": false, \"rerank_status\": \"no_candidates\"}"
+        }
+      ],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 225,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 3328,
+        "output_tokens": 161,
+        "service_tier": "standard"
+      },
+      "stop_reason": "end_turn",
+      "content": [
+        {
+          "type": "text",
+          "text": "很抱歉，关于“退款审核通过后几天到账银行卡”这个具体时效，我目前没有可引用的政策依据，无法给出确切天数，也不能凭经验编一个数字给您。\n\n需要说明的几点：\n- 系统里的退款状态查询只能看到当前演示后端的退款记录，**退款申请被受理或状态显示完成，都不代表资金已实际到账**。\n- 真实支付渠道（银行卡）的到账时间由银行和支付渠道处理，我这边没有接入交易流水或支付渠道查询能力，无法核实。\n\n如果您愿意提供订单号，我可以帮您查一下该订单当前的退款状态，确认申请是否已登记、处于哪个环节。另外，如果您希望由人工客服进一步核实到账情况，我也可以为您申请转接。"
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0012591,
+      "latency_ms": 2094.0
+    },
+    {
+      "number": 7,
+      "at_utc": "2026-10-25T09:16:17.913908+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0089649,
+      "tool_results_sent": [],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 1992,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 2048,
+        "output_tokens": 67,
+        "service_tier": "standard"
+      },
+      "stop_reason": "tool_use",
+      "content": [
+        {
+          "type": "text",
+          "text": "我先为你提交这笔退款申请。"
+        },
+        {
+          "type": "tool_use",
+          "id": "call_00_T6Uvz816Yn5fYs6zLT5R4204",
+          "name": "request_refund",
+          "input": {
+            "order_id": "ORD-H11-APPROVAL",
+            "amount": 600
+          }
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0012924000000000002,
+      "latency_ms": 1266.0
+    },
+    {
+      "number": 8,
+      "at_utc": "2026-10-25T09:16:19.192057+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0094062,
+      "tool_results_sent": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "call_00_T6Uvz816Yn5fYs6zLT5R4204",
+          "content": "{\"success\": true, \"status\": \"awaiting_approval\", \"action_id\": \"act_d2dd01b5fde9424b\", \"action\": {\"action_id\": \"act_d2dd01b5fde9424b\", \"action_type\": \"refund\", \"user_id\": \"customer-1\", \"order_id\": \"ORD-H11-APPROVAL\", \"amount\": \"600\", \"policy_decision\": {\"action\": \"refund\", \"decision\": \"require_approval\", \"reason_code\": \"amount_requires_approval\", \"policy_version\": \"refund-cancel-v1\", \"explanation\": \"退款金额超过自动处理阈值 500.00\", \"order_id\": \"ORD-H11-APPROVAL\", \"amount\": \"600\", \"evaluated_at\": \"2026-10-25T09:16:19.182880Z\", \"requires_approval\": true, \"metadata\": {}}, \"policy_version\": \"refund-cancel-v1\", \"status\": \"awaiting_approval\", \"created_at\": \"2026-10-25T09:16:19.182880Z\", \"updated_at\": \"2026-10-25T09:16:19.182880Z\", \"idempotency_key\": \"auto_51edb74be642fb01199cf878a1bbc4e3\", \"request_id\": \"87cdfb6b\", \"error_code\": null, \"error_message\": null, \"execution_result\": null, \"reviewed_by\": null, \"requested_by\": \"e2e-customer-1\"}, \"error_code\": null, \"message\": null, \"reused\": false}"
+        }
+      ],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 392,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 4096,
+        "output_tokens": 125,
+        "service_tier": "standard"
+      },
+      "stop_reason": "end_turn",
+      "content": [
+        {
+          "type": "text",
+          "text": "退款申请已提交，当前状态为**待审核**。\n\n- 订单号：ORD-H11-APPROVAL\n- 申请金额：600 元\n- 动作编号：act_d2dd01b5fde9424b\n- 审核原因：退款金额超过自动处理阈值 500 元，需人工审核（政策版本 refund-cancel-v1）\n\n需要说明的是：提交成功不等于退款已通过或已到账，最终结果以审核结论为准。审核通过后，退款状态可再帮你查询。\n\n需要我继续查看该订单当前的退款状态吗？"
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0014964,
+      "latency_ms": 1391.0
+    },
+    {
+      "number": 9,
+      "at_utc": "2026-10-25T09:16:20.709351+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.0081927,
+      "tool_results_sent": [],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 302,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 3200,
+        "output_tokens": 55,
+        "service_tier": "standard"
+      },
+      "stop_reason": "tool_use",
+      "content": [
+        {
+          "type": "text",
+          "text": "我来帮您查询该订单的退款状态。"
+        },
+        {
+          "type": "tool_use",
+          "id": "call_00_eQvsWzpPJaSlrTd3K0pg9287",
+          "name": "get_refund_status",
+          "input": {
+            "order_id": "ORD-H11-APPROVAL"
+          }
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0011166,
+      "latency_ms": 922.0
+    },
+    {
+      "number": 10,
+      "at_utc": "2026-10-25T09:16:21.654375+00:00",
+      "stage": "support",
+      "model": "deepseek-flash",
+      "reserved_usd": 0.008424,
+      "tool_results_sent": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "call_00_eQvsWzpPJaSlrTd3K0pg9287",
+          "content": "{\"success\": true, \"tool_name\": \"get_refund_status\", \"data\": {\"refund_id\": \"REF-act_d2dd01b5fde9424b\", \"order_id\": \"ORD-H11-APPROVAL\", \"customer_id\": \"customer-1\", \"status\": \"pending\", \"amount\": \"600\", \"currency\": \"CNY\", \"reason\": \"simulated_refund_request\", \"created_at\": \"2026-10-25T09:16:20.632567Z\", \"updated_at\": \"2026-10-25T09:16:20.632567Z\"}, \"source\": \"business_provider\"}"
+        }
+      ],
+      "http_status": 200,
+      "usage": {
+        "input_tokens": 254,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 3456,
+        "output_tokens": 129,
+        "service_tier": "standard"
+      },
+      "stop_reason": "end_turn",
+      "content": [
+        {
+          "type": "text",
+          "text": "您的退款当前状态是**待审核（pending）**。\n\n- 退款单号：REF-act_d2dd01b5fde9424b\n- 订单号：ORD-H11-APPROVAL\n- 申请金额：600 元（CNY）\n- 提交时间：2026-10-25 09:16（UTC）\n\n说明：因为金额超过 500 元自动处理阈值，需要人工审核，目前仍在等待审核结论。**待审核不等于退款已通过或资金已到账**，最终结果以审核结论为准。\n\n需要我帮您做其他查询吗？"
+        }
+      ],
+      "peak_cache_miss_cost_usd": 0.0012678,
+      "latency_ms": 1421.0
+    }
+  ],
+  "halted": false
+}

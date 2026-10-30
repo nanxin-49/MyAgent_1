@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 from threading import RLock
 from typing import Any, Callable
 from core.auth import Principal
+from core.harness import HarnessConfig
 
 from policies import PolicyDecision, PolicyDecisionType, PolicyEngine
 from providers import OrderProvider, RefundProvider
@@ -33,11 +34,13 @@ class ActionService:
         policy_engine: PolicyEngine | None = None,
         store: ActionStore | None = None,
         clock: Callable[[], datetime] | None = None,
+        harness: HarnessConfig | None = None,
     ) -> None:
         self._business_backend = business_backend
         self._order_provider = OrderProvider(business_backend)
         self._refund_provider = RefundProvider(business_backend)
         self._policy = policy_engine or PolicyEngine()
+        self._policy_guard = (harness or HarnessConfig()).policy_guard
         self._store = store or InMemoryActionStore()
         self._executor = ActionExecutor(action_backend)
         self._clock = clock or (lambda: datetime.now(timezone.utc))
@@ -153,13 +156,14 @@ class ActionService:
                 return action
             if action.status is ActionStatus.APPROVED:
                 return self._execute_locked(action, request_id=request_id)
+            if action.status is ActionStatus.EXECUTING:
+                return self._recover_executing(action, request_id=request_id)
             if action.status is ActionStatus.AWAITING_APPROVAL:
                 return self._result(action, reused=True)
             if action.status in {
                 ActionStatus.COMPLETED,
                 ActionStatus.REJECTED,
                 ActionStatus.FAILED,
-                ActionStatus.EXECUTING,
             }:
                 return self._result(action, reused=True)
             return self._invalid_transition(action, "resume")
@@ -287,13 +291,21 @@ class ActionService:
             action.status = ActionStatus.EXECUTING
             action.updated_at = self._now()
             self._store.save(action)
-            action.execution_result = self._executor.execute(
+            # Distinguishes "crashed before dispatch" from "dispatched, outcome unknown".
+            action.execution_attempted_at = self._now()
+            action.updated_at = self._now()
+            self._store.save(action)
+            execution = self._executor.execute(
                 action.action_type,
                 action.order_id,
                 user_id=action.user_id,
                 amount=action.amount,
                 action_id=action.action_id,
             )
+            # Persist the receipt before the terminal status; recovery can finish from it.
+            action.execution_result = execution
+            action.updated_at = self._now()
+            self._store.save(action)
             action.status = ActionStatus.COMPLETED
             action.updated_at = self._now()
             self._store.save(action)
@@ -307,7 +319,36 @@ class ActionService:
         except Exception as exc:
             return self._fail_action(action, "execution_failure", str(exc))
 
+    def _recover_executing(self, action: PendingAction, *, request_id: str) -> ActionResult:
+        """Resolve an action left in EXECUTING by a crash without guessing a result."""
+        if action.execution_result is not None:
+            action.status = ActionStatus.COMPLETED
+            action.updated_at = self._now()
+            self._store.save(action)
+            return self._result(action)
+        if action.execution_attempted_at is None:
+            # The process died after recording EXECUTING but before dispatch.
+            action.status = ActionStatus.APPROVED
+            action.updated_at = self._now()
+            self._store.save(action)
+            return self._execute_locked(action, request_id=request_id)
+        return self._fail_action(
+            action, "execution_unknown",
+            "上次执行已派发但未记录结果，不能确认是否完成；未自动重试")
+
     def _evaluate(self, action_type, order, user_id, amount, existing_refund):
+        if not self._policy_guard:
+            return PolicyDecision(
+                action="refund" if action_type is ActionType.REFUND else "cancel",
+                decision=PolicyDecisionType.ALLOW,
+                reason_code="harness_policy_disabled",
+                policy_version=self._policy.policy_version,
+                explanation="Policy guard disabled for evaluation",
+                order_id=order.order_id,
+                amount=amount if amount is not None else order.total_amount,
+                evaluated_at=self._now(),
+                requires_approval=False,
+            )
         if action_type is ActionType.REFUND:
             return self._policy.evaluate_refund(
                 order,

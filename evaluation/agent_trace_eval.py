@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,91 @@ def _arguments_match(expected: dict[str, Any], actual: dict[str, Any], tool: str
     if any(actual.get(key) != value for key, value in expected.items()):
         return False
     return not (set(actual) - set(expected) - allowed_extra)
+
+
+def trajectory_match(expected: list[str], observed: list[str], mode: str = "partial") -> bool:
+    """Compare tool names.
+
+    ordered: exact sequence and count (no extras).
+    unordered: same multiset, any order.
+    partial: expected is a subsequence; extra observed calls are allowed.
+    """
+    if mode == "ordered":
+        return list(observed) == list(expected)
+    if mode == "unordered":
+        return sorted(observed) == sorted(expected)
+    if mode == "partial":
+        iterator = iter(observed)
+        return all(any(item == wanted for item in iterator) for wanted in expected)
+    raise ValueError(f"unsupported trajectory mode: {mode}")
+
+
+def forbidden_call(expected: list[str], observed: list[str]) -> bool:
+    return any(name in expected for name in observed)
+
+
+def terminal_state_match(expected: dict[str, Any], observed: dict[str, Any] | None) -> bool:
+    observed = observed or {}
+    return all(observed.get(key) == value for key, value in expected.items())
+
+
+def _affirmative_claim(answer: str, phrase: str) -> bool:
+    """True only if the phrase appears without a nearby negation."""
+    lowered, target = answer.lower(), phrase.lower()
+    start = 0
+    while True:
+        index = lowered.find(target, start)
+        if index < 0:
+            return False
+        prefix = lowered[max(0, index - 18):index]
+        if not re.search(r"(不|无法|不能|未|没有|不代表|不等于|不会|并未|尚未)", prefix):
+            return True
+        start = index + len(target)
+
+
+def score_trajectory(traces: list[dict[str, Any]], expected: dict[str, Any],
+                     terminal_state: dict[str, Any] | None = None,
+                     answer: str | None = None) -> dict[str, bool]:
+    names = [trace.get("tool_name") for trace in traces]
+    checks: dict[str, bool] = {}
+    if "tools" in expected:
+        checks["trajectory"] = trajectory_match(
+            list(expected["tools"]), names, expected.get("tool_mode", "partial"))
+    if "forbidden_tools" in expected:
+        checks["forbidden_tools"] = not forbidden_call(expected["forbidden_tools"], names)
+    if "error_codes" in expected:
+        observed_codes = [trace.get("error_code") for trace in traces]
+        checks["error_codes"] = all(code in observed_codes for code in expected["error_codes"])
+    if "rag_status" in expected:
+        checks["rag_status"] = any(trace.get("retrieval_status") == expected["rag_status"]
+                                   for trace in traces)
+    if "citation" in expected:
+        references = [citation.get("reference")
+                      for trace in traces for citation in (trace.get("citations") or [])]
+        if expected["citation"] is None:
+            checks["citation_absent"] = not references
+        else:
+            checks["citation"] = expected["citation"] in references
+    if "citation_document_id" in expected:
+        document_ids = [citation.get("document_id")
+                        for trace in traces for citation in (trace.get("citations") or [])]
+        checks["citation"] = expected["citation_document_id"] in document_ids
+    if answer is not None and "answer_contains" in expected:
+        checks["answer_contains"] = any(text in answer for text in expected["answer_contains"])
+    if answer is not None and "answer_excludes" in expected:
+        checks["answer_excludes"] = not any(_affirmative_claim(answer, text)
+                                             for text in expected["answer_excludes"])
+    for tool, args in (expected.get("key_args") or {}).items():
+        checks[f"key_args:{tool}"] = any(
+            trace.get("tool_name") == tool
+            and isinstance(trace.get("validated_input"), dict)
+            and _arguments_match(args, trace["validated_input"], tool)
+            for trace in traces
+        )
+    if "terminal_state" in expected:
+        checks["terminal_state"] = terminal_state_match(
+            expected["terminal_state"], terminal_state)
+    return checks
 
 
 def score_agent_records(catalog: list[dict[str, Any]], records: list[dict[str, Any]]) -> dict[str, Any]:
@@ -61,6 +147,17 @@ def score_agent_records(catalog: list[dict[str, Any]], records: list[dict[str, A
                                         or any(names.count(name) > 1 and name in {
                                             "request_refund", "request_cancel_order"} for name in names)}
             checks["tool_selection"] = expected_tool in names if expected_tool else not names
+            trajectory_checks = score_trajectory(traces, expected, record.get("terminal_state"))
+            if "trajectory" in trajectory_checks:
+                observed["trajectory_match"] = trajectory_checks["trajectory"]
+                checks["trajectory"] = trajectory_checks["trajectory"]
+            if "forbidden_tools" in trajectory_checks:
+                observed["forbidden_call"] = not trajectory_checks["forbidden_tools"]
+                checks["forbidden_tools"] = trajectory_checks["forbidden_tools"]
+            for key, value in trajectory_checks.items():
+                if key.startswith("key_args:") or key == "terminal_state":
+                    checks[key] = value
+                    observed[key] = value
             if target and target.get("validated_input") is not None and "arguments" in case:
                 observed["arguments"] = target["validated_input"]
                 observed["arguments_match"] = _arguments_match(case["arguments"], target["validated_input"], expected_tool)

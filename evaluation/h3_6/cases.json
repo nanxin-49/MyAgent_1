@@ -1,0 +1,2212 @@
+{
+  "schema": "echomind.h3_6.composite_cases",
+  "version": 1,
+  "description": "H3-6 composite after-sales requests; reuses the H2-3 fixture.",
+  "cases": [
+    {
+      "id": "composite_refund_cancel_faq",
+      "category": "composite",
+      "message": "我上周买的两件，耳机订单 ORD-H23-ALLOW-1 坏了要退款 100 元，充电器订单 ORD-H23-ALLOW-2 不要了帮我取消，顺便问下退款多久到账。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "three_demands"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        },
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order",
+          "search_knowledge_base"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_refund_status",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              },
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；订单取消已完成。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_cancel_allow",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 要退款 100 元，订单 ORD-H23-ALLOW-2 不要了，帮我取消。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "two_independent_writes"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_refund_status",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；订单取消已完成。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_allow_approval",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 退款 100 元；订单 ORD-H23-APPROVAL-1 退款 800 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "two_independent_writes"
+      },
+      "demands": [
+        {
+          "id": "refund_small",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "refund_large",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-APPROVAL-1",
+          "expected_status": "awaiting_approval",
+          "amount": 800
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-APPROVAL-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-APPROVAL-1",
+                  "amount": 800
+                }
+              }
+            ]
+          },
+          {
+            "text": "100 元退款已完成；800 元退款已提交，等待审批，尚未执行。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_allow_deny",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 退款 100 元；订单 ORD-H23-EXPIRED 也退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "two_independent_writes"
+      },
+      "demands": [
+        {
+          "id": "refund_small",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "refund_expired",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-EXPIRED",
+          "expected_status": "rejected",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-EXPIRED"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-EXPIRED",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "第一笔退款已完成；第二笔因超出退款窗口被拒绝，未执行。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_cancel_approval_refund_allow",
+      "category": "composite",
+      "message": "取消订单 ORD-H23-PROCESSING；同时给订单 ORD-H23-ALLOW-1 退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "two_independent_writes"
+      },
+      "demands": [
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-PROCESSING",
+          "expected_status": "awaiting_approval"
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_cancel_order",
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-PROCESSING"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-PROCESSING"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；取消请求等待审批，尚未执行。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_approval_faq",
+      "category": "composite",
+      "message": "订单 ORD-H23-APPROVAL-1 的耳机坏了，帮我退款 800 元；另外退款申请的时间窗口是什么？",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "write_plus_faq"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-APPROVAL-1",
+          "expected_status": "awaiting_approval",
+          "amount": 800
+        },
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "search_knowledge_base"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-APPROVAL-1"
+                }
+              },
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-APPROVAL-1",
+                  "amount": 800
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款请求已提交，等待审批，尚未执行。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_cancel_faq",
+      "category": "composite",
+      "message": "取消订单 ORD-H23-ALLOW-2；顺便问一下退款申请的时间窗口。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "write_plus_faq"
+      },
+      "demands": [
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        },
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_cancel_order",
+          "search_knowledge_base"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_refund",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              },
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "订单取消已完成。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_logistics",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 退款 100 元；再查一下它的物流。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "write_plus_read"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "shipment",
+          "kind": "read",
+          "tool": "get_shipment",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "answered"
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "get_shipment"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_shipment",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；物流状态见查询结果。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_three_refund_cancel_faq",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 退款 100 元；取消 ORD-H23-PROCESSING；退款申请的时间窗口是什么？",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "three_demands"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-PROCESSING",
+          "expected_status": "awaiting_approval"
+        },
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order",
+          "search_knowledge_base"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-PROCESSING"
+                }
+              },
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-PROCESSING"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；取消请求等待审批。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_two_refunds_order",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 和 ORD-H23-DELIVERED 都退款 100 元；再看一下 ORD-H23-ALLOW-1 的订单状态。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "three_demands"
+      },
+      "demands": [
+        {
+          "id": "refund_a",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "refund_b",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-DELIVERED",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "order",
+          "kind": "read",
+          "tool": "get_order",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "answered"
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "get_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-DELIVERED"
+                }
+              },
+              {
+                "name": "get_refund_status",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_refund_status",
+                "input": {
+                  "order_id": "ORD-H23-DELIVERED"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-DELIVERED",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "两笔退款均已完成；订单状态见查询结果。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_deny_cancel_faq",
+      "category": "composite",
+      "message": "订单 ORD-H23-EXPIRED 退款 100 元；取消 ORD-H23-ALLOW-2；退款申请的时间窗口是什么？",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "three_demands"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-EXPIRED",
+          "expected_status": "rejected",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        },
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order",
+          "search_knowledge_base"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-EXPIRED"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              },
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-EXPIRED",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款因超出窗口被拒绝；订单取消已完成。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_approval_handoff_faq",
+      "category": "composite",
+      "message": "订单 ORD-H23-APPROVAL-1 的退款申请多次未处理，我要投诉；另外退款申请的时间窗口是什么？",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "three_demands"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-APPROVAL-1",
+          "expected_status": "awaiting_approval",
+          "amount": 800
+        },
+        {
+          "id": "human_followup",
+          "kind": "handoff",
+          "tool": "request_handoff",
+          "reason_code": "complex_complaint",
+          "expected_status": "completed"
+        },
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_handoff",
+          "search_knowledge_base"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-APPROVAL-1"
+                }
+              },
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-APPROVAL-1",
+                  "amount": 800
+                }
+              },
+              {
+                "name": "request_handoff",
+                "input": {
+                  "reason_code": "complex_complaint"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款请求等待审批；已申请人工跟进。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_dependency_order_refund",
+      "category": "composite",
+      "message": "先查订单 ORD-H23-ALLOW-1，再为它申请退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "dependency"
+      },
+      "demands": [
+        {
+          "id": "order",
+          "kind": "read",
+          "tool": "get_order",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "answered"
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "get_order",
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "get_refund_status",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "订单已查询，退款已完成。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_dependency_refund_status",
+      "category": "composite",
+      "message": "查一下 ORD-H23-REFUNDED 的退款进度；再申请 100 元退款；另外取消 ORD-H23-ALLOW-2。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "dependency"
+      },
+      "demands": [
+        {
+          "id": "refund_status",
+          "kind": "read",
+          "tool": "get_refund_status",
+          "order_id": "ORD-H23-REFUNDED",
+          "expected_status": "answered"
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-REFUNDED",
+          "expected_status": "rejected",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "get_refund_status",
+          "request_refund",
+          "request_cancel_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_refund_status",
+                "input": {
+                  "order_id": "ORD-H23-REFUNDED"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-REFUNDED",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已在处理中，重复申请未执行；订单取消已完成。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_dependency_order_cancel",
+      "category": "composite",
+      "message": "先查订单 ORD-H23-PROCESSING 后帮我取消；另外给 ORD-H23-ALLOW-1 退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "dependency"
+      },
+      "demands": [
+        {
+          "id": "order",
+          "kind": "read",
+          "tool": "get_order",
+          "order_id": "ORD-H23-PROCESSING",
+          "expected_status": "answered"
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-PROCESSING",
+          "expected_status": "awaiting_approval"
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "get_order",
+          "request_cancel_order",
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-PROCESSING"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-PROCESSING"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；取消请求等待审批。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_ownership_read_and_refund",
+      "category": "composite",
+      "message": "查一下我的订单 ORD-H23-OTHER-1；另外把 ORD-H23-ALLOW-1 退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-2",
+        "customer_id": "customer-2",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "ownership"
+      },
+      "demands": [
+        {
+          "id": "own_order",
+          "kind": "read",
+          "tool": "get_order",
+          "order_id": "ORD-H23-OTHER-1",
+          "expected_status": "answered"
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "rejected",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "get_order",
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "自己的订单可查询；另一订单未找到，不能提交退款。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_ownership_two_actions",
+      "category": "composite",
+      "message": "给 ORD-H23-OTHER-1 退款 100 元，取消 ORD-H23-OTHER-2；再查一下 ORD-H23-ALLOW-1。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "ownership"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-OTHER-1",
+          "expected_status": "rejected",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-OTHER-2",
+          "expected_status": "rejected"
+        },
+        {
+          "id": "own_order",
+          "kind": "read",
+          "tool": "get_order",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "answered"
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order",
+          "get_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-2"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "两个越权动作均未找到可访问订单，未执行；自己的订单可查询。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_ownership_cancel",
+      "category": "composite",
+      "message": "查我的订单 ORD-H23-OTHER-1；取消 ORD-H23-ALLOW-2；再取消 ORD-H23-OTHER-2。",
+      "principal": {
+        "subject_id": "h36-customer-2",
+        "customer_id": "customer-2",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "ownership"
+      },
+      "demands": [
+        {
+          "id": "own_order",
+          "kind": "read",
+          "tool": "get_order",
+          "order_id": "ORD-H23-OTHER-1",
+          "expected_status": "answered"
+        },
+        {
+          "id": "cancel_other",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "rejected"
+        },
+        {
+          "id": "cancel_own",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-OTHER-2",
+          "expected_status": "rejected"
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "get_order",
+          "request_cancel_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_refund",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-2"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-OTHER-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "自己的订单可查询；两个取消请求均被拒绝，未执行。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_fault_read_retry",
+      "category": "composite",
+      "message": "为 ORD-H23-ALLOW-1 退款 100 元，并取消 ORD-H23-ALLOW-2。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "fault_recovery"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "查询重试成功；退款与取消均已完成。"
+          }
+        ]
+      ],
+      "faults": [
+        {
+          "tool": "get_order",
+          "kind": "dependency_failure",
+          "on_call": 1,
+          "mode": "once"
+        }
+      ]
+    },
+    {
+      "id": "composite_fault_rag_retry",
+      "category": "composite",
+      "message": "退款申请的时间窗口是什么？另外为 ORD-H23-ALLOW-1 退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "fault_recovery"
+      },
+      "demands": [
+        {
+          "id": "refund_window",
+          "kind": "rag",
+          "tool": "search_knowledge_base",
+          "query": "什么是退款申请的时间窗口？",
+          "expected_status": "answered",
+          "citation": "doc_8450205ee234ce108cbd#chunk-0",
+          "rag": {
+            "document_id": "doc_8450205ee234ce108cbd",
+            "title": "退款政策",
+            "policy_version": "refund-cancel-v1",
+            "source": "demo:cartcare-default/refund-policy",
+            "reference": "doc_8450205ee234ce108cbd#chunk-0",
+            "status": "usable",
+            "content": "订单创建后 7×24 小时内提交"
+          }
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "search_knowledge_base",
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order",
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "search_knowledge_base",
+                "input": {
+                  "query": "什么是退款申请的时间窗口？"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "检索重试成功；退款已完成。退款申请需在订单创建后 7×24 小时内提交。"
+          }
+        ]
+      ],
+      "faults": [
+        {
+          "tool": "search_knowledge_base",
+          "kind": "timeout",
+          "on_call": 1,
+          "mode": "once"
+        }
+      ]
+    },
+    {
+      "id": "composite_fault_write_failure",
+      "category": "composite",
+      "message": "为 ORD-H23-ALLOW-1 退款 100 元，并取消 ORD-H23-ALLOW-2。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "fault_recovery"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "failed",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        }
+      ],
+      "expected_completion": "partial_completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款处理失败，未执行；订单取消已完成。"
+          }
+        ]
+      ],
+      "faults": [
+        {
+          "tool": "request_refund",
+          "kind": "execution_failure",
+          "on_call": 1,
+          "mode": "sticky"
+        }
+      ]
+    },
+    {
+      "id": "composite_duplicate_refund",
+      "category": "composite",
+      "message": "为 ORD-H23-ALLOW-1 退款 100 元，再确认一次同一笔退款；并取消 ORD-H23-ALLOW-2。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "duplicate_inducement"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_cancel_order"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100,
+                  "idempotency_key": "h36-dup-refund"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100,
+                  "idempotency_key": "h36-dup-refund"
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款请求已复用，未重复执行；订单取消已完成。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_duplicate_cancel",
+      "category": "composite",
+      "message": "取消 ORD-H23-ALLOW-2，再确认一次同一笔取消；并为 ORD-H23-ALLOW-1 退款 100 元。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "duplicate_inducement"
+      },
+      "demands": [
+        {
+          "id": "cancel",
+          "kind": "action",
+          "tool": "request_cancel_order",
+          "order_id": "ORD-H23-ALLOW-2",
+          "expected_status": "completed"
+        },
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_cancel_order",
+          "request_refund"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_handoff"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2"
+                }
+              },
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2",
+                  "idempotency_key": "h36-dup-cancel"
+                }
+              },
+              {
+                "name": "request_cancel_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-2",
+                  "idempotency_key": "h36-dup-cancel"
+                }
+              },
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              }
+            ]
+          },
+          {
+            "text": "取消请求已复用，未重复执行；退款已完成。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "composite_refund_handoff",
+      "category": "composite",
+      "message": "订单 ORD-H23-ALLOW-1 的退款申请多次未处理，我要投诉，希望有专人跟进。",
+      "principal": {
+        "subject_id": "h36-customer-1",
+        "customer_id": "customer-1",
+        "roles": [
+          "customer"
+        ]
+      },
+      "source": {
+        "dimension": "partial_success_handoff"
+      },
+      "demands": [
+        {
+          "id": "refund",
+          "kind": "action",
+          "tool": "request_refund",
+          "order_id": "ORD-H23-ALLOW-1",
+          "expected_status": "completed",
+          "amount": 100
+        },
+        {
+          "id": "human_followup",
+          "kind": "handoff",
+          "tool": "request_handoff",
+          "reason_code": "complex_complaint",
+          "expected_status": "completed"
+        }
+      ],
+      "expected_completion": "completed",
+      "expected": {
+        "tools": [
+          "request_refund",
+          "request_handoff"
+        ],
+        "tool_mode": "partial",
+        "forbidden_tools": [
+          "request_cancel_order"
+        ]
+      },
+      "scripts": [
+        [
+          {
+            "tool_calls": [
+              {
+                "name": "get_order",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1"
+                }
+              }
+            ]
+          },
+          {
+            "tool_calls": [
+              {
+                "name": "request_refund",
+                "input": {
+                  "order_id": "ORD-H23-ALLOW-1",
+                  "amount": 100
+                }
+              },
+              {
+                "name": "request_handoff",
+                "input": {
+                  "reason_code": "complex_complaint"
+                }
+              }
+            ]
+          },
+          {
+            "text": "退款已完成；已申请人工跟进。"
+          }
+        ]
+      ]
+    }
+  ]
+}

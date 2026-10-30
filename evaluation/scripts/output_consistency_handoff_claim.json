@@ -1,0 +1,7 @@
+{
+  "name": "output_consistency_handoff_claim",
+  "model": "scripted",
+  "turns": [
+    {"text": "已成功创建人工交接记录，编号 DEMO-123。"}
+  ]
+}

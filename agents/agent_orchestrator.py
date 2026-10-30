@@ -17,6 +17,11 @@
 """
 import asyncio
 from core.auth import Principal
+from core.context_budget import compose_context, compress_messages, estimate_tokens
+from core.harness import HarnessConfig
+from core.model_observation import model_events
+from core.step_trace import new_model_step, summarize_tool_trace
+from core.stop_reason import StopReason, classify_answer
 import json
 import logging
 import os
@@ -40,7 +45,7 @@ from agents.tools import (
 )
 from core.intent_recognizer import IntentCategory, IntentRecognizer, UrgencyLevel
 from core.llm_utils import extract_text_content
-from core.tool_contract import execute_tool, validate_tool_input
+from core.tool_contract import execute_tool, truncate_tool_payload, validate_tool_input
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +126,10 @@ class AgentResponse:
     escalate:    bool  = False   # 是否需要升级
     tools_used:  List[str] = field(default_factory=list)
     tool_traces: List[Dict[str, Any]] = field(default_factory=list)
+    stop_reason: Optional[str] = None
+    context_rounds: List[Dict[str, Any]] = field(default_factory=list)
+    consistency_warnings: List[Dict[str, Any]] = field(default_factory=list)
+    steps: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -191,14 +200,20 @@ class BaseAgent:
         model: str,
         skill_manager: Optional[Any] = None,
         profile: Optional[AgentProfile] = None,
+        *,
+        harness: Optional[HarnessConfig] = None,
     ):
         self._client = client
         self.profile = profile or self.profile
         self._model  = self.profile.model or model
         self._skill_manager = skill_manager
+        self._harness = harness or HarnessConfig()
         self.stats   = AgentStats()
         self._last_tools_used: List[str] = []
         self._last_tool_traces: List[Dict[str, Any]] = []
+        self._last_stop_reason: StopReason = StopReason.COMPLETED
+        self._context_rounds: List[Dict[str, Any]] = []
+        self._last_steps: List[Dict[str, Any]] = []
         self._shared_tools: Dict[str, AgentToolSpec] = {}
 
     def get_tools(self) -> Dict[str, AgentToolSpec]:
@@ -213,6 +228,9 @@ class BaseAgent:
         self.stats.total += 1
         self._last_tools_used = []
         self._last_tool_traces = []
+        self._last_stop_reason = StopReason.COMPLETED
+        self._context_rounds = []
+        self._last_steps = []
         try:
             content = await self._call_llm(req)
             ms = (time.monotonic() - t0) * 1000
@@ -227,11 +245,17 @@ class BaseAgent:
                 escalate=escalate,
                 tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
+                stop_reason=self._last_stop_reason.value,
+                context_rounds=list(self._context_rounds),
+                steps=list(self._last_steps),
             )
         except Exception as ex:
             ms = (time.monotonic() - t0) * 1000
             self.stats.total_ms += ms
             logger.error(f"{self.agent_type.value} 处理失败: {ex}")
+            self._last_stop_reason = StopReason.UNRECOVERABLE_ERROR
+            if self._last_steps:
+                self._last_steps[-1]["stop_reason"] = self._last_stop_reason.value
             receipt = self._last_action_receipt()
             return AgentResponse(
                 agent_type=self.agent_type,
@@ -240,6 +264,9 @@ class BaseAgent:
                 latency_ms=ms,
                 tools_used=list(self._last_tools_used),
                 tool_traces=list(self._last_tool_traces),
+                stop_reason=self._last_stop_reason.value,
+                context_rounds=list(self._context_rounds),
+                steps=list(self._last_steps),
             )
 
     async def _call_llm(self, req: Request) -> str:
@@ -263,29 +290,91 @@ class BaseAgent:
         tools = self.get_tools()
         tools_used: List[str] = []
         tool_traces: List[Dict[str, Any]] = []
-        for _ in range(3):
+        step_records: List[Dict[str, Any]] = []
+        steps = 0
+        tokens = 0
+        previous_fingerprint: Optional[str] = None
+        repeats = 0
+        stop_reason: Optional[StopReason] = None
+        # Step, token and duplicate limits belong to the loop-control component;
+        # the evaluation-only ablation turns them off together.
+        max_steps = self._harness.max_tool_steps if self._harness.loop_control else None
+        max_tokens = (self._harness.max_tokens_per_turn
+                      if self._harness.loop_control else None)
+        duplicate_limit = (self._harness.duplicate_call_limit
+                           if self._harness.loop_control else None)
+        system_prompt = self._build_system_prompt(req)
+        tool_schemas = [
+            {
+                "name": spec.name,
+                "description": spec.description,
+                "input_schema": spec.input_schema,
+            }
+            for spec in tools.values()
+        ] if tools else []
+        fixed_tokens = estimate_tokens(system_prompt) + estimate_tokens(
+            json.dumps(tool_schemas, ensure_ascii=False) if tool_schemas else "")
+        for _ in range(self._harness.tool_round_limit):
+            round_no = len(self._context_rounds) + 1
+            composition = compose_context(messages, system=system_prompt,
+                                          tool_schemas=tool_schemas)
+            compressed_round = False
+            over_budget = composition["total"] > self._harness.max_context_tokens
+            if self._harness.context_compression and over_budget:
+                outcome = compress_messages(
+                    messages, budget=self._harness.max_context_tokens,
+                    fixed_tokens=fixed_tokens)
+                messages = outcome["messages"]
+                compressed_round = outcome["compressed"]
+                over_budget = outcome["over_budget"]
+                composition = compose_context(messages, system=system_prompt,
+                                              tool_schemas=tool_schemas)
+            self._context_rounds.append({
+                "round": round_no,
+                "estimated_tokens": composition,
+                "compressed": compressed_round,
+                "over_budget": over_budget,
+            })
             request_kwargs: Dict[str, Any] = {
                 "model": self._model,
                 "max_tokens": self.profile.max_tokens,
                 "temperature": self.profile.temperature,
-                "system": self._build_system_prompt(req),
+                "system": system_prompt,
                 "messages": messages,
             }
-            if tools:
-                request_kwargs["tools"] = [
-                    {
-                        "name": spec.name,
-                        "description": spec.description,
-                        "input_schema": spec.input_schema,
-                    }
-                    for spec in tools.values()
-                ]
-            resp = await self._client.messages.create(**request_kwargs)
+            if tool_schemas:
+                request_kwargs["tools"] = tool_schemas
+            model_step = new_model_step(round_no, model=self._model)
+            step_records.append(model_step)
+            self._last_steps = list(step_records)
+            model_start = time.monotonic()
+            try:
+                resp = await self._client.messages.create(**request_kwargs)
+            except Exception as exc:
+                model_step["error_type"] = type(exc).__name__
+                raise
+            finally:
+                model_step["latency_ms"] = round(
+                    (time.monotonic() - model_start) * 1000, 1)
+            usage = getattr(resp, "usage", None)
+            if usage is not None:
+                model_step["input_tokens"] = int(
+                    getattr(usage, "input_tokens", 0) or 0)
+                model_step["output_tokens"] = int(
+                    getattr(usage, "output_tokens", 0) or 0)
+                tokens += model_step["input_tokens"] + model_step["output_tokens"]
             tool_uses = [block for block in (resp.content or []) if self._block_type(block) == "tool_use"]
             if not tool_uses:
+                text = extract_text_content(resp.content)
+                self._last_stop_reason = classify_answer(text, tool_traces)
+                model_step["stop_reason"] = self._last_stop_reason.value
                 self._last_tools_used = tools_used
                 self._last_tool_traces = tool_traces
-                return extract_text_content(resp.content)
+                return text
+            if max_tokens is not None and tokens >= max_tokens:
+                stop_reason = StopReason.BUDGET_EXHAUSTED
+                model_step["stop_reason"] = stop_reason.value
+                break
 
             messages.append({"role": "assistant", "content": resp.content})
             tool_results = []
@@ -296,6 +385,32 @@ class BaseAgent:
                 if args is None:
                     args = {}
                 spec = tools.get(name)
+                fingerprint = f"{name}:{json.dumps(args, sort_keys=True, ensure_ascii=False, default=str)}"
+                if fingerprint == previous_fingerprint:
+                    repeats += 1
+                else:
+                    previous_fingerprint, repeats = fingerprint, 1
+                if duplicate_limit is not None and repeats >= duplicate_limit:
+                    stop_reason = StopReason.LOOP_DETECTED
+                    skipped = self._skipped_trace(req, name, tool_use_id, args,
+                                                  "loop_detected", spec)
+                    tool_traces.append(skipped)
+                    model_step["tools"].append(summarize_tool_trace(skipped))
+                    model_step["stop_reason"] = stop_reason.value
+                    self._last_tools_used = list(tools_used)
+                    self._last_tool_traces = list(tool_traces)
+                    break
+                if max_steps is not None and steps >= max_steps:
+                    stop_reason = StopReason.BUDGET_EXHAUSTED
+                    skipped = self._skipped_trace(req, name, tool_use_id, args,
+                                                  "budget_exhausted", spec)
+                    tool_traces.append(skipped)
+                    model_step["tools"].append(summarize_tool_trace(skipped))
+                    model_step["stop_reason"] = stop_reason.value
+                    self._last_tools_used = list(tools_used)
+                    self._last_tool_traces = list(tool_traces)
+                    break
+                steps += 1
                 call_success = True
                 result_success: Optional[bool] = None
                 error_text = ""
@@ -305,6 +420,9 @@ class BaseAgent:
                 risk_level = spec.risk_level.value if spec else "unknown"
                 validated_input: Optional[Dict[str, Any]] = None
                 tool_latency_ms = 0.0
+                tool_attempts = 0
+                tool_timeout_s: Optional[float] = None
+                aux_model_calls = 0
                 if spec is None:
                     call_success = False
                     result: Any = {"success": False, "error": f"工具不在 {self.agent_type.value} Agent 白名单中"}
@@ -312,7 +430,12 @@ class BaseAgent:
                     error_code = "tool_not_allowed"
                     error_type = "permission"
                 else:
-                    execution = await execute_tool(spec, args, lambda: spec.handler(req, args))
+                    events_before_tool = len(model_events.get() or ())
+                    execution = await execute_tool(
+                        spec, args, lambda: spec.handler(req, args),
+                        timeout_s=self._harness.tool_timeout_s)
+                    aux_model_calls = max(0, len(model_events.get() or ())
+                                          - events_before_tool)
                     result = execution.agent_payload()
                     call_success = execution.success
                     error_code = execution.error_code
@@ -321,6 +444,8 @@ class BaseAgent:
                     error_text = execution.error or ""
                     validated_input = execution.validated_input
                     tool_latency_ms = execution.latency_ms
+                    tool_attempts = execution.attempts
+                    tool_timeout_s = execution.timeout_s
                     if execution.attempts > 0:
                         tools_used.append(name)
                     if isinstance(result, dict) and "success" in result:
@@ -369,6 +494,10 @@ class BaseAgent:
                         "can_confirm_refund", "reason", "success", "error", "amount_a", "amount_b",
                         "difference", "interpretation", "request_id", "sensitive_data_required",
                     ) if key in result}
+                model_payload = truncate_tool_payload(
+                    result, self._harness.max_tool_result_chars)
+                truncated = (isinstance(model_payload, dict)
+                             and model_payload.get("truncated") is True)
                 tool_traces.append(
                     {
                         "request_id": req.request_id,
@@ -384,6 +513,8 @@ class BaseAgent:
                         "error_type": error_type,
                         "retryable": retryable,
                         "latency_ms": round(tool_latency_ms, 1),
+                        "attempts": tool_attempts,
+                        "timeout_s": tool_timeout_s,
                         "cached": bool(result.get("cached")) if isinstance(result, dict) else False,
                         "reranked": bool(result.get("reranked")) if isinstance(result, dict) else False,
                         "rerank_status": result.get("rerank_status") if isinstance(result, dict) else None,
@@ -396,45 +527,131 @@ class BaseAgent:
                         "retrieval_hits": retrieval_hits,
                         "helper_result": helper_result,
                         "error": error_text,
+                        "truncated": truncated,
                     }
                 )
+                model_step["tools"].append(
+                    summarize_tool_trace(tool_traces[-1],
+                                         aux_model_calls=aux_model_calls))
                 # Persist incrementally so a later provider failure still
                 # exposes the tool attempt in the error response and trace API.
                 self._last_tools_used = list(tools_used)
                 self._last_tool_traces = list(tool_traces)
                 req.handoff_evidence = list(tool_traces)
+                tool_payload = model_payload
+                if (not self._harness.error_feedback
+                        and isinstance(result, dict) and result.get("success") is False):
+                    # Keep the required one-tool_result-per-tool_use shape while
+                    # withholding error details from the model (ablation only).
+                    tool_payload = {"success": True, "acknowledged": True}
                 tool_results.append({
                     "type": "tool_result",
                     "tool_use_id": tool_use_id,
-                    "content": json.dumps(result, ensure_ascii=False),
+                    "content": json.dumps(tool_payload, ensure_ascii=False),
                 })
+            if stop_reason is not None:
+                break
             messages.append({"role": "user", "content": tool_results})
 
         self._last_tools_used = tools_used
         self._last_tool_traces = tool_traces
+        self._last_stop_reason = stop_reason or StopReason.BUDGET_EXHAUSTED
+        if step_records and step_records[-1].get("stop_reason") is None:
+            step_records[-1]["stop_reason"] = self._last_stop_reason.value
+        self._last_steps = list(step_records)
         receipt = self._last_action_receipt()
         if receipt is not None:
             return receipt
-        raise RuntimeError(f"{self.agent_type.value} 工具调用超过最大轮数")
+        return "本次处理已达到工具调用上限，已停止继续尝试。请补充必要信息或稍后重试。"
+
+    def _skipped_trace(self, req: Request, name: str, tool_use_id: str, args: Any,
+                       code: str, spec: Optional[AgentToolSpec]) -> Dict[str, Any]:
+        """Trace a tool call the harness refused to execute (budget or loop)."""
+        return {
+            "request_id": req.request_id,
+            "agent_type": self.agent_type.value,
+            "tool_name": name,
+            "risk_level": spec.risk_level.value if spec else "unknown",
+            "tool_use_id": tool_use_id,
+            "input": dict(args) if isinstance(args, dict) else args,
+            "validated_input": None,
+            "success": False,
+            "result_success": False,
+            "error_code": code,
+            "error_type": "harness",
+            "retryable": False,
+            "latency_ms": 0.0,
+            "attempts": 0,
+            "timeout_s": None,
+            "cached": False,
+            "reranked": False,
+            "rerank_status": None,
+            "retrieval_status": None,
+            "citations": [],
+            "action_result": None,
+            "handoff_result": None,
+            "business_result": None,
+            "retrieval_hits": None,
+            "helper_result": None,
+            "truncated": False,
+            "error": ("重复调用已停止：同一工具与参数连续达到上限"
+                      if code == "loop_detected" else "工具步数预算已用尽"),
+        }
 
     def _last_action_receipt(self) -> Optional[str]:
-        """Report an observed action result if a later model step fails or loops."""
-        for trace in reversed(self._last_tool_traces):
+        """Report every observed action, not just the most recent one (C03).
+
+        A composite request can contain several business actions; a fallback
+        receipt that only shows the last one can look like the whole request
+        completed. Single-action text is kept byte-identical to the previous
+        behaviour; multiple actions get one line each, in execution order.
+        """
+        lines: List[str] = []
+        line_by_key: Dict[Any, int] = {}
+        for trace in self._last_tool_traces:
             action = trace.get("action_result")
             if not isinstance(action, dict) or not action.get("status"):
                 continue
-            kind = "退款" if trace.get("tool_name") == "request_refund" else "取消订单"
-            action_id = action.get("action_id") or "未生成"
-            status = action["status"]
-            if status == "completed":
-                return f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。"
-            if status == "awaiting_approval":
-                return f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。"
-            if status == "rejected":
-                return f"{kind}请求已被拒绝，未执行。原因代码：{action.get('reason_code') or action.get('error_code') or 'unknown'}。动作编号：{action_id}。"
-            if status == "failed":
-                return f"{kind}请求处理失败，不能视为已执行。错误代码：{action.get('error_code') or 'unknown'}。动作编号：{action_id}。"
-        return None
+            action_id = action.get("action_id")
+            key = action_id or (trace.get("tool_name"), trace.get("tool_use_id"),
+                                action["status"])
+            line = self._action_receipt_line(trace, action)
+            if not line:
+                continue
+            if key in line_by_key:
+                if action.get("reused"):
+                    lines[line_by_key[key]] = line
+                continue
+            line_by_key[key] = len(lines)
+            lines.append(line)
+        if not lines:
+            return None
+        if len(lines) == 1:
+            return lines[0]
+        return (f"本次共观察到 {len(lines)} 个状态变更动作：\n"
+                + "\n".join(f"- {line}" for line in lines))
+
+    @staticmethod
+    def _action_receipt_line(trace: Dict[str, Any], action: Dict[str, Any]) -> Optional[str]:
+        kind = "退款" if trace.get("tool_name") == "request_refund" else "取消订单"
+        action_id = action.get("action_id") or "未生成"
+        status = action["status"]
+        if status == "completed":
+            line = f"演示业务后端中的{kind}动作已完成。动作编号：{action_id}。"
+        elif status == "awaiting_approval":
+            line = f"{kind}请求已提交，正在等待审批；尚未执行。动作编号：{action_id}。"
+        elif status == "rejected":
+            line = (f"{kind}请求已被拒绝，未执行。原因代码："
+                    f"{action.get('reason_code') or action.get('error_code') or 'unknown'}。"
+                    f"动作编号：{action_id}。")
+        elif status == "failed":
+            line = (f"{kind}请求处理失败，不能视为已执行。错误代码："
+                    f"{action.get('error_code') or 'unknown'}。动作编号：{action_id}。")
+        else:
+            return None
+        if action.get("reused"):
+            line += "（复用已有请求结果，未重复执行。）"
+        return line
 
     @staticmethod
     def _block_type(block: Any) -> Optional[str]:

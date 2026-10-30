@@ -1,0 +1,50 @@
+{
+  "run_id": "20261027T094246Z-e630bbc4",
+  "status": "locked",
+  "selected_threshold": 0.65,
+  "semantic_calibration_path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H2-5\\dev\\20261027T094246Z-e630bbc4\\semantic\\semantic_calibration.json",
+  "semantic_output": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H2-5\\dev\\20261027T094246Z-e630bbc4\\semantic",
+  "hybrid_output": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H2-5\\dev\\20261027T094246Z-e630bbc4\\hybrid",
+  "b0_threshold": 0.2,
+  "b0_calibration_source": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\rag_quality\\calibration\\20261013T025559Z-ed4a1cb4\\b0_lexical_calibration_v2.json",
+  "b0_calibration_sha256": "c65630d00d33e51d345b2fb94982b24331e7385d05195ec2c34eaf213fc84ad2",
+  "b0_selected_dev_metrics": {
+    "threshold": 0.2,
+    "Recall@1": {
+      "value": 0.25,
+      "numerator": 2,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.25,
+      "numerator": 2,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.25,
+      "numerator": 2,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.25,
+      "numerator": 2.0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": 0.6667,
+      "numerator": 2,
+      "denominator": 3
+    },
+    "correct_refusals": 7,
+    "no_returned_hits": 13,
+    "status_counts": {
+      "low_confidence": 13,
+      "usable": 3
+    }
+  }
+}

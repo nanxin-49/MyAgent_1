@@ -220,6 +220,8 @@ def test_real_lifespan_refund_approval_and_http_query(monkeypatch, tmp_path):
     from monitor import performance_monitor
     from evaluation import evaluator
     import actions
+    from actions import InMemoryActionStore
+    from core.checkpoint import InMemoryCheckpointStore
 
     fixture = tmp_path / "n04-business.json"
     fixture.write_text(json.dumps(raw_data(refunds=False, total="800")), encoding="utf-8")
@@ -250,6 +252,9 @@ def test_real_lifespan_refund_approval_and_http_query(monkeypatch, tmp_path):
     monkeypatch.setattr(tool_manager, "MCPToolManager", Manager)
     monkeypatch.setattr(performance_monitor, "PerformanceMonitor", Monitor)
     monkeypatch.setattr(evaluator, "EndToEndEvaluator", lambda **kwargs: SimpleNamespace())
+    monkeypatch.setattr(actions, "RedisActionStore", lambda *args, **kwargs: InMemoryActionStore())
+    monkeypatch.setattr(actions, "RedisCheckpointStore",
+                        lambda *args, **kwargs: InMemoryCheckpointStore())
     monkeypatch.setattr(actions, "ActionService", partial(ActionService, clock=lambda: NOW))
     with TestClient(main.app, headers={"Authorization": "Bearer test-customer-1"}) as http:
         pending = http.post("/chat", json={"message": "申请退款"})

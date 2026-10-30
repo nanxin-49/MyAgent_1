@@ -10,6 +10,8 @@ from agents.agent_orchestrator import AgentProfile, AgentType, BaseAgent, Genera
 from agents.tools import general_tools, technical_tools, billing_tools, escalation_tools
 from core.model_observation import ObservedClient, model_events
 from core.handoff import HandoffService, HandoffResult, explicit_handoff, handoff_reply
+from core.harness import HarnessConfig
+from core.output_consistency import evaluate_action_claims
 from core.tool_contract import execute_tool
 from agents.tools import build_handoff_tools
 from agents.agent_orchestrator import AgentResponse
@@ -60,20 +62,38 @@ class SingleSupportAgent(BaseAgent):
                      "retryable": False, "latency_ms": execution.latency_ms,
                      "handoff_result": req.handoff.model_dump()}
             response = AgentResponse(self.agent_type, "", execution.success,
-                                     tools_used=[spec.name], tool_traces=[trace])
+                                     tools_used=[spec.name], tool_traces=[trace],
+                                     stop_reason="completed")
         else:
             response = await super().handle(req)
         response.escalate = req.handoff.handoff_created
-        if req.handoff.handoff_requested or req.handoff.handoff_failed or any(
-            t.get("tool_name") == "request_handoff" for t in response.tool_traces
-        ):
-            action_receipt = self._last_action_receipt()
-            response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
-            response.success = req.handoff.handoff_created or bool(action_receipt)
-        elif self._claims_completed_handoff(response.content):
-            # No receipt: fail closed on completion claims, without cutting
-            # sentences out of a formatted answer or attaching unrelated state.
-            response.content = handoff_reply(req.handoff)
+        if self._harness.output_consistency:
+            warnings = evaluate_action_claims(response.content, response.tool_traces)
+            if (self._claims_completed_handoff(response.content)
+                    and not req.handoff.handoff_created):
+                warnings.append({
+                    "code": "handoff_created_without_receipt",
+                    "kind": "handoff",
+                    "claimed": "handoff_created",
+                    "observed": req.handoff.status,
+                    "blocking": True,
+                })
+            response.consistency_warnings = warnings
+            if req.handoff.handoff_requested or req.handoff.handoff_failed or any(
+                t.get("tool_name") == "request_handoff" for t in response.tool_traces
+            ):
+                action_receipt = self._last_action_receipt()
+                response.content = (action_receipt + "\n" if action_receipt else "") + handoff_reply(req.handoff)
+                response.success = req.handoff.handoff_created or bool(action_receipt)
+            elif any(w["blocking"] and w["kind"] == "action" for w in warnings):
+                action_receipt = self._last_action_receipt()
+                response.content = action_receipt or (
+                    "本次没有已完成的状态变更动作；相关退款/取消尚未执行。")
+                response.success = bool(action_receipt)
+            elif self._claims_completed_handoff(response.content):
+                # No receipt: fail closed on completion claims, without cutting
+                # sentences out of a formatted answer or attaching unrelated state.
+                response.content = handoff_reply(req.handoff)
         return response
 
     @staticmethod
@@ -116,7 +136,16 @@ class SingleSupportAgent(BaseAgent):
             "模拟动作completed不证明真实资金到账；模拟交接记录不证明真人接单。"
             "\n人工交接只能通过 request_handoff 创建模拟记录。理由码仅 explicit_request、complex_complaint、"
             "business_dependency_failure。不要把摘要、越界拒绝或缺参数当成交接。"
-            "订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。")
+            "订票等非电商能力可合理拒绝。不允许声称真人已接单或工具未创建的交接已成功。"
+            "\n[检索与显式动作]\n"
+            "静态政策、FAQ、流程和规则类问题，应先调用 search_knowledge_base 获取当前有效片段；"
+            "没有可用引用时只说明无法确认，不凭 Skills、历史回复或常识补全政策细节。"
+            "用户明确给出订单号、金额并直接要求申请退款时，视为已授权提交，但须先调用 get_order 和 "
+            "get_refund_status 核对归属、订单状态、7×24 小时窗口、已有退款记录和金额范围；"
+            "条件明确不满足时说明原因，不提交；条件满足或无法确定时，直接调用 request_refund 提交，"
+            "不要再次询问是否确认。是否批准、拒绝或执行仍由后端 Policy/HITL 决定；"
+            "不得因提交而声称退款已通过、已完成或已到账。"
+            "取消订单同理：只有明确指令才提交，是否允许由后端决定。")
 
 
 @dataclass
@@ -131,19 +160,24 @@ class SupportResult:
     handoff: HandoffResult = field(default_factory=HandoffResult)
     agent_type: AgentType = AgentType.SUPPORT
     intent: None = None
+    stop_reason: str | None = None
+    context_rounds: list = field(default_factory=list)
+    consistency_warnings: list = field(default_factory=list)
+    steps: list = field(default_factory=list)
 
 
 class SupportRuntime:
     """One topology, independent Agent state per request, shared guarded handlers."""
     supports_routing = False
 
-    def __init__(self, api_key, model, base_url=None, skill_manager=None, client=None):
+    def __init__(self, api_key, model, base_url=None, skill_manager=None, client=None, *, harness=None):
         kwargs = {"api_key": api_key}
         if base_url:
             kwargs["base_url"] = base_url
         self._raw_client = client or AsyncAnthropic(**kwargs)
         self._client = ObservedClient(self._raw_client, "support")
         self._model, self._skills = model, skill_manager
+        self._harness = harness or HarnessConfig()
         self._tools = {}
         self.handoff_service = HandoffService()
         self._traces = deque(maxlen=int(os.getenv("ECHOMIND_TOOL_TRACE_MAX", "200")))
@@ -157,7 +191,7 @@ class SupportRuntime:
 
     def make_agent(self):
         agent = SingleSupportAgent(self._client, self._model,
-            AllRoleSkills(self._skills) if self._skills else None)
+            AllRoleSkills(self._skills) if self._skills else None, harness=self._harness)
         agent.set_shared_tools({**self._tools, **build_handoff_tools(self.handoff_service)})
         agent.profile = replace(agent.profile, tool_scope=tuple(agent.get_tools()))
         return agent
@@ -177,7 +211,11 @@ class SupportRuntime:
         self._success += int(response.success)
         self._total_ms += elapsed
         result = SupportResult(req.request_id, response.content, response.escalate, elapsed,
-                               response.tools_used, response.tool_traces, events, handoff=req.handoff)
+                               response.tools_used, response.tool_traces, events, handoff=req.handoff,
+                               stop_reason=response.stop_reason,
+                               context_rounds=response.context_rounds,
+                               consistency_warnings=response.consistency_warnings,
+                               steps=response.steps)
         self._traces.append({"request_id": req.request_id, "topology": "single", "agent_type": "support",
             "intent": None, "primary_agent": None, "supporting_agents": None,
             "routing_reason": None, "routing_confidence": None,
@@ -185,6 +223,13 @@ class SupportRuntime:
             "tools_used": list(result.tools_used), "tool_calls": list(result.tool_traces),
             "escalated": result.escalated, "latency_ms": round(elapsed, 1),
             "handoff": result.handoff.model_dump(),
+            "stop_reason": result.stop_reason,
+            "context_rounds": list(result.context_rounds),
+            "consistency_warnings": list(result.consistency_warnings),
+            "steps": list(result.steps), "step_count": len(result.steps),
+            "step_scope": ("one step per Agent model call; tool calls are grouped under "
+                           "the step that selected them; tool-internal SDK calls are counted "
+                           "as aux_model_calls and listed in model_calls"),
             "model_call_count": len(events), "model_calls": list(events),
             "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries"})
         return result

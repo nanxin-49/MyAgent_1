@@ -1,0 +1,46 @@
+{
+  "checks": {
+    "anonymous_trace": {
+      "status": 401
+    },
+    "customer_trace": {
+      "status": 403
+    },
+    "admin_trace": {
+      "status": 200
+    },
+    "anonymous_chat": {
+      "status": 401
+    },
+    "identity_mismatch": {
+      "status": 403
+    }
+  },
+  "assertions": [
+    {
+      "assertion": "anonymous_trace",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "assertion": "customer_trace",
+      "pass": true,
+      "detail": 403
+    },
+    {
+      "assertion": "admin_trace",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "anonymous_chat_401",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "assertion": "identity_mismatch_403",
+      "pass": true,
+      "detail": 403
+    }
+  ]
+}

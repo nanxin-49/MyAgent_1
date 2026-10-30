@@ -1,0 +1,99 @@
+{
+  "schema": "cartcare.h3_3.context_cases",
+  "version": 1,
+  "cases": [
+    {
+      "id": "single_query",
+      "context_chars": 0,
+      "message": "查订单 ORD-1001",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}}]},
+        {"text": "订单查询完成。"}
+      ]],
+      "expected": {"tools": ["get_order"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 0}}
+    },
+    {
+      "id": "long_memory",
+      "context_chars": 12000,
+      "message": "查订单 ORD-1001",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}}]},
+        {"text": "订单查询完成。"}
+      ]],
+      "expected": {"tools": ["get_order"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 0}}
+    },
+    {
+      "id": "long_memory_two_calls",
+      "context_chars": 8000,
+      "message": "查订单和物流 ORD-1001",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}}]},
+        {"tool_calls": [{"name": "get_shipment", "input": {"order_id": "ORD-1001"}}]},
+        {"text": "订单和物流查询完成。"}
+      ]],
+      "expected": {"tools": ["get_order", "get_shipment"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 0}}
+    },
+    {
+      "id": "big_result",
+      "context_chars": 2000,
+      "message": "调用大结果工具",
+      "scripts": [[
+        {"tool_calls": [{"name": "big", "input": {}}]},
+        {"text": "大结果处理完成。"}
+      ]],
+      "expected": {"tools": ["big"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 0}}
+    },
+    {
+      "id": "big_then_query",
+      "context_chars": 6000,
+      "message": "先取大结果再查订单",
+      "scripts": [[
+        {"tool_calls": [{"name": "big", "input": {}}]},
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}}]},
+        {"text": "处理完成。"}
+      ]],
+      "expected": {"tools": ["big", "get_order"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 0}}
+    },
+    {
+      "id": "rag_long",
+      "context_chars": 9000,
+      "message": "退款需要满足什么条件？",
+      "scripts": [[
+        {"tool_calls": [{"name": "rag_like", "input": {"query": "退款条件"}}]},
+        {"text": "退款条件已查到。"}
+      ]],
+      "expected": {"tools": ["rag_like"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 0}}
+    },
+    {
+      "id": "cancel_action",
+      "context_chars": 7000,
+      "message": "帮我取消订单 ORD-T09-CANCEL",
+      "scripts": [[
+        {"tool_calls": [{"name": "request_cancel_order",
+                         "input": {"order_id": "ORD-T09-CANCEL"}}]},
+        {"text": "取消请求已提交。"}
+      ]],
+      "expected": {"tools": ["request_cancel_order"], "tool_mode": "ordered",
+                   "terminal_state": {"executor_calls": 1}}
+    },
+    {
+      "id": "three_rounds",
+      "context_chars": 5000,
+      "message": "查订单、物流，再查一次订单",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}}]},
+        {"tool_calls": [{"name": "get_shipment", "input": {"order_id": "ORD-1001"}}]},
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}}]},
+        {"text": "三次查询完成。"}
+      ]],
+      "expected": {"tools": ["get_order", "get_shipment", "get_order"],
+                   "tool_mode": "ordered", "terminal_state": {"executor_calls": 0}}
+    }
+  ]
+}

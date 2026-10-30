@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv sync --dev)",
+      "Bash(uv lock --check)",
+      "Bash(uv run python -m pytest:*)",
+      "Bash(node --check:*)",
+      "Bash(node --test:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git rev-parse:*)"
+    ],
+    "deny": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(git tag:*)",
+      "Read(./.env)",
+      "Read(./.env.local)"
+    ]
+  }
+}

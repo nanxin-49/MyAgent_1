@@ -28,7 +28,7 @@ Agent 负责理解、澄清、参数收集、选择工具和生成回复。生�
 - RAG 经外部 Chroma HTTP 存取；字符 n-gram embedding 是演示词面基线。usable 命中才有可用引用；来源、document_id、policy_version 与 chunk 信息保留。阈值仍为 0.35，fallback 不能作为可靠依据。
 - Memory 的工作层按用户/会话隔离并设置 24 小时 TTL；15 条触发确定性压缩，保留最近 5 条、订单号引用及待澄清字段。Chroma 只接收有来源和有效期的咨询主题与明确回复偏好，分别保留 30/180 天；订单、物流、库存和退款状态不进入长期事实。Monitor 继续观测工具和 Agent 成功率/延迟；Single 不再计算或反馈路由惩罚。
 - Trace 标记 topology=single、agent_type=support。模型调用统计覆盖 Support 与 RAG SDK 调用，不包含 Memory/profile 和 SDK 内部重试；不保存隐藏推理。
-- A02人工交接以 required/requested/created/failed 和可查询模拟记录为证据；明确人工请求由确定性门控兜底，复杂投诉由Agent请求后再校验。摘要不建单，越界合理拒绝不自动升级，created不代表真人已接单。具体路径与故障测试见 [A02说明](../docs/engineering/A02-handoff.md)。
+- A02人工交接以 required/requested/created/failed 和可查询模拟记录为证据；明确人工请求由确定性门控兜底，复杂投诉由Agent请求后再校验。摘要不建单，越界合理拒绝不自动升级，created不代表真人已接单。具体路径与故障测试见 `core/handoff.py` 与 `tests/test_handoff.py`。
 
 ## 为什么简化
 
@@ -52,7 +52,7 @@ Multi 的最终样本未使用 supporting Agent 或 Composer；当前电商 work
 
 结果支持实验 Single 与生产入口的主要行为一致。不必要调用比例较历史 Single 高，单轮不能判定稳定变化；该十场景回归未验证 Redis/长期 Memory，也不能用这些演示样本宣称真实生产效果。unsupported escalation（0/1）、ownership 严格任务证据缺口、technical/真实协作 workload 未覆盖均保留为 follow-up，没有同时修改 prompt 或业务规则。生产迁移已验收 done。
 
-历史 T09 10 场景基线保持原样（intent 7/10、tool selection 7/10、arguments 6/6、unnecessary cases 5/10、strict E2E 6/10），不能与新 citation contract 直接混算；报告现位于 `evaluation/reports/t09/`。旧 Wiki 及配图归档至本机 `cash/wiki/`，不上传。本文件、重点代码与 README 为当前核心说明；演进对照见 [CartCare 与 EchoMind 的差别](../docs/CartCare-vs-EchoMind.md)。
+历史 T09 10 场景基线保持原样（intent 7/10、tool selection 7/10、arguments 6/6、unnecessary cases 5/10、strict E2E 6/10），不能与新 citation contract 直接混算；报告现位于 `evaluation/reports/t09/`。旧 Wiki 及配图归档至本机 `cash/wiki/`，不上传。本文件、重点代码与 README 为当前核心说明；旧演进对照已归档到本机 `cash/`。
 
 历史 [真实 Memory 验收](../evaluation/reports/support_production/memory_acceptance.md)记录旧实现的短期集成结果。T11 [新验收](../evaluation/reports/t11_memory_acceptance.md)保留原 16 项检查，新增演示订单状态变化后再次调用 Provider、异步偏好写入真实 Chroma，共 18/18；真实 Redis/Chroma 可选集成测试覆盖压缩、长期记录隔离与删除。Redis 读取故障返回 503 且 Agent 不执行。演示 user_id 仍非正式身份认证；长期记录按有效期读取，但物理过期清理尚未自动调度。
 

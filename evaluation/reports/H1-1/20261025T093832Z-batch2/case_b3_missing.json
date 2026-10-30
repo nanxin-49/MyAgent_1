@@ -1,0 +1,520 @@
+{
+  "request": {
+    "message": "我要退款",
+    "conv_id": "h11-b2-missing-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "api_response": {
+    "conv_id": "h11-b2-missing-customer1",
+    "request_id": "34024aea",
+    "response": "您好，我可以帮您处理退款申请。请提供以下信息：\n\n1. **订单号**（必填）\n2. **退款金额**（如只退部分金额请说明；不填则按订单总额申请）\n\n收到订单号后，我会先核对订单归属、状态和是否已有退款记录，再为您提交申请。请注意：提交后是否通过由系统审核决定，模拟申请成功也不代表资金已实际到账。",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 1360.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 1,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "34024aea",
+    "found": true,
+    "trace": {
+      "request_id": "34024aea",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 1360.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 157,
+          "output_tokens": 92,
+          "latency_ms": 1360.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 15.0
+      },
+      "request_latency_ms": 1406.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "scenario": "B3-MISSING",
+  "assertions": [
+    {
+      "assertion": "http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "request_refund_not_submitted",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "assertion": "no_action_created",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "assertion": "no_business_write",
+      "pass": true,
+      "detail": {
+        "before": 1,
+        "after": 1
+      }
+    },
+    {
+      "assertion": "asks_for_order_id",
+      "pass": true,
+      "detail": "您好，我可以帮您处理退款申请。请提供以下信息：\n\n1. **订单号**（必填）\n2. **退款金额**（如只退部分金额请说明；不填则按订单总额申请）\n\n收到订单号后，我会先核对订单归属、状态和是否已有退款记录，再为您提交申请。请注意：提交后是否通过由系统审核决定，模拟申请成功也不代表资金已实际到账。"
+    }
+  ],
+  "verdict": "pass",
+  "state_before": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T09:38:56.522785+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "refund_pending",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T09:38:56.522785+00:00"
+        },
+        "ORD-H11-EXPIRED": {
+          "order_id": "ORD-H11-EXPIRED",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-15T09:38:56.522785+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T09:38:56.522785+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T09:38:56.522785+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        },
+        "ORD-H11-EXPIRED": {
+          "shipment_id": "SHP-H11-EXPIRED",
+          "order_id": "ORD-H11-EXPIRED",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-EXPIRED",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        }
+      },
+      "refunds": {
+        "REF-act_b02400b7fb9347e5": {
+          "refund_id": "REF-act_b02400b7fb9347e5",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "600",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-25T09:42:40.543034Z",
+          "updated_at": "2026-10-25T09:42:40.543034Z"
+        }
+      }
+    },
+    "handoffs": {},
+    "actions": {
+      "act_b02400b7fb9347e5": {
+        "action_id": "act_b02400b7fb9347e5",
+        "action_type": "refund",
+        "user_id": "customer-1",
+        "order_id": "ORD-H11-APPROVAL",
+        "amount": "600",
+        "policy_decision": {
+          "action": "refund",
+          "decision": "require_approval",
+          "reason_code": "amount_requires_approval",
+          "policy_version": "refund-cancel-v1",
+          "explanation": "退款金额超过自动处理阈值 500.00",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "evaluated_at": "2026-10-25T09:42:40.543034Z",
+          "requires_approval": true,
+          "metadata": {}
+        },
+        "policy_version": "refund-cancel-v1",
+        "status": "completed",
+        "created_at": "2026-10-25T09:42:39.192519Z",
+        "updated_at": "2026-10-25T09:42:40.543034Z",
+        "idempotency_key": "auto_51edb74be642fb01199cf878a1bbc4e3",
+        "request_id": "47b7b1d8",
+        "error_code": null,
+        "error_message": null,
+        "execution_result": {
+          "simulated": true,
+          "operation": "refund",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "status": "completed",
+          "refund_id": "REF-act_b02400b7fb9347e5",
+          "refund_status": "pending"
+        },
+        "reviewed_by": "e2e-reviewer",
+        "requested_by": "e2e-customer-1"
+      }
+    },
+    "executor_calls": 1
+  },
+  "state_after": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T09:38:56.522785+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "refund_pending",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T09:38:56.522785+00:00"
+        },
+        "ORD-H11-EXPIRED": {
+          "order_id": "ORD-H11-EXPIRED",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-15T09:38:56.522785+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T09:38:56.522785+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T09:38:56.522785+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        },
+        "ORD-H11-EXPIRED": {
+          "shipment_id": "SHP-H11-EXPIRED",
+          "order_id": "ORD-H11-EXPIRED",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-EXPIRED",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T09:38:56.522785+00:00"
+        }
+      },
+      "refunds": {
+        "REF-act_b02400b7fb9347e5": {
+          "refund_id": "REF-act_b02400b7fb9347e5",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "pending",
+          "amount": "600",
+          "currency": "CNY",
+          "reason": "simulated_refund_request",
+          "created_at": "2026-10-25T09:42:40.543034Z",
+          "updated_at": "2026-10-25T09:42:40.543034Z"
+        }
+      }
+    },
+    "handoffs": {},
+    "actions": {
+      "act_b02400b7fb9347e5": {
+        "action_id": "act_b02400b7fb9347e5",
+        "action_type": "refund",
+        "user_id": "customer-1",
+        "order_id": "ORD-H11-APPROVAL",
+        "amount": "600",
+        "policy_decision": {
+          "action": "refund",
+          "decision": "require_approval",
+          "reason_code": "amount_requires_approval",
+          "policy_version": "refund-cancel-v1",
+          "explanation": "退款金额超过自动处理阈值 500.00",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "evaluated_at": "2026-10-25T09:42:40.543034Z",
+          "requires_approval": true,
+          "metadata": {}
+        },
+        "policy_version": "refund-cancel-v1",
+        "status": "completed",
+        "created_at": "2026-10-25T09:42:39.192519Z",
+        "updated_at": "2026-10-25T09:42:40.543034Z",
+        "idempotency_key": "auto_51edb74be642fb01199cf878a1bbc4e3",
+        "request_id": "47b7b1d8",
+        "error_code": null,
+        "error_message": null,
+        "execution_result": {
+          "simulated": true,
+          "operation": "refund",
+          "order_id": "ORD-H11-APPROVAL",
+          "amount": "600",
+          "status": "completed",
+          "refund_id": "REF-act_b02400b7fb9347e5",
+          "refund_status": "pending"
+        },
+        "reviewed_by": "e2e-reviewer",
+        "requested_by": "e2e-customer-1"
+      }
+    },
+    "executor_calls": 1
+  },
+  "ledger_before": {
+    "requests": 7,
+    "charged_or_reserved_usd": 0.009738,
+    "halted": false
+  },
+  "ledger_after": {
+    "requests": 8,
+    "charged_or_reserved_usd": 0.010855500000000002,
+    "halted": false
+  }
+}

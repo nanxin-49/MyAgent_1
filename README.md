@@ -39,8 +39,8 @@ flowchart TD
 
 - **单 Agent + 工具**：当前电商 workload 未证明多 Agent 协作收益。T10 对比支持简化，生产入口不再经过 Intent / specialist dispatch / supporting Agent / Composer。旧 Multi 仅保留为历史实验。
 - **知识与事实分离**：政策解释来自 RAG；订单、库存和物流必须重新查 Provider，不能从检索文本或历史回复推断当前状态。
-- **统一工具边界**：严格 schema、read / write / dangerous 风险、typed errors、timeout / retry 元数据。仅幂等读工具自动重试可重试错误；危险动作由 ActionService 控制。
-- **可观察而不暴露隐藏推理**：Trace 展示已执行的工具、校验输入、结果摘要与错误，记录模型调用次数，不保存隐藏 chain-of-thought。`mcp/` 是自研本地工具层，尚非标准 MCP SDK / transport 接入。
+- **统一工具边界**：严格 schema、read / write / dangerous 风险、typed errors、timeout / retry 元数据。仅幂等读工具自动重试已完成的 retryable 错误；超时不自动重试，避免仍在运行的 worker 与重试重叠；危险动作由 ActionService 控制。
+- **可观察而不暴露隐藏推理**：Trace 展示已执行的工具、校验输入、结果摘要与错误，并按步记录每次模型调用的 token、延迟、选择的工具、参数摘要和停止原因；不保存隐藏 chain-of-thought 或原始 Memory 内容。`mcp/` 是自研本地工具层，尚非标准 MCP SDK / transport 接入。
 
 ## End-to-end examples
 
@@ -52,7 +52,7 @@ flowchart TD
 
 这些是演示输入与观察目标，模型输出和实际工具调用不预设成功。Trace 中没有 ActionService 结果时，UI 不从回答推定动作已完成。库存缺少 SKU 时应澄清；ownership violation 使用 customer-2 请求 customer-1 的订单；订票等越界请求可合理拒绝，不自动等于需要人工。
 
-结构化交接：`SingleSupportAgent → request_handoff → HandoffService → API/Trace handoff`。明确人工请求由保守确定性门控兜底；复杂电商投诉和已观察到的业务查询依赖故障可由 Agent 请求，服务再次校验策略。`handoff_required/requested/created/failed` 分别记录业务需求、真实创建调用、成功和失败；兼容 `escalated` 仅表示 created。`GET /handoffs/{id}` 只允许 owner 查询。客户端重复提交应复用 `conv_id + handoff_key`；新请求用新 key。没有 key 时只在同一后端请求内去重。创建成功后模型或 Memory 写入失败仍保留回执；摘要工具不建单。进程内模拟记录不等于真人接单，重启/多worker不共享。设计、故障证据与独立练习见 [A02说明](docs/engineering/A02-handoff.md)。
+结构化交接：`SingleSupportAgent → request_handoff → HandoffService → API/Trace handoff`。明确人工请求由保守确定性门控兜底；复杂电商投诉和已观察到的业务查询依赖故障可由 Agent 请求，服务再次校验策略。`handoff_required/requested/created/failed` 分别记录业务需求、真实创建调用、成功和失败；兼容 `escalated` 仅表示 created。`GET /handoffs/{id}` 只允许 owner 查询。客户端重复提交应复用 `conv_id + handoff_key`；新请求用新 key。没有 key 时只在同一后端请求内去重。创建成功后模型或 Memory 写入失败仍保留回执；摘要工具不建单。进程内模拟记录不等于真人接单，重启/多worker不共享。设计与实现见 `core/handoff.py` 与 `agents/support_agent.py`。
 
 ## Safety / business controls
 
@@ -60,19 +60,19 @@ HTTP 先由可替换 AuthAdapter 验证 Principal（subject_id/customer_id/roles
 
 需要人工审核的动作仅可由独立 reviewer 批准，且 owner 必须在其服务端 `review_customers` 范围；同 customer_id 或同请求主体禁止自审。动作保留 owner、requested_by 和 reviewed_by，重复审批仍单次执行。客户可拒绝自己的待审批请求，不能批准；admin 不自动获得 reviewer 权限。
 
-Trace、Knowledge 添加/上传/统计、Skills 查询/reload、Eval、Monitor、Metrics 和诊断 Search 要求 admin。`/eval/run` 每轮通过独立模拟 Runtime/BusinessState/ActionStore 执行，内部使用固定 customer-1 测试 Principal，保留 Policy/HITL；不接入聊天 Memory。见 [N10 隔离说明](docs/engineering/N10-evaluation-runtime-isolation.md)。静态 Demo 与 health 仍公开；没有生产认证验证器时不会自动降级为Demo/anonymous。
+Trace、Knowledge 添加/上传/统计、Skills 查询/reload、Eval、Monitor、Metrics 和诊断 Search 要求 admin。`/eval/run` 每轮通过独立模拟 Runtime/BusinessState/ActionStore 执行，内部使用固定 customer-1 测试 Principal，保留 Policy/HITL；不接入聊天 Memory。隔离实现见 `evaluation/runtime.py`。静态 Demo 与 health 仍公开；没有生产认证验证器时不会自动降级为Demo/anonymous。
 
-受控本地 Demo Auth 需同时配置 `CARTCARE_AUTH_MODE=demo`、`APP_ENV=development`、`API_HOST=127.0.0.1`（或 ::1）、回环客户端/Host及 `CARTCARE_DEMO_CREDENTIALS` 服务端JSON映射。凭据键为自行生成、至少32字符的Bearer token；值为 `{"subject_id":"...","customer_id":"customer-1","roles":["customer"]}`，reviewer另设roles及review_customers列表，admin另设roles。没有默认凭据。Demo页面分开输入customer/reviewer/admin token，不保存至浏览器存储；user_id仍须与客户凭据一致。CLI 使用 `CARTCARE_CLI_TOKEN`。不要把Demo暴露到公网或公共反向代理；它不替代生产认证、凭据生命周期与部署安全审查。真实验证器通过 `app.state.auth_adapter` 或 FastAPI `get_auth_adapter` 依赖安装。设计与限制见 [ADR](docs/engineering/ADR-auth-and-provider-safety.md)。
+受控本地 Demo Auth 需同时配置 `CARTCARE_AUTH_MODE=demo`、`APP_ENV=development`、`API_HOST=127.0.0.1`（或 ::1）、回环客户端/Host及 `CARTCARE_DEMO_CREDENTIALS` 服务端JSON映射。凭据键为自行生成、至少32字符的Bearer token；值为 `{"subject_id":"...","customer_id":"customer-1","roles":["customer"]}`，reviewer另设roles及review_customers列表，admin另设roles。没有默认凭据。Demo页面分开输入customer/reviewer/admin token，不保存至浏览器存储；user_id仍须与客户凭据一致。CLI 使用 `CARTCARE_CLI_TOKEN`。不要把Demo暴露到公网或公共反向代理；它不替代生产认证、凭据生命周期与部署安全审查。真实验证器通过 `app.state.auth_adapter` 或 FastAPI `get_auth_adapter` 依赖安装。设计与限制见 `core/auth.py` 及本节说明。
 
 `request_refund` / `request_cancel_order` → ActionService → PolicyEngine → deny / allow / require_approval → HITL（需要时）→ Executor。审批、恢复、执行时再次校验和幂等都在后端实现。UI 只消费 `/actions/{id}/approve`、`reject`、`resume` 和 GET `/actions/{id}`；现有 Approve API 可能直接完成执行，Resume 不能绕过审批。
 
-模拟退款执行完成后，Action 为 `completed`，订单为 `refund_pending`，退款查询返回新建的 `RefundRecord.status=pending`，表示等待后续处理，不能据此声称资金到账。执行回执追加 `refund_id` / `refund_status`，查询 Tool 沿用原字段并新增可返回状态 `pending`；按订单查询选择最新 updated_at 的记录，旧记录仍可按退款编号查询。startup 的读写 Backend 显式共享进程内状态和锁；不保证重启或多进程一致性。见 [N04 技术说明](docs/engineering/N04-refund-read-write-consistency.md)。
+模拟退款执行完成后，Action 为 `completed`，订单为 `refund_pending`，退款查询返回新建的 `RefundRecord.status=pending`，表示等待后续处理，不能据此声称资金到账。执行回执追加 `refund_id` / `refund_status`，查询 Tool 沿用原字段并新增可返回状态 `pending`；按订单查询选择最新 updated_at 的记录，旧记录仍可按退款编号查询。startup 的读写 Backend 显式共享进程内状态和锁；不保证重启或多进程一致性。实现见 `actions/backend.py` 与 `providers/mock_backend.py`。
 
 ## RAG
 
-知识文档要求 source / document_id / doc_type；政策还要求 policy_version / effective_at。同 document_id/version 修订会完整替换旧片段；跨版本替代必须显式声明 `supersedes`（同文档前驱版本），并受 `effective_at` / 可选 `expires_at` / `publication_status=active|revoked` 约束。新 citation 增加 content_hash，reference 附实际 chunk hash。发布失败返回固定 503，不把部分写入作为成功；Chroma 非事务、逐文档发布。旧无发布记录数据不作为当前依据，需从可信源审核重发布，不能自动按版本字符串迁移。详细接口、恢复及旧数据限制见 [N06 技术说明](docs/engineering/N06-knowledge-version-consistency.md)。外部 Chroma Server 是唯一存储路径，连接失败不会切换到嵌入式数据库。字符 n-gram lexical embedding 是演示基线，`1 - Chroma distance` 的 0.35 阈值仍待更广泛校准。
+知识文档要求 source / document_id / doc_type；政策还要求 policy_version / effective_at。同 document_id/version 修订会完整替换旧片段；跨版本替代必须显式声明 `supersedes`（同文档前驱版本），并受 `effective_at` / 可选 `expires_at` / `publication_status=active|revoked` 约束。新 citation 增加 content_hash，reference 附实际 chunk hash。发布失败返回固定 503，不把部分写入作为成功；Chroma 非事务、逐文档发布。旧无发布记录数据不作为当前依据，需从可信源审核重发布，不能自动按版本字符串迁移。详细接口与恢复逻辑见 `mcp/knowledge_base.py`。外部 Chroma Server 是唯一存储路径，连接失败不会切换到嵌入式数据库。字符 n-gram lexical embedding 是演示基线，`1 - Chroma distance` 的 0.35 阈值仍待更广泛校准。
 
-只有 `usable` 命中可展示可靠 citation；正常 `no_answer` / `low_confidence` 的检索调用可 `success=true`，但 results/citations 为空；调用成功不等于有可用知识。`reranked` 仅表示模型完成有效排序，新增 `rerank_status` 区分跳过与 fallback。空/异常排序按完整排序契约整体拒绝，原序 fallback 必须经过最终证据及 N06 版本复核；详见 [N07 契约](docs/engineering/N07-rerank-result-contract.md)。`low_confidence`、`no_answer`、`degraded` 和未检索分别显示。引用证明检索来源，不等于逐句事实核验。文档标题通过 Trace 的 retrieval_hits 关联 citation，未观测时明确标示。改写、重排、熔断和 fallback 留在现有 RAG 层；KnowledgeBase 命中禁用结果缓存并在重排后复核当前版本，普通工具缓存保留。
+只有 `usable` 命中可展示可靠 citation；正常 `no_answer` / `low_confidence` 的检索调用可 `success=true`，但 results/citations 为空；调用成功不等于有可用知识。`reranked` 仅表示模型完成有效排序，新增 `rerank_status` 区分跳过与 fallback。空/异常排序按完整排序契约整体拒绝，原序 fallback 必须经过最终证据及 N06 版本复核；排序契约见 `mcp/rag_contract.py`。`low_confidence`、`no_answer`、`degraded` 和未检索分别显示。引用证明检索来源，不等于逐句事实核验。文档标题通过 Trace 的 retrieval_hits 关联 citation，未观测时明确标示。改写、重排、熔断和 fallback 留在现有 RAG 层；KnowledgeBase 命中禁用结果缓存并在重排后复核当前版本，普通工具缓存保留。
 
 ## Memory
 
@@ -80,13 +80,13 @@ Redis 工作记忆按用户 / 会话隔离，TTL 24 小时；15 条触发确定�
 
 Trace 展示读取计数、摘要是否存在、读写状态与耗时，不记录原始 Memory 内容。后台画像仅标记 `scheduled_unobserved`，不把调度成功视为落库成功。Redis 读取故障返回明确 503，Agent 不执行；该早期失败不会生成 Agent Trace。
 
-`/chat` 追加 `action_results`（既有 ActionResult 契约）、`memory_write_status` 和 `warning_codes`。危险工具回执须经带 Principal 的 ActionService 查询确认；至少一个动作已 `completed` 且有执行回执时，后续 Memory 写入失败返回 HTTP 200、`memory_write_status=failed`、`warning_codes=["memory_write_failed"]`，保留各动作真实状态和可查询编号。HTTP 200 不代表所有动作成功，更不代表退款到账；客户端以结构化动作状态判断业务结果。没有确认完成动作或已创建交接时，写入异常仍走原 HTTP 500；读取故障仍 fail-closed。失败写入不调度画像，Trace 记录失败角色、成功返回的写入调用数和耗时。见 [N05 技术说明](docs/engineering/N05-action-memory-consistency.md)。
+`/chat` 追加 `action_results`（既有 ActionResult 契约）、`memory_write_status` 和 `warning_codes`。危险工具回执须经带 Principal 的 ActionService 查询确认；至少一个动作已 `completed` 且有执行回执时，后续 Memory 写入失败返回 HTTP 200、`memory_write_status=failed`、`warning_codes=["memory_write_failed"]`，保留各动作真实状态和可查询编号。HTTP 200 不代表所有动作成功，更不代表退款到账；客户端以结构化动作状态判断业务结果。没有确认完成动作或已创建交接时，写入异常仍走原 HTTP 500；读取故障仍 fail-closed。失败写入不调度画像，Trace 记录失败角色、成功返回的写入调用数和耗时。实现见 `api/main.py` 的 `/chat` 写入分支。
 
 ## Evaluation
 
 [确定性专项 Eval](evaluation/README.md)评分工具参数、业务规则、HITL、RAG 和安全行为；LLM-as-Judge 只用于主观回复质量。历史报告保持原样，Single 的 nullable deprecated routing / intent 字段不用于伪造路由准确率。
 
-A02独立交接数据集：`uv run python -m evaluation.run_handoff_eval`，只运行 Fake SDK 与本地 FastAPI TestClient；以 API状态、Trace、owner可查询记录和后端回执评分，结果见 `docs/engineering/A02-handoff-observations.json`。不以回答中的“转人工”评分，不改 T10 历史 `0/3`。
+A02独立交接数据集：`uv run python -m evaluation.run_handoff_eval`，只运行 Fake SDK 与本地 FastAPI TestClient；以 API状态、Trace、owner可查询记录和后端回执评分。不以回答中的“转人工”评分，不改 T10 历史 `0/3`。
 
 [T10 历史对比](evaluation/reports/t10_topology_comparison.md)：真实模型、演示业务后端，**controlled demo workload，3 × 10 cases / topology，not production benchmark**。
 
@@ -107,6 +107,8 @@ A02独立交接数据集：`uv run python -m evaluation.run_handoff_eval`，只�
 
 服务启动后打开 [Live Demo](http://localhost:8000/demo)。无需前端构建或新框架，静态资源由同一 FastAPI 提供。
 
+运维探针：`GET /health` 只表示进程存活；`GET /ready` 检查 Redis 与 Chroma（不调用模型），依赖未就绪时返回 503。Docker app healthcheck 使用 `/ready`，nginx 仍使用 `/health`。
+
 十个一键填入场景：FAQ / policy、order lookup、logistics lookup、inventory clarification、refund allow、refund require approval、refund deny、cancel、ownership violation、unsupported request。选择场景会新建会话；普通连续输入沿用 conv_id。切换 demo user_id 会清空会话号。
 
 使用步骤：
@@ -120,7 +122,7 @@ A02独立交接数据集：`uv run python -m evaluation.run_handoff_eval`，只�
 
 演示执行会改变当前进程内的业务状态。新建会话不会重置业务后端；重复退款 / 取消未必得到首次结果。需要恢复初始场景时重新生成 fixture 并重启 API。过期 fixture 应重新生成，UI 不改变业务规则以维持演示结果。
 
-本轮 [T12 验证记录与截图](docs/t12-trace-demo-validation.md)包含真实模型、Redis/Chroma 与演示动作的 FAQ / Pending approval / Resume / Approve smoke；不是新的生产 benchmark。
+历史 T12 验证记录（真实模型、Redis/Chroma 与演示动作的 FAQ / Pending approval / Resume / Approve smoke）已归档到本机 `cash/`；它是当时的演示证据，不是当前生产 benchmark。
 
 ## Local setup
 
@@ -164,15 +166,14 @@ uv 缓存统一位于 `cash/cache/uv`（由 pyproject.toml 配置），pytest �
 
 - demo `user_id`，非正式认证；审批 API 仍沿用演示身份模型。
 - demo / in-memory commerce Action backend；external commerce / payment API 未接入。
-- PendingAction 持久化仍有限；当前 Store 与有界 Trace 随进程重启丢失，Trace 默认只保留最近 200 个请求。
+- PendingAction 与审批检查点持久化在 Redis（单实例；多 worker 并发不承诺）；审批前/中/执行中/执行后的进程崩溃可由检查点恢复，执行已派发但无回执时按 `execution_unknown` 失败且不自动重放；恢复回执用 `wm:once:` marker 最多写一次；有界 Trace 仍随进程重启丢失，默认只保留最近 200 个请求；模拟业务表仍是内存 fixture。
+- Memory 压缩与画像更新使用进程内 `asyncio` 锁：单实例下避免压缩丢消息和画像 read-modify-write 覆盖，多 worker 仍不承诺；读工具超时不会自动重试，避免后台 worker 重叠。
 - character n-gram lexical embedding baseline；阈值、语义召回和更大知识集效果仍需验证。
 - unsupported escalation 仍需改进；ownership 严格在线任务证据有缺口，不能混同为确定性安全层未检查。
 - long-term expired Chroma records 尚无后台物理清理任务；读取时过滤有效期。
 - Trace 的工具结果为业务 / 动作 / 检索摘要及确定性 helper 白名单输出，非完整原始输出；早期 Memory 读失败无 Agent trace，后台画像完成状态未追踪。
 - 没有生产 SLA、真实支付成功率、完整客服交接集成或大规模负载证据。
 
-当前核心说明：本 README、[定位与技术亮点](wiki/CartCare定位与技术亮点.md)、[重点代码](wiki/重点代码.md)。另见 [CartCare 与原始 EchoMind 的差别](docs/CartCare-vs-EchoMind.md)。
+当前核心说明：本 README、[定位与技术亮点](wiki/CartCare定位与技术亮点.md)、[重点代码](wiki/重点代码.md)；执行计划与任务状态见 `CARTCARE_PLAN.md`，协作规则见 `CLAUDE.md`，每轮修改记录见 [变更日志](docs/CHANGELOG.md)。
 
-[Workbench](docs/CartCare-Codex-Workbench.html) / progress JSON 保留任务与验收记录，[hardening](docs/hardening/README.md) 保留后续任务入口。旧 Wiki / 配图、本机 IDE 状态、旧嵌入式数据和缓存已归档到本机 `cash/`，不上传、不进入镜像；历史验收报告继续保留并版本化。
-
-根目录保留 uv、Docker、CI、pytest 和原部署脚本需要的标准入口，`.venv` 原地保留。T09 / FAQ JSON 已原样归入 `evaluation/reports/t09/` 与 `evaluation/reports/rag_http/`；新评测临时输出进入 `data/evaluation/`。目录职责、移动原因与恢复方法见 [文件组织说明](docs/project-organization.md) 和 [逐项迁移清单](docs/project-file-moves.json)。
+历史 Workbench、progress JSON、hardening 任务、旧工程说明、T12 记录与截图、旧迁移清单已归档到本机 `cash/archive-20261025/`（不纳入版本库、不进入镜像）。任务证据写入 `docs/reports/`，历史评测报告保留在 `evaluation/reports/`。

@@ -1,0 +1,304 @@
+{
+  "run": "20261025T091107Z-repair1",
+  "scenarios": {
+    "S1B": {
+      "verdict": "pass",
+      "assertions": [
+        {
+          "assertion": "http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "search_knowledge_base_selected",
+          "pass": true,
+          "detail": [
+            "search_knowledge_base"
+          ]
+        },
+        {
+          "assertion": "retrieval_status_usable",
+          "pass": true,
+          "detail": "usable"
+        },
+        {
+          "assertion": "citations_present",
+          "pass": true,
+          "detail": 1
+        },
+        {
+          "assertion": "citation_policy_version",
+          "pass": true,
+          "detail": [
+            "refund-cancel-v1"
+          ]
+        },
+        {
+          "assertion": "citation_content_hash",
+          "pass": true,
+          "detail": [
+            true
+          ]
+        },
+        {
+          "assertion": "answer_mentions_window",
+          "pass": true,
+          "detail": "以下是当前有效的退款政策（版本 refund-cancel-v1，人民币演示用例）：\n\n**申请条件**\n- 需核验客户身份和订单归属\n- 需在订单创建后 **7×24 小时内**提交（执行前仍会复核）\n- 可进入资格检查的订单状态：已支付、处理中、已发货、已签收、已完成；其他状态不满足当前退款条件\n- 金额须大于 0 且不超过订单总额；不填金额时默认按订单总额\n\n**重复申请**\n- 若已有待处"
+        },
+        {
+          "assertion": "answer_mentions_threshold",
+          "pass": true,
+          "detail": "以下是当前有效的退款政策（版本 refund-cancel-v1，人民币演示用例）：\n\n**申请条件**\n- 需核验客户身份和订单归属\n- 需在订单创建后 **7×24 小时内**提交（执行前仍会复核）\n- 可进入资格检查的订单状态：已支付、处理中、已发货、已签收、已完成；其他状态不满足当前退款条件\n- 金额须大于 0 且不超过订单总额；不填金额时默认按订单总额\n\n**重复申请**\n- 若已有待处"
+        },
+        {
+          "assertion": "no_business_write",
+          "pass": true,
+          "detail": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "model_requests": 3
+    },
+    "S2": {
+      "verdict": "pass",
+      "assertions": [
+        {
+          "assertion": "http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "search_knowledge_base_selected",
+          "pass": true,
+          "detail": [
+            "search_knowledge_base"
+          ]
+        },
+        {
+          "assertion": "no_fabricated_arrival_time",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "assertion": "states_boundary",
+          "pass": true,
+          "detail": "无法核实"
+        },
+        {
+          "assertion": "retrieval_evidence_recorded",
+          "pass": true,
+          "detail": {
+            "retrieval_status": "low_confidence",
+            "citations": 0
+          }
+        },
+        {
+          "assertion": "no_business_write",
+          "pass": true,
+          "detail": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "model_requests": 3
+    },
+    "S4": {
+      "verdict": "pass",
+      "assertions": [
+        {
+          "assertion": "apply_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "request_refund_selected",
+          "pass": true,
+          "detail": [
+            "request_refund"
+          ]
+        },
+        {
+          "assertion": "action_receipt_present",
+          "pass": true,
+          "detail": 1
+        },
+        {
+          "assertion": "apply_status_awaiting_approval",
+          "pass": true,
+          "detail": "awaiting_approval"
+        },
+        {
+          "assertion": "apply_amount_600",
+          "pass": true,
+          "detail": "600"
+        },
+        {
+          "assertion": "pre_approval_execution_result_null",
+          "pass": true,
+          "detail": {
+            "success": true,
+            "status": "awaiting_approval",
+            "action_id": "act_d2dd01b5fde9424b",
+            "action": {
+              "action_id": "act_d2dd01b5fde9424b",
+              "action_type": "refund",
+              "user_id": "customer-1",
+              "order_id": "ORD-H11-APPROVAL",
+              "amount": "600",
+              "policy_decision": {
+                "action": "refund",
+                "decision": "require_approval",
+                "reason_code": "amount_requires_approval",
+                "policy_version": "refund-cancel-v1",
+                "explanation": "退款金额超过自动处理阈值 500.00",
+                "order_id": "ORD-H11-APPROVAL",
+                "amount": "600",
+                "evaluated_at": "2026-10-25T09:16:19.182880Z",
+                "requires_approval": true,
+                "metadata": {}
+              },
+              "policy_version": "refund-cancel-v1",
+              "status": "awaiting_approval",
+              "created_at": "2026-10-25T09:16:19.182880Z",
+              "updated_at": "2026-10-25T09:16:19.182880Z",
+              "idempotency_key": "auto_51edb74be642fb01199cf878a1bbc4e3",
+              "request_id": "87cdfb6b",
+              "error_code": null,
+              "error_message": null,
+              "execution_result": null,
+              "reviewed_by": null,
+              "requested_by": "e2e-customer-1"
+            },
+            "error_code": null,
+            "message": null,
+            "reused": false
+          }
+        },
+        {
+          "assertion": "pre_approval_executor_calls_zero",
+          "pass": true,
+          "detail": 0
+        },
+        {
+          "assertion": "reviewer_approve_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "approved_completed",
+          "pass": true,
+          "detail": "completed"
+        },
+        {
+          "assertion": "approved_execution_result",
+          "pass": true,
+          "detail": {
+            "simulated": true,
+            "operation": "refund",
+            "order_id": "ORD-H11-APPROVAL",
+            "amount": "600",
+            "status": "completed",
+            "refund_id": "REF-act_d2dd01b5fde9424b",
+            "refund_status": "pending"
+          }
+        },
+        {
+          "assertion": "post_approval_executor_calls_one",
+          "pass": true,
+          "detail": 1
+        },
+        {
+          "assertion": "repeat_approve_reused",
+          "pass": true,
+          "detail": true
+        },
+        {
+          "assertion": "repeat_approve_no_second_execution",
+          "pass": true,
+          "detail": 1
+        },
+        {
+          "assertion": "query_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "get_refund_status_selected",
+          "pass": true,
+          "detail": [
+            "get_refund_status"
+          ]
+        },
+        {
+          "assertion": "refund_record_pending",
+          "pass": true,
+          "detail": {
+            "REF-act_d2dd01b5fde9424b": {
+              "refund_id": "REF-act_d2dd01b5fde9424b",
+              "order_id": "ORD-H11-APPROVAL",
+              "customer_id": "customer-1",
+              "status": "pending",
+              "amount": "600",
+              "currency": "CNY",
+              "reason": "simulated_refund_request",
+              "created_at": "2026-10-25T09:16:20.632567Z",
+              "updated_at": "2026-10-25T09:16:20.632567Z"
+            }
+          }
+        },
+        {
+          "assertion": "order_refund_pending",
+          "pass": true,
+          "detail": "refund_pending"
+        },
+        {
+          "assertion": "answer_distinguishes_pending",
+          "pass": true,
+          "detail": "您的退款当前状态是**待审核（pending）**。\n\n- 退款单号：REF-act_d2dd01b5fde9424b\n- 订单号：ORD-H11-APPROVAL\n- 申请金额：600 元（CNY）\n- 提交时间：2026-10-25 09:16（UTC）\n\n说明：因为金额超过 500 元自动处理阈值，需要人工审核，目前仍在等待审核结论。**待审核不等于退款已通过或资金已到账**，最终结果以审核结论为准。\n\n需要我帮您做其他查询吗？"
+        }
+      ],
+      "model_requests": 4
+    }
+  },
+  "model_ledger_before": {
+    "requests": 0,
+    "charged_or_reserved_usd": 0.0,
+    "halted": false
+  },
+  "preflight": "pass",
+  "preflight_assertions": [
+    {
+      "assertion": "anonymous_trace",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "assertion": "customer_trace",
+      "pass": true,
+      "detail": 403
+    },
+    {
+      "assertion": "admin_trace",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "anonymous_chat_401",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "assertion": "identity_mismatch_403",
+      "pass": true,
+      "detail": 403
+    }
+  ],
+  "model_ledger_after": {
+    "requests": 10,
+    "charged_or_reserved_usd": 0.010339200000000002,
+    "halted": false
+  }
+}

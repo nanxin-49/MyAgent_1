@@ -24,8 +24,10 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Depends
 from core.auth import Principal, get_principal, require_admin, require_reviewer, customer_identity
+from core.checkpoint import ActionCheckpoint, CheckpointService, reconcile_checkpoint
+from core.checkpoint_resume import CheckpointResumer
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -54,6 +56,9 @@ _monitor      = None
 _evaluator    = None
 _skill_manager = None
 _action_service = None
+_checkpoint_service = None
+_action_store = None
+_checkpoint_store = None
 
 def _anthropic_cfg() -> Dict[str, Any]:
     key = os.getenv("ANTHROPIC_API_KEY", "")
@@ -72,13 +77,16 @@ def _anthropic_cfg() -> Dict[str, Any]:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _orchestrator, _memory, _tool_manager, _monitor, _evaluator, _skill_manager, _action_service
+    global _checkpoint_service, _action_store, _checkpoint_store
 
     print(BANNER, flush=True)
 
     from agents.support_agent import SupportRuntime
     from agents.tools import build_shared_rag_tools
     from agents.tools import build_action_tools, build_business_tools
-    from actions import ActionService, InMemoryBusinessActionBackend
+    from actions import (ActionService, InMemoryBusinessActionBackend,
+                         RedisActionStore, RedisCheckpointStore)
+    from core.checkpoint import CheckpointService
     from core.intent_recognizer import IntentRecognizer
     from evaluation.evaluator import EndToEndEvaluator
     from evaluation.runtime import EvaluationRuntimeFactory, EVALUATION_PRINCIPAL
@@ -180,10 +188,21 @@ async def lifespan(app: FastAPI):
         business_data = json.load(handle)
     business_backend = InMemoryBusinessBackend(business_data)
     action_backend = InMemoryBusinessActionBackend(business_backend.state)
+    redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    _action_store = RedisActionStore(
+        redis_url,
+        prefix=os.getenv("CARTCARE_ACTION_PREFIX", "cartcare:actions"),
+    )
     _action_service = ActionService(
         business_backend=business_backend,
         action_backend=action_backend,
+        store=_action_store,
     )
+    _checkpoint_store = RedisCheckpointStore(
+        redis_url,
+        prefix=os.getenv("CARTCARE_CHECKPOINT_PREFIX", "cartcare:checkpoints"),
+    )
+    _checkpoint_service = CheckpointService(_checkpoint_store)
     business_tools = build_business_tools(business_backend)
     business_tools.update(build_action_tools(_action_service))
     logger.info(
@@ -229,6 +248,10 @@ async def lifespan(app: FastAPI):
     await _monitor.stop()
     if _memory is not None:
         await _memory.close()
+    if _action_store is not None:
+        _action_store.close()
+    if _checkpoint_store is not None:
+        _checkpoint_store.close()
     if _orchestrator is not None:
         await _orchestrator.close()
     logger.info("CartCare 已关闭")
@@ -350,12 +373,42 @@ class RecentToolTracesResponse(BaseModel):
     items: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class CheckpointResumeResponse(BaseModel):
+    request_id: str
+    conv_id: str
+    status: str
+    response: str
+    action_results: List[ActionResult] = Field(default_factory=list)
+    memory_write_status: str = "not_attempted"
+    already_resumed: bool = False
+
+
 # ── 路由 ──────────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
+    """Liveness only; dependency readiness is exposed by /ready."""
     if _orchestrator is None:
         raise HTTPException(503, "服务未就绪")
     return {"status": "ok", "agents": _orchestrator.get_stats()}
+
+
+@app.get("/ready")
+async def ready():
+    """Readiness for Redis and Chroma without calling the model."""
+    checks = {"orchestrator": _orchestrator is not None,
+              "redis": False, "chroma": False}
+    probe = getattr(_memory, "readiness", None)
+    if callable(probe):
+        try:
+            dependencies = await probe()
+        except Exception:
+            dependencies = {}
+        if isinstance(dependencies, dict):
+            checks["redis"] = bool(dependencies.get("redis"))
+            checks["chroma"] = bool(dependencies.get("chroma"))
+    ready_now = all(checks.values())
+    body = {"status": "ready" if ready_now else "not_ready", "checks": checks}
+    return body if ready_now else JSONResponse(status_code=503, content=body)
 
 
 @app.get("/skills", tags=["Skills"], dependencies=[Depends(require_admin)])
@@ -430,6 +483,12 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
     )
     confirmed_completed = confirmed_completed or result.handoff.handoff_created
     warning_codes = []
+    if _checkpoint_service is not None:
+        try:
+            _checkpoint_service.record_result(result, conv_id=conv_id, user_id=user_id)
+        except Exception:
+            logger.warning("checkpoint_write_failed request_id=%s", result.request_id)
+            warning_codes.append("checkpoint_write_failed")
 
     # Extend the existing bounded trace with counts, never raw memory or prompts.
     trace = _orchestrator.get_tool_trace(result.request_id)
@@ -473,7 +532,7 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
 
     # 5. 异步更新用户画像（不阻塞响应）
     if memory_observation["write_status"] == "completed":
-        asyncio.create_task(_memory.update_profile(user_id, conv_id))
+        asyncio.create_task(_memory.update_profile(user_id, conv_id, req.message))
         memory_observation["profile_update_status"] = "scheduled_unobserved"
 
     retrieval_status, citations = collect_rag_evidence(result.tool_traces)
@@ -515,12 +574,14 @@ async def approve_action(action_id: str, req: ActionCommandRequest,
     """Approve an awaiting demo action; repeated approvals are idempotent."""
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
-    return _action_http_result(_action_service.approve(
+    result = _action_service.approve(
         action_id=action_id,
         user_id=req.user_id or "",
         principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    ))
+    )
+    _update_checkpoint_for_result(action_id, result)
+    return _action_http_result(result)
 
 
 @app.post("/actions/{action_id}/reject", response_model=ActionResult, tags=["Actions"])
@@ -530,12 +591,14 @@ async def reject_action(action_id: str, req: ActionCommandRequest,
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
     user_id = customer_identity(principal, req.user_id)
-    return _action_http_result(_action_service.reject(
+    result = _action_service.reject(
         action_id=action_id,
         user_id=user_id,
         principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    ))
+    )
+    _update_checkpoint_for_result(action_id, result)
+    return _action_http_result(result)
 
 
 @app.post("/actions/{action_id}/resume", response_model=ActionResult, tags=["Actions"])
@@ -545,12 +608,14 @@ async def resume_action(action_id: str, req: ActionCommandRequest,
     if _action_service is None:
         raise HTTPException(503, "服务未就绪")
     user_id = customer_identity(principal, req.user_id)
-    return _action_http_result(_action_service.resume(
+    result = _action_service.resume(
         action_id=action_id,
         user_id=user_id,
         principal=principal,
         request_id=req.request_id or str(uuid.uuid4()),
-    ))
+    )
+    _update_checkpoint_for_result(action_id, result)
+    return _action_http_result(result)
 
 
 @app.get("/actions/{action_id}", response_model=ActionResult, tags=["Actions"])
@@ -567,6 +632,66 @@ def _action_http_result(result: ActionResult) -> ActionResult:
     if result.error_code in statuses:
         raise HTTPException(statuses[result.error_code], "未找到可访问的动作" if statuses[result.error_code] == 404 else result.message)
     return result
+
+
+def _update_checkpoint_for_result(action_id: str, result: ActionResult) -> None:
+    if _checkpoint_service is None or result.action_id is None:
+        return
+    try:
+        _checkpoint_service.update_for_action(
+            result.action_id, result.status.value, result.error_code)
+    except Exception:
+        logger.warning("checkpoint_update_failed action_id=%s", action_id)
+
+
+@app.get("/checkpoints/{request_id}", response_model=ActionCheckpoint, tags=["Checkpoints"])
+async def get_checkpoint(request_id: str, principal: Principal = Depends(get_principal)):
+    """Read an owner-visible approval checkpoint; never exposes Memory or prompts."""
+    if _checkpoint_service is None:
+        raise HTTPException(503, "服务未就绪")
+    user_id = customer_identity(principal)
+    checkpoint = _checkpoint_service.get(request_id)
+    if checkpoint is None or checkpoint.user_id != user_id:
+        raise HTTPException(404, "检查点不存在")
+    observed: Dict[str, tuple[str, Optional[str]]] = {}
+    if _action_service is not None:
+        for item in checkpoint.actions:
+            result = _action_service.get(
+                item.action_id, user_id=user_id, principal=principal)
+            if result.action is not None:
+                observed[item.action_id] = (result.status.value, result.error_code)
+    return reconcile_checkpoint(checkpoint, observed)
+
+
+@app.post("/checkpoints/{request_id}/resume", response_model=CheckpointResumeResponse,
+          tags=["Checkpoints"])
+async def resume_checkpoint(request_id: str, principal: Principal = Depends(get_principal)):
+    """Resume a checkpoint after approval and report back to the original conversation.
+
+    Awaiting actions are not executed here; an independent reviewer must approve them.
+    APPROVED actions execute through ActionService.resume; EXECUTING actions are
+    reconciled from their persisted receipt or failed as execution_unknown.
+    """
+    if _checkpoint_service is None or _action_service is None:
+        raise HTTPException(503, "服务未就绪")
+    user_id = customer_identity(principal)
+    checkpoint = _checkpoint_service.get(request_id)
+    if checkpoint is None or checkpoint.user_id != user_id:
+        raise HTTPException(404, "检查点不存在")
+    resumer = CheckpointResumer(_checkpoint_service, _action_service, _memory)
+    outcome = await resumer.resume(
+        request_id, user_id=user_id, principal=principal)
+    if outcome is None:
+        raise HTTPException(404, "检查点不存在")
+    return CheckpointResumeResponse(
+        request_id=request_id,
+        conv_id=outcome.checkpoint.conv_id,
+        status=outcome.status,
+        response=outcome.response,
+        action_results=outcome.action_results,
+        memory_write_status=outcome.memory_write_status,
+        already_resumed=outcome.already_resumed,
+    )
 
 
 async def _build_knowledge_context(message: str, intent=None, top_k: int = 3) -> tuple[str, bool]:
