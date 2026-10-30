@@ -27,7 +27,7 @@ from core.auth import Principal, get_principal, require_admin, require_reviewer,
 from core.checkpoint import ActionCheckpoint, CheckpointService, reconcile_checkpoint
 from core.checkpoint_resume import CheckpointResumer
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -386,9 +386,29 @@ class CheckpointResumeResponse(BaseModel):
 # ── 路由 ──────────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
+    """Liveness only; dependency readiness is exposed by /ready."""
     if _orchestrator is None:
         raise HTTPException(503, "服务未就绪")
     return {"status": "ok", "agents": _orchestrator.get_stats()}
+
+
+@app.get("/ready")
+async def ready():
+    """Readiness for Redis and Chroma without calling the model."""
+    checks = {"orchestrator": _orchestrator is not None,
+              "redis": False, "chroma": False}
+    probe = getattr(_memory, "readiness", None)
+    if callable(probe):
+        try:
+            dependencies = await probe()
+        except Exception:
+            dependencies = {}
+        if isinstance(dependencies, dict):
+            checks["redis"] = bool(dependencies.get("redis"))
+            checks["chroma"] = bool(dependencies.get("chroma"))
+    ready_now = all(checks.values())
+    body = {"status": "ready" if ready_now else "not_ready", "checks": checks}
+    return body if ready_now else JSONResponse(status_code=503, content=body)
 
 
 @app.get("/skills", tags=["Skills"], dependencies=[Depends(require_admin)])
@@ -512,7 +532,7 @@ async def chat(req: ChatRequest, principal: Principal = Depends(get_principal)):
 
     # 5. 异步更新用户画像（不阻塞响应）
     if memory_observation["write_status"] == "completed":
-        asyncio.create_task(_memory.update_profile(user_id, conv_id))
+        asyncio.create_task(_memory.update_profile(user_id, conv_id, req.message))
         memory_observation["profile_update_status"] = "scheduled_unobserved"
 
     retrieval_status, citations = collect_rag_evidence(result.tool_traces)

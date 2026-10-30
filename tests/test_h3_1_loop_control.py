@@ -205,8 +205,12 @@ def test_unrecoverable_error_sets_stop_reason():
 
 # ── step timeout ────────────────────────────────────────────────────────────
 
-def test_read_tool_timeout_uses_harness_cap_and_retry_is_bounded():
+def test_read_tool_timeout_uses_harness_cap_without_retrying_worker():
+    calls = 0
+
     def slow(req, args):
+        nonlocal calls
+        calls += 1
         time.sleep(0.02)
         return {"success": True}
 
@@ -222,8 +226,10 @@ def test_read_tool_timeout_uses_harness_cap_and_retry_is_bounded():
     timeout = [trace for trace in result.tool_traces
                if trace.get("error_code") == "timeout"]
     assert timeout, result.tool_traces
-    assert timeout[0]["attempts"] == 2
+    assert timeout[0]["attempts"] == 1
     assert timeout[0]["timeout_s"] == 0.001
+    time.sleep(0.05)
+    assert calls == 1
 
 
 def test_write_tool_is_not_cancelled_by_step_timeout():

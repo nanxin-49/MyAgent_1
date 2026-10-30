@@ -273,12 +273,15 @@ async def execute_tool(contract: Any, params: Any, handler: Callable[[], Any],
                                            attempts=attempt, validated_input=validated,
                                            timeout_s=effective_timeout)
         except asyncio.TimeoutError:
-            result = ToolExecutionResult(False, error_code="timeout", error_type="timeout",
-                                         retryable=contract.idempotent,
-                                         latency_ms=(time.monotonic() - started) * 1000,
-                                         error="执行超时", attempts=attempt, validated_input=validated,
-                                         timeout_s=effective_timeout,
-                                         suggested_action=suggested_action_for("timeout", "timeout"))
+            # A timed-out synchronous handler may still be running in its worker
+            # thread. Retrying here could overlap workers, so surface the timeout
+            # and let the caller/model decide whether to try again later.
+            return ToolExecutionResult(False, error_code="timeout", error_type="timeout",
+                                       retryable=contract.idempotent,
+                                       latency_ms=(time.monotonic() - started) * 1000,
+                                       error="执行超时", attempts=attempt, validated_input=validated,
+                                       timeout_s=effective_timeout,
+                                       suggested_action=suggested_action_for("timeout", "timeout"))
         except Exception as exc:
             code = str(getattr(exc, "code", "execution_failure"))
             result = ToolExecutionResult(False, error_code=code, error_type="execution",

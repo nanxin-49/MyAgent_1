@@ -39,7 +39,7 @@ flowchart TD
 
 - **单 Agent + 工具**：当前电商 workload 未证明多 Agent 协作收益。T10 对比支持简化，生产入口不再经过 Intent / specialist dispatch / supporting Agent / Composer。旧 Multi 仅保留为历史实验。
 - **知识与事实分离**：政策解释来自 RAG；订单、库存和物流必须重新查 Provider，不能从检索文本或历史回复推断当前状态。
-- **统一工具边界**：严格 schema、read / write / dangerous 风险、typed errors、timeout / retry 元数据。仅幂等读工具自动重试可重试错误；危险动作由 ActionService 控制。
+- **统一工具边界**：严格 schema、read / write / dangerous 风险、typed errors、timeout / retry 元数据。仅幂等读工具自动重试已完成的 retryable 错误；超时不自动重试，避免仍在运行的 worker 与重试重叠；危险动作由 ActionService 控制。
 - **可观察而不暴露隐藏推理**：Trace 展示已执行的工具、校验输入、结果摘要与错误，并按步记录每次模型调用的 token、延迟、选择的工具、参数摘要和停止原因；不保存隐藏 chain-of-thought 或原始 Memory 内容。`mcp/` 是自研本地工具层，尚非标准 MCP SDK / transport 接入。
 
 ## End-to-end examples
@@ -107,6 +107,8 @@ A02独立交接数据集：`uv run python -m evaluation.run_handoff_eval`，只�
 
 服务启动后打开 [Live Demo](http://localhost:8000/demo)。无需前端构建或新框架，静态资源由同一 FastAPI 提供。
 
+运维探针：`GET /health` 只表示进程存活；`GET /ready` 检查 Redis 与 Chroma（不调用模型），依赖未就绪时返回 503。Docker app healthcheck 使用 `/ready`，nginx 仍使用 `/health`。
+
 十个一键填入场景：FAQ / policy、order lookup、logistics lookup、inventory clarification、refund allow、refund require approval、refund deny、cancel、ownership violation、unsupported request。选择场景会新建会话；普通连续输入沿用 conv_id。切换 demo user_id 会清空会话号。
 
 使用步骤：
@@ -165,6 +167,7 @@ uv 缓存统一位于 `cash/cache/uv`（由 pyproject.toml 配置），pytest �
 - demo `user_id`，非正式认证；审批 API 仍沿用演示身份模型。
 - demo / in-memory commerce Action backend；external commerce / payment API 未接入。
 - PendingAction 与审批检查点持久化在 Redis（单实例；多 worker 并发不承诺）；审批前/中/执行中/执行后的进程崩溃可由检查点恢复，执行已派发但无回执时按 `execution_unknown` 失败且不自动重放；恢复回执用 `wm:once:` marker 最多写一次；有界 Trace 仍随进程重启丢失，默认只保留最近 200 个请求；模拟业务表仍是内存 fixture。
+- Memory 压缩与画像更新使用进程内 `asyncio` 锁：单实例下避免压缩丢消息和画像 read-modify-write 覆盖，多 worker 仍不承诺；读工具超时不会自动重试，避免后台 worker 重叠。
 - character n-gram lexical embedding baseline；阈值、语义召回和更大知识集效果仍需验证。
 - unsupported escalation 仍需改进；ownership 严格在线任务证据有缺口，不能混同为确定性安全层未检查。
 - long-term expired Chroma records 尚无后台物理清理任务；读取时过滤有效期。

@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
+from weakref import WeakValueDictionary
 
 import chromadb
 import redis.asyncio as redis
@@ -118,6 +119,9 @@ class MemoryManager:
             message = f"无法连接 ChromaDB Server: {chroma_host}:{chroma_port}"
             logger.error(message)
             raise ConnectionError(message) from exc
+        self._chroma = chroma
+        self._conversation_locks: WeakValueDictionary = WeakValueDictionary()
+        self._profile_locks: WeakValueDictionary = WeakValueDictionary()
 
         # 情景记忆：存储历史对话片段
         self._episodic = chroma.get_or_create_collection(
@@ -146,19 +150,20 @@ class MemoryManager:
         msg = Message(role=role, content=self._safe_text(content), metadata=clean_metadata)
         key = self._wm_key(user_id, conv_id)
 
-        # 追加到 Redis 列表（左推，最新在前）
-        await self._redis.lpush(key, json.dumps({
-            "role":      msg.role.value,
-            "content":   msg.content,
-            "ts":        msg.timestamp.isoformat(),
-            "metadata":  msg.metadata,
-        }))
-        await self._redis.expire(key, 86400)  # 24h TTL
+        async with self._conversation_lock(key):
+            # 追加到 Redis 列表（左推，最新在前）
+            await self._redis.lpush(key, json.dumps({
+                "role":      msg.role.value,
+                "content":   msg.content,
+                "ts":        msg.timestamp.isoformat(),
+                "metadata":  msg.metadata,
+            }))
+            await self._redis.expire(key, 86400)  # 24h TTL
 
-        # 超过压缩阈值时触发压缩（评测可关闭；默认开启）
-        if (getattr(self, "_context_compression", True)
-                and await self._redis.llen(key) >= self.COMPRESS_AT):
-            await self._compress(user_id, conv_id)
+            # 超过压缩阈值时触发压缩（评测可关闭；默认开启）
+            if (getattr(self, "_context_compression", True)
+                    and await self._redis.llen(key) >= self.COMPRESS_AT):
+                await self._compress_locked(user_id, conv_id)
 
     async def add_message_once(
         self,
@@ -186,46 +191,54 @@ class MemoryManager:
         msg = Message(role=role, content=self._safe_text(content), metadata=clean_metadata)
         key = self._wm_key(user_id, conv_id)
         marker = self._once_key(user_id, conv_id, idempotency_key)
-        length = await self._redis.eval(
-            _ADD_MESSAGE_ONCE_LUA, 2, key, marker,
-            json.dumps({
-                "role":      msg.role.value,
-                "content":   msg.content,
-                "ts":        msg.timestamp.isoformat(),
-                "metadata":  msg.metadata,
-            }),
-            86400,
-            86400,
-        )
-        if not length:
-            return False
-        if (getattr(self, "_context_compression", True)
-                and int(length) >= self.COMPRESS_AT):
-            await self._compress(user_id, conv_id)
-        return True
 
-    async def update_profile(self, user_id: str, conv_id: str) -> None:
-        """Persist only explicit, allowlisted communication preferences."""
+        async with self._conversation_lock(key):
+            length = await self._redis.eval(
+                _ADD_MESSAGE_ONCE_LUA, 2, key, marker,
+                json.dumps({
+                    "role":      msg.role.value,
+                    "content":   msg.content,
+                    "ts":        msg.timestamp.isoformat(),
+                    "metadata":  msg.metadata,
+                }),
+                86400,
+                86400,
+            )
+            if not length:
+                return False
+            if (getattr(self, "_context_compression", True)
+                    and int(length) >= self.COMPRESS_AT):
+                await self._compress_locked(user_id, conv_id)
+            return True
+
+    async def update_profile(self, user_id: str, conv_id: str,
+                             message: Optional[str] = None) -> None:
+        """Persist allowlisted preferences from the triggering user message."""
         user_id, conv_id = self._safe_text(user_id), self._safe_text(conv_id)
-        messages = await self._get_working_memory(user_id, conv_id)
-        latest_user = next((m for m in reversed(messages) if m.role is MsgRole.USER), None)
-        updates = explicit_preferences(latest_user.content) if latest_user else {}
+        if message is not None:
+            updates = explicit_preferences(self._safe_text(message))
+        else:
+            messages = await self._get_working_memory(user_id, conv_id)
+            latest_user = next((m for m in reversed(messages) if m.role is MsgRole.USER), None)
+            updates = explicit_preferences(latest_user.content) if latest_user else {}
         if not updates:
             return
         try:
-            preferences = validated_preferences((await self._get_profile(user_id)).get("preferences"))
-            preferences.update(updates)
-            now = datetime.now(timezone.utc)
-            await asyncio.to_thread(
-                self._profile.upsert,
-                ids=[self._profile_doc_id(user_id)],
-                documents=[json.dumps({"preferences": preferences}, ensure_ascii=False)],
-                embeddings=[embed_query("用户偏好")],
-                metadatas=[{"user_id": user_id, "conv_id": conv_id,
-                            "source": "explicit_user_statement", "memory_type": "user_profile",
-                            "created_at": now.isoformat(),
-                            "expires_at": (now + timedelta(days=self.PROFILE_TTL_DAYS)).isoformat()}],
-            )
+            async with self._profile_lock(user_id):
+                preferences = validated_preferences(
+                    (await self._get_profile(user_id)).get("preferences"))
+                preferences.update(updates)
+                now = datetime.now(timezone.utc)
+                await asyncio.to_thread(
+                    self._profile.upsert,
+                    ids=[self._profile_doc_id(user_id)],
+                    documents=[json.dumps({"preferences": preferences}, ensure_ascii=False)],
+                    embeddings=[embed_query("用户偏好")],
+                    metadatas=[{"user_id": user_id, "conv_id": conv_id,
+                                "source": "explicit_user_statement", "memory_type": "user_profile",
+                                "created_at": now.isoformat(),
+                                "expires_at": (now + timedelta(days=self.PROFILE_TTL_DAYS)).isoformat()}],
+                )
         except Exception as ex:
             logger.warning(f"更新用户画像失败: {ex}")
 
@@ -267,6 +280,11 @@ class MemoryManager:
     # ── 压缩（防止 context 爆炸）─────────────────────────────────────────────
 
     async def _compress(self, user_id: str, conv_id: str) -> None:
+        """Serialize compression with writers for the same conversation."""
+        async with self._conversation_lock(self._wm_key(user_id, conv_id)):
+            await self._compress_locked(user_id, conv_id)
+
+    async def _compress_locked(self, user_id: str, conv_id: str) -> None:
         """Atomically retain five recent messages and a bounded safe reference summary."""
         messages = await self._get_working_memory(user_id, conv_id)
         if len(messages) < self.COMPRESS_AT:
@@ -359,6 +377,38 @@ class MemoryManager:
     async def close(self) -> None:
         """关闭异步 Redis 连接。"""
         await self._redis.aclose()
+
+    async def readiness(self) -> Dict[str, bool]:
+        """Cheap dependency probe for readiness; never calls the model."""
+        checks = {"redis": False, "chroma": False}
+        try:
+            checks["redis"] = bool(await self._redis.ping())
+        except Exception:
+            pass
+        chroma = getattr(self, "_chroma", None)
+        if chroma is not None:
+            try:
+                checks["chroma"] = bool(await asyncio.to_thread(chroma.heartbeat))
+            except Exception:
+                pass
+        return checks
+
+    def _conversation_lock(self, key: str) -> asyncio.Lock:
+        return self._named_lock("_conversation_locks", key)
+
+    def _profile_lock(self, user_id: str) -> asyncio.Lock:
+        return self._named_lock("_profile_locks", f"profile:{user_id}")
+
+    def _named_lock(self, attribute: str, key: str) -> asyncio.Lock:
+        locks = getattr(self, attribute, None)
+        if locks is None:
+            locks = WeakValueDictionary()
+            setattr(self, attribute, locks)
+        lock = locks.get(key)
+        if lock is None:
+            lock = asyncio.Lock()
+            locks[key] = lock
+        return lock
 
     async def delete_session(self, user_id: str, conv_id: str) -> None:
         """Forget one session without deleting the user's explicit preferences."""

@@ -20,6 +20,7 @@ def test_live_memory_isolation_compression_and_long_term_metadata():
 
     async def scenario():
         memory = MemoryManager(redis_url=redis_url, chroma_host="127.0.0.1", chroma_port=8001)
+        assert await memory.readiness() == {"redis": True, "chroma": True}
         suffix = uuid.uuid4().hex
         alice, bob, session, other = (f"t11-a-{suffix}", f"t11-b-{suffix}",
                                       f"t11-c-{suffix}", f"t11-d-{suffix}")

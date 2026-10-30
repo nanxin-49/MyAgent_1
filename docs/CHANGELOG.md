@@ -248,3 +248,14 @@
 - **验证**：全量 `pytest` **765 passed / 12 skipped**（新增 9 单测 + 7 live skip）；H4-1 live 回归 **2 passed**；Node **12 passed**；`git diff --check` 通过。
 - **限制**：执行中已提交但无回执只能按 unknown 收口，模拟业务表不持久；unknown 动作不能用原幂等键自动重试；单实例；GET 对账不写存储；未启动完整 uvicorn 重启；孤立 idem 键问题仍保留。
 - **状态**：H4-2 `todo → verify`。
+
+## 2026-10-27 — H4-3 已知风险收口
+
+- **N08 修复**：`MemoryManager` 增加按会话的进程内 `asyncio.Lock`；`add_message`/`add_message_once` 在锁内完成写入与压缩触发，`_compress` 拆为取锁入口和 `_compress_locked`。受控 interleaving 测试在修复前失败，修复后 6 条并发消息全部保留。
+- **N09 修复**：`update_profile(user_id, conv_id, message=None)` 绑定触发消息；`api/main.py` 后台任务传入 `req.message`；按用户 `asyncio.Lock` 串行化画像 `_get_profile` → merge → upsert。测试覆盖触发消息错绑与并发 RMW。
+- **N11 收口**：`core/tool_contract.py` 超时分支立即返回，不再自动重试；`retryable` 仍为 True 但 `attempts=1`，避免超时 worker 与重试重叠。H3-1 超时测试期望从 2 改为 1，新增 `execute_tool` 同步读超时测试。
+- **N14 修复**：`MemoryManager.readiness()` 检查 Redis ping 与 Chroma heartbeat；`GET /health` 保持 liveness，新增 `GET /ready` 返回 200/503 依赖检查；Dockerfile 与 compose 的 app healthcheck 改为 `/ready`，nginx 仍走 `/health`。
+- **C03 复核**：多 action 回执专项测试通过，无实现改动，记 `verified_no_fix`。
+- **验证**：全量 `pytest` **775 passed / 12 skipped**；H4-2 + H4-1 live **9 passed**；Memory live（含 readiness）**1 passed**；Node **12 passed**；`uv lock --check`、`git diff --check` 通过。未重建应用容器，未调用真实模型。
+- **限制**：会话/画像锁是进程内锁，多 worker 不承诺；`/ready` 每次探测 Chroma heartbeat；超时后需模型显式重试；Docker `/ready` 健康检查留 H5-1 验证。
+- **状态**：H4-3 `todo → verify`。
