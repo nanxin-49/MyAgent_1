@@ -2,6 +2,8 @@
 mcp/knowledge_assets/default_business_v1.json -text
 mcp/knowledge_assets/default_business_v1.approval.json -text
 evaluation/reports/hardening/A05/default-kb-publication-20261013/** -text
+# Byte-hashed by tests/test_rag_gold_v2_candidate.py; keep LF in every checkout.
+docs/engineering/A05-rag-evaluation.md -text
 # Frozen evaluation inputs and historical reports were sealed as raw CRLF bytes.
 # Keep those bytes in Git so their recorded SHA256 values survive every checkout.
 evaluation/answerability/** -text whitespace=cr-at-eol
