@@ -259,3 +259,14 @@
 - **验证**：全量 `pytest` **775 passed / 12 skipped**；H4-2 + H4-1 live **9 passed**；Memory live（含 readiness）**1 passed**；Node **12 passed**；`uv lock --check`、`git diff --check` 通过。未重建应用容器，未调用真实模型。
 - **限制**：会话/画像锁是进程内锁，多 worker 不承诺；`/ready` 每次探测 Chroma heartbeat；超时后需模型显式重试；Docker `/ready` 健康检查留 H5-1 验证。
 - **状态**：H4-3 `todo → verify`。
+
+## 2026-10-30 — H5-1 固定候选版本与干净环境验证
+
+- **候选**：`aba17f4`（H4-3 + `.gitattributes` 字节稳定性修复），分支 `claude/cartcare-harness`，PR #3。
+- **发现并修复**：Windows 干净克隆 `731c247` 时，`docs/engineering/A05-rag-evaluation.md` 因 `core.autocrlf=true` 检出为 CRLF，导致 `test_rag_gold_v2_candidate` 的 SHA256 断言失败；在 `.gitattributes` 增加 `docs/engineering/A05-rag-evaluation.md -text`，提交 `aba17f4`。
+- **干净检出**：最终克隆 `aba17f4`，无 `.env`；`uv lock --check`、`uv sync --locked --dev --python 3.12` 通过；全量 **775 passed / 12 skipped**；Node **12 passed**。
+- **核心链路**：干净检出中 H4-1 + H4-2 live **9 passed**；Memory live（含 readiness）**1 passed**；support/action/checkpoint/crash/composite 确定性 **74 passed**。
+- **远端 CI**：PR #3 run [41021860137](https://github.com/nanxin-49/MyAgent_1/actions/runs/41021860137) 在 `aba17f4` 上 **success**。
+- **限制**：未调用真实模型；未重建应用容器验证 `/ready` healthcheck；分支 push 只有伴随 PR 才触发 workflow。
+- **Tag**：建议 `v0.1.0-candidate-aba17f4`，由用户创建。
+- **状态**：H5-1 `todo → verify`。
