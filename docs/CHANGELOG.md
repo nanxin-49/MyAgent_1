@@ -270,3 +270,14 @@
 - **限制**：未调用真实模型；未重建应用容器验证 `/ready` healthcheck；分支 push 只有伴随 PR 才触发 workflow。
 - **Tag**：建议 `v0.1.0-candidate-aba17f4`，由用户创建。
 - **状态**：H5-1 `todo → verify`。
+
+## 2026-11-06 — H5-2 README 首屏重写、内部材料下沉、旧命名迁移
+
+- **README**：重写为定位、能力地图（Harness 七层 + Agent 六项）、实测结果、Demo、快速开始、已知限制六块；指标标注模型/样本/模拟后端，Demo 视频保留占位。
+- **新文档**：`docs/architecture.md`、`docs/evaluation.md`、`docs/operations.md`、`docs/limitations.md`、`docs/naming.md`；README 只保留索引。
+- **下沉**：详细 Safety/RAG/Memory、T10/T11、A05 hardening、Windows-only 启动和本机归档引用移出 README；Wiki 定位页缩短并链接 docs，核心 Wiki 清理归档引用。
+- **命名**：新增 `core/env.py`；生产代码使用 `CARTCARE_*` 并回退旧 `ECHOMIND_*`；Compose 服务/容器/网络、nginx、Prometheus、Dockerfile 用户、部署脚本和 `.env.example` 迁移到 `cartcare-*` / `cartcare123`。
+- **兼容**：历史 answerability 脚本、旧 Multi env 清单、历史报告/CHANGELOG 保留旧名；`docs/naming.md` 说明迁移步骤和历史例外。
+- **验证**：`tests/test_naming_compat.py` **7 passed**；全量 `pytest` **782 passed / 12 skipped**；Node **12 passed**；`docker compose config`、`git diff --check` 通过。
+- **限制**：未重建 Docker 镜像；旧 `echomind-*` 容器迁移需停旧栈并保留数据卷；未调用真实模型。
+- **状态**：H5-2 `todo → verify`。

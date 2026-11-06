@@ -1,6 +1,6 @@
 # CartCare Skills 文档
 
-CartCare 启动时从 `ECHOMIND_SKILLS_DIR`（默认仓库 `skills`）加载 Skills。当前 `/chat` 使用 SingleSupportAgent；`AllRoleSkills` 忽略兼容用 `agents` 标签，按关键词匹配后经 BaseAgent 注入同一个 Agent 的 system prompt，不执行多个独立 Agent 分流。明确转人工走确定性交接门，不调用模型，因此 Skill 匹配不等于该请求一定发生模型注入。
+CartCare 启动时从 `CARTCARE_SKILLS_DIR`（默认仓库 `skills`；兼容旧名 `ECHOMIND_SKILLS_DIR`）加载 Skills。当前 `/chat` 使用 SingleSupportAgent；`AllRoleSkills` 忽略兼容用 `agents` 标签，按关键词匹配后经 BaseAgent 注入同一个 Agent 的 system prompt，不执行多个独立 Agent 分流。明确转人工走确定性交接门，不调用模型，因此 Skill 匹配不等于该请求一定发生模型注入。
 
 Skills 只提供解释和参数收集指导，不能代替 Provider 动态事实、PolicyEngine/ActionService 的资格、金额、权限或审批控制。当前知识正文及模拟交接/退款能力边界为准；没有证据不补全未接入商城能力或外部业务规则。默认总预算5000、单 Skill 正文上限3200字符；重要边界靠前，修改后应验证真实注入而非只搜索文本。本轮 API保持停止，不调用实际 reload 接口。
 

@@ -4,7 +4,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    cluster: 'echomind'
+    cluster: 'cartcare'
     environment: 'production'
 
 rule_files:
@@ -12,11 +12,11 @@ rule_files:
 
 scrape_configs:
   # CartCare 主应用指标
-  - job_name: 'echomind-app'
+  - job_name: 'cartcare-app'
     static_configs:
-      - targets: ['echomind:8000']
+      - targets: ['cartcare:8000']
         labels:
-          service: 'echomind'
+          service: 'cartcare'
     scrape_interval: 10s
     metrics_path: '/metrics'
 

@@ -75,21 +75,27 @@ class AgentProfile:
     max_tokens: int = 1024
 
 
-def _env_float(name: str, default: float) -> float:
-    """读取可选浮点配置；错误配置不应阻塞服务启动。"""
+def _env_float(name: str, default: float, legacy: str | None = None) -> float:
+    """读取可选浮点配置；新名优先，旧 EchoMind 名回退。"""
+    raw = os.getenv(name)
+    if raw is None and legacy:
+        raw = os.getenv(legacy)
     try:
-        return float(os.getenv(name, str(default)))
+        return float(raw if raw is not None else default)
     except (TypeError, ValueError):
-        logger.warning("忽略非法浮点配置 %s=%r", name, os.getenv(name))
+        logger.warning("忽略非法浮点配置 %s=%r", name, raw)
         return default
 
 
-def _env_int(name: str, default: int) -> int:
-    """读取可选整数配置；错误配置不应阻塞服务启动。"""
+def _env_int(name: str, default: int, legacy: str | None = None) -> int:
+    """读取可选整数配置；新名优先，旧 EchoMind 名回退。"""
+    raw = os.getenv(name)
+    if raw is None and legacy:
+        raw = os.getenv(legacy)
     try:
-        return int(os.getenv(name, str(default)))
+        return int(raw if raw is not None else default)
     except (TypeError, ValueError):
-        logger.warning("忽略非法整数配置 %s=%r", name, os.getenv(name))
+        logger.warning("忽略非法整数配置 %s=%r", name, raw)
         return default
 
 
@@ -913,8 +919,10 @@ class ResponseComposer:
         try:
             response = await self._client.messages.create(
                 model=self._model,
-                max_tokens=_env_int("ECHOMIND_COMPOSER_MAX_TOKENS", 1000),
-                temperature=_env_float("ECHOMIND_COMPOSER_TEMPERATURE", 0.1),
+                max_tokens=_env_int("CARTCARE_COMPOSER_MAX_TOKENS", 1000,
+                                    "ECHOMIND_COMPOSER_MAX_TOKENS"),
+                temperature=_env_float("CARTCARE_COMPOSER_TEMPERATURE", 0.1,
+                                       "ECHOMIND_COMPOSER_TEMPERATURE"),
                 messages=[{"role": "user", "content": prompt}],
             )
             content = extract_text_content(response.content).strip()
@@ -975,7 +983,8 @@ class AgentOrchestrator:
         self._skill_manager = skill_manager
         self._composer = ResponseComposer(client, model, skill_manager)
         self._shared_tools: Dict[str, AgentToolSpec] = {}
-        self._recent_tool_traces = deque(maxlen=_env_int("ECHOMIND_TOOL_TRACE_MAX", 200))
+        self._recent_tool_traces = deque(maxlen=_env_int(
+            "CARTCARE_TOOL_TRACE_MAX", 200, "ECHOMIND_TOOL_TRACE_MAX"))
 
         # Agent 池：每种类型可有多个实例（水平扩展）
         self._pool: Dict[AgentType, List[BaseAgent]] = {
@@ -998,8 +1007,9 @@ class AgentOrchestrator:
         可使用更强模型，通用接待可使用更快模型，升级节点本身不需要调用 LLM。
         """
         profile = agent_cls.profile
-        env_name = f"ECHOMIND_{agent_cls.agent_type.value.upper()}_MODEL"
-        model = os.getenv(env_name, "").strip() or profile.model
+        role = agent_cls.agent_type.value.upper()
+        model = (os.getenv(f"CARTCARE_{role}_MODEL")
+                 or os.getenv(f"ECHOMIND_{role}_MODEL", "")).strip() or profile.model
         configured_profile = replace(profile, model=model) if model else profile
         return agent_cls(client, default_model, skill_manager, profile=configured_profile)
 

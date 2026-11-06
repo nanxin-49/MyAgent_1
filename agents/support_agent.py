@@ -1,7 +1,6 @@
 """Production Single Support Agent, with backend-owned A02 handoff receipts."""
 from dataclasses import dataclass, replace, field
 from collections import deque
-import os
 import re
 import time
 
@@ -9,6 +8,7 @@ from anthropic import AsyncAnthropic
 from agents.agent_orchestrator import AgentProfile, AgentType, BaseAgent, GeneralAgent
 from agents.tools import general_tools, technical_tools, billing_tools, escalation_tools
 from core.model_observation import ObservedClient, model_events
+from core.env import compat_env_int
 from core.handoff import HandoffService, HandoffResult, explicit_handoff, handoff_reply
 from core.harness import HarnessConfig
 from core.output_consistency import evaluate_action_claims
@@ -180,7 +180,8 @@ class SupportRuntime:
         self._harness = harness or HarnessConfig()
         self._tools = {}
         self.handoff_service = HandoffService()
-        self._traces = deque(maxlen=int(os.getenv("ECHOMIND_TOOL_TRACE_MAX", "200")))
+        self._traces = deque(maxlen=compat_env_int(
+            "CARTCARE_TOOL_TRACE_MAX", "ECHOMIND_TOOL_TRACE_MAX", 200))
         self._total, self._success, self._total_ms = 0, 0, 0.0
 
     def set_shared_tools(self, tools):

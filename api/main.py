@@ -26,6 +26,7 @@ from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Depends
 from core.auth import Principal, get_principal, require_admin, require_reviewer, customer_identity
 from core.checkpoint import ActionCheckpoint, CheckpointService, reconcile_checkpoint
 from core.checkpoint_resume import CheckpointResumer
+from core.env import compat_env
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -109,10 +110,12 @@ async def lifespan(app: FastAPI):
     )
 
     # Skills：启动时从目录加载业务能力说明，并在 Agent 调用 LLM 时动态注入。
-    skills_dir = os.getenv("ECHOMIND_SKILLS_DIR", str(pathlib.Path(_ROOT) / "skills"))
+    skills_dir = compat_env("CARTCARE_SKILLS_DIR", "ECHOMIND_SKILLS_DIR",
+                            str(pathlib.Path(_ROOT) / "skills"))
     _skill_manager = SkillManager(
         root_dir=skills_dir,
-        max_prompt_chars=int(os.getenv("ECHOMIND_SKILLS_MAX_PROMPT_CHARS", "5000")),
+        max_prompt_chars=int(compat_env(
+            "CARTCARE_SKILLS_MAX_PROMPT_CHARS", "ECHOMIND_SKILLS_MAX_PROMPT_CHARS", "5000")),
     )
     _skill_manager.load()
 
@@ -237,7 +240,8 @@ async def lifespan(app: FastAPI):
         runtime_factory=EvaluationRuntimeFactory(
             fixture_data=business_data, cfg=cfg, knowledge_tool=knowledge_tool,
             skills_dir=skills_dir,
-            max_prompt_chars=int(os.getenv("ECHOMIND_SKILLS_MAX_PROMPT_CHARS", "5000")),
+            max_prompt_chars=int(compat_env(
+                "CARTCARE_SKILLS_MAX_PROMPT_CHARS", "ECHOMIND_SKILLS_MAX_PROMPT_CHARS", "5000")),
         ),
         evaluation_principal=EVALUATION_PRINCIPAL,
     )

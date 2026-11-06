@@ -161,4 +161,4 @@ git diff --check
 
 ## 16. 品牌兼容
 
-对外名称是 CartCare。运行时的旧标识（`ECHOMIND_*`、`echomind-app`、`echomind-network`）暂时保留。不在无关任务中重命名，只在专门的兼容任务（H5-2）中迁移。
+对外名称是 CartCare。H5-2 已把运行配置迁移到 `CARTCARE_*` / `cartcare-*`；旧标识（`ECHOMIND_*`、`echomind-app`、`echomind-network`）仅作为兼容回退或历史证据保留，不再作为新部署的主名称。
