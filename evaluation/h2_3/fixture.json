@@ -1,0 +1,365 @@
+{
+  "products": {
+    "SKU-H23-A": {
+      "product_id": "SKU-H23-A",
+      "name": "H23 Backpack",
+      "price": "129.90",
+      "currency": "CNY",
+      "active": true
+    },
+    "SKU-H23-B": {
+      "product_id": "SKU-H23-B",
+      "name": "H23 Bottle",
+      "price": "89.00",
+      "currency": "CNY",
+      "active": true
+    },
+    "SKU-H23-C": {
+      "product_id": "SKU-H23-C",
+      "name": "H23 Chair",
+      "price": "500.00",
+      "currency": "CNY",
+      "active": true
+    },
+    "SKU-H23-D": {
+      "product_id": "SKU-H23-D",
+      "name": "H23 Desk",
+      "price": "800.00",
+      "currency": "CNY",
+      "active": true
+    }
+  },
+  "orders": {
+    "ORD-H23-ALLOW-1": {
+      "order_id": "ORD-H23-ALLOW-1",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-H23-A",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-ALLOW-2": {
+      "order_id": "ORD-H23-ALLOW-2",
+      "customer_id": "customer-1",
+      "status": "paid",
+      "items": [
+        {
+          "product_id": "SKU-H23-B",
+          "quantity": 1,
+          "unit_price": "89.00"
+        }
+      ],
+      "total_amount": "89.00",
+      "currency": "CNY",
+      "created_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-ALLOW-3": {
+      "order_id": "ORD-H23-ALLOW-3",
+      "customer_id": "customer-1",
+      "status": "delivered",
+      "items": [
+        {
+          "product_id": "SKU-H23-C",
+          "quantity": 1,
+          "unit_price": "500.00"
+        }
+      ],
+      "total_amount": "500.00",
+      "currency": "CNY",
+      "created_at": "2026-09-29T00:00:00+00:00"
+    },
+    "ORD-H23-APPROVAL-1": {
+      "order_id": "ORD-H23-APPROVAL-1",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-H23-D",
+          "quantity": 1,
+          "unit_price": "800.00"
+        }
+      ],
+      "total_amount": "800.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-APPROVAL-2": {
+      "order_id": "ORD-H23-APPROVAL-2",
+      "customer_id": "customer-1",
+      "status": "processing",
+      "items": [
+        {
+          "product_id": "SKU-H23-D",
+          "quantity": 1,
+          "unit_price": "1200.00"
+        }
+      ],
+      "total_amount": "1200.00",
+      "currency": "CNY",
+      "created_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-EXPIRED": {
+      "order_id": "ORD-H23-EXPIRED",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-H23-A",
+          "quantity": 1,
+          "unit_price": "199.00"
+        }
+      ],
+      "total_amount": "199.00",
+      "currency": "CNY",
+      "created_at": "2026-09-22T00:00:00+00:00"
+    },
+    "ORD-H23-CANCELLED": {
+      "order_id": "ORD-H23-CANCELLED",
+      "customer_id": "customer-1",
+      "status": "cancelled",
+      "items": [
+        {
+          "product_id": "SKU-H23-A",
+          "quantity": 1,
+          "unit_price": "99.00"
+        }
+      ],
+      "total_amount": "99.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-COMPLETED": {
+      "order_id": "ORD-H23-COMPLETED",
+      "customer_id": "customer-1",
+      "status": "completed",
+      "items": [
+        {
+          "product_id": "SKU-H23-B",
+          "quantity": 1,
+          "unit_price": "150.00"
+        }
+      ],
+      "total_amount": "150.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-REFUNDED": {
+      "order_id": "ORD-H23-REFUNDED",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-H23-C",
+          "quantity": 1,
+          "unit_price": "300.00"
+        }
+      ],
+      "total_amount": "300.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-PROCESSING": {
+      "order_id": "ORD-H23-PROCESSING",
+      "customer_id": "customer-1",
+      "status": "processing",
+      "items": [
+        {
+          "product_id": "SKU-H23-D",
+          "quantity": 1,
+          "unit_price": "250.00"
+        }
+      ],
+      "total_amount": "250.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-DELIVERED": {
+      "order_id": "ORD-H23-DELIVERED",
+      "customer_id": "customer-1",
+      "status": "delivered",
+      "items": [
+        {
+          "product_id": "SKU-H23-A",
+          "quantity": 1,
+          "unit_price": "180.00"
+        }
+      ],
+      "total_amount": "180.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-PENDING": {
+      "order_id": "ORD-H23-PENDING",
+      "customer_id": "customer-1",
+      "status": "pending",
+      "items": [
+        {
+          "product_id": "SKU-H23-B",
+          "quantity": 1,
+          "unit_price": "75.00"
+        }
+      ],
+      "total_amount": "75.00",
+      "currency": "CNY",
+      "created_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-OTHER-1": {
+      "order_id": "ORD-H23-OTHER-1",
+      "customer_id": "customer-2",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-H23-A",
+          "quantity": 1,
+          "unit_price": "129.90"
+        }
+      ],
+      "total_amount": "129.90",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    },
+    "ORD-H23-OTHER-2": {
+      "order_id": "ORD-H23-OTHER-2",
+      "customer_id": "customer-2",
+      "status": "shipped",
+      "items": [
+        {
+          "product_id": "SKU-H23-D",
+          "quantity": 1,
+          "unit_price": "800.00"
+        }
+      ],
+      "total_amount": "800.00",
+      "currency": "CNY",
+      "created_at": "2026-09-30T00:00:00+00:00"
+    }
+  },
+  "inventory": {
+    "SKU-H23-A": {
+      "product_id": "SKU-H23-A",
+      "available_quantity": 20,
+      "reserved_quantity": 2,
+      "as_of": "2026-10-02T00:00:00+00:00"
+    },
+    "SKU-H23-B": {
+      "product_id": "SKU-H23-B",
+      "available_quantity": 0,
+      "reserved_quantity": 0,
+      "as_of": "2026-10-02T00:00:00+00:00"
+    },
+    "SKU-H23-C": {
+      "product_id": "SKU-H23-C",
+      "available_quantity": 5,
+      "reserved_quantity": 1,
+      "as_of": "2026-10-02T00:00:00+00:00"
+    },
+    "SKU-H23-D": {
+      "product_id": "SKU-H23-D",
+      "available_quantity": 10,
+      "reserved_quantity": 0,
+      "as_of": "2026-10-02T00:00:00+00:00"
+    }
+  },
+  "shipments": {
+    "ORD-H23-ALLOW-1": {
+      "shipment_id": "SHP-ORD-H23-ALLOW-1",
+      "order_id": "ORD-H23-ALLOW-1",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-ALLOW-1",
+      "status": "in_transit",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-APPROVAL-1": {
+      "shipment_id": "SHP-ORD-H23-APPROVAL-1",
+      "order_id": "ORD-H23-APPROVAL-1",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-APPROVAL-1",
+      "status": "in_transit",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-EXPIRED": {
+      "shipment_id": "SHP-ORD-H23-EXPIRED",
+      "order_id": "ORD-H23-EXPIRED",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-EXPIRED",
+      "status": "in_transit",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-REFUNDED": {
+      "shipment_id": "SHP-ORD-H23-REFUNDED",
+      "order_id": "ORD-H23-REFUNDED",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-REFUNDED",
+      "status": "in_transit",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-OTHER-1": {
+      "shipment_id": "SHP-ORD-H23-OTHER-1",
+      "order_id": "ORD-H23-OTHER-1",
+      "customer_id": "customer-2",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-OTHER-1",
+      "status": "in_transit",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-OTHER-2": {
+      "shipment_id": "SHP-ORD-H23-OTHER-2",
+      "order_id": "ORD-H23-OTHER-2",
+      "customer_id": "customer-2",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-OTHER-2",
+      "status": "in_transit",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-ALLOW-3": {
+      "shipment_id": "SHP-ORD-H23-ALLOW-3",
+      "order_id": "ORD-H23-ALLOW-3",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-ALLOW-3",
+      "status": "delivered",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    },
+    "ORD-H23-DELIVERED": {
+      "shipment_id": "SHP-ORD-H23-DELIVERED",
+      "order_id": "ORD-H23-DELIVERED",
+      "customer_id": "customer-1",
+      "carrier": "demo-carrier",
+      "tracking_number": "TRACK-ORD-H23-DELIVERED",
+      "status": "delivered",
+      "estimated_delivery": "2026-10-04",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    }
+  },
+  "refunds": {
+    "REF-H23-EXISTING": {
+      "refund_id": "REF-H23-EXISTING",
+      "order_id": "ORD-H23-REFUNDED",
+      "customer_id": "customer-1",
+      "status": "pending",
+      "amount": "300.00",
+      "currency": "CNY",
+      "reason": "demo existing",
+      "created_at": "2026-10-01T00:00:00+00:00",
+      "updated_at": "2026-10-01T00:00:00+00:00"
+    }
+  }
+}

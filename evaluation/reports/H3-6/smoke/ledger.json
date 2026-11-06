@@ -1,0 +1,53 @@
+{
+  "requests": 6,
+  "max_requests": 30,
+  "input_tokens": 14412,
+  "output_tokens": 945,
+  "cost_usd": 0.0054576,
+  "max_usd": 0.05,
+  "halted": false,
+  "events": [
+    {
+      "number": 1,
+      "input_tokens": 2347,
+      "output_tokens": 176,
+      "cost_usd": 0.0009153,
+      "at": "2026-10-27T05:22:23.743233+00:00"
+    },
+    {
+      "number": 2,
+      "input_tokens": 75,
+      "output_tokens": 28,
+      "cost_usd": 5.61e-05,
+      "at": "2026-10-27T05:22:25.227568+00:00"
+    },
+    {
+      "number": 3,
+      "input_tokens": 3057,
+      "output_tokens": 289,
+      "cost_usd": 0.0012639,
+      "at": "2026-10-27T05:22:29.109849+00:00"
+    },
+    {
+      "number": 4,
+      "input_tokens": 2330,
+      "output_tokens": 128,
+      "cost_usd": 0.0008526,
+      "at": "2026-10-27T05:22:33.691873+00:00"
+    },
+    {
+      "number": 5,
+      "input_tokens": 2840,
+      "output_tokens": 110,
+      "cost_usd": 0.000984,
+      "at": "2026-10-27T05:22:35.358185+00:00"
+    },
+    {
+      "number": 6,
+      "input_tokens": 3763,
+      "output_tokens": 214,
+      "cost_usd": 0.0013857,
+      "at": "2026-10-27T05:22:37.618454+00:00"
+    }
+  ]
+}

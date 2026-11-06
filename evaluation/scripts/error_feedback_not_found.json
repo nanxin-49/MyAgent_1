@@ -1,0 +1,8 @@
+{
+  "name": "error_feedback_not_found",
+  "model": "scripted",
+  "turns": [
+    {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-MISSING"}, "id": "call_1"}]},
+    {"text": "已处理。"}
+  ]
+}

@@ -1,0 +1,481 @@
+{
+  "request": {
+    "message": "退款政策是什么？",
+    "conv_id": "h11-s1b-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "api_response": {
+    "conv_id": "h11-s1b-customer1",
+    "request_id": "cc504a32",
+    "response": "以下是当前有效的退款政策（版本 refund-cancel-v1，人民币演示用例）：\n\n**申请条件**\n- 需核验客户身份和订单归属\n- 需在订单创建后 **7×24 小时内**提交（执行前仍会复核）\n- 可进入资格检查的订单状态：已支付、处理中、已发货、已签收、已完成；其他状态不满足当前退款条件\n- 金额须大于 0 且不超过订单总额；不填金额时默认按订单总额\n\n**重复申请**\n- 若已有待处理、已申请、已批准、处理中或已完成的退款记录，不再新建重复申请\n\n**审批**\n- 超过 500 元需由有审核权限、且非申请人本人的审核人审批；恰好 500 元不因金额单独触发审批\n\n**重要说明**\n- 当前仅创建**模拟退款申请**，状态为待处理；动作完成**不代表退款完成或到账**\n- 不承诺原路退回、到账时间、手续费或补偿\n- 该政策为演示用例，程序未实现币种准入或换算校验\n\n需要我帮你查某个订单的退款资格或提交申请吗？提供订单号即可。\n\n知识库引用：doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [
+      "search_knowledge_base"
+    ],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 5188.0,
+    "knowledge_used": true,
+    "retrieval_status": "usable",
+    "citations": [
+      {
+        "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+        "content_hash": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+        "document_id": "doc_8450205ee234ce108cbd",
+        "chunk_index": 0,
+        "source": "demo:cartcare-default/refund-policy",
+        "policy_version": "refund-cancel-v1"
+      }
+    ],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 3,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "cc504a32",
+    "found": true,
+    "trace": {
+      "request_id": "cc504a32",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "search_knowledge_base"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "cc504a32",
+          "agent_type": "support",
+          "tool_name": "search_knowledge_base",
+          "risk_level": "read",
+          "tool_use_id": "call_00_wEoAyz6YIrci6S2d70E18745",
+          "input": {
+            "query": "退款政策 退款条件 时效 规则",
+            "top_k": 5
+          },
+          "validated_input": {
+            "query": "退款政策 退款条件 时效 规则",
+            "top_k": 5
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 1234.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": "not_needed",
+          "retrieval_status": "usable",
+          "citations": [
+            {
+              "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+              "content_hash": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+              "document_id": "doc_8450205ee234ce108cbd",
+              "chunk_index": 0,
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1"
+            }
+          ],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": [
+            {
+              "document_id": "doc_8450205ee234ce108cbd",
+              "title": "退款政策",
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1",
+              "chunk_index": 0,
+              "score": 0.4200630141870336,
+              "content": "CartCare退款政策仅描述人民币演示用例，不构成真实商城或支付渠道承诺；程序未实现币种准入或换算校验。新建退款申请须核验客户身份和订单归属，在订单创建后不超过7×24小时内提交，执行前仍会复核。已支付、处理中、已发货、已签收、已完成订单可进入资格检查，其他状态不满足当前退款条件。金额须大于0且不超过订单总额；省略金额时使用订单总额。已有待处理、已申请、已批准、处理中或已完成退款记录时，不再新建重复申请。当前进程内，同一客户的合法同键同参数退款重试返回既有动作的当前结果，不另行执行或绕过审批；同键异参不能复用原结果。超过500元须由有审核范围权限且非申请人、非该客户的审核人审批；恰好500元不因金额单独触发审批。当前仅创建模拟退款申请，退款状态为待处理；动作完成不代表退款完成或到账，不承诺原路退回、到账时间、手续费或补偿。",
+              "citation": {
+                "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+                "content_hash": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+                "document_id": "doc_8450205ee234ce108cbd",
+                "chunk_index": 0,
+                "source": "demo:cartcare-default/refund-policy",
+                "policy_version": "refund-cancel-v1"
+              }
+            }
+          ],
+          "helper_result": null,
+          "error": ""
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 5188.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 1898,
+          "output_tokens": 73,
+          "latency_ms": 1907.0
+        },
+        {
+          "stage": "rag_rewrite_or_rerank",
+          "model": "deepseek-flash",
+          "input_tokens": 76,
+          "output_tokens": 26,
+          "latency_ms": 1000.0
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 1005,
+          "output_tokens": 258,
+          "latency_ms": 2031.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 78.0,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0.0
+      },
+      "request_latency_ms": 5266.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "scenario": "S1B",
+  "assertions": [
+    {
+      "assertion": "http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "search_knowledge_base_selected",
+      "pass": true,
+      "detail": [
+        "search_knowledge_base"
+      ]
+    },
+    {
+      "assertion": "retrieval_status_usable",
+      "pass": true,
+      "detail": "usable"
+    },
+    {
+      "assertion": "citations_present",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "assertion": "citation_policy_version",
+      "pass": true,
+      "detail": [
+        "refund-cancel-v1"
+      ]
+    },
+    {
+      "assertion": "citation_content_hash",
+      "pass": true,
+      "detail": [
+        true
+      ]
+    },
+    {
+      "assertion": "answer_mentions_window",
+      "pass": true,
+      "detail": "以下是当前有效的退款政策（版本 refund-cancel-v1，人民币演示用例）：\n\n**申请条件**\n- 需核验客户身份和订单归属\n- 需在订单创建后 **7×24 小时内**提交（执行前仍会复核）\n- 可进入资格检查的订单状态：已支付、处理中、已发货、已签收、已完成；其他状态不满足当前退款条件\n- 金额须大于 0 且不超过订单总额；不填金额时默认按订单总额\n\n**重复申请**\n- 若已有待处"
+    },
+    {
+      "assertion": "answer_mentions_threshold",
+      "pass": true,
+      "detail": "以下是当前有效的退款政策（版本 refund-cancel-v1，人民币演示用例）：\n\n**申请条件**\n- 需核验客户身份和订单归属\n- 需在订单创建后 **7×24 小时内**提交（执行前仍会复核）\n- 可进入资格检查的订单状态：已支付、处理中、已发货、已签收、已完成；其他状态不满足当前退款条件\n- 金额须大于 0 且不超过订单总额；不填金额时默认按订单总额\n\n**重复申请**\n- 若已有待处"
+    },
+    {
+      "assertion": "no_business_write",
+      "pass": true,
+      "detail": {
+        "before": 0,
+        "after": 0
+      }
+    }
+  ],
+  "verdict": "pass",
+  "state_before": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "state_after": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "ledger_before": {
+    "requests": 0,
+    "charged_or_reserved_usd": 0.0,
+    "halted": false
+  },
+  "ledger_after": {
+    "requests": 3,
+    "charged_or_reserved_usd": 0.0027428999999999995,
+    "halted": false
+  }
+}

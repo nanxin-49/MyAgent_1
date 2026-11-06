@@ -1,0 +1,730 @@
+{
+  "runs": [
+    {
+      "case_id": "replay_order",
+      "run": 1,
+      "response": "订单已查询。",
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "334015af",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        }
+      ],
+      "model_calls": 2,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [],
+      "checks": {
+        "trajectory": true,
+        "forbidden_tools": true,
+        "key_args:get_order": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "fault_not_found",
+      "run": 1,
+      "response": "未找到可访问订单。",
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "f400e051",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-MISSING"
+          },
+          "validated_input": {
+            "order_id": "ORD-MISSING"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 16.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "injected not_found"
+        }
+      ],
+      "model_calls": 2,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [
+        {
+          "tool": "get_order",
+          "call_index": 1,
+          "kind": "not_found",
+          "error_code": "not_found"
+        }
+      ],
+      "checks": {
+        "trajectory": true,
+        "forbidden_tools": true,
+        "error_codes": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "fault_timeout",
+      "run": 1,
+      "response": "查询超时，请稍后重试。",
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "4bc4bbb6",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "timeout",
+          "error_type": "timeout",
+          "retryable": true,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "执行超时"
+        }
+      ],
+      "model_calls": 2,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [
+        {
+          "tool": "get_order",
+          "call_index": 1,
+          "kind": "timeout",
+          "error_code": "timeout"
+        }
+      ],
+      "checks": {
+        "trajectory": true,
+        "error_codes": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "fault_second_call",
+      "run": 1,
+      "response": "第一次成功，第二次失败。",
+      "tools_used": [
+        "get_order",
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "c56c9cef",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        },
+        {
+          "request_id": "c56c9cef",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_2",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "injected not_found"
+        }
+      ],
+      "model_calls": 3,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [
+        {
+          "tool": "get_order",
+          "call_index": 2,
+          "kind": "not_found",
+          "error_code": "not_found"
+        }
+      ],
+      "checks": {
+        "trajectory": true,
+        "error_codes": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "trajectory_partial",
+      "run": 1,
+      "response": "订单状态已查询。",
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "ab1c3a49",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        }
+      ],
+      "model_calls": 2,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [],
+      "checks": {
+        "trajectory": true,
+        "forbidden_tools": true,
+        "key_args:get_order": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "pass_three",
+      "run": 1,
+      "response": "订单状态已查询。",
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "7829388a",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        }
+      ],
+      "model_calls": 2,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [],
+      "checks": {
+        "trajectory": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "pass_three",
+      "run": 2,
+      "response": "订单状态已查询。",
+      "tools_used": [
+        "get_order"
+      ],
+      "tool_traces": [
+        {
+          "request_id": "e0a0272c",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_1",
+          "input": {
+            "order_id": "ORD-1001"
+          },
+          "validated_input": {
+            "order_id": "ORD-1001"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0.0,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-1001",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": ""
+        }
+      ],
+      "model_calls": 2,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [],
+      "checks": {
+        "trajectory": true,
+        "terminal_state": true
+      },
+      "passed": true
+    },
+    {
+      "case_id": "pass_three",
+      "run": 3,
+      "response": "这次没有查询订单。",
+      "tools_used": [],
+      "tool_traces": [],
+      "model_calls": 1,
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null,
+        "order_status": "shipped",
+        "refund_statuses": [
+          "requested"
+        ]
+      },
+      "fault_events": [],
+      "checks": {
+        "trajectory": false,
+        "terminal_state": true
+      },
+      "passed": false
+    }
+  ],
+  "metrics": {
+    "intent": {
+      "accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "tool": {
+      "tool_selection_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "argument_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "schema_validation_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "invocation_success_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "expected_business_outcome_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "technical_failure_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "invalid_tool_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "unnecessary_tool_call_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "trajectory_accuracy": {
+        "value": 0.875,
+        "numerator": 7,
+        "denominator": 8
+      },
+      "forbidden_call_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 8
+      },
+      "read_expected_business_outcome_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "write_expected_business_outcome_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "dangerous_expected_business_outcome_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "rag": {
+      "recall_at_3": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "retrieval_status_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "citation_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "no_answer_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "low_confidence_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "degraded_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "grounding_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "policy": {
+      "policy_decision_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "policy_violation_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "ownership_bypass_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "action": {
+      "approval_required_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "missed_approval_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "approval_bypass_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "duplicate_action_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "idempotency_success_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "end_to_end": {
+      "task_success_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "expected_escalation_accuracy": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      }
+    },
+    "performance": {
+      "latency_mean_ms": null,
+      "latency_samples": 0,
+      "token_cost": null
+    }
+  },
+  "pass_metrics": {
+    "cases": [
+      {
+        "case_id": "fault_not_found",
+        "runs": 1,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "fault_second_call",
+        "runs": 1,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "fault_timeout",
+        "runs": 1,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "pass_three",
+        "runs": 3,
+        "passes": 2,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "replay_order",
+        "runs": 1,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "trajectory_partial",
+        "runs": 1,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": true
+      }
+    ],
+    "pass@runs": {
+      "value": 1.0,
+      "numerator": 6,
+      "denominator": 6
+    },
+    "pass^runs": {
+      "value": 0.8333,
+      "numerator": 5,
+      "denominator": 6
+    }
+  },
+  "regressions": []
+}

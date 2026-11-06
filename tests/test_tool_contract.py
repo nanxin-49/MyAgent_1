@@ -1,6 +1,7 @@
 """T08 contract tests for both local tool execution paths."""
 
 import asyncio
+import time
 
 import pytest
 
@@ -65,6 +66,25 @@ def test_read_timeout_has_typed_result_and_does_not_use_fallback_for_validation(
     assert result.error_type == "timeout"
     assert result.retryable is True
     assert result.attempts == 1
+
+
+def test_sync_read_timeout_is_not_auto_retried():
+    calls = 0
+
+    def slow():
+        nonlocal calls
+        calls += 1
+        time.sleep(0.02)
+        return {"success": True}
+
+    spec = make_tool("slow", "slow", {}, lambda req, args: slow(), timeout_s=0.001,
+                     retry_policy=RetryPolicy(max_attempts=2))
+    result = asyncio.run(execute_tool(spec, {}, slow))
+    assert result.success is False
+    assert result.error_code == "timeout"
+    assert result.attempts == 1
+    time.sleep(0.05)
+    assert calls == 1
 
 
 def test_retryable_read_failure_retries_once():

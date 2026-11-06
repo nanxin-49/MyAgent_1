@@ -1,0 +1,196 @@
+{
+  "at_utc": "2026-10-25T08:54:59.167999+00:00",
+  "head": "56e085f7aabe5de47a356865a885791f264a970b",
+  "initial_git_status": " M CARTCARE_PLAN.md\n M docs/CHANGELOG.md\n M docs/reports/H0-1.md\n?? evaluation/reports/H1-1/\n",
+  "python": "3.12.3 | packaged by conda-forge | (main, Apr 15 2024, 18:20:11) [MSC v.1938 64 bit (AMD64)]",
+  "source_sha256": {
+    "api/main.py": "3cfa5c4f4467aab7e0fd2f1a2d0b61396ba38ada7afa02526673a59e76431658",
+    "agents/support_agent.py": "9f4ad9549f5c46bf15b465c2a96d67b7b934bc84418a18953683a07519c256ee",
+    "agents/agent_orchestrator.py": "5e6a371b9bf6f5e2ad36b2827e84e325701f6afcdc6b039f84ce8b5b22a9daf9",
+    "agents/tools.py": "6ee4b291e45683cf452abd48b8aa639b4e096dcd253931422697b7cbd8867d7f",
+    "core/handoff.py": "cbeaa5c2087c4a45ce7771f8dab464610af7b05e3e00a18c6d91ba2e6c999e40",
+    "core/auth.py": "4ec90f84f81da61e28366f35ad7ee85f9299625dbefa016609c17f112a54ae69",
+    "core/model_observation.py": "f1e229f751e62b0bbdb5a2efb0f508957564688d90c5540f8a968d6bbd8c3506",
+    "mcp/tool_manager.py": "af90e5a419503ece6d0b910f0134c3901343596624cb81390e61dc8101ad6844",
+    "mcp/knowledge_base.py": "45308227e583668ade3896bf235f1f991b671ba3bb8d81095e2010059c611f30",
+    "memory/conversation_memory.py": "d5c34854737e3132830ba8de7be9c596417a4a9e8bc682305d9824332f687c20",
+    "pyproject.toml": "ff2810b5a12473a618b8ee8fbf40cadfb06a71ee76477973b67d43d7bb630bb1",
+    "uv.lock": "392b74a8798b2a576cf33aeb13fa6ab73c5ecfe2a27eb669cae6a88e64b5687b",
+    "skills/billing_support/SKILL.md": "6d0ab756c6996d6e47447acd6a589d98e464790a2a7aa262a12bfbdfb6b30451",
+    "skills/general_customer_service/SKILL.md": "4204d924ef6f20203b0747373fa3e3a17e5bf6a4aa7cf42e0f48acf7ea7a977a",
+    "skills/technical_support/SKILL.md": "4df87bcaf6f823e19a0c7d757207f14339fa95a18ab4da59adcaa1a84f7dddba"
+  },
+  "fixture_sha256": "62da00190a5700c5703ceaf76c94989524c5058594812c9c4f17f943d9924f6d",
+  "skills": {
+    "root_dir": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\skills",
+    "count": 3,
+    "skills": [
+      {
+        "name": "账单退款处理规范",
+        "description": "SingleSupportAgent 的退款解释、业务查询、受控动作与未接入账单能力边界",
+        "path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\skills\\billing_support\\SKILL.md",
+        "keywords": [
+          "退款",
+          "退费",
+          "扣款",
+          "重复扣款",
+          "支付",
+          "账单",
+          "发票",
+          "订阅",
+          "续费",
+          "取消订阅",
+          "优惠券",
+          "余额",
+          "充值",
+          "付款",
+          "收据",
+          "invoice",
+          "refund",
+          "billing",
+          "payment"
+        ],
+        "agents": [
+          "billing"
+        ],
+        "enabled": true,
+        "content_chars": 1868
+      },
+      {
+        "name": "通用客服接待规范",
+        "description": "SingleSupportAgent 的接待、澄清、业务证据边界和模拟人工交接规范",
+        "path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\skills\\general_customer_service\\SKILL.md",
+        "keywords": [
+          "你好",
+          "您好",
+          "咨询",
+          "帮助",
+          "客服",
+          "订单",
+          "售后",
+          "活动",
+          "会员",
+          "账户",
+          "资料",
+          "投诉",
+          "建议",
+          "人工",
+          "转人工",
+          "处理进度",
+          "服务"
+        ],
+        "agents": [
+          "general"
+        ],
+        "enabled": true,
+        "content_chars": 1253
+      },
+      {
+        "name": "技术支持处理规范",
+        "description": "SingleSupportAgent 的故障排查方向、未实现操作边界和模拟人工交接规范",
+        "path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\skills\\technical_support\\SKILL.md",
+        "keywords": [
+          "报错",
+          "错误",
+          "异常",
+          "崩溃",
+          "卡顿",
+          "无法登录",
+          "登录失败",
+          "接口",
+          "API",
+          "SDK",
+          "配置",
+          "部署",
+          "连接失败",
+          "超时",
+          "500",
+          "401",
+          "403",
+          "404",
+          "回调",
+          "webhook",
+          "日志",
+          "数据库",
+          "缓存"
+        ],
+        "agents": [
+          "technical"
+        ],
+        "enabled": true,
+        "content_chars": 1484
+      }
+    ],
+    "errors": []
+  },
+  "versions": {
+    "anthropic": "0.40.0",
+    "httpx": "0.28.1",
+    "uvicorn": "0.32.1",
+    "fastapi": "0.115.5",
+    "redis": "5.2.1",
+    "chromadb-client": "0.5.23"
+  },
+  "config": {
+    "APP_ENV": "development",
+    "API_HOST": "127.0.0.1",
+    "API_PORT": "8016",
+    "CARTCARE_AUTH_MODE": "demo",
+    "CHROMA_HOST": "127.0.0.1",
+    "CHROMA_PORT": "8001",
+    "REDIS_URL": "redis://127.0.0.1:6396/0",
+    "CARTCARE_RAG_MIN_SCORE": "0.35",
+    "CARTCARE_BUSINESS_FIXTURE": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H1-1\\20261025T085310Z-batch1\\fixture.json"
+  },
+  "principals": {
+    "customer1": {
+      "subject_id": "e2e-customer-1",
+      "customer_id": "customer-1",
+      "roles": [
+        "customer"
+      ]
+    },
+    "customer2": {
+      "subject_id": "e2e-customer-2",
+      "customer_id": "customer-2",
+      "roles": [
+        "customer"
+      ]
+    },
+    "reviewer": {
+      "subject_id": "e2e-reviewer",
+      "roles": [
+        "reviewer"
+      ],
+      "review_customers": [
+        "customer-1"
+      ]
+    },
+    "admin": {
+      "subject_id": "e2e-admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  },
+  "model": "deepseek-flash",
+  "endpoint": "https://api.deepseek.com/anthropic",
+  "api_key_present": true,
+  "redis_ping": true,
+  "redis_size": 0,
+  "kb_sha256": "a40dd176314775016aa476f02c11bee9553dea0808bd6c4e35e3237dd4ddc0a7",
+  "model_requests": 0,
+  "live_model_compatibility_verified": false,
+  "budget_authorization": {
+    "source": "H1-1 approved plan 2026-10-25",
+    "usd_max": 0.1,
+    "requests_max": 20
+  },
+  "sdk_retries": 0,
+  "request_timeout_seconds": 60,
+  "thinking": "disabled",
+  "memory_collections": [
+    "h11_e2e_20261025_topics",
+    "h11_e2e_20261025_profile"
+  ]
+}

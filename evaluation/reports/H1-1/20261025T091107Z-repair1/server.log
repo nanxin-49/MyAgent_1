@@ -1,0 +1,110 @@
+INFO:     Started server process [28224]
+INFO:     Waiting for application startup.
+========================================
+ CartCare
+ E-commerce Support Agent
+========================================
+
+2026-10-25 17:12:28,618 [INFO] api.main: 模型: deepseek-flash  base_url: https://api.deepseek.com/anthropic
+2026-10-25 17:12:28,830 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-25 17:12:29,161 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/auth/identity "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,181 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,187 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,191 [ERROR] chromadb.telemetry.product.posthog: Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-10-25 17:12:29,195 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/heartbeat "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,195 [INFO] memory.conversation_memory: ChromaDB 已连接: 127.0.0.1:8001
+2026-10-25 17:12:29,230 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,261 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,302 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/auth/identity "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,326 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,332 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,333 [ERROR] chromadb.telemetry.product.posthog: Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-10-25 17:12:29,338 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/heartbeat "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,339 [INFO] mcp.knowledge_base: 知识库 ChromaDB 已连接: 127.0.0.1:8001
+2026-10-25 17:12:29,346 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/cartcare_demo_knowledge_chargram_v1 "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,353 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/count "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,360 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/count "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,370 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:12:29,371 [INFO] api.main: 知识库已加载: 6 个文档片段
+2026-10-25 17:12:29,371 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-25 17:12:29,373 [INFO] api.main: 业务工具已加载（测试/演示 backend）: check_inventory, get_order, get_product, get_refund_status, get_shipment, request_cancel_order, request_refund
+2026-10-25 17:12:29,373 [INFO] monitor.performance_monitor: Monitor 已启动，采集间隔 10.0s
+2026-10-25 17:12:29,386 [INFO] api.main: CartCare 已就绪
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8017 (Press CTRL+C to quit)
+2026-10-25 17:16:07,966 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:07,978 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:07,995 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/1db127ba-0536-47e3-9f95-573e29c2decb/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:08,002 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='退款政策是什么？'
+2026-10-25 17:16:09,900 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:10,910 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:10,911 [INFO] mcp.tool_manager: 查询改写: '退款政策 退款条件 时效 规则' → ['退款政策 退款条件 时效 规则', '退款政策的具体条件和适用范围', '退款申请的处理时效和到账时间', '退款规则中的例外情况和限制条款']
+2026-10-25 17:16:10,930 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:10,949 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:10,961 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:10,974 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:10,993 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,003 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,016 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,036 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,054 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,066 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,088 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,107 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,128 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:11,134 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='退款政策是什么？'
+2026-10-25 17:16:13,176 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:13,233 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:13,245 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:13,254 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/1db127ba-0536-47e3-9f95-573e29c2decb/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:13,257 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='退款审核通过后，钱几天能到我的银行卡？'
+2026-10-25 17:16:14,486 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,580 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,580 [INFO] mcp.tool_manager: 查询改写: '退款审核通过后到账时效 银行卡 几天' → ['退款审核通过后到账时效 银行卡 几天', '退款审核通过后银行卡到账需要几天', '退款到账时效受哪些因素影响 银行卡类型 银行处理时间', '不同支付方式退款到账时间对比 银行卡 支付宝 微信']
+2026-10-25 17:16:15,595 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,617 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,627 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,639 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,655 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,665 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,677 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,693 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,703 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,712 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,727 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,735 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:15,738 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='退款审核通过后，钱几天能到我的银行卡？'
+2026-10-25 17:16:17,838 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:17,884 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:17,893 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:17,904 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/1db127ba-0536-47e3-9f95-573e29c2decb/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:17,907 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-APPROVAL 申请退款 600 元'
+2026-10-25 17:16:19,181 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:19,184 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-APPROVAL 申请退款 600 元'
+2026-10-25 17:16:19,568 [WARNING] monitor.performance_monitor: [WARNING] support_0 的 agent_avg_ms = 4883.000，阈值 3000
+2026-10-25 17:16:20,599 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:20,673 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:20,686 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/a3e93fa1-e140-4f71-aa40-2ab1e30fce62/query "HTTP/1.1 200 OK"
+2026-10-25 17:16:20,696 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/1db127ba-0536-47e3-9f95-573e29c2decb/get "HTTP/1.1 200 OK"
+2026-10-25 17:16:20,699 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='我的退款现在什么状态？'
+2026-10-25 17:16:21,642 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:21,644 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='我的退款现在什么状态？'
+2026-10-25 17:16:23,077 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:16:29,576 [WARNING] monitor.performance_monitor: [WARNING] support_0 的 agent_avg_ms = 3711.000，阈值 3000
+2026-10-25 17:16:39,579 [WARNING] monitor.performance_monitor: [WARNING] support_0 的 agent_avg_ms = 3711.000，阈值 3000

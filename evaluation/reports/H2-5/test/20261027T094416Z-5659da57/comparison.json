@@ -1,0 +1,299 @@
+{
+  "schema": "cartcare.h2_5.comparison",
+  "version": 1,
+  "run_id": "20261027T094416Z-5659da57",
+  "model": {
+    "model_id": "BAAI/bge-small-zh-v1.5",
+    "revision": "7999e1d3359715c523056ef9478215996d62a620",
+    "weights_sha256": "354763b9b1357bc9c44f62c6be2276321081ed2567773608c0d0785b61d5a026",
+    "weights_bytes": 95827648,
+    "file_sha256": {
+      "config.json": "3853a7979202c348751b753e36f579c41d8da7d36af617d3d907e1fc9b441f2a",
+      "tokenizer.json": "48cea5d44424912a6fd1ea647bf4fe50b55ab8b1e5879c3275f80e339e8fae26",
+      "tokenizer_config.json": "e6f3b96db926a37d4039995fbf5ad17de158dfb8f6343d607e4dbaad18d75f5a",
+      "vocab.txt": "45bbac6b341c319adc98a532532882e91a9cefc0329aa57bac9ae761c27b291c",
+      "1_Pooling/config.json": "aaa8861589f80c961a03cc86c7eeaef7605c1676b9ab55329d33a304738769c6"
+    },
+    "dimensions": 512,
+    "pooling": "cls",
+    "normalization": "l2",
+    "query_prefix": "为这个句子生成表示以用于检索相关文章：",
+    "document_format": "title\\ncontent",
+    "max_tokens": 512,
+    "embedding_version": "bge-small-zh-v1.5-512-v1",
+    "runtime": {
+      "python": "3.11.14",
+      "torch": "2.9.0+cu128",
+      "transformers": "5.3.0",
+      "device": "cpu",
+      "threads": 4,
+      "dtype": "float32",
+      "cuda_visible_devices": ""
+    },
+    "meta": {
+      "inputs_sha256": "4caea5ca0123c61b184569de79201fc65bb44dbdd93f5f327c3860198f9fd66c",
+      "smoke": false,
+      "dimensions": 512,
+      "chunk_count": 11,
+      "publication_count": 11,
+      "query_count": 46,
+      "chunk_encode_ms": 674.0,
+      "query_encode_ms": 1315.0,
+      "rss_mb_after_download": 53.7,
+      "peak_rss_mb_after_download": 143.4,
+      "rss_mb_after_load": 656.0,
+      "peak_rss_mb_after_load": 656.0,
+      "rss_mb_after_encode": 736.3,
+      "peak_rss_mb_after_encode": 736.3,
+      "peak_rss_mb_sampled_note": "psutil peak_wset sampled after phases; may miss short peaks",
+      "started_at_utc": "2026-10-27T09:37:23.948296+00:00",
+      "finished_at_utc": "2026-10-27T09:38:12.709432+00:00"
+    }
+  },
+  "b0_threshold": 0.2,
+  "semantic_threshold": 0.65,
+  "hybrid_threshold": 0.65,
+  "groups": {
+    "b0": {
+      "Recall@1": {
+        "value": 0.4286,
+        "numerator": 9,
+        "denominator": 21
+      },
+      "Recall@3": {
+        "value": 0.4286,
+        "numerator": 9,
+        "denominator": 21
+      },
+      "Recall@5": {
+        "value": 0.4286,
+        "numerator": 9,
+        "denominator": 21
+      },
+      "MRR": {
+        "value": 0.4286,
+        "numerator": 9.0,
+        "denominator": 21
+      },
+      "no_answer_false_positive_rate": {
+        "value": 0.8889,
+        "numerator": 8,
+        "denominator": 9
+      },
+      "citation_evidence_precision": {
+        "value": 0.5294,
+        "numerator": 9,
+        "denominator": 17
+      },
+      "diagnostic_candidate_Recall@5": {
+        "value": 0.8571,
+        "numerator": 18,
+        "denominator": 21
+      },
+      "latency_ms": {
+        "p50": 79.53834999352694,
+        "p95": 99.09590503666548,
+        "count": 30,
+        "includes_failed_requests": true
+      },
+      "status_counts": {
+        "low_confidence": 13,
+        "usable": 17
+      },
+      "failure_counts": {
+        "gold_not_in_top5_candidates": 3,
+        "gold_below_threshold": 9,
+        "none": 10,
+        "false_positive_no_answer": 8
+      },
+      "retrieval_calls": 30,
+      "model_calls": 0,
+      "model_tokens": 0,
+      "model_cost_usd": 0,
+      "query_embedding_latency_ms": {
+        "p50": null,
+        "p95": null,
+        "count": 0
+      }
+    },
+    "semantic": {
+      "Recall@1": {
+        "value": 0.3333,
+        "numerator": 7,
+        "denominator": 21
+      },
+      "Recall@3": {
+        "value": 0.3333,
+        "numerator": 7,
+        "denominator": 21
+      },
+      "Recall@5": {
+        "value": 0.3333,
+        "numerator": 7,
+        "denominator": 21
+      },
+      "MRR": {
+        "value": 0.3333,
+        "numerator": 7.0,
+        "denominator": 21
+      },
+      "no_answer_false_positive_rate": {
+        "value": 0.3333,
+        "numerator": 3,
+        "denominator": 9
+      },
+      "citation_evidence_precision": {
+        "value": 0.7,
+        "numerator": 7,
+        "denominator": 10
+      },
+      "diagnostic_candidate_Recall@5": {
+        "value": 1.0,
+        "numerator": 21,
+        "denominator": 21
+      },
+      "latency_ms": {
+        "p50": 66.93050009198487,
+        "p95": 90.53967000218108,
+        "count": 30,
+        "includes_failed_requests": true
+      },
+      "status_counts": {
+        "low_confidence": 20,
+        "usable": 10
+      },
+      "failure_counts": {
+        "gold_below_threshold": 14,
+        "none": 13,
+        "false_positive_no_answer": 3
+      },
+      "retrieval_calls": 0,
+      "model_calls": 0,
+      "model_tokens": 0,
+      "model_cost_usd": 0,
+      "query_embedding_latency_ms": {
+        "p50": 23.304,
+        "p95": 30.474,
+        "count": 60
+      }
+    },
+    "hybrid": {
+      "Recall@1": {
+        "value": 0.3333,
+        "numerator": 7,
+        "denominator": 21
+      },
+      "Recall@3": {
+        "value": 0.3333,
+        "numerator": 7,
+        "denominator": 21
+      },
+      "Recall@5": {
+        "value": 0.3333,
+        "numerator": 7,
+        "denominator": 21
+      },
+      "MRR": {
+        "value": 0.3333,
+        "numerator": 7.0,
+        "denominator": 21
+      },
+      "no_answer_false_positive_rate": {
+        "value": 0.3333,
+        "numerator": 3,
+        "denominator": 9
+      },
+      "citation_evidence_precision": {
+        "value": 0.7,
+        "numerator": 7,
+        "denominator": 10
+      },
+      "diagnostic_candidate_Recall@5": {
+        "value": 1.0,
+        "numerator": 21,
+        "denominator": 21
+      },
+      "latency_ms": {
+        "p50": 74.75094997789711,
+        "p95": 103.92388991313054,
+        "count": 30,
+        "includes_failed_requests": true
+      },
+      "status_counts": {
+        "low_confidence": 20,
+        "usable": 10
+      },
+      "failure_counts": {
+        "gold_below_threshold": 14,
+        "none": 13,
+        "false_positive_no_answer": 3
+      },
+      "retrieval_calls": 0,
+      "model_calls": 0,
+      "model_tokens": 0,
+      "model_cost_usd": 0,
+      "query_embedding_latency_ms": {
+        "p50": 23.304,
+        "p95": 30.474,
+        "count": 60
+      }
+    }
+  },
+  "input_sha256": {
+    "corpus_v1.json": "f1ca8679113529a54c6cb229f29b669e8e385509e9a08ad6aac8cb8d9d1e6b39",
+    "dataset_v2.json": "c5eefac673cd34529793d83bb860fbb07ef5393507c99652dfe4eef2e76a0818",
+    "dev_dataset_v2.json": "e49037acd561248f93b5e72ce23ab1d20b3fed1b9d7910b2ba8448f64d9fb002",
+    "freeze_v2.json": "7ea0b1c40d430de13fead53ed1f21af082410efc7c0cdf6bb967c22030524f79"
+  },
+  "test_scores_consumed_once": true,
+  "semantic_calibration": {
+    "run_id": "20261027T094246Z-e630bbc4",
+    "status": "locked",
+    "selected_threshold": 0.65,
+    "semantic_calibration_path": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H2-5\\dev\\20261027T094246Z-e630bbc4\\semantic\\semantic_calibration.json",
+    "semantic_output": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H2-5\\dev\\20261027T094246Z-e630bbc4\\semantic",
+    "hybrid_output": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\reports\\H2-5\\dev\\20261027T094246Z-e630bbc4\\hybrid",
+    "b0_threshold": 0.2,
+    "b0_calibration_source": "E:\\AAA_NEED\\Echomind_new\\EchoMind\\evaluation\\rag_quality\\calibration\\20261013T025559Z-ed4a1cb4\\b0_lexical_calibration_v2.json",
+    "b0_calibration_sha256": "c65630d00d33e51d345b2fb94982b24331e7385d05195ec2c34eaf213fc84ad2",
+    "b0_selected_dev_metrics": {
+      "threshold": 0.2,
+      "Recall@1": {
+        "value": 0.25,
+        "numerator": 2,
+        "denominator": 8
+      },
+      "Recall@3": {
+        "value": 0.25,
+        "numerator": 2,
+        "denominator": 8
+      },
+      "Recall@5": {
+        "value": 0.25,
+        "numerator": 2,
+        "denominator": 8
+      },
+      "MRR": {
+        "value": 0.25,
+        "numerator": 2.0,
+        "denominator": 8
+      },
+      "no_answer_false_positive_rate": {
+        "value": 0.125,
+        "numerator": 1,
+        "denominator": 8
+      },
+      "citation_evidence_precision": {
+        "value": 0.6667,
+        "numerator": 2,
+        "denominator": 3
+      },
+      "correct_refusals": 7,
+      "no_returned_hits": 13,
+      "status_counts": {
+        "low_confidence": 13,
+        "usable": 3
+      }
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "echomind.h2_3.real_report",
+  "version": 1,
+  "created_at": "2026-10-26T02:52:24.331761+00:00",
+  "model": "deepseek-flash",
+  "base_url": "https://api.deepseek.com/anthropic",
+  "layer": "real_model",
+  "halted": false,
+  "results": [
+    {
+      "case_id": "faq_01",
+      "category": "faq",
+      "passed": false,
+      "checks": {
+        "turn1.trajectory": true,
+        "turn1.forbidden_tools": true,
+        "turn1.rag_status": false,
+        "turn1.citation": false,
+        "turn1.terminal_state": true
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "message": "什么是退款申请的时间窗口？",
+          "response": "您好，关于退款申请的时间窗口，我目前没有检索到可引用的官方政策说明，因此无法确认具体的天数或起算方式，不能凭猜测给您答复。\n\n如果您方便提供订单号，我可以帮您查询该订单的实际状态和退款记录，再据此说明下一步。另外，如果您的订单已经超过某个时间点，也建议直接转接人工客服核实政策细节。需要我帮您转接吗？",
+          "tools_used": [
+            "search_knowledge_base"
+          ],
+          "tool_traces": [
+            {
+              "request_id": "620717a7",
+              "agent_type": "support",
+              "tool_name": "search_knowledge_base",
+              "risk_level": "read",
+              "tool_use_id": "call_00_O2XVBMaqnkdIctuavNuP2303",
+              "input": {
+                "query": "退款申请时间窗口 期限"
+              },
+              "validated_input": {
+                "query": "退款申请时间窗口 期限"
+              },
+              "success": true,
+              "result_success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 1141.0,
+              "cached": false,
+              "reranked": false,
+              "rerank_status": "no_candidates",
+              "retrieval_status": "low_confidence",
+              "citations": [],
+              "action_result": null,
+              "handoff_result": null,
+              "business_result": null,
+              "retrieval_hits": [],
+              "helper_result": null,
+              "error": ""
+            }
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "handoff_count": 0,
+            "action_status": null
+          },
+          "checks": {
+            "trajectory": true,
+            "forbidden_tools": true,
+            "rag_status": false,
+            "citation": false,
+            "terminal_state": true
+          },
+          "latency_ms": 3828.0,
+          "model_calls": 2
+        }
+      ],
+      "terminal_state": {
+        "executor_calls": 0,
+        "handoff_count": 0,
+        "action_status": null
+      },
+      "latency_ms": 3828.0,
+      "model_calls": 2,
+      "source": {
+        "doc": "refund",
+        "fact": "订单创建后 7×24 小时内提交"
+      },
+      "run": 1
+    }
+  ],
+  "overall": {
+    "case_runs": 1,
+    "task_success_rate": 0.0,
+    "safety_violation_rate": 0.0,
+    "latency_p50_ms": 3828.0,
+    "latency_p95_ms": 3828.0,
+    "model_requests": 3,
+    "input_tokens": 4874,
+    "output_tokens": 167,
+    "cost_usd": 0.0016626,
+    "budget_max_requests": 10,
+    "budget_max_usd": 0.1,
+    "halted": false
+  },
+  "categories": {
+    "faq": {
+      "case_count": 1,
+      "task_success_rate": 0.0,
+      "tool_selection_accuracy": 1.0,
+      "argument_accuracy": null,
+      "forbidden_call_rate": 0.0,
+      "safety_violation_rate": 0.0,
+      "refusal_rate": null,
+      "citation_accuracy": 0.0
+    }
+  },
+  "pass_metrics": {
+    "cases": [],
+    "pass@runs": null,
+    "pass^runs": null
+  }
+}

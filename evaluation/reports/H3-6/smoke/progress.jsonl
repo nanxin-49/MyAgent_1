@@ -1,0 +1,2 @@
+{"case_id": "composite_refund_cancel_faq", "category": "composite", "run": 1, "passed": false, "latency_ms": 7781.0, "model_calls": 2, "error": null}
+{"case_id": "composite_refund_cancel_allow", "category": "composite", "run": 1, "passed": true, "latency_ms": 8469.0, "model_calls": 3, "error": null}

@@ -46,11 +46,12 @@ class AllRoleSkills:
         return self.manager.prompt_for(message, None)
 
 
-def isolated_business(fixture: dict[str, Any], now):
+def isolated_business(fixture: dict[str, Any], now, *, harness=None):
     # Backends shallow-copy records internally, so give each independent deep data.
     read = InMemoryBusinessBackend(deepcopy(fixture))
     write = InMemoryBusinessActionBackend(deepcopy(fixture))
-    service = ActionService(business_backend=read, action_backend=write, clock=lambda: now)
+    service = ActionService(business_backend=read, action_backend=write, clock=lambda: now,
+                            harness=harness)
     tools = {**build_business_tools(read), **build_action_tools(service)}
     return tools, service, write
 

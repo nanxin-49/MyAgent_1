@@ -1,0 +1,85 @@
+INFO:     Started server process [32496]
+INFO:     Waiting for application startup.
+========================================
+ CartCare
+ E-commerce Support Agent
+========================================
+
+2026-10-25 17:42:05,626 [INFO] api.main: 模型: deepseek-flash  base_url: https://api.deepseek.com/anthropic
+2026-10-25 17:42:05,765 [INFO] core.skill_loader: 
+================ CartCare Skills Loaded ================
+目录: E:\AAA_NEED\Echomind_new\EchoMind\skills
+数量: 3
+1. 账单退款处理规范
+   agents: billing
+   keywords: 退款, 退费, 扣款, 重复扣款, 支付, 账单, 发票, 订阅, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\billing_support\SKILL.md
+2. 通用客服接待规范
+   agents: general
+   keywords: 你好, 您好, 咨询, 帮助, 客服, 订单, 售后, 活动, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\general_customer_service\SKILL.md
+3. 技术支持处理规范
+   agents: technical
+   keywords: 报错, 错误, 异常, 崩溃, 卡顿, 无法登录, 登录失败, 接口, ...
+   path: E:\AAA_NEED\Echomind_new\EchoMind\skills\technical_support\SKILL.md
+========================================================
+2026-10-25 17:42:06,189 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/auth/identity "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,209 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,215 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,217 [ERROR] chromadb.telemetry.product.posthog: Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-10-25 17:42:06,221 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/heartbeat "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,222 [INFO] memory.conversation_memory: ChromaDB 已连接: 127.0.0.1:8001
+2026-10-25 17:42:06,266 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,291 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,327 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/auth/identity "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,347 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,352 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,354 [ERROR] chromadb.telemetry.product.posthog: Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-10-25 17:42:06,359 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/heartbeat "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,360 [INFO] mcp.knowledge_base: 知识库 ChromaDB 已连接: 127.0.0.1:8001
+2026-10-25 17:42:06,365 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/cartcare_demo_knowledge_chargram_v1 "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,373 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/count "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,378 [INFO] httpx: HTTP Request: GET http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/count "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,390 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/b73625ea-89c5-496e-8ece-c3875c9d5867/get "HTTP/1.1 200 OK"
+2026-10-25 17:42:06,392 [INFO] api.main: 知识库已加载: 6 个文档片段
+2026-10-25 17:42:06,392 [INFO] mcp.tool_manager: 注册工具: knowledge_search
+2026-10-25 17:42:06,394 [INFO] api.main: 业务工具已加载（测试/演示 backend）: check_inventory, get_order, get_product, get_refund_status, get_shipment, request_cancel_order, request_refund
+2026-10-25 17:42:06,395 [INFO] monitor.performance_monitor: Monitor 已启动，采集间隔 10.0s
+2026-10-25 17:42:06,408 [INFO] api.main: CartCare 已就绪
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8018 (Press CTRL+C to quit)
+2026-10-25 17:42:36,759 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:36,771 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:36,785 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/3fbb9d70-b8dc-42db-8e9e-4eb1a6de987e/get "HTTP/1.1 200 OK"
+2026-10-25 17:42:36,790 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-APPROVAL 申请退款 600 元'
+2026-10-25 17:42:38,144 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:38,151 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-APPROVAL 申请退款 600 元'
+2026-10-25 17:42:39,191 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:39,192 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-APPROVAL 申请退款 600 元'
+2026-10-25 17:42:40,510 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:40,578 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:40,590 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:40,599 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/3fbb9d70-b8dc-42db-8e9e-4eb1a6de987e/get "HTTP/1.1 200 OK"
+2026-10-25 17:42:40,603 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='我的退款现在什么状态？'
+2026-10-25 17:42:41,240 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:41,241 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='我的退款现在什么状态？'
+2026-10-25 17:42:42,594 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:42,638 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:42,646 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:42,655 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/3fbb9d70-b8dc-42db-8e9e-4eb1a6de987e/get "HTTP/1.1 200 OK"
+2026-10-25 17:42:42,659 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-EXPIRED 申请退款 100 元'
+2026-10-25 17:42:43,330 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:43,334 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款); 通用客服接待规范(keywords=订单) message='为订单 ORD-H11-EXPIRED 申请退款 100 元'
+2026-10-25 17:42:45,100 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:45,153 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:45,164 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:45,171 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/3fbb9d70-b8dc-42db-8e9e-4eb1a6de987e/get "HTTP/1.1 200 OK"
+2026-10-25 17:42:45,174 [INFO] core.skill_loader: Skills 已注入: agent=all matched=账单退款处理规范(keywords=退款) message='我要退款'
+2026-10-25 17:42:46,530 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:46,580 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:46,592 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/23386367-64c0-4842-b6ad-0dfb7eed2561/query "HTTP/1.1 200 OK"
+2026-10-25 17:42:46,598 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8001/api/v2/tenants/default_tenant/databases/default_database/collections/3fbb9d70-b8dc-42db-8e9e-4eb1a6de987e/get "HTTP/1.1 200 OK"
+2026-10-25 17:42:46,602 [INFO] core.skill_loader: Skills 已注入: agent=all matched=通用客服接待规范(keywords=订单) message='帮我查订单 ORD-H11-ORDER'
+2026-10-25 17:42:47,296 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"
+2026-10-25 17:42:47,297 [INFO] core.skill_loader: Skills 已注入: agent=all matched=通用客服接待规范(keywords=订单) message='帮我查订单 ORD-H11-ORDER'
+2026-10-25 17:42:48,795 [INFO] httpx: HTTP Request: POST https://api.deepseek.com/anthropic/v1/messages "HTTP/1.1 200 OK"

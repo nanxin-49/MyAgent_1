@@ -1,0 +1,337 @@
+{
+  "run": "20261025T085310Z-batch1",
+  "scenarios": {
+    "S1": {
+      "verdict": "fail",
+      "assertions": [
+        {
+          "assertion": "http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "search_knowledge_base_selected",
+          "pass": true,
+          "detail": [
+            "search_knowledge_base"
+          ]
+        },
+        {
+          "assertion": "retrieval_status_usable",
+          "pass": false,
+          "detail": "low_confidence"
+        },
+        {
+          "assertion": "citations_present",
+          "pass": false,
+          "detail": 0
+        },
+        {
+          "assertion": "citation_policy_version",
+          "pass": false,
+          "detail": []
+        },
+        {
+          "assertion": "citation_content_hash",
+          "pass": false,
+          "detail": []
+        },
+        {
+          "assertion": "answer_mentions_window",
+          "pass": true,
+          "detail": "知识库这次没有检索到可引用的政策条文，所以我无法给出完整的官方条件清单。以下是我能确认的部分，供你参考：\n\n**可以确认的（来自当前处理规则）**\n- 退款申请需要核验订单归属和订单状态，并检查该订单是否已有进行中的退款记录。\n- 申请金额需大于 0，且不超过订单总额；不填金额时默认按订单总额申请。\n- 订单创建后超过 7×24 小时的，通常不再符合默认退款规则。\n- 单笔超过 500 元需进入审"
+        },
+        {
+          "assertion": "answer_mentions_threshold",
+          "pass": true,
+          "detail": "知识库这次没有检索到可引用的政策条文，所以我无法给出完整的官方条件清单。以下是我能确认的部分，供你参考：\n\n**可以确认的（来自当前处理规则）**\n- 退款申请需要核验订单归属和订单状态，并检查该订单是否已有进行中的退款记录。\n- 申请金额需大于 0，且不超过订单总额；不填金额时默认按订单总额申请。\n- 订单创建后超过 7×24 小时的，通常不再符合默认退款规则。\n- 单笔超过 500 元需进入审"
+        },
+        {
+          "assertion": "no_business_write",
+          "pass": true,
+          "detail": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "model_requests": 3
+    },
+    "S2": {
+      "verdict": "fail",
+      "assertions": [
+        {
+          "assertion": "http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "search_knowledge_base_selected",
+          "pass": false,
+          "detail": []
+        },
+        {
+          "assertion": "no_fabricated_arrival_time",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "assertion": "states_boundary",
+          "pass": true,
+          "detail": "无法确认"
+        },
+        {
+          "assertion": "retrieval_evidence_recorded",
+          "pass": false,
+          "detail": {
+            "retrieval_status": null,
+            "citations": 0
+          }
+        },
+        {
+          "assertion": "no_business_write",
+          "pass": true,
+          "detail": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "model_requests": 1
+    },
+    "S3": {
+      "verdict": "pass",
+      "assertions": [
+        {
+          "assertion": "turn1_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "turn1_get_order_selected",
+          "pass": true,
+          "detail": [
+            "get_order"
+          ]
+        },
+        {
+          "assertion": "turn1_shipped_seen",
+          "pass": true,
+          "detail": "订单 ORD-H11-ORDER 当前状态为**已发货（shipped）**。\n\n- 商品：SKU-H11 × 1，单价 129.90 CNY\n- 订单金额：129.90 CNY（订单总额，非实付金额核验）\n- 下单时间：2026-10-23\n\n需要我继续查一下这个订单的物流进度吗？"
+        },
+        {
+          "assertion": "isolated_state_mutated",
+          "pass": true,
+          "detail": "delivered"
+        },
+        {
+          "assertion": "turn2_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "turn2_get_order_selected",
+          "pass": true,
+          "detail": [
+            "get_order",
+            "get_shipment"
+          ]
+        },
+        {
+          "assertion": "turn2_delivered_seen",
+          "pass": true,
+          "detail": "刚重新查了一下，状态有更新：\n\n**订单 ORD-H11-ORDER：已签收（delivered）**\n- 商品：SKU-H11 × 1，单价 129.90 CNY\n- 订单金额：129.90 CNY\n- 下单时间：2026-10-23\n\n**物流：已签收**\n- 承运商：demo-carrier\n- 运单号：TRACK-ORD-H11-ORDER\n- 预计送达：2026-10-27\n- 物流最后"
+        },
+        {
+          "assertion": "no_business_write",
+          "pass": true,
+          "detail": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "model_requests": 4
+    },
+    "S4": {
+      "verdict": "fail",
+      "assertions": [
+        {
+          "assertion": "apply_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "request_refund_selected",
+          "pass": false,
+          "detail": [
+            "get_order",
+            "get_refund_status"
+          ]
+        },
+        {
+          "assertion": "action_receipt_present",
+          "pass": false,
+          "detail": 0
+        },
+        {
+          "assertion": "apply_status_awaiting_approval",
+          "pass": false,
+          "detail": null
+        },
+        {
+          "assertion": "apply_amount_600",
+          "pass": false,
+          "detail": null
+        },
+        {
+          "assertion": "query_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "get_refund_status_selected",
+          "pass": true,
+          "detail": [
+            "get_refund_status"
+          ]
+        },
+        {
+          "assertion": "refund_record_pending",
+          "pass": false,
+          "detail": {}
+        },
+        {
+          "assertion": "order_refund_pending",
+          "pass": false,
+          "detail": "shipped"
+        },
+        {
+          "assertion": "answer_distinguishes_pending",
+          "pass": true,
+          "detail": "目前查询结果是：**未找到该订单可访问的退款记录**（订单号 ORD-H11-APPROVAL）。\n\n说明一下：\n\n1. 上一轮我只是询问您是否确认提交 600 元部分退款申请，**尚未实际提交**，所以系统里没有退款记录是正常的；\n2. 该查询结果只表示当前没有可访问的退款记录，不代表退款已失败或被拒绝；\n3. 退款状态查询只反映演示后端记录，即使后续申请登记成功，也不代表资金已到账。\n\n下一步：如果您确认按 600 元提交部分退款申请，请回复确认，我会立即提交；提交后超过 500 元需经审核"
+        }
+      ],
+      "model_requests": 4
+    },
+    "S5": {
+      "verdict": "pass",
+      "assertions": [
+        {
+          "assertion": "turn1_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "handoff_created",
+          "pass": true,
+          "detail": {
+            "status": "created",
+            "handoff_required": true,
+            "handoff_requested": true,
+            "handoff_created": true,
+            "handoff_failed": false,
+            "handoff_id": "bb3af240-3001-4ffc-a7a7-a634b35681ff",
+            "reason_code": "explicit_request",
+            "error_code": null,
+            "reused": false,
+            "simulated": true
+          }
+        },
+        {
+          "assertion": "handoff_id_present",
+          "pass": true,
+          "detail": "bb3af240-3001-4ffc-a7a7-a634b35681ff"
+        },
+        {
+          "assertion": "handoff_record_count_one",
+          "pass": true,
+          "detail": 1
+        },
+        {
+          "assertion": "owner_can_read_handoff",
+          "pass": true,
+          "detail": {
+            "owner": "customer-1",
+            "requested_by": "e2e-customer-1",
+            "handoff_id": "bb3af240-3001-4ffc-a7a7-a634b35681ff",
+            "status": "created",
+            "reason_code": "explicit_request",
+            "simulated": true,
+            "summary": "用户请求人工协助"
+          }
+        },
+        {
+          "assertion": "turn2_http_200",
+          "pass": true,
+          "detail": 200
+        },
+        {
+          "assertion": "no_duplicate_handoff",
+          "pass": true,
+          "detail": {
+            "status": "not_required",
+            "handoff_required": false,
+            "handoff_requested": false,
+            "handoff_created": false,
+            "handoff_failed": false,
+            "handoff_id": null,
+            "reason_code": null,
+            "error_code": null,
+            "reused": false,
+            "simulated": true
+          }
+        },
+        {
+          "assertion": "handoff_count_still_one",
+          "pass": true,
+          "detail": 1
+        },
+        {
+          "assertion": "no_false_human_acceptance",
+          "pass": true,
+          "detail": null
+        }
+      ],
+      "model_requests": 1
+    }
+  },
+  "model_ledger_before": {
+    "requests": 0,
+    "charged_or_reserved_usd": 0.0,
+    "halted": false
+  },
+  "preflight": "pass",
+  "preflight_assertions": [
+    {
+      "assertion": "anonymous_trace",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "assertion": "customer_trace",
+      "pass": true,
+      "detail": 403
+    },
+    {
+      "assertion": "admin_trace",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "anonymous_chat_401",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "assertion": "identity_mismatch_403",
+      "pass": true,
+      "detail": 403
+    }
+  ],
+  "model_ledger_after": {
+    "requests": 13,
+    "charged_or_reserved_usd": 0.013001399999999996,
+    "halted": false
+  }
+}

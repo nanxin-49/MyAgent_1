@@ -28,6 +28,8 @@ def started(monkeypatch, tmp_path, request):
     from monitor import performance_monitor
     from evaluation import evaluator
     import actions
+    from actions import InMemoryActionStore
+    from core.checkpoint import InMemoryCheckpointStore
 
     data = raw_data(refunds=False, status="paid", total=getattr(request, "param", "129.90"))
     fixture = tmp_path / "business.json"
@@ -70,6 +72,9 @@ def started(monkeypatch, tmp_path, request):
         async def stop(self): pass
     async def judge(*args, **kwargs): return QualityScores(1, 1, 1, 1)
     monkeypatch.setattr(support_agent, "SupportRuntime", runtime)
+    monkeypatch.setattr(actions, "RedisActionStore", lambda *args, **kwargs: InMemoryActionStore())
+    monkeypatch.setattr(actions, "RedisCheckpointStore",
+                        lambda *args, **kwargs: InMemoryCheckpointStore())
     monkeypatch.setattr(actions, "ActionService", service)
     monkeypatch.setattr(conversation_memory, "MemoryManager", EmptyMemory)
     monkeypatch.setattr(intent_recognizer, "IntentRecognizer", lambda **kwargs: SimpleNamespace())

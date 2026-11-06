@@ -1,0 +1,78 @@
+{
+  "schema": "echomind.trajectory",
+  "version": 1,
+  "created_at": "2026-10-25T00:00:00Z",
+  "evidence_level": "scripted",
+  "provenance": {
+    "model": "scripted",
+    "note": "deterministic replay fixture"
+  },
+  "case": {
+    "id": "replay_order",
+    "message": "查订单 ORD-1001",
+    "turn_range": []
+  },
+  "turns": [
+    {
+      "index": 0,
+      "source_event_number": 1,
+      "stage": "support",
+      "request": {
+        "messages_sha256": null,
+        "system_sha256": null,
+        "tool_schema_sha256": null,
+        "message_count": null,
+        "tool_results_sent": []
+      },
+      "response": {
+        "id": "scripted-1",
+        "model": "scripted",
+        "stop_reason": "tool_use",
+        "usage": {},
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "call_1",
+            "name": "get_order",
+            "input": {
+              "order_id": "ORD-1001"
+            }
+          }
+        ]
+      },
+      "latency_ms": 0,
+      "http_status": 200,
+      "error": null,
+      "at_utc": ""
+    },
+    {
+      "index": 1,
+      "source_event_number": 2,
+      "stage": "support",
+      "request": {
+        "messages_sha256": null,
+        "system_sha256": null,
+        "tool_schema_sha256": null,
+        "message_count": null,
+        "tool_results_sent": []
+      },
+      "response": {
+        "id": "scripted-2",
+        "model": "scripted",
+        "stop_reason": "end_turn",
+        "usage": {},
+        "content": [
+          {
+            "type": "text",
+            "text": "订单已查询。"
+          }
+        ]
+      },
+      "latency_ms": 0,
+      "http_status": 200,
+      "error": null,
+      "at_utc": ""
+    }
+  ],
+  "outcome": {}
+}

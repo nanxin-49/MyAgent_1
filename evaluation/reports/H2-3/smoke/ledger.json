@@ -1,0 +1,32 @@
+{
+  "requests": 3,
+  "max_requests": 10,
+  "input_tokens": 4874,
+  "output_tokens": 167,
+  "cost_usd": 0.0016626,
+  "max_usd": 0.1,
+  "halted": false,
+  "events": [
+    {
+      "number": 1,
+      "input_tokens": 2301,
+      "output_tokens": 45,
+      "cost_usd": 0.0007442999999999999,
+      "at": "2026-10-26T02:52:21.749062+00:00"
+    },
+    {
+      "number": 2,
+      "input_tokens": 73,
+      "output_tokens": 32,
+      "cost_usd": 6.0299999999999995e-05,
+      "at": "2026-10-26T02:52:22.705185+00:00"
+    },
+    {
+      "number": 3,
+      "input_tokens": 2500,
+      "output_tokens": 90,
+      "cost_usd": 0.000858,
+      "at": "2026-10-26T02:52:24.327616+00:00"
+    }
+  ]
+}

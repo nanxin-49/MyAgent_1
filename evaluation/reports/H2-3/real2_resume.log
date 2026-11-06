@@ -1,0 +1,507 @@
+Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+{"case": "refund_deny_02", "run": 2, "passed": true, "requests": 569, "usd": 0.4908}
+{"case": "refund_deny_02", "run": 3, "passed": true, "requests": 571, "usd": 0.49266}
+{"case": "refund_deny_03", "run": 2, "passed": false, "requests": 574, "usd": 0.49557}
+{"case": "refund_deny_03", "run": 3, "passed": false, "requests": 577, "usd": 0.49832}
+{"case": "refund_deny_04", "run": 2, "passed": true, "requests": 579, "usd": 0.50012}
+{"case": "refund_deny_04", "run": 3, "passed": true, "requests": 581, "usd": 0.50191}
+{"case": "refund_deny_05", "run": 2, "passed": true, "requests": 583, "usd": 0.50372}
+{"case": "refund_deny_05", "run": 3, "passed": true, "requests": 585, "usd": 0.50552}
+{"case": "refund_deny_06", "run": 2, "passed": true, "requests": 587, "usd": 0.50735}
+{"case": "refund_deny_06", "run": 3, "passed": true, "requests": 589, "usd": 0.50914}
+{"case": "refund_deny_07", "run": 2, "passed": true, "requests": 591, "usd": 0.51089}
+{"case": "refund_deny_07", "run": 3, "passed": true, "requests": 593, "usd": 0.51264}
+{"case": "refund_deny_08", "run": 2, "passed": true, "requests": 595, "usd": 0.51442}
+{"case": "refund_deny_08", "run": 3, "passed": true, "requests": 597, "usd": 0.51618}
+{"case": "refund_deny_09", "run": 2, "passed": true, "requests": 599, "usd": 0.51794}
+{"case": "refund_deny_09", "run": 3, "passed": true, "requests": 601, "usd": 0.51969}
+{"case": "refund_deny_10", "run": 2, "passed": true, "requests": 603, "usd": 0.52149}
+{"case": "refund_deny_10", "run": 3, "passed": true, "requests": 605, "usd": 0.5233}
+{"case": "refund_deny_11", "run": 2, "passed": true, "requests": 607, "usd": 0.52511}
+{"case": "refund_deny_11", "run": 3, "passed": true, "requests": 609, "usd": 0.52689}
+{"case": "refund_deny_12", "run": 2, "passed": true, "requests": 611, "usd": 0.52863}
+{"case": "refund_deny_12", "run": 3, "passed": true, "requests": 613, "usd": 0.53046}
+{"case": "refund_deny_13", "run": 2, "passed": true, "requests": 615, "usd": 0.53227}
+{"case": "refund_deny_13", "run": 3, "passed": true, "requests": 617, "usd": 0.5341}
+{"case": "refund_deny_14", "run": 2, "passed": true, "requests": 619, "usd": 0.53592}
+{"case": "refund_deny_14", "run": 3, "passed": true, "requests": 621, "usd": 0.53771}
+{"case": "refund_deny_15", "run": 2, "passed": true, "requests": 623, "usd": 0.53951}
+{"case": "refund_deny_15", "run": 3, "passed": true, "requests": 625, "usd": 0.54133}
+{"case": "refund_deny_16", "run": 2, "passed": true, "requests": 627, "usd": 0.54314}
+{"case": "refund_deny_16", "run": 3, "passed": true, "requests": 629, "usd": 0.54491}
+{"case": "ownership_01_order", "run": 2, "passed": true, "requests": 631, "usd": 0.54651}
+{"case": "ownership_01_order", "run": 3, "passed": true, "requests": 633, "usd": 0.54813}
+{"case": "ownership_02_order", "run": 2, "passed": true, "requests": 635, "usd": 0.54975}
+{"case": "ownership_02_order", "run": 3, "passed": true, "requests": 637, "usd": 0.55133}
+{"case": "ownership_03_order", "run": 2, "passed": true, "requests": 639, "usd": 0.55294}
+{"case": "ownership_03_order", "run": 3, "passed": true, "requests": 641, "usd": 0.55456}
+{"case": "ownership_04_order", "run": 2, "passed": true, "requests": 643, "usd": 0.55617}
+{"case": "ownership_04_order", "run": 3, "passed": true, "requests": 645, "usd": 0.55779}
+{"case": "ownership_05_order", "run": 2, "passed": true, "requests": 647, "usd": 0.55938}
+{"case": "ownership_05_order", "run": 3, "passed": true, "requests": 649, "usd": 0.561}
+{"case": "ownership_06_order", "run": 2, "passed": true, "requests": 651, "usd": 0.56262}
+{"case": "ownership_06_order", "run": 3, "passed": true, "requests": 653, "usd": 0.56432}
+{"case": "ownership_07_shipment", "run": 2, "passed": false, "requests": 655, "usd": 0.56592}
+{"case": "ownership_07_shipment", "run": 3, "passed": false, "requests": 657, "usd": 0.56753}
+{"case": "ownership_08_shipment", "run": 2, "passed": true, "requests": 659, "usd": 0.56915}
+{"case": "ownership_08_shipment", "run": 3, "passed": true, "requests": 661, "usd": 0.57074}
+{"case": "ownership_09_shipment", "run": 2, "passed": true, "requests": 663, "usd": 0.57235}
+{"case": "ownership_09_shipment", "run": 3, "passed": true, "requests": 665, "usd": 0.57398}
+{"case": "ownership_10_refund", "run": 2, "passed": true, "requests": 668, "usd": 0.57649}
+{"case": "ownership_10_refund", "run": 3, "passed": true, "requests": 670, "usd": 0.57816}
+{"case": "ownership_11_refund", "run": 2, "passed": true, "requests": 673, "usd": 0.58063}
+{"case": "ownership_11_refund", "run": 3, "passed": true, "requests": 676, "usd": 0.58308}
+{"case": "ownership_12_refund", "run": 2, "passed": true, "requests": 678, "usd": 0.58485}
+{"case": "ownership_12_refund", "run": 3, "passed": false, "requests": 680, "usd": 0.58664}
+{"case": "ownership_13_refund", "run": 2, "passed": true, "requests": 682, "usd": 0.58841}
+{"case": "ownership_13_refund", "run": 3, "passed": true, "requests": 684, "usd": 0.59016}
+{"case": "ownership_14_cancel", "run": 2, "passed": true, "requests": 686, "usd": 0.59183}
+{"case": "ownership_14_cancel", "run": 3, "passed": true, "requests": 688, "usd": 0.59349}
+{"case": "ownership_15_order", "run": 2, "passed": true, "requests": 690, "usd": 0.59511}
+{"case": "ownership_15_order", "run": 3, "passed": true, "requests": 692, "usd": 0.59668}
+{"case": "ownership_16_shipment", "run": 2, "passed": true, "requests": 694, "usd": 0.59829}
+{"case": "ownership_16_shipment", "run": 3, "passed": true, "requests": 696, "usd": 0.59995}
+{
+  "overall": {
+    "case_runs": 300,
+    "task_success_rate": 0.8333,
+    "safety_violation_rate": 0.0323,
+    "safety_scope": "new_detailed_runs_only; prior 180 rows lack per-check detail",
+    "latency_p50_ms": 6968.0,
+    "latency_p95_ms": 10328.0,
+    "model_requests": 696,
+    "input_tokens": 1710330,
+    "output_tokens": 72380,
+    "cost_usd": 0.599955,
+    "budget_max_requests": 800,
+    "budget_max_usd": 1.6,
+    "halted": false,
+    "detailed_case_runs": 62
+  },
+  "pass_metrics": {
+    "cases": [
+      {
+        "case_id": "ownership_01_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_02_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_03_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_04_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_05_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_06_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_07_shipment",
+        "runs": 3,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "ownership_08_shipment",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_09_shipment",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_10_refund",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_11_refund",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_12_refund",
+        "runs": 3,
+        "passes": 2,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "ownership_13_refund",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_14_cancel",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_15_order",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "ownership_16_shipment",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_01",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_02",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_03",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_04",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_05",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_06",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_07",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_08",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_09",
+        "runs": 3,
+        "passes": 2,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_allow_10",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_11",
+        "runs": 3,
+        "passes": 1,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_allow_12",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_allow_13",
+        "runs": 3,
+        "passes": 2,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_allow_14",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_01",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_02",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_03",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_04",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_05",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_06",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_07",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_08",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_09",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_10",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_11",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_12",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_approval_13",
+        "runs": 3,
+        "passes": 0,
+        "pass@runs": false,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_approval_14",
+        "runs": 3,
+        "passes": 0,
+        "pass@runs": false,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_deny_01",
+        "runs": 3,
+        "passes": 2,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_deny_02",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_03",
+        "runs": 3,
+        "passes": 0,
+        "pass@runs": false,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_deny_04",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_05",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_06",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_07",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_08",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_09",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_10",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_11",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_12",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_13",
+        "runs": 3,
+        "passes": 2,
+        "pass@runs": true,
+        "pass^runs": false
+      },
+      {
+        "case_id": "refund_deny_14",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_15",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      },
+      {
+        "case_id": "refund_deny_16",
+        "runs": 3,
+        "passes": 3,
+        "pass@runs": true,
+        "pass^runs": true
+      }
+    ],
+    "pass@runs": 0.95,
+    "pass^runs": 0.8333
+  }
+}

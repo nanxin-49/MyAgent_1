@@ -23,23 +23,23 @@ RUN pip install --upgrade pip && \
 FROM base AS production
 
 # 非 root 用户运行。先创建用户，后续 COPY 直接带 owner，避免 chown -R 复制出额外大层。
-RUN useradd -m -u 1000 echomind
+RUN useradd -m -u 1000 cartcare
 
 # 从依赖阶段复制已安装的包
 COPY --from=dependencies /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 # 复制应用代码
-COPY --chown=echomind:echomind . .
+COPY --chown=cartcare:cartcare . .
 
 # 创建必要目录，只调整运行期需要写入的目录权限，避免递归 chown 整个应用。
 RUN mkdir -p /app/data/chroma /app/logs /app/config && \
-    chown echomind:echomind /app/data /app/data/chroma /app/logs /app/config
-USER echomind
+    chown cartcare:cartcare /app/data /app/data/chroma /app/logs /app/config
+USER cartcare
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5).read()"
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready', timeout=5).read()"
 
 CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 

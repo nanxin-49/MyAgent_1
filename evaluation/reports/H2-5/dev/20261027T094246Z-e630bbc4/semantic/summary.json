@@ -1,0 +1,112 @@
+{
+  "1": {
+    "Recall@1": {
+      "value": 0.875,
+      "numerator": 7,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.9167,
+      "numerator": 7.333333333333333,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": 0.1,
+      "numerator": 8,
+      "denominator": 80
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 70.55325002875179,
+      "p95": 87.01027487404644,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "usable": 16
+    },
+    "failure_counts": {
+      "none": 7,
+      "gold_not_rank1": 1,
+      "false_positive_no_answer": 8
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  },
+  "2": {
+    "Recall@1": {
+      "value": 0.875,
+      "numerator": 7,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.9167,
+      "numerator": 7.333333333333333,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": 0.1,
+      "numerator": 8,
+      "denominator": 80
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 76.34020014666021,
+      "p95": 184.62649988941848,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "usable": 16
+    },
+    "failure_counts": {
+      "none": 7,
+      "gold_not_rank1": 1,
+      "false_positive_no_answer": 8
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  }
+}

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CartCare · Demo Evidence</title>
+<style>
+  :root { color-scheme: light; --ink:#1e293b; --muted:#64748b; --line:#e2e8f0; --accent:#2563eb; --bg:#f8fafc; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; }
+  main { max-width:1120px; margin:0 auto; padding:36px 24px 64px; }
+  h1 { font-size:30px; margin:0 0 6px; letter-spacing:-.02em; }
+  h2 { font-size:21px; margin:34px 0 12px; padding-top:18px; border-top:1px solid var(--line); }
+  h3 { font-size:16px; margin:18px 0 8px; }
+  p { margin:8px 0; }
+  .lede { color:var(--muted); font-size:16px; }
+  .meta { display:flex; flex-wrap:wrap; gap:8px 18px; color:var(--muted); font-size:13px; margin:14px 0 22px; }
+  .badge { display:inline-block; padding:2px 9px; border-radius:999px; background:#e0f2fe; color:#075985; font-size:12px; font-weight:600; }
+  .warn { background:#fef3c7; color:#92400e; }
+  .ok { background:#dcfce7; color:#166534; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:14px 0; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+  .kv { font-size:14px; }
+  .kv b { color:var(--muted); font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin:10px 0; }
+  th,td { text-align:left; border-bottom:1px solid var(--line); padding:8px 6px; vertical-align:top; }
+  th { color:var(--muted); font-weight:600; }
+  code { background:#f1f5f9; padding:1px 5px; border-radius:5px; font-size:13px; }
+  .shot { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:#fff; }
+  .crop { max-height:1500px; overflow:hidden; border:1px solid var(--line); border-radius:10px; background:#fff; }
+  .crop img { display:block; width:100%; height:auto; }
+  figure { margin:12px 0; }
+  figcaption { color:var(--muted); font-size:13px; margin-top:6px; }
+  a { color:var(--accent); }
+  .links { display:flex; flex-wrap:wrap; gap:10px 20px; font-size:14px; }
+  .note { color:var(--muted); font-size:13px; }
+  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:13px; color:var(--muted); }
+  .flow span { background:#f1f5f9; border-radius:7px; padding:5px 9px; color:var(--ink); }
+  @media (max-width:700px) { main { padding:24px 14px 40px; } h1 { font-size:24px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>CartCare · Demo Evidence</h1>
+    <p class="lede">真实模型 + 真实 Redis/Chroma + 模拟商城/支付后端的浏览器测试证据。不是生产 SLA，也不是真实支付或真人客服集成。</p>
+    <div class="meta">
+      <span>2026-11-06</span>
+      <span>模型：<code>deepseek-flash</code></span>
+      <span>页面：<code>/demo</code></span>
+      <span>浏览器：Chrome headless</span>
+      <span class="badge ok">H5-3 evidence</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2 style="border:0;margin-top:0;padding-top:0">这是什么</h2>
+    <p>CartCare 是自研 Agent Harness + 电商客服 Agent。模型负责理解、澄清、选工具和生成回复；Provider 提供订单等实时事实；Policy / 审批 / 幂等控制退款和取消。</p>
+    <div class="grid" style="margin-top:12px">
+      <div class="kv"><b>本次页面验证</b><br>政策问答 + citation<br>复合售后 + 待审批</div>
+      <div class="kv"><b>执行证据</b><br>ActionResult、Policy、Tool Trace<br>按步 token / 延迟 / stop_reason</div>
+      <div class="kv"><b>业务后端</b><br>明确标注的模拟 fixture<br>不接真实商城或支付</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>0. 页面壳</h2>
+    <figure>
+      <img class="shot" src="assets/demo-shell.png" alt="CartCare demo page shell">
+      <figcaption>真实的 <code>/demo</code> 页面壳。测试结果在下方真实浏览器元素截图中；本页不展示 token。</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>1. 政策问答与 citation</h2>
+    <p>输入：<code>退款政策是什么？</code></p>
+    <div class="card">
+      <div class="kv"><b>request_id</b> <code>1539ffee</code> · <b>Tool</b> <code>search_knowledge_base</code> · <b>RAG</b> <span class="badge ok">usable</span></div>
+      <p class="note">回答来自真实模型；检索结果包含 <code>refund-cancel-v1</code>、source 和 chunk reference。工具调用与 citation 均来自 Trace。</p>
+    </div>
+    <figure>
+      <div class="crop"><img src="assets/policy.png" alt="Policy answer with citations"></div>
+      <figcaption>真实浏览器元素截图（完整图片可点击打开）。下方是 RAG 卡片和 Tool Trace。</figcaption>
+      <p class="links"><a href="assets/policy.png" target="_blank" rel="noopener">打开完整截图</a></p>
+    </figure>
+    <div class="card">
+      <h3>为什么这条证据重要</h3>
+      <p>H5-3 准备期间发现：政策原文里的“已完成退款记录”“退款到账后”曾被输出一致性守卫误判成本轮完成声明，导致整段回答被替换成固定回执。该问题已经修复并加入回归测试；本截图是修复后的真实结果。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 复合售后：部分成功 + 待审批</h2>
+    <p>输入：</p>
+    <blockquote style="margin:8px 0 14px;padding:10px 14px;border-left:3px solid var(--accent);background:#fff;color:var(--ink)">请现在为订单 ORD-DEMO-REFUND 提交 100 元退款；为订单 ORD-DEMO-APPROVAL 提交 800 元退款，需要审批就暂停等待审批。</blockquote>
+    <div class="card">
+      <div class="kv"><b>request_id</b> <code>d572433c</code> · <b>Tools</b> <code>get_order</code>, <code>get_refund_status</code>, <code>request_refund</code> ×2</div>
+      <table>
+        <thead><tr><th>诉求</th><th>Action</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td>ORD-DEMO-REFUND · 100 元</td><td><code>act_ed938da02f274b93</code></td><td><span class="badge ok">completed</span></td></tr>
+          <tr><td>ORD-DEMO-APPROVAL · 800 元</td><td><code>act_4fd2235daf8e478a</code></td><td><span class="badge warn">awaiting_approval</span></td></tr>
+        </tbody>
+      </table>
+      <p class="note">completed 只表示模拟动作完成；pending 不代表到账。800 元动作尚未执行，必须由独立 reviewer 审批。</p>
+    </div>
+    <figure>
+      <div class="crop"><img src="assets/composite.png" alt="Composite refund answer and action cards"></div>
+      <figcaption>真实浏览器元素截图：上方是逐项回答，下方是两个独立 Action 卡片和 Tool Trace。完整图中 Trace 很长，建议打开原图或查看右侧证据 JSON。</figcaption>
+      <p class="links"><a href="assets/composite.png" target="_blank" rel="noopener">打开完整截图</a><a href="assets/composite-trace.png" target="_blank" rel="noopener">展开后的完整 Trace 截图</a></p>
+    </figure>
+  </section>
+
+  <section>
+    <h2>3. 审批中断恢复说明</h2>
+    <p>浏览器正常流程可以点击待审批 Action 的 <code>Approve</code>；完整“杀进程 → 重启 → 批准 → checkpoint resume”证据在 H4-2 的真实子进程测试中，不在本次两个浏览器截图内。</p>
+    <div class="flow" style="margin:12px 0">
+      <span>awaiting_approval</span><span>→</span><span>进程被杀</span><span>→</span><span>重启读回</span><span>→</span><span>reviewer approve</span><span>→</span><span>checkpoint resume</span><span>→</span><span>completed + 回执</span>
+    </div>
+    <div class="links">
+      <a href="../reports/H4-2.md">H4-2 崩溃恢复报告</a>
+      <a href="../reports/H5-3-test-record/traces.json">本次测试 Trace JSON</a>
+      <a href="../reports/H5-3-test-record/README.md">测试记录摘要</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. 越权与 Trace</h2>
+    <p>越权场景在本次测试记录中：customer-2 尝试操作 customer-1 订单，Action 为 rejected，没有已执行写动作。按步 Trace 可在页面 Test Trace 或原始 JSON 中查看。</p>
+    <div class="links">
+      <a href="../reports/H5-3-test-record/traces.json">9 条请求 Trace</a>
+      <a href="../reports/H5-3-test-record/demo-page.html">页面 HTML 快照</a>
+      <a href="traces.json">本页两条请求的 Trace</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. 限制与说明</h2>
+    <ul>
+      <li>真实模型、真实 Redis/Chroma；商城、支付、退款执行和人工交接是模拟后端。</li>
+      <li>截图中的 token 输入框未填入明文；页面不展示真实 API key。</li>
+      <li>政策问答的 <code>stop_reason</code> 可能因结尾“请提供订单号”被标为 <code>needs_clarification</code>；这是窄措辞观测，不影响回答和 citation。</li>
+      <li>复合请求偶尔可能在 3 轮上限处出现 <code>budget_exhausted</code>；本页展示的是两个 action 成功的真实一次。</li>
+      <li>退款回答偏工程化（包含 action_id、pending、Policy 字段），已记录为后续回复风格事项；不是执行错误。</li>
+      <li>Docker app 镜像未能重建：Docker Hub 拉取 <code>python:3.12-slim</code> 网络超时；本证据使用本地 uvicorn + 容器 Redis/Chroma。</li>
+    </ul>
+  </section>
+
+  <footer class="note" style="margin-top:36px;border-top:1px solid var(--line);padding-top:14px">
+    <p>证据层级：真实模型 + 真实浏览器 UI + 真实 Redis/Chroma + 模拟业务后端。不是生产 SLA、真实支付成功率或长期稳定性测试。</p>
+    <p><a href="../../README.md">README</a> · <a href="../reports/H5-3.md">H5-3 REPORT</a> · <a href="../evaluation.md">评测结果</a> · <a href="../architecture.md">架构</a></p>
+  </footer>
+</main>
+</body>
+</html>

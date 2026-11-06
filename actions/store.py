@@ -38,5 +38,8 @@ class InMemoryActionStore:
         self._idempotency[action.idempotency_key] = action.action_id
         return action
 
+    def close(self) -> None:
+        return None
+
 
 __all__ = ["ActionStore", "InMemoryActionStore"]

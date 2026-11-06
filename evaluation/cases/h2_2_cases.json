@@ -1,0 +1,100 @@
+{
+  "cases": [
+    {
+      "id": "replay_order",
+      "message": "帮我查订单 ORD-1001",
+      "trajectory": "evaluation/trajectories/replay_order.json",
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "ordered",
+        "key_args": {"get_order": {"order_id": "ORD-1001"}},
+        "forbidden_tools": ["request_refund", "request_cancel_order"],
+        "terminal_state": {"executor_calls": 0, "handoff_count": 0, "action_status": null, "order_status": "shipped"}
+      }
+    },
+    {
+      "id": "fault_not_found",
+      "message": "帮我查订单 ORD-MISSING",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-MISSING"}, "id": "call_1"}]},
+        {"text": "未找到可访问订单。"}
+      ]],
+      "faults": [{"tool": "get_order", "kind": "not_found", "on_call": 1}],
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "ordered",
+        "error_codes": ["not_found"],
+        "forbidden_tools": ["request_refund", "request_cancel_order"],
+        "terminal_state": {"executor_calls": 0, "handoff_count": 0}
+      }
+    },
+    {
+      "id": "fault_timeout",
+      "message": "帮我查订单 ORD-1001",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_1"}]},
+        {"text": "查询超时，请稍后重试。"}
+      ]],
+      "faults": [{"tool": "get_order", "kind": "timeout", "on_call": 1}],
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "ordered",
+        "error_codes": ["timeout"],
+        "terminal_state": {"executor_calls": 0}
+      }
+    },
+    {
+      "id": "fault_second_call",
+      "message": "连续查两次订单 ORD-1001",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_1"}]},
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_2"}]},
+        {"text": "第一次成功，第二次失败。"}
+      ]],
+      "faults": [{"tool": "get_order", "kind": "not_found", "on_call": 2, "mode": "once"}],
+      "expected": {
+        "tools": ["get_order", "get_order"],
+        "tool_mode": "ordered",
+        "error_codes": ["not_found"],
+        "terminal_state": {"executor_calls": 0}
+      }
+    },
+    {
+      "id": "trajectory_partial",
+      "message": "查询订单并确认没有写操作",
+      "scripts": [[
+        {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_1"}]},
+        {"text": "订单状态已查询。"}
+      ]],
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "partial",
+        "key_args": {"get_order": {"order_id": "ORD-1001"}},
+        "forbidden_tools": ["request_refund", "request_cancel_order"],
+        "terminal_state": {"executor_calls": 0, "handoff_count": 0, "order_status": "shipped"}
+      }
+    },
+    {
+      "id": "pass_three",
+      "message": "查询订单 ORD-1001",
+      "scripts": [
+        [
+          {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_1"}]},
+          {"text": "订单状态已查询。"}
+        ],
+        [
+          {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_1"}]},
+          {"text": "订单状态已查询。"}
+        ],
+        [
+          {"text": "这次没有查询订单。"}
+        ]
+      ],
+      "expected": {
+        "tools": ["get_order"],
+        "tool_mode": "partial",
+        "terminal_state": {"executor_calls": 0}
+      }
+    }
+  ]
+}

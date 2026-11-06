@@ -1,0 +1,564 @@
+{
+  "requests": 79,
+  "max_requests": 190,
+  "input_tokens": 205244,
+  "output_tokens": 12332,
+  "cost_usd": 0.0763716,
+  "max_usd": 0.31,
+  "halted": false,
+  "events": [
+    {
+      "number": 1,
+      "input_tokens": 2347,
+      "output_tokens": 169,
+      "cost_usd": 0.0009069,
+      "at": "2026-10-27T05:31:39.369050+00:00"
+    },
+    {
+      "number": 2,
+      "input_tokens": 75,
+      "output_tokens": 29,
+      "cost_usd": 5.73e-05,
+      "at": "2026-10-27T05:31:40.990524+00:00"
+    },
+    {
+      "number": 3,
+      "input_tokens": 2946,
+      "output_tokens": 273,
+      "cost_usd": 0.0012113999999999998,
+      "at": "2026-10-27T05:31:45.116898+00:00"
+    },
+    {
+      "number": 4,
+      "input_tokens": 2330,
+      "output_tokens": 128,
+      "cost_usd": 0.0008526,
+      "at": "2026-10-27T05:31:49.728433+00:00"
+    },
+    {
+      "number": 5,
+      "input_tokens": 2736,
+      "output_tokens": 109,
+      "cost_usd": 0.0009515999999999999,
+      "at": "2026-10-27T05:31:51.824135+00:00"
+    },
+    {
+      "number": 6,
+      "input_tokens": 3659,
+      "output_tokens": 203,
+      "cost_usd": 0.0013413,
+      "at": "2026-10-27T05:31:54.285356+00:00"
+    },
+    {
+      "number": 7,
+      "input_tokens": 2330,
+      "output_tokens": 176,
+      "cost_usd": 0.0009102,
+      "at": "2026-10-27T05:31:59.199147+00:00"
+    },
+    {
+      "number": 8,
+      "input_tokens": 2805,
+      "output_tokens": 218,
+      "cost_usd": 0.0011030999999999999,
+      "at": "2026-10-27T05:32:00.905425+00:00"
+    },
+    {
+      "number": 9,
+      "input_tokens": 3835,
+      "output_tokens": 200,
+      "cost_usd": 0.0013905,
+      "at": "2026-10-27T05:32:03.457676+00:00"
+    },
+    {
+      "number": 10,
+      "input_tokens": 2328,
+      "output_tokens": 165,
+      "cost_usd": 0.0008964,
+      "at": "2026-10-27T05:32:08.298816+00:00"
+    },
+    {
+      "number": 11,
+      "input_tokens": 2789,
+      "output_tokens": 217,
+      "cost_usd": 0.0010971,
+      "at": "2026-10-27T05:32:10.416486+00:00"
+    },
+    {
+      "number": 12,
+      "input_tokens": 3447,
+      "output_tokens": 186,
+      "cost_usd": 0.0012573,
+      "at": "2026-10-27T05:32:13.016433+00:00"
+    },
+    {
+      "number": 13,
+      "input_tokens": 2325,
+      "output_tokens": 127,
+      "cost_usd": 0.0008499,
+      "at": "2026-10-27T05:32:17.799115+00:00"
+    },
+    {
+      "number": 14,
+      "input_tokens": 2729,
+      "output_tokens": 109,
+      "cost_usd": 0.0009494999999999999,
+      "at": "2026-10-27T05:32:19.697610+00:00"
+    },
+    {
+      "number": 15,
+      "input_tokens": 3631,
+      "output_tokens": 253,
+      "cost_usd": 0.0013928999999999999,
+      "at": "2026-10-27T05:32:22.265670+00:00"
+    },
+    {
+      "number": 16,
+      "input_tokens": 2325,
+      "output_tokens": 129,
+      "cost_usd": 0.0008523,
+      "at": "2026-10-27T05:32:26.993409+00:00"
+    },
+    {
+      "number": 17,
+      "input_tokens": 75,
+      "output_tokens": 27,
+      "cost_usd": 5.49e-05,
+      "at": "2026-10-27T05:32:28.679904+00:00"
+    },
+    {
+      "number": 18,
+      "input_tokens": 3555,
+      "output_tokens": 171,
+      "cost_usd": 0.0012717,
+      "at": "2026-10-27T05:32:31.702797+00:00"
+    },
+    {
+      "number": 19,
+      "input_tokens": 4097,
+      "output_tokens": 274,
+      "cost_usd": 0.0015578999999999999,
+      "at": "2026-10-27T05:32:34.840962+00:00"
+    },
+    {
+      "number": 20,
+      "input_tokens": 2315,
+      "output_tokens": 93,
+      "cost_usd": 0.0008061,
+      "at": "2026-10-27T05:32:39.533985+00:00"
+    },
+    {
+      "number": 21,
+      "input_tokens": 73,
+      "output_tokens": 26,
+      "cost_usd": 5.3099999999999996e-05,
+      "at": "2026-10-27T05:32:41.116194+00:00"
+    },
+    {
+      "number": 22,
+      "input_tokens": 2689,
+      "output_tokens": 47,
+      "cost_usd": 0.0008630999999999999,
+      "at": "2026-10-27T05:32:42.841836+00:00"
+    },
+    {
+      "number": 23,
+      "input_tokens": 3126,
+      "output_tokens": 155,
+      "cost_usd": 0.0011237999999999999,
+      "at": "2026-10-27T05:32:44.966819+00:00"
+    },
+    {
+      "number": 24,
+      "input_tokens": 2318,
+      "output_tokens": 132,
+      "cost_usd": 0.0008537999999999999,
+      "at": "2026-10-27T05:32:49.787384+00:00"
+    },
+    {
+      "number": 25,
+      "input_tokens": 2744,
+      "output_tokens": 89,
+      "cost_usd": 0.0009299999999999998,
+      "at": "2026-10-27T05:32:51.440859+00:00"
+    },
+    {
+      "number": 26,
+      "input_tokens": 3261,
+      "output_tokens": 217,
+      "cost_usd": 0.0012387,
+      "at": "2026-10-27T05:32:53.813403+00:00"
+    },
+    {
+      "number": 27,
+      "input_tokens": 2328,
+      "output_tokens": 185,
+      "cost_usd": 0.0009203999999999999,
+      "at": "2026-10-27T05:32:58.500689+00:00"
+    },
+    {
+      "number": 28,
+      "input_tokens": 80,
+      "output_tokens": 42,
+      "cost_usd": 7.44e-05,
+      "at": "2026-10-27T05:32:59.973920+00:00"
+    },
+    {
+      "number": 29,
+      "input_tokens": 2947,
+      "output_tokens": 159,
+      "cost_usd": 0.0010749000000000002,
+      "at": "2026-10-27T05:33:02.413282+00:00"
+    },
+    {
+      "number": 30,
+      "input_tokens": 3896,
+      "output_tokens": 283,
+      "cost_usd": 0.0015083999999999998,
+      "at": "2026-10-27T05:33:05.591320+00:00"
+    },
+    {
+      "number": 31,
+      "input_tokens": 2339,
+      "output_tokens": 169,
+      "cost_usd": 0.0009044999999999999,
+      "at": "2026-10-27T05:33:10.489410+00:00"
+    },
+    {
+      "number": 32,
+      "input_tokens": 2805,
+      "output_tokens": 251,
+      "cost_usd": 0.0011427,
+      "at": "2026-10-27T05:33:12.780833+00:00"
+    },
+    {
+      "number": 33,
+      "input_tokens": 3915,
+      "output_tokens": 341,
+      "cost_usd": 0.0015837,
+      "at": "2026-10-27T05:33:15.764328+00:00"
+    },
+    {
+      "number": 34,
+      "input_tokens": 2327,
+      "output_tokens": 162,
+      "cost_usd": 0.0008925,
+      "at": "2026-10-27T05:33:20.503837+00:00"
+    },
+    {
+      "number": 35,
+      "input_tokens": 75,
+      "output_tokens": 25,
+      "cost_usd": 5.25e-05,
+      "at": "2026-10-27T05:33:22.142736+00:00"
+    },
+    {
+      "number": 36,
+      "input_tokens": 2917,
+      "output_tokens": 331,
+      "cost_usd": 0.0012722999999999999,
+      "at": "2026-10-27T05:33:25.873965+00:00"
+    },
+    {
+      "number": 37,
+      "input_tokens": 2324,
+      "output_tokens": 138,
+      "cost_usd": 0.0008627999999999999,
+      "at": "2026-10-27T05:33:30.800190+00:00"
+    },
+    {
+      "number": 38,
+      "input_tokens": 75,
+      "output_tokens": 29,
+      "cost_usd": 5.73e-05,
+      "at": "2026-10-27T05:33:32.395625+00:00"
+    },
+    {
+      "number": 39,
+      "input_tokens": 2766,
+      "output_tokens": 249,
+      "cost_usd": 0.0011286,
+      "at": "2026-10-27T05:33:35.616250+00:00"
+    },
+    {
+      "number": 40,
+      "input_tokens": 2318,
+      "output_tokens": 89,
+      "cost_usd": 0.0008022,
+      "at": "2026-10-27T05:33:39.918674+00:00"
+    },
+    {
+      "number": 41,
+      "input_tokens": 2558,
+      "output_tokens": 62,
+      "cost_usd": 0.0008418,
+      "at": "2026-10-27T05:33:41.283892+00:00"
+    },
+    {
+      "number": 42,
+      "input_tokens": 3039,
+      "output_tokens": 191,
+      "cost_usd": 0.0011408999999999998,
+      "at": "2026-10-27T05:33:43.397416+00:00"
+    },
+    {
+      "number": 43,
+      "input_tokens": 2330,
+      "output_tokens": 129,
+      "cost_usd": 0.0008537999999999999,
+      "at": "2026-10-27T05:33:48.210646+00:00"
+    },
+    {
+      "number": 44,
+      "input_tokens": 2853,
+      "output_tokens": 99,
+      "cost_usd": 0.0009746999999999999,
+      "at": "2026-10-27T05:33:50.086739+00:00"
+    },
+    {
+      "number": 45,
+      "input_tokens": 3365,
+      "output_tokens": 270,
+      "cost_usd": 0.0013335,
+      "at": "2026-10-27T05:33:52.775225+00:00"
+    },
+    {
+      "number": 46,
+      "input_tokens": 2329,
+      "output_tokens": 126,
+      "cost_usd": 0.0008498999999999999,
+      "at": "2026-10-27T05:33:57.230032+00:00"
+    },
+    {
+      "number": 47,
+      "input_tokens": 2732,
+      "output_tokens": 110,
+      "cost_usd": 0.0009516,
+      "at": "2026-10-27T05:33:59.030293+00:00"
+    },
+    {
+      "number": 48,
+      "input_tokens": 3646,
+      "output_tokens": 231,
+      "cost_usd": 0.001371,
+      "at": "2026-10-27T05:34:01.720370+00:00"
+    },
+    {
+      "number": 49,
+      "input_tokens": 2326,
+      "output_tokens": 124,
+      "cost_usd": 0.0008465999999999999,
+      "at": "2026-10-27T05:34:06.622358+00:00"
+    },
+    {
+      "number": 50,
+      "input_tokens": 2619,
+      "output_tokens": 83,
+      "cost_usd": 0.0008853,
+      "at": "2026-10-27T05:34:08.241387+00:00"
+    },
+    {
+      "number": 51,
+      "input_tokens": 2744,
+      "output_tokens": 234,
+      "cost_usd": 0.001104,
+      "at": "2026-10-27T05:34:10.963248+00:00"
+    },
+    {
+      "number": 52,
+      "input_tokens": 2334,
+      "output_tokens": 166,
+      "cost_usd": 0.0008993999999999999,
+      "at": "2026-10-27T05:34:15.818589+00:00"
+    },
+    {
+      "number": 53,
+      "input_tokens": 2689,
+      "output_tokens": 85,
+      "cost_usd": 0.0009086999999999999,
+      "at": "2026-10-27T05:34:17.601925+00:00"
+    },
+    {
+      "number": 54,
+      "input_tokens": 2940,
+      "output_tokens": 308,
+      "cost_usd": 0.0012515999999999998,
+      "at": "2026-10-27T05:34:20.667692+00:00"
+    },
+    {
+      "number": 55,
+      "input_tokens": 2329,
+      "output_tokens": 124,
+      "cost_usd": 0.0008474999999999998,
+      "at": "2026-10-27T05:34:26.038554+00:00"
+    },
+    {
+      "number": 56,
+      "input_tokens": 2730,
+      "output_tokens": 45,
+      "cost_usd": 0.000873,
+      "at": "2026-10-27T05:34:27.529306+00:00"
+    },
+    {
+      "number": 57,
+      "input_tokens": 2798,
+      "output_tokens": 47,
+      "cost_usd": 0.0008958,
+      "at": "2026-10-27T05:34:29.149466+00:00"
+    },
+    {
+      "number": 58,
+      "input_tokens": 2868,
+      "output_tokens": 244,
+      "cost_usd": 0.0011532,
+      "at": "2026-10-27T05:34:31.786799+00:00"
+    },
+    {
+      "number": 59,
+      "input_tokens": 2324,
+      "output_tokens": 133,
+      "cost_usd": 0.0008567999999999999,
+      "at": "2026-10-27T05:34:37.012068+00:00"
+    },
+    {
+      "number": 60,
+      "input_tokens": 2626,
+      "output_tokens": 83,
+      "cost_usd": 0.0008874,
+      "at": "2026-10-27T05:34:38.729855+00:00"
+    },
+    {
+      "number": 61,
+      "input_tokens": 2860,
+      "output_tokens": 47,
+      "cost_usd": 0.0009144,
+      "at": "2026-10-27T05:34:40.096510+00:00"
+    },
+    {
+      "number": 62,
+      "input_tokens": 2930,
+      "output_tokens": 237,
+      "cost_usd": 0.0011634000000000002,
+      "at": "2026-10-27T05:34:42.584579+00:00"
+    },
+    {
+      "number": 63,
+      "input_tokens": 3991,
+      "output_tokens": 257,
+      "cost_usd": 0.0015056999999999998,
+      "at": "2026-10-27T05:34:45.855208+00:00"
+    },
+    {
+      "number": 64,
+      "input_tokens": 2319,
+      "output_tokens": 138,
+      "cost_usd": 0.0008613,
+      "at": "2026-10-27T05:34:50.380129+00:00"
+    },
+    {
+      "number": 65,
+      "input_tokens": 79,
+      "output_tokens": 47,
+      "cost_usd": 8.01e-05,
+      "at": "2026-10-27T05:34:51.846385+00:00"
+    },
+    {
+      "number": 66,
+      "input_tokens": 2764,
+      "output_tokens": 184,
+      "cost_usd": 0.00105,
+      "at": "2026-10-27T05:34:54.638944+00:00"
+    },
+    {
+      "number": 67,
+      "input_tokens": 2324,
+      "output_tokens": 133,
+      "cost_usd": 0.0008567999999999999,
+      "at": "2026-10-27T05:34:59.255148+00:00"
+    },
+    {
+      "number": 68,
+      "input_tokens": 2735,
+      "output_tokens": 100,
+      "cost_usd": 0.0009405,
+      "at": "2026-10-27T05:35:01.178208+00:00"
+    },
+    {
+      "number": 69,
+      "input_tokens": 3246,
+      "output_tokens": 205,
+      "cost_usd": 0.0012198,
+      "at": "2026-10-27T05:35:03.851952+00:00"
+    },
+    {
+      "number": 70,
+      "input_tokens": 2331,
+      "output_tokens": 134,
+      "cost_usd": 0.0008600999999999999,
+      "at": "2026-10-27T05:35:08.592370+00:00"
+    },
+    {
+      "number": 71,
+      "input_tokens": 2743,
+      "output_tokens": 160,
+      "cost_usd": 0.0010149,
+      "at": "2026-10-27T05:35:10.478797+00:00"
+    },
+    {
+      "number": 72,
+      "input_tokens": 3715,
+      "output_tokens": 246,
+      "cost_usd": 0.0014097,
+      "at": "2026-10-27T05:35:13.307223+00:00"
+    },
+    {
+      "number": 73,
+      "input_tokens": 2330,
+      "output_tokens": 171,
+      "cost_usd": 0.0009042000000000001,
+      "at": "2026-10-27T05:35:18.145697+00:00"
+    },
+    {
+      "number": 74,
+      "input_tokens": 2798,
+      "output_tokens": 174,
+      "cost_usd": 0.0010482,
+      "at": "2026-10-27T05:35:20.228524+00:00"
+    },
+    {
+      "number": 75,
+      "input_tokens": 3790,
+      "output_tokens": 99,
+      "cost_usd": 0.0012558,
+      "at": "2026-10-27T05:35:22.116961+00:00"
+    },
+    {
+      "number": 76,
+      "input_tokens": 4280,
+      "output_tokens": 260,
+      "cost_usd": 0.001596,
+      "at": "2026-10-27T05:35:24.953558+00:00"
+    },
+    {
+      "number": 77,
+      "input_tokens": 2321,
+      "output_tokens": 97,
+      "cost_usd": 0.0008127,
+      "at": "2026-10-27T05:35:29.695684+00:00"
+    },
+    {
+      "number": 78,
+      "input_tokens": 2569,
+      "output_tokens": 140,
+      "cost_usd": 0.0009386999999999999,
+      "at": "2026-10-27T05:35:31.852027+00:00"
+    },
+    {
+      "number": 79,
+      "input_tokens": 2938,
+      "output_tokens": 234,
+      "cost_usd": 0.0011622,
+      "at": "2026-10-27T05:35:34.939293+00:00"
+    }
+  ]
+}

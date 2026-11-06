@@ -1,0 +1,31 @@
+{
+  "status": "ok",
+  "agents": {
+    "support_0": {
+      "total": 0,
+      "success_rate": 1.0,
+      "avg_ms": 0.0,
+      "model": "deepseek-flash",
+      "role": "support",
+      "topology": "single",
+      "available_tools": [
+        "search_knowledge_base",
+        "get_product",
+        "get_order",
+        "get_shipment",
+        "check_inventory",
+        "get_refund_status",
+        "request_refund",
+        "request_cancel_order",
+        "request_handoff",
+        "inspect_request_context",
+        "suggest_required_fields",
+        "lookup_error_code",
+        "build_diagnostic_plan",
+        "check_billing_fields",
+        "compare_amounts",
+        "create_handoff_summary"
+      ]
+    }
+  }
+}

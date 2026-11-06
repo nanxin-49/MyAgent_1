@@ -1,0 +1,6 @@
+{"case_id": "refund_deny_01", "category": "refund_deny", "run": 1, "passed": true, "latency_ms": 4656.0, "model_calls": 2, "error": null}
+{"case_id": "ownership_01_order", "category": "ownership", "run": 1, "passed": true, "latency_ms": 6812.0, "model_calls": 2, "error": null}
+{"case_id": "refund_deny_01", "category": "refund_deny", "run": 2, "passed": true, "latency_ms": 7219.0, "model_calls": 2, "error": null}
+{"case_id": "refund_deny_01", "category": "refund_deny", "run": 3, "passed": false, "latency_ms": 7453.0, "model_calls": 2, "error": null}
+{"case_id": "ownership_01_order", "category": "ownership", "run": 2, "passed": true, "latency_ms": 6500.0, "model_calls": 2, "error": null}
+{"case_id": "ownership_01_order", "category": "ownership", "run": 3, "passed": true, "latency_ms": 6391.0, "model_calls": 2, "error": null}

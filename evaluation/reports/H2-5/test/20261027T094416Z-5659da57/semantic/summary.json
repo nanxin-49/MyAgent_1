@@ -1,0 +1,61 @@
+{
+  "Recall@1": {
+    "value": 0.3333,
+    "numerator": 7,
+    "denominator": 21
+  },
+  "Recall@3": {
+    "value": 0.3333,
+    "numerator": 7,
+    "denominator": 21
+  },
+  "Recall@5": {
+    "value": 0.3333,
+    "numerator": 7,
+    "denominator": 21
+  },
+  "MRR": {
+    "value": 0.3333,
+    "numerator": 7.0,
+    "denominator": 21
+  },
+  "no_answer_false_positive_rate": {
+    "value": 0.3333,
+    "numerator": 3,
+    "denominator": 9
+  },
+  "citation_evidence_precision": {
+    "value": 0.7,
+    "numerator": 7,
+    "denominator": 10
+  },
+  "diagnostic_candidate_Recall@5": {
+    "value": 1.0,
+    "numerator": 21,
+    "denominator": 21
+  },
+  "latency_ms": {
+    "p50": 66.93050009198487,
+    "p95": 90.53967000218108,
+    "count": 30,
+    "includes_failed_requests": true
+  },
+  "status_counts": {
+    "low_confidence": 20,
+    "usable": 10
+  },
+  "failure_counts": {
+    "gold_below_threshold": 14,
+    "none": 13,
+    "false_positive_no_answer": 3
+  },
+  "retrieval_calls": 0,
+  "model_calls": 0,
+  "model_tokens": 0,
+  "model_cost_usd": 0,
+  "query_embedding_latency_ms": {
+    "p50": 23.304,
+    "p95": 30.474,
+    "count": 60
+  }
+}

@@ -1,0 +1,376 @@
+{
+  "request": {
+    "message": "退款审核通过后，钱几天能到我的银行卡？",
+    "conv_id": "h11-s2-customer1"
+  },
+  "principal": {
+    "subject_id": "e2e-customer-1",
+    "customer_id": "customer-1",
+    "roles": [
+      "customer"
+    ]
+  },
+  "http_status": 200,
+  "api_response": {
+    "conv_id": "h11-s2-customer1",
+    "request_id": "af67d263",
+    "response": "退款审核通过后，资金到账时间取决于支付渠道和银行处理，我这边无法确认具体天数，也不能承诺到账时效。\n\n需要说明的是：\n- 我这边只能查询订单的退款状态记录，**退款申请/审核完成不等于资金已到账**。\n- 真实到账时间需以支付渠道（微信、支付宝、银行卡发卡行）的实际处理为准，当前没有接入交易流水或支付渠道查询能力。\n\n如果你提供订单号，我可以帮你查一下该订单当前的退款状态记录，看看处于哪个环节。",
+    "topology": "single",
+    "intent": null,
+    "intent_group": null,
+    "agent_type": "support",
+    "agent_types": [
+      "support"
+    ],
+    "primary_agent": null,
+    "supporting_agents": null,
+    "tools_used": [],
+    "routing_reason": null,
+    "routing_confidence": null,
+    "escalated": false,
+    "latency_ms": 1609.0,
+    "knowledge_used": false,
+    "retrieval_status": null,
+    "citations": [],
+    "entities": {},
+    "intent_confidence": null,
+    "intent_source_scores": null,
+    "model_call_count": 1,
+    "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile",
+    "action_results": [],
+    "memory_write_status": "completed",
+    "warning_codes": [],
+    "handoff": {
+      "status": "not_required",
+      "handoff_required": false,
+      "handoff_requested": false,
+      "handoff_created": false,
+      "handoff_failed": false,
+      "handoff_id": null,
+      "reason_code": null,
+      "error_code": null,
+      "reused": false,
+      "simulated": true
+    }
+  },
+  "trace_http_status": 200,
+  "trace": {
+    "request_id": "af67d263",
+    "found": true,
+    "trace": {
+      "request_id": "af67d263",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [],
+      "tool_calls": [],
+      "escalated": false,
+      "latency_ms": 1609.0,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "model_call_count": 1,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 239,
+          "output_tokens": 114,
+          "latency_ms": 1609.0
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31.0,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 16.0
+      },
+      "request_latency_ms": 1656.0,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  },
+  "scenario": "S2",
+  "assertions": [
+    {
+      "assertion": "http_200",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "assertion": "search_knowledge_base_selected",
+      "pass": false,
+      "detail": []
+    },
+    {
+      "assertion": "no_fabricated_arrival_time",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "assertion": "states_boundary",
+      "pass": true,
+      "detail": "无法确认"
+    },
+    {
+      "assertion": "retrieval_evidence_recorded",
+      "pass": false,
+      "detail": {
+        "retrieval_status": null,
+        "citations": 0
+      }
+    },
+    {
+      "assertion": "no_business_write",
+      "pass": true,
+      "detail": {
+        "before": 0,
+        "after": 0
+      }
+    }
+  ],
+  "verdict": "fail",
+  "state_before": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "state_after": {
+    "business": {
+      "products": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "name": "CartCare H1-1 Backpack",
+          "price": "129.90",
+          "currency": "CNY",
+          "active": true
+        }
+      },
+      "orders": {
+        "ORD-H11-ORDER": {
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "129.90"
+            }
+          ],
+          "total_amount": "129.90",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "800.00"
+            }
+          ],
+          "total_amount": "800.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "status": "shipped",
+          "items": [
+            {
+              "product_id": "SKU-H11",
+              "quantity": 1,
+              "unit_price": "199.00"
+            }
+          ],
+          "total_amount": "199.00",
+          "currency": "CNY",
+          "created_at": "2026-10-23T08:54:20.341524+00:00"
+        }
+      },
+      "inventory": {
+        "SKU-H11": {
+          "product_id": "SKU-H11",
+          "available_quantity": 20,
+          "reserved_quantity": 0,
+          "as_of": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "shipments": {
+        "ORD-H11-ORDER": {
+          "shipment_id": "SHP-H11-ORDER",
+          "order_id": "ORD-H11-ORDER",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-ORDER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-APPROVAL": {
+          "shipment_id": "SHP-H11-APPROVAL",
+          "order_id": "ORD-H11-APPROVAL",
+          "customer_id": "customer-1",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-APPROVAL",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        },
+        "ORD-H11-OTHER": {
+          "shipment_id": "SHP-H11-OTHER",
+          "order_id": "ORD-H11-OTHER",
+          "customer_id": "customer-2",
+          "carrier": "demo-carrier",
+          "tracking_number": "TRACK-ORD-H11-OTHER",
+          "status": "in_transit",
+          "estimated_delivery": "2026-10-27",
+          "updated_at": "2026-10-25T08:54:20.341524+00:00"
+        }
+      },
+      "refunds": {}
+    },
+    "handoffs": {},
+    "actions": {},
+    "executor_calls": 0
+  },
+  "ledger_before": {
+    "requests": 3,
+    "charged_or_reserved_usd": 0.0023862000000000006,
+    "halted": false
+  },
+  "ledger_after": {
+    "requests": 4,
+    "charged_or_reserved_usd": 0.0034779000000000008,
+    "halted": false
+  }
+}

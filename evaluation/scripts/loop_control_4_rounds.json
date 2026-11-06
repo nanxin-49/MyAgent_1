@@ -1,0 +1,11 @@
+{
+  "name": "loop_control_4_rounds",
+  "model": "scripted",
+  "turns": [
+    {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_1"}]},
+    {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_2"}]},
+    {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_3"}]},
+    {"tool_calls": [{"name": "get_order", "input": {"order_id": "ORD-1001"}, "id": "call_4"}]},
+    {"text": "四次查询完成。"}
+  ]
+}

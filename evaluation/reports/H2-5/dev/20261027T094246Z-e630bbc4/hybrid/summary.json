@@ -1,0 +1,114 @@
+{
+  "1": {
+    "Recall@1": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.125,
+      "numerator": 1.0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": 0.5,
+      "numerator": 1,
+      "denominator": 2
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 58.904050034470856,
+      "p95": 83.28052487922832,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "low_confidence": 14,
+      "usable": 2
+    },
+    "failure_counts": {
+      "gold_below_threshold": 7,
+      "none": 8,
+      "false_positive_no_answer": 1
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  },
+  "2": {
+    "Recall@1": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "Recall@3": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "Recall@5": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "MRR": {
+      "value": 0.125,
+      "numerator": 1.0,
+      "denominator": 8
+    },
+    "no_answer_false_positive_rate": {
+      "value": 0.125,
+      "numerator": 1,
+      "denominator": 8
+    },
+    "citation_evidence_precision": {
+      "value": 0.5,
+      "numerator": 1,
+      "denominator": 2
+    },
+    "diagnostic_candidate_Recall@5": {
+      "value": 1.0,
+      "numerator": 8,
+      "denominator": 8
+    },
+    "latency_ms": {
+      "p50": 60.51425007171929,
+      "p95": 82.54947507521138,
+      "count": 16,
+      "includes_failed_requests": true
+    },
+    "status_counts": {
+      "low_confidence": 14,
+      "usable": 2
+    },
+    "failure_counts": {
+      "gold_below_threshold": 7,
+      "none": 8,
+      "false_positive_no_answer": 1
+    },
+    "retrieval_calls": 0,
+    "model_calls": 0,
+    "model_tokens": 0,
+    "model_cost_usd": 0
+  }
+}

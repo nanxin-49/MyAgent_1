@@ -1,0 +1,922 @@
+{
+  "schema": "cartcare.h3_3.context_report",
+  "version": 1,
+  "created_at": "2026-10-26T10:39:14.808605+00:00",
+  "layer": "deterministic",
+  "budget_tokens": 4000,
+  "note": "Estimated tokens (ASCII/4 + non-ASCII chars), not tokenizer output. Deterministic scripts do not react to context; success equality only shows the compressed path is intact. Real-model quality is H3-6.",
+  "arms": {
+    "on": {
+      "cases": [
+        {
+          "case_id": "single_query",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 5280,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 0,
+                "user_message": 6,
+                "dialogue": 0,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 2588
+              },
+              "compressed": false,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 0,
+                "user_message": 6,
+                "dialogue": 24,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 2692
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "long_memory",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 6112,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 6,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3004
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 6,
+                "dialogue": 36,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 3108
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "long_memory_two_calls",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order",
+            "get_shipment"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 9335,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 9,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3007
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 9,
+                "dialogue": 36,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 3111
+              },
+              "compressed": false,
+              "over_budget": false
+            },
+            {
+              "round": 3,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 9,
+                "dialogue": 60,
+                "tool_results": 162,
+                "retrieval": 0,
+                "total": 3217
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "big_result",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "big"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 6787,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 7,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3005
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 7,
+                "dialogue": 29,
+                "tool_results": 760,
+                "retrieval": 0,
+                "total": 3782
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "big_then_query",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "big",
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 10679,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 9,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3007
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 9,
+                "dialogue": 29,
+                "tool_results": 760,
+                "retrieval": 0,
+                "total": 3784
+              },
+              "compressed": false,
+              "over_budget": false
+            },
+            {
+              "round": 3,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 9,
+                "dialogue": 53,
+                "tool_results": 840,
+                "retrieval": 0,
+                "total": 3888
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "rag_long",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 6098,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 11,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3009
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 11,
+                "dialogue": 37,
+                "tool_results": 55,
+                "retrieval": 0,
+                "total": 3089
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "cancel_action",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 1,
+            "action_status": "completed"
+          },
+          "estimated_tokens": 6315,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 10,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3008
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 10,
+                "dialogue": 40,
+                "tool_results": 271,
+                "retrieval": 0,
+                "total": 3307
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "three_rounds",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order",
+            "get_shipment",
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 9347,
+          "compressed_rounds": 1,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 13,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 3011
+              },
+              "compressed": true,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 13,
+                "dialogue": 36,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 3115
+              },
+              "compressed": false,
+              "over_budget": false
+            },
+            {
+              "round": 3,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 404,
+                "user_message": 13,
+                "dialogue": 60,
+                "tool_results": 162,
+                "retrieval": 0,
+                "total": 3221
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        }
+      ],
+      "task_success_rate": 1.0,
+      "estimated_tokens": 59953,
+      "compressed_rounds": 7,
+      "over_budget_rounds": 0,
+      "executor_calls": 1
+    },
+    "off": {
+      "cases": [
+        {
+          "case_id": "single_query",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 5280,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 0,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 0,
+                "user_message": 6,
+                "dialogue": 0,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 2588
+              },
+              "compressed": false,
+              "over_budget": false
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 0,
+                "user_message": 6,
+                "dialogue": 24,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 2692
+              },
+              "compressed": false,
+              "over_budget": false
+            }
+          ]
+        },
+        {
+          "case_id": "long_memory",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 29314,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 2,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 12005,
+                "user_message": 6,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 14605
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 12005,
+                "user_message": 6,
+                "dialogue": 36,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 14709
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        },
+        {
+          "case_id": "long_memory_two_calls",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order",
+            "get_shipment"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 32138,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 3,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 8005,
+                "user_message": 9,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 10608
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 8005,
+                "user_message": 9,
+                "dialogue": 36,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 10712
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 3,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 8005,
+                "user_message": 9,
+                "dialogue": 60,
+                "tool_results": 162,
+                "retrieval": 0,
+                "total": 10818
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        },
+        {
+          "case_id": "big_result",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "big"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 9989,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 2,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 2005,
+                "user_message": 7,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 4606
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 2005,
+                "user_message": 7,
+                "dialogue": 29,
+                "tool_results": 760,
+                "retrieval": 0,
+                "total": 5383
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        },
+        {
+          "case_id": "big_then_query",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "big",
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 27482,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 3,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 6005,
+                "user_message": 9,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 8608
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 6005,
+                "user_message": 9,
+                "dialogue": 29,
+                "tool_results": 760,
+                "retrieval": 0,
+                "total": 9385
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 3,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 6005,
+                "user_message": 9,
+                "dialogue": 53,
+                "tool_results": 840,
+                "retrieval": 0,
+                "total": 9489
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        },
+        {
+          "case_id": "rag_long",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 23300,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 2,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 9005,
+                "user_message": 11,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 11610
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 9005,
+                "user_message": 11,
+                "dialogue": 37,
+                "tool_results": 55,
+                "retrieval": 0,
+                "total": 11690
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        },
+        {
+          "case_id": "cancel_action",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "request_cancel_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 1,
+            "action_status": "completed"
+          },
+          "estimated_tokens": 19517,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 2,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 7005,
+                "user_message": 10,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 9609
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 7005,
+                "user_message": 10,
+                "dialogue": 40,
+                "tool_results": 271,
+                "retrieval": 0,
+                "total": 9908
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        },
+        {
+          "case_id": "three_rounds",
+          "passed": true,
+          "checks": {
+            "trajectory": true,
+            "terminal_state": true
+          },
+          "tools_used": [
+            "get_order",
+            "get_shipment",
+            "get_order"
+          ],
+          "terminal_state": {
+            "executor_calls": 0,
+            "action_status": null
+          },
+          "estimated_tokens": 23150,
+          "compressed_rounds": 0,
+          "over_budget_rounds": 3,
+          "context_rounds": [
+            {
+              "round": 1,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 5005,
+                "user_message": 13,
+                "dialogue": 12,
+                "tool_results": 0,
+                "retrieval": 0,
+                "total": 7612
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 2,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 5005,
+                "user_message": 13,
+                "dialogue": 36,
+                "tool_results": 80,
+                "retrieval": 0,
+                "total": 7716
+              },
+              "compressed": false,
+              "over_budget": true
+            },
+            {
+              "round": 3,
+              "estimated_tokens": {
+                "system_prompt": 1053,
+                "tool_schemas": 1529,
+                "memory_context": 5005,
+                "user_message": 13,
+                "dialogue": 60,
+                "tool_results": 162,
+                "retrieval": 0,
+                "total": 7822
+              },
+              "compressed": false,
+              "over_budget": true
+            }
+          ]
+        }
+      ],
+      "task_success_rate": 1.0,
+      "estimated_tokens": 170170,
+      "compressed_rounds": 0,
+      "over_budget_rounds": 17,
+      "executor_calls": 1
+    }
+  }
+}

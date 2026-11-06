@@ -1,0 +1,95 @@
+{
+  "requests": 12,
+  "max_requests": 20,
+  "input_tokens": 29008,
+  "output_tokens": 1344,
+  "cost_usd": 0.0103152,
+  "max_usd": 0.2,
+  "halted": false,
+  "events": [
+    {
+      "number": 1,
+      "input_tokens": 2311,
+      "output_tokens": 88,
+      "cost_usd": 0.0007989,
+      "at": "2026-10-26T03:05:15.231282+00:00"
+    },
+    {
+      "number": 2,
+      "input_tokens": 2612,
+      "output_tokens": 207,
+      "cost_usd": 0.001032,
+      "at": "2026-10-26T03:05:17.751013+00:00"
+    },
+    {
+      "number": 3,
+      "input_tokens": 2307,
+      "output_tokens": 45,
+      "cost_usd": 0.0007461,
+      "at": "2026-10-26T03:05:22.114192+00:00"
+    },
+    {
+      "number": 4,
+      "input_tokens": 2438,
+      "output_tokens": 103,
+      "cost_usd": 0.000855,
+      "at": "2026-10-26T03:05:24.591602+00:00"
+    },
+    {
+      "number": 5,
+      "input_tokens": 2311,
+      "output_tokens": 86,
+      "cost_usd": 0.0007965,
+      "at": "2026-10-26T03:05:29.156187+00:00"
+    },
+    {
+      "number": 6,
+      "input_tokens": 2610,
+      "output_tokens": 221,
+      "cost_usd": 0.0010482,
+      "at": "2026-10-26T03:05:31.844243+00:00"
+    },
+    {
+      "number": 7,
+      "input_tokens": 2311,
+      "output_tokens": 88,
+      "cost_usd": 0.0007989,
+      "at": "2026-10-26T03:05:36.431432+00:00"
+    },
+    {
+      "number": 8,
+      "input_tokens": 2612,
+      "output_tokens": 201,
+      "cost_usd": 0.0010248,
+      "at": "2026-10-26T03:05:39.324392+00:00"
+    },
+    {
+      "number": 9,
+      "input_tokens": 2307,
+      "output_tokens": 51,
+      "cost_usd": 0.0007533,
+      "at": "2026-10-26T03:05:43.697598+00:00"
+    },
+    {
+      "number": 10,
+      "input_tokens": 2444,
+      "output_tokens": 111,
+      "cost_usd": 0.0008663999999999999,
+      "at": "2026-10-26T03:05:45.856688+00:00"
+    },
+    {
+      "number": 11,
+      "input_tokens": 2307,
+      "output_tokens": 45,
+      "cost_usd": 0.0007461,
+      "at": "2026-10-26T03:05:50.115997+00:00"
+    },
+    {
+      "number": 12,
+      "input_tokens": 2438,
+      "output_tokens": 98,
+      "cost_usd": 0.000849,
+      "at": "2026-10-26T03:05:52.279194+00:00"
+    }
+  ]
+}
