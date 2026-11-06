@@ -1,0 +1,750 @@
+{
+  "items": [
+    {
+      "request_id": "d572433c",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "get_order",
+        "get_refund_status",
+        "get_order",
+        "get_refund_status",
+        "request_refund",
+        "request_refund"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "d572433c",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_00_rAiB8RlJijvLnvI4pzEB9094",
+          "input": {
+            "order_id": "ORD-DEMO-REFUND"
+          },
+          "validated_input": {
+            "order_id": "ORD-DEMO-REFUND"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-DEMO-REFUND",
+            "status": "shipped",
+            "total_amount": "129.90"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "",
+          "truncated": false
+        },
+        {
+          "request_id": "d572433c",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_01_hxEBaGzPaKKvmBNl1RRU4684",
+          "input": {
+            "order_id": "ORD-DEMO-REFUND"
+          },
+          "validated_input": {
+            "order_id": "ORD-DEMO-REFUND"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "未找到可访问的业务记录",
+          "truncated": false
+        },
+        {
+          "request_id": "d572433c",
+          "agent_type": "support",
+          "tool_name": "get_order",
+          "risk_level": "read",
+          "tool_use_id": "call_02_ARPqMmRfxqbX0tjr0hMd5445",
+          "input": {
+            "order_id": "ORD-DEMO-APPROVAL"
+          },
+          "validated_input": {
+            "order_id": "ORD-DEMO-APPROVAL"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": {
+            "order_id": "ORD-DEMO-APPROVAL",
+            "status": "shipped",
+            "total_amount": "800.00"
+          },
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "",
+          "truncated": false
+        },
+        {
+          "request_id": "d572433c",
+          "agent_type": "support",
+          "tool_name": "get_refund_status",
+          "risk_level": "read",
+          "tool_use_id": "call_03_F3J66V8zsn89CYbS31bt0756",
+          "input": {
+            "order_id": "ORD-DEMO-APPROVAL"
+          },
+          "validated_input": {
+            "order_id": "ORD-DEMO-APPROVAL"
+          },
+          "success": false,
+          "result_success": false,
+          "error_code": "not_found",
+          "error_type": "provider",
+          "retryable": false,
+          "latency_ms": 0,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "未找到可访问的业务记录",
+          "truncated": false
+        },
+        {
+          "request_id": "d572433c",
+          "agent_type": "support",
+          "tool_name": "request_refund",
+          "risk_level": "dangerous",
+          "tool_use_id": "call_00_jpnwUoAP8tTxSgxJEKBK3086",
+          "input": {
+            "order_id": "ORD-DEMO-REFUND",
+            "amount": 100,
+            "idempotency_key": "refund-ORD-DEMO-REFUND-100-v1"
+          },
+          "validated_input": {
+            "order_id": "ORD-DEMO-REFUND",
+            "amount": 100,
+            "idempotency_key": "refund-ORD-DEMO-REFUND-100-v1"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 0,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": {
+            "action_id": "act_ed938da02f274b93",
+            "status": "completed",
+            "error_code": null,
+            "policy_decision": "allow",
+            "reason_code": "refund_eligible",
+            "policy_version": "refund-cancel-v1",
+            "execution_simulated": true,
+            "reused": false
+          },
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "",
+          "truncated": false
+        },
+        {
+          "request_id": "d572433c",
+          "agent_type": "support",
+          "tool_name": "request_refund",
+          "risk_level": "dangerous",
+          "tool_use_id": "call_01_Y9zprL7ticgNwu09OZci9352",
+          "input": {
+            "order_id": "ORD-DEMO-APPROVAL",
+            "amount": 800,
+            "idempotency_key": "refund-ORD-DEMO-APPROVAL-800-v1"
+          },
+          "validated_input": {
+            "order_id": "ORD-DEMO-APPROVAL",
+            "amount": 800,
+            "idempotency_key": "refund-ORD-DEMO-APPROVAL-800-v1"
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 15,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": null,
+          "retrieval_status": null,
+          "citations": [],
+          "action_result": {
+            "action_id": "act_4fd2235daf8e478a",
+            "status": "awaiting_approval",
+            "error_code": null,
+            "policy_decision": "require_approval",
+            "reason_code": "amount_requires_approval",
+            "policy_version": "refund-cancel-v1",
+            "execution_simulated": null,
+            "reused": false
+          },
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": null,
+          "helper_result": null,
+          "error": "",
+          "truncated": false
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 6438,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "stop_reason": "awaiting_approval",
+      "context_rounds": [
+        {
+          "round": 1,
+          "estimated_tokens": {
+            "system_prompt": 3691,
+            "tool_schemas": 1555,
+            "memory_context": 0,
+            "user_message": 45,
+            "dialogue": 0,
+            "tool_results": 0,
+            "retrieval": 0,
+            "total": 5291
+          },
+          "compressed": false,
+          "over_budget": false
+        },
+        {
+          "round": 2,
+          "estimated_tokens": {
+            "system_prompt": 3691,
+            "tool_schemas": 1555,
+            "memory_context": 0,
+            "user_message": 45,
+            "dialogue": 322,
+            "tool_results": 365,
+            "retrieval": 0,
+            "total": 5978
+          },
+          "compressed": false,
+          "over_budget": false
+        },
+        {
+          "round": 3,
+          "estimated_tokens": {
+            "system_prompt": 3691,
+            "tool_schemas": 1555,
+            "memory_context": 0,
+            "user_message": 45,
+            "dialogue": 715,
+            "tool_results": 945,
+            "retrieval": 0,
+            "total": 6951
+          },
+          "compressed": false,
+          "over_budget": false
+        }
+      ],
+      "consistency_warnings": [],
+      "steps": [
+        {
+          "step": 1,
+          "model": "deepseek-flash",
+          "input_tokens": 179,
+          "output_tokens": 275,
+          "latency_ms": 1563,
+          "tools": [
+            {
+              "tool_name": "get_order",
+              "risk_level": "read",
+              "parameter_summary": {
+                "order_id": "ORD-DEMO-REFUND"
+              },
+              "result_summary": {
+                "success": true,
+                "result_success": true,
+                "error_code": null,
+                "truncated": false,
+                "business_fields": [
+                  "order_id",
+                  "status",
+                  "total_amount"
+                ]
+              },
+              "success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0,
+              "attempts": 1,
+              "aux_model_calls": 0
+            },
+            {
+              "tool_name": "get_refund_status",
+              "risk_level": "read",
+              "parameter_summary": {
+                "order_id": "ORD-DEMO-REFUND"
+              },
+              "result_summary": {
+                "success": false,
+                "result_success": false,
+                "error_code": "not_found",
+                "truncated": false
+              },
+              "success": false,
+              "error_code": "not_found",
+              "error_type": "provider",
+              "retryable": false,
+              "latency_ms": 0,
+              "attempts": 1,
+              "aux_model_calls": 0
+            },
+            {
+              "tool_name": "get_order",
+              "risk_level": "read",
+              "parameter_summary": {
+                "order_id": "ORD-DEMO-APPROVAL"
+              },
+              "result_summary": {
+                "success": true,
+                "result_success": true,
+                "error_code": null,
+                "truncated": false,
+                "business_fields": [
+                  "order_id",
+                  "status",
+                  "total_amount"
+                ]
+              },
+              "success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0,
+              "attempts": 1,
+              "aux_model_calls": 0
+            },
+            {
+              "tool_name": "get_refund_status",
+              "risk_level": "read",
+              "parameter_summary": {
+                "order_id": "ORD-DEMO-APPROVAL"
+              },
+              "result_summary": {
+                "success": false,
+                "result_success": false,
+                "error_code": "not_found",
+                "truncated": false
+              },
+              "success": false,
+              "error_code": "not_found",
+              "error_type": "provider",
+              "retryable": false,
+              "latency_ms": 0,
+              "attempts": 1,
+              "aux_model_calls": 0
+            }
+          ],
+          "stop_reason": null
+        },
+        {
+          "step": 2,
+          "model": "deepseek-flash",
+          "input_tokens": 580,
+          "output_tokens": 419,
+          "latency_ms": 2469,
+          "tools": [
+            {
+              "tool_name": "request_refund",
+              "risk_level": "dangerous",
+              "parameter_summary": {
+                "order_id": "ORD-DEMO-REFUND",
+                "amount": 100,
+                "idempotency_key": "refund-ORD-DEMO-REFUND-100-v1"
+              },
+              "result_summary": {
+                "success": true,
+                "result_success": true,
+                "error_code": null,
+                "truncated": false,
+                "action_status": "completed"
+              },
+              "success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 0,
+              "attempts": 1,
+              "aux_model_calls": 0
+            },
+            {
+              "tool_name": "request_refund",
+              "risk_level": "dangerous",
+              "parameter_summary": {
+                "order_id": "ORD-DEMO-APPROVAL",
+                "amount": 800,
+                "idempotency_key": "refund-ORD-DEMO-APPROVAL-800-v1"
+              },
+              "result_summary": {
+                "success": true,
+                "result_success": true,
+                "error_code": null,
+                "truncated": false,
+                "action_status": "awaiting_approval"
+              },
+              "success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 15,
+              "attempts": 1,
+              "aux_model_calls": 0
+            }
+          ],
+          "stop_reason": null
+        },
+        {
+          "step": 3,
+          "model": "deepseek-flash",
+          "input_tokens": 939,
+          "output_tokens": 345,
+          "latency_ms": 2391,
+          "tools": [],
+          "stop_reason": "awaiting_approval"
+        }
+      ],
+      "step_count": 3,
+      "step_scope": "one step per Agent model call; tool calls are grouped under the step that selected them; tool-internal SDK calls are counted as aux_model_calls and listed in model_calls",
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 179,
+          "output_tokens": 275,
+          "latency_ms": 1563
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 580,
+          "output_tokens": 419,
+          "latency_ms": 2469
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 939,
+          "output_tokens": 345,
+          "latency_ms": 2391
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 31,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0
+      },
+      "request_latency_ms": 6485,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    },
+    {
+      "request_id": "1539ffee",
+      "topology": "single",
+      "agent_type": "support",
+      "intent": null,
+      "primary_agent": null,
+      "supporting_agents": null,
+      "routing_reason": null,
+      "routing_confidence": null,
+      "deprecated_fields": [
+        "primary_agent",
+        "supporting_agents",
+        "routing_reason",
+        "routing_confidence"
+      ],
+      "tools_used": [
+        "search_knowledge_base"
+      ],
+      "tool_calls": [
+        {
+          "request_id": "1539ffee",
+          "agent_type": "support",
+          "tool_name": "search_knowledge_base",
+          "risk_level": "read",
+          "tool_use_id": "call_00_bfWZPw5659yOXIYdVN7C5216",
+          "input": {
+            "query": "退款政策 退款条件 时效 金额门槛",
+            "top_k": 5
+          },
+          "validated_input": {
+            "query": "退款政策 退款条件 时效 金额门槛",
+            "top_k": 5
+          },
+          "success": true,
+          "result_success": true,
+          "error_code": null,
+          "error_type": null,
+          "retryable": false,
+          "latency_ms": 1828,
+          "attempts": 1,
+          "timeout_s": 30,
+          "cached": false,
+          "reranked": false,
+          "rerank_status": "not_needed",
+          "retrieval_status": "usable",
+          "citations": [
+            {
+              "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+              "content_hash": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+              "document_id": "doc_8450205ee234ce108cbd",
+              "chunk_index": 0,
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1"
+            }
+          ],
+          "action_result": null,
+          "handoff_result": null,
+          "business_result": null,
+          "retrieval_hits": [
+            {
+              "document_id": "doc_8450205ee234ce108cbd",
+              "title": "退款政策",
+              "source": "demo:cartcare-default/refund-policy",
+              "policy_version": "refund-cancel-v1",
+              "chunk_index": 0,
+              "score": 0.41899007556723866,
+              "content": "CartCare退款政策仅描述人民币演示用例，不构成真实商城或支付渠道承诺；程序未实现币种准入或换算校验。新建退款申请须核验客户身份和订单归属，在订单创建后不超过7×24小时内提交，执行前仍会复核。已支付、处理中、已发货、已签收、已完成订单可进入资格检查，其他状态不满足当前退款条件。金额须大于0且不超过订单总额；省略金额时使用订单总额。已有待处理、已申请、已批准、处理中或已完成退款记录时，不再新建重复申请。当前进程内，同一客户的合法同键同参数退款重试返回既有动作的当前结果，不另行执行或绕过审批；同键异参不能复用原结果。超过500元须由有审核范围权限且非申请人、非该客户的审核人审批；恰好500元不因金额单独触发审批。当前仅创建模拟退款申请，退款状态为待处理；动作完成不代表退款完成或到账，不承诺原路退回、到账时间、手续费或补偿。",
+              "citation": {
+                "reference": "doc_8450205ee234ce108cbd@refund-cancel-v1#chunk-0~8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+                "content_hash": "8adc41cea31d0e7ca042472f23c9254c2486f2f22f5ec7e0b14362e96de4cc37",
+                "document_id": "doc_8450205ee234ce108cbd",
+                "chunk_index": 0,
+                "source": "demo:cartcare-default/refund-policy",
+                "policy_version": "refund-cancel-v1"
+              }
+            }
+          ],
+          "helper_result": null,
+          "error": "",
+          "truncated": false
+        }
+      ],
+      "escalated": false,
+      "latency_ms": 5968,
+      "handoff": {
+        "status": "not_required",
+        "handoff_required": false,
+        "handoff_requested": false,
+        "handoff_created": false,
+        "handoff_failed": false,
+        "handoff_id": null,
+        "reason_code": null,
+        "error_code": null,
+        "reused": false,
+        "simulated": true
+      },
+      "stop_reason": "needs_clarification",
+      "context_rounds": [
+        {
+          "round": 1,
+          "estimated_tokens": {
+            "system_prompt": 2606,
+            "tool_schemas": 1555,
+            "memory_context": 0,
+            "user_message": 8,
+            "dialogue": 0,
+            "tool_results": 0,
+            "retrieval": 0,
+            "total": 4169
+          },
+          "compressed": false,
+          "over_budget": false
+        },
+        {
+          "round": 2,
+          "estimated_tokens": {
+            "system_prompt": 2606,
+            "tool_schemas": 1555,
+            "memory_context": 0,
+            "user_message": 8,
+            "dialogue": 95,
+            "tool_results": 921,
+            "retrieval": 921,
+            "total": 5185
+          },
+          "compressed": false,
+          "over_budget": false
+        }
+      ],
+      "consistency_warnings": [],
+      "steps": [
+        {
+          "step": 1,
+          "model": "deepseek-flash",
+          "input_tokens": 184,
+          "output_tokens": 82,
+          "latency_ms": 1375,
+          "tools": [
+            {
+              "tool_name": "search_knowledge_base",
+              "risk_level": "read",
+              "parameter_summary": {
+                "query": "退款政策 退款条件 时效 金额门槛",
+                "top_k": 5
+              },
+              "result_summary": {
+                "success": true,
+                "result_success": true,
+                "error_code": null,
+                "truncated": false,
+                "retrieval_status": "usable",
+                "citation_count": 1,
+                "retrieval_hit_count": 1
+              },
+              "success": true,
+              "error_code": null,
+              "error_type": null,
+              "retryable": false,
+              "latency_ms": 1828,
+              "attempts": 1,
+              "aux_model_calls": 1
+            }
+          ],
+          "stop_reason": null
+        },
+        {
+          "step": 2,
+          "model": "deepseek-flash",
+          "input_tokens": 965,
+          "output_tokens": 347,
+          "latency_ms": 2765,
+          "tools": [],
+          "stop_reason": "needs_clarification"
+        }
+      ],
+      "step_count": 2,
+      "step_scope": "one step per Agent model call; tool calls are grouped under the step that selected them; tool-internal SDK calls are counted as aux_model_calls and listed in model_calls",
+      "model_call_count": 3,
+      "model_calls": [
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 184,
+          "output_tokens": 82,
+          "latency_ms": 1375
+        },
+        {
+          "stage": "rag_rewrite_or_rerank",
+          "model": "deepseek-flash",
+          "input_tokens": 103,
+          "output_tokens": 142,
+          "latency_ms": 1656
+        },
+        {
+          "stage": "support",
+          "model": "deepseek-flash",
+          "input_tokens": 965,
+          "output_tokens": 347,
+          "latency_ms": 2765
+        }
+      ],
+      "model_observation_scope": "support + RAG SDK calls; excludes Memory/profile and internal HTTP retries",
+      "memory": {
+        "read_status": "completed",
+        "read_latency_ms": 47,
+        "recent_message_count": 0,
+        "relevant_history_count": 0,
+        "profile_field_count": 0,
+        "summary_present": false,
+        "write_status": "completed",
+        "profile_update_status": "scheduled_unobserved",
+        "messages_written": 2,
+        "write_latency_ms": 0
+      },
+      "request_latency_ms": 6015,
+      "latency_scope": "latency_ms: Agent runtime; request_latency_ms: Memory read + Agent + Memory write, before serialization; excludes background profile"
+    }
+  ]
+}

@@ -15,6 +15,11 @@ _NEGATED = re.compile(
     r"|如果|假如|若|一旦|待|等待|将在|将会|将|审批后|审核后|通过后)"
     r"[^，,。！？.!?；;\n]{0,12}$"
 )
+# Policy/FAQ prose can contain "已完成退款记录" or "退款到账后"; those are
+# descriptions of a condition, not this turn's completion receipt.
+_NON_CLAIM_SUFFIX = re.compile(
+    r"^\s*(?:记录|的|时|后|之后|以后|条件|政策|规则|流程|状态|申请|订单|列表|说明)"
+)
 # The free gap may not swallow a negation marker, otherwise "退款尚未成功"
 # would match "退款...成功" and hide the negation inside the match itself.
 _GAP = (r"(?:(?!尚未|并未|没有|未能|未|不|无法|不能|是否|能否|何时|多久)"
@@ -44,6 +49,8 @@ def _claims(pattern: re.Pattern, text: str) -> bool:
     cleaned = re.sub(r"[*_`]", "", text or "").lower()
     for clause in CLAUSE_SPLIT.split(cleaned):
         for match in pattern.finditer(clause):
+            if _NON_CLAIM_SUFFIX.match(clause[match.end():]):
+                continue
             if not _NEGATED.search(clause[:match.start()]):
                 return True
     return False

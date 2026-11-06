@@ -42,6 +42,16 @@ def test_refund_claims_respect_negation(text):
 
 
 @pytest.mark.parametrize("text", [
+    "已有待处理、已申请、已批准、处理中或已完成退款记录时，不再新建重复申请。",
+    "退款已完成后的记录仍可查询。",
+    "退款已到账后会显示在记录中。",
+])
+def test_policy_descriptions_are_not_completion_or_arrival_claims(text):
+    assert refund_completion_claim(text) is False
+    assert refund_arrival_claim(text) is False
+
+
+@pytest.mark.parametrize("text", [
     "已为您取消订单。",
     "已成功取消订单。",
 ])

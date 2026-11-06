@@ -61,7 +61,7 @@ H2-3 的 180 条逐 check 安全/工具指标因首段中断不可完整恢复�
 
 启动后打开 <http://localhost:8000/demo>。页面消费真实 `/chat`、Trace 和 ActionService API；不补造工具结果或审批逻辑。
 
-> Demo 视频：待录制（H5-3 完成后补充链接）。
+> 不录屏；真实浏览器截图、ActionResult/Trace 和测试记录见 [Demo Evidence](docs/demo-evidence/index.html)。
 
 可直接观察：政策问答与 citation、订单/物流查询、库存澄清、退款允许/需审批/拒绝、取消、越权拦截、转人工；Pending approval 可 Approve / Reject / Resume。
 

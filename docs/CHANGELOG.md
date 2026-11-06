@@ -281,3 +281,15 @@
 - **验证**：`tests/test_naming_compat.py` **7 passed**；全量 `pytest` **782 passed / 12 skipped**；Node **12 passed**；`docker compose config`、`git diff --check` 通过。
 - **限制**：未重建 Docker 镜像；旧 `echomind-*` 容器迁移需停旧栈并保留数据卷；未调用真实模型。
 - **状态**：H5-2 `todo → verify`。
+
+## 2026-11-06 — H5-3 Demo 脚本、浏览器证据与测试记录
+
+- **产出**：`docs/demo-script.md`（5 分镜/恢复步骤/检查表）、`demo/prepare_h5_3.py`（fixture/场景）、`demo/print_credentials.py`（一次性 Demo Auth）、`demo/preflight_h5_3.py`、`tests/test_h5_3_demo_fixture.py`（7 测试）。
+- **证据页**：`docs/demo-evidence/index.html` + 真实 Chrome/Playwright 截图（页面壳、政策问答 citation、复合售后两个 action、完整 Trace）+ `traces.json`；替代录屏。
+- **真实模型**：5 次 `/chat`（3 次 API 冒烟 + 2 次浏览器截图）；政策问答 usable/citation；复合退款 `completed` + `awaiting_approval`。
+- **修复**：`core/output_consistency.py` 将政策原文“已完成退款记录/退款到账后”误判为完成声明；增加描述性后缀 guard，补 3 条回归；真实政策问答恢复完整回答，`consistency_warnings=[]`。
+- **测试记录**：`docs/reports/H5-3-test-record/`（9 条历史请求 Trace、页面 HTML、冒烟响应）。
+- **Docker 环境问题**：Docker Hub 拉取 `python:3.12-slim` 超时导致 app 镜像未构建；Windows 排除 6379/6380，Redis 用 16379；旧网络/旧容器清理且数据卷保留；详见 `docs/operations.md` 与 H5-3 REPORT。
+- **验证**：全量 `pytest` **792 passed / 12 skipped**；H3-4 **26 passed**；H5-3 **7 passed**；Node **12 passed**；`docker compose config`、`git diff --check` 通过。
+- **限制**：不录屏；回答偏后台语言未排期；app 容器未重建；H5-3 产物未提交。
+- **状态**：H5-3 `todo → verify`。

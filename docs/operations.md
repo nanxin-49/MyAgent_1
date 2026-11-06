@@ -47,7 +47,7 @@ $env:CARTCARE_BUSINESS_FIXTURE = (Resolve-Path data/demo_business_fixture.json).
 uv run python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
 ```
 
-如果 `.env` 里已有旧的 `REDIS_PASSWORD`，本地 `REDIS_URL` 要与实际 Redis 容器一致；不要为了改文档重置已有数据卷。
+如果 `.env` 里已有旧的 `REDIS_PASSWORD`，本地 `REDIS_URL` 要与实际 Redis 容器一致；不要为了改文档重置已有数据卷。Windows 若 6379/6380 被系统端口排除，可设置 `REDIS_PORT=16379` 启动 Redis，并把 `REDIS_URL` 端口同步改为 16379。
 
 ## 环境变量
 
@@ -103,6 +103,13 @@ git diff --check
 ```
 
 真实 Redis/Chroma 测试是 opt-in：`CARTCARE_TEST_LIVE_MEMORY=1` / `CARTCARE_TEST_LIVE_ACTIONS=1`，需要 `REDIS_URL`；真实 Chroma RAG 见 `tests/test_rag_http_integration.py`。
+
+## Docker 常见问题
+
+- **app 镜像构建失败，`python:3.12-slim` 元数据超时**：这是 Docker Hub 网络/代理问题，不是 Dockerfile 错误。可先使用本地 uvicorn 路径；修复 Docker Desktop 代理或预加载基础镜像后再 `docker compose up -d --build`。
+- **6379/6380 端口 bind forbidden**：Windows 可能把端口加入排除范围。`netsh interface ipv4 show excludedportrange protocol=tcp` 查看；用 `REDIS_PORT=16379 docker compose up -d redis`，并把 `REDIS_URL` 端口同步改为 16379。
+- **network pool overlaps**：旧 Compose 网络可能仍占用 `172.28.0.0/16`。确认旧容器已停止后删除旧网络，再启动新网络；不要删除数据卷。
+- **旧 `echomind-app` 不在 Compose 管理内**：它可能单独占用 8000；停止/删除该容器后再启动当前 app。旧 `echomind-*` 容器迁移见 [命名迁移](naming.md)。
 
 ## 备份与迁移
 

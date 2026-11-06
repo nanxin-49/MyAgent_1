@@ -66,7 +66,7 @@
 | H4-3 | 已知风险收口（N08/N09、N11、N14、C03 复核） | G4 | H3-6 | 2 天 | verify | [H4-3](docs/reports/H4-3.md) |
 | H5-1 | 固定候选版本与干净环境验证 | G5 | H4-1~H4-3, H2-5 | 1 天 | verify | [H5-1](docs/reports/H5-1.md) |
 | H5-2 | README 首屏重写、内部材料下沉、旧命名迁移 | G5 | H5-1 | 2 天 | verify | [H5-2](docs/reports/H5-2.md) |
-| H5-3 | Demo 脚本与录屏素材 | G5 | H5-2 | 2 天 | todo | |
+| H5-3 | Demo 脚本与录屏素材 | G5 | H5-2 | 2 天 | verify | [H5-3](docs/reports/H5-3.md) |
 | H5-4 | 简历与面试材料（填实测数字） | G5 | H5-2 | 1 天 | todo | |
 | H6-1 | 标准 MCP Server | G6 | H5-1 | 3 天 | todo | |
 | H6-2 | 提示词注入防护与范围兜底 | G6 | H5-1 | 3 天 | todo | |
